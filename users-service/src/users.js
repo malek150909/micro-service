@@ -21,11 +21,11 @@ async function getUserByMatricule(matricule) {
     }
 }
 
-app.get('/auth/login' , (req,res) => {
+app.get('/login' , (req,res) => {
     res.send("login interface");
 })
 
-app.post('/auth/login', async (req, res) => {
+app.post('/login', async (req, res) => {
     const { matricule, password } = req.body;
 
     try {
@@ -42,7 +42,7 @@ app.post('/auth/login', async (req, res) => {
             return res.status(401).json({ error: "Mot de passe incorrect" });
         }
 
-        res.json({ message: "Connexion réussie", user });
+        res.json({ message: "Connexion réussie", nom: user.nom, prenom: user.prenom });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Erreur serveur" });
