@@ -11,7 +11,7 @@ const Login = () => {
     const navigate = useNavigate(); // ✅ Hook pour la navigation
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        e.preventDefault();// empêche le rechargement de la page , La requête fetch() est envoyée normalement au backend.
         setError("");
         setLoading(true);
 

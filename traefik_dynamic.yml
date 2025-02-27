@@ -1,0 +1,24 @@
+http:
+  routers:
+    users:
+      rule: "Host(`users.localhost`)"
+      service: "users-service"
+      entryPoints:
+        - "web"
+
+    frontend:
+      rule: "Host(`localhost`)"
+      service: "frontend"
+      entryPoints:
+        - "web"
+
+  services:
+    users-service:
+      loadBalancer:
+        servers:
+          - url: "http://localhost:8081"
+
+    frontend:
+      loadBalancer:
+        servers:
+          - url: "http://localhost:9000"

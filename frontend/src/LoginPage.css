@@ -16,25 +16,15 @@
       transform: scale(1.1);
     }
   }
-  @keyframes slideIn {
-  from {
-    transform: translateX(-100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  }
   /* Animation de déplacement */
-  @keyframes slideIn {
-    0% {
-      transform: translateX(100%); /* Le formulaire commence à droite de l'écran */
-    }
-    100% {
-      transform: translateX(0); /* Le formulaire se déplace à sa position finale */
-    }
+@keyframes slideIn {
+  0% {
+    transform: translateX(100%); /* Le formulaire commence à droite de l'écran */
   }
+  100% {
+    transform: translateX(0); /* Le formulaire se déplace à sa position finale */
+  }
+}
   @keyframes fadeIn {
     from {
       opacity: 0;
@@ -55,6 +45,12 @@
     0%, 100% { transform: scale(1); opacity: 0.3; }
     50% { transform: scale(1.5); opacity: 1; }
   }
+
+  /* Application de l'animation */
+.login-container {
+  animation: slideIn 1s ease-out forwards;
+}
+
 
 
   .loading-circles span {
