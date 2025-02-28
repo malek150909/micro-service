@@ -7,7 +7,7 @@ http:
         - "web"
 
     frontend:
-      rule: "Host(`localhost`)"
+      rule: "Host(`plateform.universitaire`)"
       service: "frontend"
       entryPoints:
         - "web"

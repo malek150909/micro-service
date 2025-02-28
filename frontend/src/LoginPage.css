@@ -4,7 +4,7 @@
     background-image: url('/image.jpg');
     background-size: cover;
     background-position: center;
-    filter: brightness(70%);
+    filter: brightness(75%);
     animation: backgroundAnimation 15s infinite alternate ease-in-out;
   }
   
@@ -16,47 +16,29 @@
       transform: scale(1.1);
     }
   }
-  /* Animation de déplacement */
-@keyframes slideIn {
-  0% {
-    transform: translateX(100%); /* Le formulaire commence à droite de l'écran */
-  }
-  100% {
-    transform: translateX(0); /* Le formulaire se déplace à sa position finale */
-  }
-}
-  @keyframes fadeIn {
-    from {
+  
+  @keyframes slideAndFade {
+    0% {
+      transform: translateX(100%);
       opacity: 0;
-      transform: translateY(20px);
     }
-    to {
+    100% {
+      transform: translateX(0);
       opacity: 1;
-      transform: translateY(0);
     }
   }
   
-  .animate-fade-in {
-    animation: fadeIn 0.8s ease-out forwards;
+  .login-container {
+    animation: slideAndFade 1s ease-out forwards;
   }
-
-  /*la partie qui faire l'animation de chargement*/
-  @keyframes grow {
-    0%, 100% { transform: scale(1); opacity: 0.3; }
-    50% { transform: scale(1.5); opacity: 1; }
-  }
-
-  /* Application de l'animation */
-.login-container {
-  animation: slideIn 1s ease-out forwards;
-}
+  
 
 
 
   .loading-circles span {
     display: inline-block;
-    width: 8px;
-    height: 8px;
+    width: 0.5rem;
+    height: 0.5rem;
     margin: 0 3px;
     background-color: white;
     border-radius: 50%;
