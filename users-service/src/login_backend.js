@@ -42,7 +42,7 @@ app.post('/login', async (req, res) => {
             return res.status(401).json({ error: "Mot de passe incorrect" });
         }
 
-        res.json({ message: "Connexion réussie", nom: user.nom, prenom: user.prenom });
+        res.json({ message: "Connexion réussie", nom: user.nom, prenom: user.prenom , role: user.role });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Erreur serveur" });

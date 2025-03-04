@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom"; // ✅ Permet la redirection
-
 import "./LoginPage.css";
 
 const Login = () => {
@@ -11,28 +10,33 @@ const Login = () => {
     const navigate = useNavigate(); // ✅ Hook pour la navigation
 
     const handleSubmit = async (e) => {
-        e.preventDefault(); // Empêche le rechargement de la page
-       
+        e.preventDefault(); 
         setLoading(true);
         setMessage("");
-
+    
         try {
             const response = await fetch("http://localhost:8081/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ matricule, password })
             });
-
+    
             const data = await response.json();
-
+    
             if (response.ok) {
-                const { nom, prenom } = data;
                 setMessage("Connexion réussie !");
-                localStorage.setItem("nom", nom);
-                localStorage.setItem("prenom", prenom);
+                
+                // Stocker les données dans localStorage
+                localStorage.setItem("user", JSON.stringify(data));
 
-                // Redirection après un court délai
-                setTimeout(() => navigate("/feed"), 1000);
+                const user = JSON.parse(localStorage.getItem("user"));
+    
+                // Rediriger selon le rôle de l'utilisateur
+                setTimeout(() => {
+                    if (user.role === "admin") navigate("/admin");
+                    else if (user.role === "enseignant") navigate("/enseignant");
+                    else if(user.role === "etudiant") navigate("/etudiant");
+                }, 1000);
             } else {
                 setMessage("Matricule ou mot de passe incorrect.");
             }
@@ -43,6 +47,7 @@ const Login = () => {
             setLoading(false);
         }
     };
+    
 
     return (
         <div className="relative h-screen w-full flex items-center justify-end pr-20 ">

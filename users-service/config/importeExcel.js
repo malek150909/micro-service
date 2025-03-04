@@ -1,54 +1,67 @@
-require('dotenv').config(); // Charger les variables d'environnement
-const db = require('./db'); // Utiliser ta connexion MySQL
-const xlsx = require('xlsx'); // Lire le fichier Excel
-const fs = require('fs');
+const mysql = require("mysql2/promise");
+const xlsx = require("xlsx");
+require("dotenv").config();
 
-const filePath = 'etudiants.xlsx'; // Ton fichier Excel
+// 📌 Connexion à la base de données MySQL
+const db = mysql.createPool({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME
+});
 
-// 📌 Vérifier si le fichier existe
-if (!fs.existsSync(filePath)) {
-    console.error("❌ Le fichier Excel n'existe pas !");
-    process.exit(1);
-}
-
-// 📌 Fonction pour nettoyer le rôle et éviter les erreurs MySQL
-const cleanRole = (role) => {
-    if (!role) return "Etudiant"; // Valeur par défaut si vide
-    return role.trim(); // Supprimer les espaces avant/après
-};
-
-// 📌 Lire le fichier Excel
+// 📌 Fonction pour lire un fichier Excel
 function readExcelFile(filePath) {
     const workbook = xlsx.readFile(filePath);
-    const sheetName = workbook.SheetNames[0]; // Prendre la première feuille
-    const sheet = workbook.Sheets[sheetName];
-    return xlsx.utils.sheet_to_json(sheet); // Convertir en JSON
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    return xlsx.utils.sheet_to_json(sheet);
 }
 
-// 📌 Insérer les étudiants dans MySQL
-async function insertEtudiants() {
-    const etudiants = readExcelFile(filePath);
-
-    for (const etudiant of etudiants) {
-        const { Matricule, Nom, Prenom, Password, Role, Email } = etudiant;
-        try {
-            await db.query(
-                "INSERT INTO users (matricule, nom, prenom, role, password, email) VALUES (?, ?, ?, ?, ?,?)",
-                [Matricule, Nom, Prenom, Role, Password, Email]
-            );
-
-            console.log(`✅ Étudiant ${Nom} ${Prenom} inséré avec succès.`);
-        } catch (error) {
-            if (error.code === 'ER_DUP_ENTRY') {
-                console.error(`⚠️ Matricule ${Matricule} déjà existant, utilisateur ignoré.`);
-            } else {
-                console.error(`❌ Erreur lors de l'insertion de ${Nom} ${Prenom} :`, error.message);
-            }
-        }
+// 📌 Fonction pour insérer les utilisateurs dans MySQL
+async function insertUsers(filePath) {
+    let role = null;
+    if (filePath.includes("etudiants.xlsx")) role = "etudiant";
+    else if (filePath.includes("enseignants.xlsx")) role = "enseignant";
+    else if (filePath.includes("admins.xlsx")) role = "admin";
+    
+    if (!role) {
+        console.error(`❌ Le fichier ${filePath} ne correspond à aucun rôle.`);
+        return;
     }
 
-    console.log("🚀 Importation terminée !");
+    const users = readExcelFile(filePath);
+
+    for (const user of users) {
+        const { Palier, Matricule, Nom, Prenom, Etat, Email, Password } = user;
+
+        try {
+            // 📌 Insérer dans la table `user`
+            await db.query(
+                "INSERT INTO user (matricule, nom, prenom, email, password) VALUES (?, ?, ?, ?, ?)",
+                [Matricule, Nom, Prenom, Email, Password]
+            );
+
+            // 📌 Insérer dans la table spécifique (etudiant, enseignant, admin)
+            await db.query(
+                `INSERT INTO ${role} (niveau,matricule,etat) VALUES (?,?,?)`,
+                [Palier,Matricule,Etat]
+            );
+
+            console.log(`✅ Utilisateur ${Nom} ${Prenom} inséré dans 'user' et '${role}'.`);
+        } catch (error) {
+            console.error(`❌ Erreur pour ${Nom} ${Prenom}:`, error.message);
+        }
+    }
+    console.log(`🚀 Importation terminée pour ${filePath} !`);
 }
 
-// 📌 Exécuter l'importation
-insertEtudiants();
+// 📌 Exécuter l'importation pour chaque fichier
+async function importAll() {
+    await insertUsers("excelFolders/etudiants.xlsx");
+    await insertUsers("excelFolders/enseignants.xlsx");
+    await insertUsers("excelFolders/admins.xlsx");
+    console.log("✅ Tous les fichiers ont été importés !");
+}
+
+// 📌 Lancer l'importation
+importAll();
