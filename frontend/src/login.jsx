@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom"; // ✅ Permet la redirection
+import { useNavigate } from "react-router-dom";
 import "./LoginPage.css";
 
 const Login = () => {
@@ -7,7 +7,7 @@ const Login = () => {
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(false);
-    const navigate = useNavigate(); // ✅ Hook pour la navigation
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault(); 
@@ -20,25 +20,24 @@ const Login = () => {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ matricule, password })
             });
-    
+
             const data = await response.json();
-    
+
             if (response.ok) {
                 setMessage("Connexion réussie !");
-                
-                // Stocker les données dans localStorage
-                localStorage.setItem("user", JSON.stringify(data));
 
-                const user = JSON.parse(localStorage.getItem("user"));
-    
-                // Rediriger selon le rôle de l'utilisateur
+                // ✅ Stocker toutes les infos de l'utilisateur
+                localStorage.setItem("user", JSON.stringify(data.user));
+
+                // ✅ Rediriger selon le rôle
                 setTimeout(() => {
-                    if (user.role === "admin") navigate("/admin");
-                    else if (user.role === "enseignant") navigate("/enseignant");
-                    else if(user.role === "etudiant") navigate("/etudiant");
+                    if (data.user.role === "admin") navigate("/admin");
+                    else if (data.user.role === "enseignant") navigate("/enseignant");
+                    else if (data.user.role === "etudiant") navigate("/etudiant");
+                    else setMessage("Votre rôle n'a pas été identifié."); // Cas d'erreur
                 }, 1000);
             } else {
-                setMessage("Matricule ou mot de passe incorrect.");
+                setMessage(data.error || "Matricule ou mot de passe incorrect.");
             }
         } catch (error) {
             setMessage("Erreur de connexion au serveur.");
@@ -47,22 +46,21 @@ const Login = () => {
             setLoading(false);
         }
     };
-    
 
     return (
-        <div className="relative h-screen w-full flex items-center justify-end pr-20 ">
+        <div className="relative h-screen w-full flex items-center justify-end pr-20">
             <div className="animated-background"></div>
             <div className="relative bg-white p-10 rounded-[50px] shadow-2xl w-96 border border-gray-300 backdrop-blur-md login-container">
                 <div className="flex flex-col items-center mb-6">
                     <img src="/usthb-logo.png" alt="USTHB Logo" className="w-24 h-24 mb-2" />
                     <h2 className="text-2xl font-bold text-gray-800 text-center leading-tight">
-                        🌍 Bienvenue dans votre ESpace Universitaire 
+                        🌍 Bienvenue dans votre ESpace Universitaire
                     </h2>
                 </div>
 
                 <form className="bg-white p-6 rounded shadow-md w-80" onSubmit={handleSubmit}>
                     {message && <p className="text-red-500 mb-2">{message}</p>}
-                    
+
                     <div className="mb-4">
                         <label className="block text-gray-700">Matricule</label>
                         <input 
