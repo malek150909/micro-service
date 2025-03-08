@@ -35,17 +35,17 @@ async function insertEtudiants(filePath) {
     await clearEtudiants(); // 🔴 Supprime les anciens étudiants avant d'insérer les nouveaux
 
     for (const etudiant of etudiants) {
-        const { Matricule, Nom, Prenom, Email, Password, Niveau, Etat } = etudiant;
+        const { Matricule, Nom, Prenom, Email, Password, Etat } = etudiant;
 
         try {
             await db.query(
-                "INSERT INTO user (matricule, nom, prenom, email, password) VALUES (?, ?, ?, ?, ?)",
+                "INSERT INTO user (matricule, nom, prenom, email, password) VALUES (?, ?, ?, ?)",
                 [Matricule, Nom, Prenom, Email, Password]
             );
 
             await db.query(
-                "INSERT INTO etudiant (matricule, niveau, etat) VALUES (?, ?, ?)",
-                [Matricule, Niveau, Etat]
+                "INSERT INTO etudiant (matricule, etat) VALUES (?, ?)",
+                [Matricule, Etat]
             );
 
             console.log(`✅ Étudiant ${Nom} ${Prenom} ajouté.`);

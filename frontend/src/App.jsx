@@ -2,14 +2,18 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./login";
 import Etudiant from "./etudiant";
 import Enseignant from "./enseignant";
-import Admin from "./admin";
+import Admin from "./admin/admin";
 import { Navigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import Feed from "./Feed";
-import Annonces from "./annonces";
-import Demades from "./demandes";
-import Evenements from "./evenements";
-import Plannings from "./plannings";
+import Annonces from "./admin/annonces";
+import ListeEtudiants from "./admin/listeEtudiants";
+import Evenements from "./admin/evenements";
+import Plannings from "./admin/plannings";
+import ConsultPage from './pages/ConsultPage';
+import CreatePage from './pages/CreatePage';
+import './css_files/style.css';
+import GestionEvenements from "./GestionEvenements";
 
 
 const PrivateRoute = ({ element }) => {
@@ -31,9 +35,12 @@ function App() {
                 <Route path="/admin" element={<PrivateRoute element={<Admin />} />} />
                 <Route path="/feed" element={<PrivateRoute element={<Feed />} />} />
                 <Route path="/annonces" element={<PrivateRoute element={<Annonces />} />} />
-                <Route path="/demandes" element={<PrivateRoute element={<Demades />} />} />
                 <Route path="/evenements" element={<PrivateRoute element={<Evenements />} />} />
+                <Route path="/listeEtudiants" element={<PrivateRoute element={<ListeEtudiants />} />} />
                 <Route path="/plannings" element={<PrivateRoute element={<Plannings />} />} />
+                <Route path="/consult" element={<ConsultPage />} />
+                <Route path="/create" element={<CreatePage />} />
+                <Route path="/gestionEvenements" element={<GestionEvenements />} />
             </Routes>
         </Router>
     );

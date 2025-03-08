@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./LoginPage.css";
+import "./css_files/loginPage.css";
 
 const Login = () => {
     const [matricule, setMatricule] = useState("");
