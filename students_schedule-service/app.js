@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import planningRoutes from './routes/planningRoutes.js';
+import moduleRoutes from './routes/moduleRoutes.js';
+
 
 dotenv.config();
 const app = express();
@@ -10,6 +12,8 @@ const app = express();
 // ✅ Autoriser toutes les origines (pas recommandé en prod)
 app.use(cors());
 app.use('/api', planningRoutes);
+app.use('/modules', moduleRoutes);
+
 
 
 // ✅ Autoriser une origine spécifique

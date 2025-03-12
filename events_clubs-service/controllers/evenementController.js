@@ -13,7 +13,7 @@ exports.getAllEvenements = (req, res) => {
             ...evenement,
             image_url: evenement.image_url?.startsWith('http') 
                 ? evenement.image_url 
-                : `http://localhost:5000${evenement.image_url || ''}`
+                : `http://localhost:8084${evenement.image_url || ''}`
         }));
 
         res.json(evenementsWithFullUrl);
@@ -52,7 +52,7 @@ exports.createEvenement = (req, res) => {
             res.status(201).json({ 
                 message: 'Événement créé avec succès', 
                 eventId: eventId,
-                image_url: image_url ? `http://localhost:5000${image_url}` : ''
+                image_url: image_url ? `http://localhost:8084${image_url}` : ''
             });
         });
     });

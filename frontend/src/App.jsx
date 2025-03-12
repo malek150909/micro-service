@@ -1,19 +1,15 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Login from "./login";
-import Etudiant from "./etudiant";
-import Enseignant from "./enseignant";
-import Admin from "./admin/admin";
+import Login from "./main/login";
+import Etudiant from "./main/etudiant";
+import Enseignant from "./main/enseignant";
+import Admin from "./main/admin";
 import { Navigate } from "react-router-dom";
 import PropTypes from "prop-types";
-import Feed from "./Feed";
-import Annonces from "./admin/annonces";
-import ListeEtudiants from "./admin/listeEtudiants";
-import Evenements from "./admin/evenements";
-import Plannings from "./admin/plannings";
-import ConsultPage from './pages/ConsultPage';
-import CreatePage from './pages/CreatePage';
-import './css_files/style.css';
-import GestionEvenements from "./GestionEvenements";
+import Annonces from "./admin/annonce/annonces";
+import ListeEtudiants from "./admin/etudiant/listeEtudiants";
+import GestionEvenements from "./admin/evenement/GestionEvenements";
+import Modules from "./admin/module/pages/Home";
+import ExamPlanning from "./admin/planning/pages/ExamPlanning";
 
 
 const PrivateRoute = ({ element }) => {
@@ -33,14 +29,11 @@ function App() {
                 <Route path="/etudiant" element={<PrivateRoute element={<Etudiant />} />} />
                 <Route path="/enseignant" element={<PrivateRoute element={<Enseignant />} />} />
                 <Route path="/admin" element={<PrivateRoute element={<Admin />} />} />
-                <Route path="/feed" element={<PrivateRoute element={<Feed />} />} />
                 <Route path="/annonces" element={<PrivateRoute element={<Annonces />} />} />
-                <Route path="/evenements" element={<PrivateRoute element={<Evenements />} />} />
                 <Route path="/listeEtudiants" element={<PrivateRoute element={<ListeEtudiants />} />} />
-                <Route path="/plannings" element={<PrivateRoute element={<Plannings />} />} />
-                <Route path="/consult" element={<ConsultPage />} />
-                <Route path="/create" element={<CreatePage />} />
                 <Route path="/gestionEvenements" element={<GestionEvenements />} />
+                <Route path="/modules" element={<Modules />} />
+                <Route path="/consult" element={<ExamPlanning />} />
             </Routes>
         </Router>
     );

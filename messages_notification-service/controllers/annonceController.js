@@ -1,66 +1,80 @@
-// backend/controllers/annonceController.js
 const db = require('../config/db');
 
-// Get all announcements
 exports.getAllAnnonces = (req, res) => {
     const sql = 'SELECT * FROM Annonce';
     db.query(sql, (err, results) => {
-      if (err) {
-        console.error('Error fetching announcements:', err);
-        return res.status(500).json({ message: 'Server error' });
-      }
-  
-      // Add the full URL to the image_url only if it doesn't already have it
-      const annoncesWithFullUrl = results.map(annonce => ({
-        ...annonce,
-        image_url: annonce.image_url?.startsWith('http') 
-          ? annonce.image_url 
-          : `http://localhost:8082${annonce.image_url}`
-      }));
-  
-      res.json(annoncesWithFullUrl);
-    });
-  };
-exports.createAnnonce = (req, res) => {
-    const { title, content, image_url = null, admin_id = null } = req.body;
+        if (err) {
+            console.error('Erreur lors de la récupération des annonces :', err);
+            return res.status(500).json({ message: 'Erreur serveur' });
+        }
 
-    // If admin_id is provided, ensure it's a valid integer
-    if (admin_id && isNaN(admin_id)) {
-        return res.status(400).json({ message: 'admin_id must be a valid integer' });
-    }
+        const annoncesWithFullUrl = results.map(annonce => {
+            if (!annonce.image_url) return { ...annonce, image_url: '' };
+
+            // Si l’annonce est liée à un événement (port 5000)
+            if (annonce.event_id) {
+                return {
+                    ...annonce,
+                    image_url: annonce.image_url.startsWith('http') 
+                        ? annonce.image_url 
+                        : `http://localhost:8084${annonce.image_url}`
+                };
+            }
+
+            // Sinon, l’image vient du service Annonce (port 5001)
+            return {
+                ...annonce,
+                image_url: annonce.image_url.startsWith('http') 
+                    ? annonce.image_url 
+                    : `http://localhost:8082${annonce.image_url}`
+            };
+        });
+
+        console.log('Annonces renvoyées :', annoncesWithFullUrl);
+        res.json(annoncesWithFullUrl);
+    });
+};
+
+exports.createAnnonce = (req, res) => {
+    const { title, content, admin_id, image_url } = req.body;
+    const uploadedImageUrl = req.file ? `/uploads/${req.file.filename}` : null;
+    const finalImageUrl = uploadedImageUrl || image_url || '';
 
     const sql = 'INSERT INTO Annonce (title, content, image_url, admin_id) VALUES (?, ?, ?, ?)';
-    db.query(sql, [title, content, image_url, admin_id], (err, result) => {
+    const values = [title, content, finalImageUrl, admin_id || 0];
+
+    db.query(sql, values, (err, result) => {
         if (err) {
-            console.error('Error creating announcement:', err);
-            return res.status(500).json({ message: 'Server error' });
+            console.error('Erreur lors de la création de l\'annonce :', err);
+            return res.status(500).json({ message: 'Erreur serveur', error: err.message });
         }
-        res.json({ message: 'Announcement created successfully', id: result.insertId });
-    });
-};
-// Update an announcement
-exports.updateAnnonce = (req, res) => {
-    const { id } = req.params;
-    const { title, content, image_url } = req.body;
-    const sql = 'UPDATE Annonce SET title = ?, content = ?, image_url = ? WHERE id = ?';
-    db.query(sql, [title, content, image_url, id], (err, result) => {
-        if (err) {
-            console.error('Error updating announcement:', err);
-            return res.status(500).json({ message: 'Server error' });
-        }
-        res.json({ message: 'Announcement updated successfully' });
+        res.status(201).json({ message: 'Annonce créée avec succès', id: result.insertId });
     });
 };
 
-// Delete an announcement
+exports.updateAnnonce = (req, res) => {
+    const { id } = req.params;
+    const { title, content, image_url, admin_id } = req.body;
+
+    const sql = 'UPDATE Annonce SET title = ?, content = ?, image_url = ?, admin_id = ? WHERE id = ?';
+    db.query(sql, [title, content, image_url, admin_id || 0, id], (err, result) => {
+        if (err) {
+            console.error('Erreur lors de la mise à jour de l\'annonce :', err);
+            return res.status(500).json({ message: 'Erreur serveur' });
+        }
+        res.json({ message: 'Annonce mise à jour avec succès' });
+    });
+};
+
 exports.deleteAnnonce = (req, res) => {
     const { id } = req.params;
+
     const sql = 'DELETE FROM Annonce WHERE id = ?';
     db.query(sql, [id], (err, result) => {
         if (err) {
-            console.error('Error deleting announcement:', err);
-            return res.status(500).json({ message: 'Server error' });
+            console.error('Erreur lors de la suppression de l\'annonce :', err);
+            return res.status(500).json({ message: 'Erreur serveur' });
         }
-        res.json({ message: 'Announcement deleted successfully' });
+        res.json({ message: 'Annonce supprimée avec succès' });
     });
 };

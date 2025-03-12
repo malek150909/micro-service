@@ -13,7 +13,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "secret_key";
 
 async function getUserByMatricule(matricule) {
     try {
-        const [user] = await db.query('SELECT * FROM user WHERE atricule = ?', [matricule]);
+        const [user] = await db.query('SELECT * FROM user WHERE matricule = ?', [matricule]);
         return user.length > 0 ? user[0] : null;
     } catch (error) {
         console.error("Erreur lors de la récupération de l'utilisateur:", error);
