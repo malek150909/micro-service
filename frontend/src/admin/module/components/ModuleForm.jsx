@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
+import '../../../admin_css_files/module.css';
 
 const ModuleForm = ({ onAdd, disabled }) => {
   const [moduleData, setModuleData] = useState({

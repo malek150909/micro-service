@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
+import '../../../admin_css_files/exam.css';
 
 const ExamModal = ({ exam, onClose, onSave, modules, salles: initialSalles, semestres }) => {
   const [formData, setFormData] = useState({

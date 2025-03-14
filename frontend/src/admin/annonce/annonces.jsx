@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { FaHome, FaPlus, FaEdit, FaTrash, FaTimes } from 'react-icons/fa'; // Icônes
-import '../../css_files/index.css';
+import '../../admin_css_files/annonce.css';
 
 const handleImageUpload = async (e, setFormData) => {
   const file = e.target.files[0];
@@ -124,8 +124,8 @@ function GestionAnnonces() {
   };
 
   return (
-    <div className="evenement-container">
-      <h1>Gestion des Annonces</h1>
+    <div id="annonces">
+    <div className="container">
       <div className="button-group">
         <button onClick={() => navigate('/admin')}>
           <FaHome style={{ marginRight: '8px' }} /> Retour à l&apos;accueil
@@ -205,7 +205,7 @@ function GestionAnnonces() {
                     src={annonces.find((a) => a.id === selectedAnnonce).image_url}
                     alt={annonces.find((a) => a.id === selectedAnnonce).title}
                     className="event-image"
-                    onError={() => console.error('Erreur chargement image :', annonces.find((a) => a.id === selectedAnnonce).image_url)}
+                    onError={(e) => console.error('Erreur chargement image :', annonces.find((a) => a.id === selectedAnnonce).image_url)}
                   />
                 ) : (
                   <div className="image-placeholder">Aucune image</div>
@@ -227,6 +227,7 @@ function GestionAnnonces() {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 }

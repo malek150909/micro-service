@@ -1,0 +1,216 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(180deg, #b3e5fc, #0d47a1); /* Premier fichier */
+    margin: 0;
+    padding: 0;
+    color: #093980;
+    overflow-x: hidden;
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(94, 53, 177, 0.2)" d="M0,224L80,224C160,224,320,224,480,208C640,192,800,160,960,160C1120,160,1280,192,1360,208L1440,224V0H1360C1280,0,1120,0,960,0C800,0,640,0,480,0C320,0,160,0,80,0H0V224Z"></path></svg>') repeat-x bottom; /* Premier fichier */
+    animation: waveMove 12s linear infinite;
+    pointer-events: none;
+}
+
+/* Styles du header */
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background-color: #2563eb; /* Bleu foncé */
+    color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Informations utilisateur */
+.user-info {
+    font-size: 14px;
+    display: flex;
+    gap: 8px;
+}
+
+/* Bouton utilisateur */
+.user-button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: white;
+    color: #2563eb;
+    padding: 10px 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s ease;
+}
+
+.user-button:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25), 0 0 10px rgba(21, 101, 192, 0.4);
+    transform: translateY(-2px);
+}
+/* Icône de dropdown */
+.user-button .dropdown-icon {
+    margin-left: 8px;
+}
+
+.dropdown-container {
+    position: relative; /* Permet au menu d’être bien positionné par rapport au bouton */
+    display: inline-block;
+}
+
+/* Menu déroulant */
+.dropdown-menu {
+    position: absolute;
+    animation: dropdownFadeIn 0.3s ease forwards;
+}
+
+/* Items du menu */
+.dropdown-menu button {
+    background: linear-gradient(135deg, #1565c0, #42a5f5);
+    color: #fff;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.dropdown-menu button:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25), 0 0 10px rgba(21, 101, 192, 0.4);
+    transform: translateY(-2px);
+}
+
+/* Bouton déconnexion */
+.logout-button {
+    color: red !important; 
+    font-weight: bold;
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 50%;
+    background-color: #2563eb; /* Bleu */
+    color: white;
+    margin-right: 10px;
+}
+
+@keyframes dropdownFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Conteneur principal */
+.main-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background-color: #f3f4f6;
+    min-height: 100vh;
+}
+
+/* Grid pour organiser les cartes */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 24px;
+    width: 100%;
+    max-width: 1200px;
+}
+
+/* Style des cartes */
+.card {
+    background: white;
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Effet lumineux */
+.card::before {
+    content: "";
+    position: absolute;
+    top: -100%;
+    left: -100%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.15));
+    transition: opacity 0.3s ease;
+    opacity: 0;
+}
+
+/* Effet au survol */
+.card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.card:hover::before {
+    opacity: 1;
+}
+
+/* Titre des cartes */
+.card-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #1e3a8a;
+    margin-bottom: 10px;
+}
+
+/* Description */
+.card-description {
+    font-size: 0.9rem;
+    color: #4b5563;
+}
+
+/* Bouton */
+.card-button {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 10px 16px;
+    background: #2563eb;
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background 0.3s ease;
+}
+
+.card-button:hover {
+    background: #1e40af;
+}

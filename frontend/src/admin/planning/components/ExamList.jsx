@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import ExamModal from './ExamModal';
+import '../../../admin_css_files/exam.css';
 
 const ExamList = ({ exams, onDelete, onUpdate, salles, semestres }) => {
   const [selectedExam, setSelectedExam] = React.useState(null);

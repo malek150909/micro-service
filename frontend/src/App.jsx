@@ -6,10 +6,12 @@ import Admin from "./main/admin";
 import { Navigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import Annonces from "./admin/annonce/annonces";
-import ListeEtudiants from "./admin/etudiant/listeEtudiants";
 import GestionEvenements from "./admin/evenement/GestionEvenements";
 import Modules from "./admin/module/pages/Home";
 import ExamPlanning from "./admin/planning/pages/ExamPlanning";
+import TeacherSection from "./admin/enseignant/listenseignant";
+import StudentSection from "./admin/etudiant/listetudiant";
+import ModifieProfilAdmin from "./main/modifierProfilAdmin";
 
 
 const PrivateRoute = ({ element }) => {
@@ -30,10 +32,12 @@ function App() {
                 <Route path="/enseignant" element={<PrivateRoute element={<Enseignant />} />} />
                 <Route path="/admin" element={<PrivateRoute element={<Admin />} />} />
                 <Route path="/annonces" element={<PrivateRoute element={<Annonces />} />} />
-                <Route path="/listeEtudiants" element={<PrivateRoute element={<ListeEtudiants />} />} />
                 <Route path="/gestionEvenements" element={<GestionEvenements />} />
                 <Route path="/modules" element={<Modules />} />
                 <Route path="/consult" element={<ExamPlanning />} />
+                <Route path="/enseignants" element={<TeacherSection />} />
+                <Route path="/etudiants" element={<StudentSection />} />
+                <Route path="/modifierProfilAdmin" element={<ModifieProfilAdmin />} />
             </Routes>
         </Router>
     );

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -7,7 +8,9 @@ import { saveAs } from "file-saver";
 import FilterForm from "../components/FilterForm";
 import ExamForm from "../components/ExamForm";
 import ExamList from "../components/ExamList";
-import '../../../css_files/index.css';
+import '../../../admin_css_files/exam.css';
+
+
 
 const ExamPlanning = () => {
   const [exams, setExams] = useState([]);
@@ -24,6 +27,7 @@ const ExamPlanning = () => {
     section: "",
     ID_semestre: "",
   });
+  const navigate = useNavigate();
   const [modules, setModules] = useState([]);
   const [salles, setSalles] = useState([]);
   const [semestres, setSemestres] = useState([]);
@@ -413,9 +417,19 @@ const exportToPDF = () => {
     }
   };
 
+  const handleBackToAdmin = () => {
+    navigate("/Admin"); // Navigation vers la page Admin
+  };
+
   return (
-    <div className="exam-container">
-      <h1>Planning des Examens{filters.ID_semestre ? ` - Semestre ${filters.ID_semestre}` : ""}</h1>
+    <div id="exams">
+    <div className="container">
+    <button
+      onClick={handleBackToAdmin}
+      className="button" // Ajoutez cette classe personnalisée
+    >
+      Retour à l&apos;accueil
+    </button>
       {error && <p style={{ color: "red" }}>{error}</p>}
       <FilterForm onFilter={handleFilter} />
       {exams.length > 0 ? (
@@ -449,6 +463,7 @@ const exportToPDF = () => {
         selectedSemestre={filters.ID_semestre}
         onFilterReset={() => true}
       />
+    </div>
     </div>
   );
 };

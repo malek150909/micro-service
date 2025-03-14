@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
-import '../../../css_files/index.css';
+import '../../../admin_css_files/module.css';
 
 const FilterForm = ({ onFilter }) => {
   const [filters, setFilters] = useState({

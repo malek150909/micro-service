@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaChevronDown } from "react-icons/fa";
+import '../admin_css_files/admin.css';
 
 const Admin = () => {
     const navigate = useNavigate();
@@ -13,76 +14,71 @@ const Admin = () => {
             navigate("/login");
         } else {
             setUser(storedUser);
+            console.log("Utilisateur chargé dans Admin :", storedUser); // Log pour vérifier
         }
     }, [navigate]);
 
     const handleLogout = () => {
         localStorage.removeItem("user");
+        localStorage.removeItem("token");
         navigate("/");
     };
 
+    const handleEditProfile = () => {
+        navigate("/modifierProfilAdmin");
+    };
+
     const items = [
-        { title: "📍​Événements", description: "Consulter et creer les événements", route: "/gestionEvenements" },
-        { title: "📅​Exams Planning", description: "Consulter et creer les Plannings des exams", route: "/consult" },
-        { title: "📚Modules", description: "Consulter les modules", route: "/modules" },
-        { title: "📢​Annonces", description: "Consulter et creer les annonces", route: "/annonces" },
-        { title: "🧑‍🎓Etudiants", description: "Consulter la liste des etudiants", route: "/listeEtudiants" },
-        { title: "🧑‍🏫Profs", description: "Listes des enseignants", route: "/profs" },
-        { title: "👤Users", description: "Consulter les utilisateurs", route: "/users" },
-        
+        { title: "📍 Événements", description: "Consulter et créer les événements", route: "/gestionEvenements" },
+        { title: "📅 Exams Planning", description: "Consulter et créer les plannings des exams", route: "/consult" },
+        { title: "📚 Modules", description: "Consulter les modules", route: "/modules" },
+        { title: "📢 Annonces", description: "Consulter et créer les annonces", route: "/annonces" },
+        { title: "🧑‍🎓 Étudiants", description: "Consulter la liste des étudiants", route: "/etudiants" },
+        { title: "🧑‍🏫 Profs", description: "Listes des enseignants", route: "/enseignants" },
+        { title: "👤 Users", description: "Consulter les utilisateurs", route: "/users" },
+        { title: "📅 Emploi du temps", description: "Consulter et créer des emplois", route: "/emplois" },
     ];
 
     return (
         <div className="h-screen flex flex-col">
-            {/* Header */}
-            <header className="flex justify-between items-center p-4 bg-blue-600 text-white shadow-md">
-                <h1 className="text-lg font-bold">{user ? `${user.poste}` : "Admin"}</h1>
 
-                {/* Bouton utilisateur */}
-                <div className="relative">
-                    <button
-                        onClick={() => setMenuOpen(!menuOpen)}
-                        className="flex items-center bg-white text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-100"
-                    >
-                        <span className="mr-2">{user ? `${user.nom} ${user.prenom}` : "Admin"}</span>
-                        <FaChevronDown />
-                    </button>
-
-                    {/* Menu déroulant */}
-                    {menuOpen && (
-                        <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg overflow-hidden">
-                            <button className="block px-4 py-2 text-gray-700 hover:bg-gray-100 w-full text-left">
-                                Modifier Profil
-                            </button>
-                            <button className="block px-4 py-2 text-gray-700 hover:bg-gray-100 w-full text-left">
-                                Messages
-                            </button>
-                            <button
-                                onClick={handleLogout}
-                                className="block px-4 py-2 text-red-600 hover:bg-gray-100 w-full text-left"
-                            >
-                                Déconnexion
-                            </button>
-                        </div>
-                    )}
+        <header className="header-container">
+            <div className="user-info">
+                {user && (
+                    <div>
+                        <span>Matricule: {user.Matricule || "N/A"}</span> | <span>Poste: {user.poste || "N/A"}</span>
+                    </div>
+                )}
+            </div>
+            <div className="dropdown-container">
+                <button onClick={() => setMenuOpen(!menuOpen)} className="user-button">
+                <div className="user-avatar">
+                    {user?.nom ? user.nom.charAt(0).toUpperCase() : "A"}
                 </div>
-            </header>
+                    <span>{user ? `${user.nom} ${user.prenom}` : "Admin"}</span>
+                    <FaChevronDown className="dropdown-icon" />
+                </button>
+                {menuOpen && (
+                    <div className="dropdown-menu">
+                        <button onClick={handleEditProfile}>Compte</button>
+                        <button>Messages</button>
+                        <button onClick={handleLogout} className="logout-button">Déconnexion</button>
+                    </div>
+                )}
+            </div>
+        </header>
 
-            {/* Contenu principal */}
-            <main className="flex-grow flex flex-col items-center justify-center p-6 bg-gray-100 min-h-screen">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 w-full max-w-5xl">
-                    {items.map((item, index) => (
-                        <div
-                            key={index}
-                            onClick={() => navigate(item.route)}
-                            className="cursor-pointer bg-white p-8 rounded-2xl shadow-md transform transition-all duration-300 hover:scale-110 hover:shadow-2xl"
-                        >
-                            <h3 className="text-xl font-bold text-gray-800">{item.title}</h3>
-                            <p className="text-gray-600">{item.description}</p>
-                        </div>
-                    ))}
-                </div>
-            </main>
+        <main className="main-container">
+            <div className="cards-grid">
+                {items.map((item, index) => (
+                    <div key={index} onClick={() => navigate(item.route)} className="card">
+                        <h3 className="card-title">{item.title}</h3>
+                        <p className="card-description">{item.description}</p>
+                        <a href="#" className="card-button">Voir plus</a>
+                    </div>
+                ))}
+            </div>
+        </main>
 
         </div>
     );

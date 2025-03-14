@@ -1,0 +1,264 @@
+
+  
+  /* Main Container */
+  #profs .container {
+    max-width: 1100px;
+    width: 90%;
+    margin: 20px auto;
+    padding: 25px;
+    background: linear-gradient(135deg, #f5f5f5, #d6eaff);
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    position: relative;
+    overflow: hidden;
+    animation: containerGlow 5s ease infinite;
+    text-align: center;
+  }
+  
+  /* Titles */
+  #profs h1, #profs h2, #profs h3, #profs h4 {
+    font-weight: 800;
+    background: linear-gradient(135deg, #1565c0, #5e35b1);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-align: center;
+    padding: 15px 25px;
+    border: 2px solid rgba(21, 101, 192, 0.6);
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(175, 146, 146, 0.2);
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  
+  #profs h1 {
+    text-align: center;
+    color: #1a237e;
+    font-size: 2.5em;
+    margin-bottom: 20px;
+  }
+  
+  /* Buttons */
+  #profs button {
+    background: linear-gradient(135deg, #1565c0, #42a5f5);
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  #profs button:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25), 0 0 10px rgba(21, 101, 192, 0.4);
+    transform: translateY(-2px);
+  }
+  
+  #profs .edit-btn {
+    background: linear-gradient(135deg, #5e35b1, #8e24aa);
+  }
+  
+  #profs .delete-btn, .delete-section-btn {
+    background: linear-gradient(135deg, #f57c00, #e64a19);
+  }
+  
+  #profs .back-btn {
+    background: linear-gradient(135deg, #1f7aa8, #14739f);
+  }
+  
+  /* Forms */
+  #profs form, #profs .add-student-form {
+    background: linear-gradient(135deg, #e8f0fe, #b0bec5);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    animation: formPop 0.8s ease-out;
+  }
+  
+  #profs .input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  
+  #profs input, #profs select {
+    padding: 12px;
+    border: 2px solid rgba(189, 189, 189, 0.5);
+    border-radius: 10px;
+    font-size: 1rem;
+    background: #fff;
+    color: #0d47a1;
+    transition: all 0.3s ease;
+    width: 100%;
+  }
+  
+  #profs input:focus, #profs select:focus {
+    border-color: #1565c0;
+    box-shadow: 0 0 10px rgba(21, 101, 192, 0.3);
+  }
+  
+  /* Tables */
+  #profs table {
+    width: 100%;
+    border-collapse: collapse;
+    background: linear-gradient(135deg, #e8f0fe, #b0bec5);
+    border-radius: 15px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  #profs th, #profs td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid rgba(189, 189, 189, 0.5);
+  }
+  
+  #profs th {
+    background: linear-gradient(135deg, #1565c0, #42a5f5);
+    color: #fff;
+    font-weight: 600;
+  }
+  
+  /* Teacher List */
+  #profs .teachers-list {
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+    gap: 15px; /* Space between teacher cards */
+    margin-top: 20px;
+    align-items: center; /* Center cards horizontally */
+  }
+  
+  #profs .teacher-card {
+    background: linear-gradient(135deg, #e8f0fe, #699ac3);
+    padding: 15px;
+    border-radius: 15px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    animation: cardFloat 5s ease-in-out infinite;
+    width: 100%; /* Full width of the container */
+    max-width: 300px; /* Limit the width for better readability */
+    text-align: center; /* Center the text inside the card */
+    border: 1px solid rgba(37, 69, 111, 0.3); /* Subtle border */
+  }
+  
+  #profs .teacher-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 25px rgba(80, 134, 156, 0.2);
+    background: linear-gradient(135deg, #d6eaff, #5e92c7); /* Slightly darker gradient on hover */
+  }
+  
+  /* Teacher Details Section */
+  #profs .teacher-section {
+    margin-top: 20px;
+    padding: 20px;
+    background: linear-gradient(135deg, #e8f0fe, #b0bec5);
+    border-radius: 15px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    margin: 20px auto;
+  }
+  
+  #profs .teacher-section h2 {
+    margin-bottom: 15px;
+  }
+  
+  #profs .teacher-section p {
+    margin: 5px 0;
+  }
+  
+  #profs .teacher-section ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  #profs .teacher-section ul li {
+    background: #fff;
+    padding: 5px 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+  }
+  
+  #profs .teacher-section button {
+    margin: 5px;
+    padding: 8px 15px;
+    background: linear-gradient(135deg, #1565c0, #42a5f5);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  #profs .teacher-section button.delete-btn {
+    background: linear-gradient(135deg, #f57c00, #e64a19);
+  }
+  
+  #profs .teacher-section button.back-btn {
+    background: linear-gradient(135deg, #607d8b, #455a64);
+  }
+  
+  #profs select[multiple] {
+    height: auto !important;
+    overflow-y: auto !important;
+  }
+  
+  /* No Teachers Message */
+  #profs .no-teachers {
+    text-align: center;
+    color: #0d47a1;
+    font-size: 1.1rem;
+    padding: 15px;
+    animation: fadeIn 1s ease-out;
+  }
+  
+  /* Animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes waveMove {
+    0% { background-position: 0 100%; }
+    100% { background-position: -1440px 100%; }
+  }
+  
+  @keyframes containerGlow {
+    0%, 100% { box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); }
+    50% { box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15), 0 0 20px rgba(21, 101, 192, 0.3); }
+  }
+  
+  @keyframes formPop {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  
+  @keyframes cardFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }

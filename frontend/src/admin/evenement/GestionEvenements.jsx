@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { FaEdit, FaTrash, FaTimes, FaCalendar, FaMapMarkerAlt, FaUsers, FaSearch, FaList, FaPlus, FaHome } from 'react-icons/fa';
-import '../../css_files/index.css';
+import '../../admin_css_files/evenement.css';
 
 const handleImageUpload = (e, setFormData) => {
   const file = e.target.files[0];
@@ -152,14 +152,16 @@ function GestionEvenements() {
   );
 
   return (
-    <div className="evenement-container">
-      <h1 className={isFirstLoad ? 'animate-on-load' : ''}>Gestion des Événements Universitaires</h1>
+    <div id="evenements">
+    <div className="container">
+    <div className="button-group">
       <button className={isFirstLoad ? 'animate-on-load' : ''} onClick={() => navigate('/admin')}>
         <FaHome /> Retour à l&apos;accueil
       </button>
       <button className={isFirstLoad ? 'animate-on-load' : ''} onClick={() => setShowForm(!showForm)}>
         <FaPlus /> {showForm ? 'Masquer le formulaire' : 'Ajouter un événement'}
       </button>
+    </div>
 
       {showForm && (
         <form className={isFirstLoad ? 'animate-on-load' : ''} onSubmit={handleSubmit} ref={formRef}>
@@ -233,7 +235,6 @@ function GestionEvenements() {
           <div className="event-modal">
             {(() => {
               const evenement = evenements.find(e => e.ID_evenement === selectedEvent);
-              if (!evenement) return null;
               return (
                 <>
                   {evenement.image_url && (
@@ -267,6 +268,7 @@ function GestionEvenements() {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 }

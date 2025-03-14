@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import ModuleModal from './ModuleModal';
+import '../../../admin_css_files/module.css';
 
 const ModuleList = ({ modules, onDelete, onUpdate }) => {
   const semestre1 = modules.filter(module => module.semestre === '1');

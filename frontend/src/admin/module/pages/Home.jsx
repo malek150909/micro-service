@@ -1,12 +1,14 @@
 // pages/Home.jsx
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import FilterForm from '../components/FilterForm';
 import ModuleForm from '../components/ModuleForm';
 import ModuleList from '../components/ModuleList';
 import { getModules, addModule, deleteModule } from '../api/moduleApi';
-import '../../../css_files/index.css';
+import '../../../admin_css_files/module.css';
 
 const Home = () => {
+  const navigate = useNavigate();
   const [modules, setModules] = useState([]);
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
@@ -69,9 +71,21 @@ const Home = () => {
     ));
   };
 
+  const handleBackToAdmin = () => {
+    navigate("/Admin"); // Navigation vers la page Admin
+  };
+
   return (
-    <div className="modules-container">
+    <div id="modules">
+    <div className="container">
+      <button
+        onClick={handleBackToAdmin}
+        className="button" // Ajoutez cette classe personnalisée
+      >
+        Retour à l&apos;accueil
+      </button>
       <h1>Gestion des Modules</h1>
+      
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <FilterForm onFilter={handleFilter} />
       {modules.length > 0 ? (
@@ -87,6 +101,7 @@ const Home = () => {
         onAdd={handleAddModule}
         disabled={!filters.section}
       />
+    </div>
     </div>
   );
 };
