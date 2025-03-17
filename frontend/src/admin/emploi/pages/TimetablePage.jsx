@@ -12,7 +12,6 @@ function TimetablePage() {
 
   return (
     <div className="timetable-page">
-      <h1>Emploi du Temps</h1>
       <TimetableFilter onFetch={handleTimetableFetch} />
       <TimetableDisplay timetable={timetableData} />
     </div>

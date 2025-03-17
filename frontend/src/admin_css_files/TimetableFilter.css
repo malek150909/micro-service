@@ -1,0 +1,73 @@
+/* src/components/TimetableFilter.css */
+.timetable-filter-container {
+    max-width: 1200px;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 100%;
+    margin: 0 auto;
+  }
+  
+  .timetable-filter-title {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  .timetable-filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+  }
+  
+  .timetable-filter-form .form-group {
+    flex: 1;
+    min-width: 200px;
+    margin-bottom: 15px;
+  }
+  
+  .timetable-filter-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-family: 'Roboto', sans-serif;
+    color: #333;
+  }
+  
+  .timetable-filter-form select {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    width: 100%;
+    font-size: 1rem;
+    font-family: 'Roboto', sans-serif;
+  }
+  
+  .timetable-filter-btn {
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: none;
+    font-size: 1rem;
+    background-color: #4CAF50;
+    color: #fff;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.3s;
+  }
+  
+  .timetable-filter-btn:hover {
+    background-color: #45a049;
+  }
+  
+  .timetable-filter-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .timetable-filter-error {
+    color: red;
+    font-family: 'Roboto', sans-serif;
+    margin-top: 10px;
+  }

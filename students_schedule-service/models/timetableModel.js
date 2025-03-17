@@ -3,93 +3,137 @@ import pool from '../config/db.js';
 
 const Timetable = {
   // models/timetableModel.js
-getTimetable: async (filters) => {
+  getTimetable: async (filters) => {
+    try {
+      const { sectionId } = filters; // Changé de section à sectionId
+      console.log('Filters received:', filters);
+
+      if (!sectionId) {
+        throw new Error('sectionId is required');
+      }
+
+      const query = `
+        SELECT s.ID_seance, s.jour, s.time_slot, s.type_seance,
+               m.nom_module AS module, CONCAT(u.prenom, ' ', u.nom) AS teacher,
+               s.ID_salle AS room, g.num_groupe AS "group"
+        FROM Seance s
+        LEFT JOIN Module m ON s.ID_module = m.ID_module
+        LEFT JOIN User u ON s.Matricule = u.Matricule
+        LEFT JOIN Groupe g ON s.ID_groupe = g.ID_groupe
+        WHERE s.ID_section = ?
+      `;
+      const params = [sectionId];
+      console.log('Executing query:', query);
+      console.log('With params:', params);
+
+      const [rows] = await pool.query(query, params);
+      console.log('Query result:', rows);
+
+      const timetable = {};
+      rows.forEach(row => {
+        if (!timetable[row.jour]) timetable[row.jour] = [];
+        timetable[row.jour].push(row);
+      });
+
+      console.log('Fetched timetable from Seance:', timetable);
+      return timetable;
+    } catch (err) {
+      console.error('Error in getTimetable:', err.message);
+      throw err;
+    }
+  },
+
+getFilterOptions: async ({ niveau = null, faculte = null, departement = null, specialite = null } = {}) => {
   try {
-    const { section } = filters;
-    console.log('Filters received:', filters);
+    const [niveaux] = await pool.query('SELECT DISTINCT niveau FROM Section ORDER BY niveau');
+    
+    let facultesQuery = 'SELECT ID_faculte, nom_faculte FROM faculte';
+    const facultesParams = [];
+    if (niveau) {
+      facultesQuery = `
+        SELECT DISTINCT f.ID_faculte, f.nom_faculte 
+        FROM faculte f
+        JOIN Departement d ON f.ID_faculte = d.ID_faculte
+        JOIN Specialite sp ON d.ID_departement = sp.ID_departement
+        JOIN Section s ON sp.ID_specialite = s.ID_specialite
+        WHERE s.niveau = ?
+      `;
+      facultesParams.push(niveau);
+    }
+    facultesQuery += ' ORDER BY nom_faculte';
+    const [facultes] = await pool.query(facultesQuery, facultesParams);
 
-    const query = `
-      SELECT s.ID_seance, s.jour, s.time_slot, s.type_seance,
-             m.nom_module AS module, CONCAT(u.prenom, ' ', u.nom) AS teacher,
-             s.ID_salle AS room, g.num_groupe AS "group"
-      FROM Seance s
-      LEFT JOIN Module m ON s.ID_module = m.ID_module
-      LEFT JOIN User u ON s.Matricule = u.Matricule
-      LEFT JOIN Groupe g ON s.ID_groupe = g.ID_groupe
-      WHERE s.ID_section = ?
-    `;
-    const params = [section];
-    console.log('Executing query:', query);
-    console.log('With params:', params);
+    let departementsQuery = 'SELECT ID_departement, Nom_departement FROM Departement';
+    const departementsParams = [];
+    if (niveau) {
+      departementsQuery = `
+        SELECT DISTINCT d.ID_departement, d.Nom_departement 
+        FROM Departement d
+        JOIN Specialite sp ON d.ID_departement = sp.ID_departement
+        JOIN Section s ON sp.ID_specialite = s.ID_specialite
+        WHERE s.niveau = ?
+      `;
+      departementsParams.push(niveau);
+      if (faculte) {
+        departementsQuery += ' AND d.ID_faculte = ?';
+        departementsParams.push(faculte);
+      }
+    } else if (faculte) {
+      departementsQuery += ' WHERE ID_faculte = ?';
+      departementsParams.push(faculte);
+    }
+    departementsQuery += ' ORDER BY Nom_departement';
+    const [departements] = await pool.query(departementsQuery, departementsParams);
 
-    const [rows] = await pool.query(query, params);
-    console.log('Query result:', rows);
+    let specialitesQuery = 'SELECT ID_specialite, nom_specialite FROM Specialite';
+    const specialitesParams = [];
+    if (niveau) {
+      specialitesQuery = `
+        SELECT DISTINCT sp.ID_specialite, sp.nom_specialite 
+        FROM Specialite sp
+        JOIN Section s ON sp.ID_specialite = s.ID_specialite
+        WHERE s.niveau = ?
+      `;
+      specialitesParams.push(niveau);
+      if (departement) {
+        specialitesQuery += ' AND sp.ID_departement = ?';
+        specialitesParams.push(departement);
+      }
+    } else if (departement) {
+      specialitesQuery += ' WHERE ID_departement = ?';
+      specialitesParams.push(departement);
+    }
+    specialitesQuery += ' ORDER BY nom_specialite';
+    const [specialites] = await pool.query(specialitesQuery, specialitesParams);
 
-    const timetable = {};
-    rows.forEach(row => {
-      if (!timetable[row.jour]) timetable[row.jour] = [];
-      timetable[row.jour].push(row);
-    });
+    let sectionsQuery = 'SELECT ID_section, num_section FROM Section';
+    const sectionsParams = [];
+    if (niveau) {
+      sectionsQuery += ' WHERE niveau = ?';
+      sectionsParams.push(niveau);
+      if (specialite) {
+        sectionsQuery += ' AND ID_specialite = ?';
+        sectionsParams.push(specialite);
+      }
+    } else if (specialite) {
+      sectionsQuery += ' WHERE ID_specialite = ?';
+      sectionsParams.push(specialite);
+    }
+    sectionsQuery += ' ORDER BY num_section';
+    const [sections] = await pool.query(sectionsQuery, sectionsParams);
 
-    console.log('Fetched timetable from Seance:', timetable);
-    return timetable;
+    return {
+      niveaux: niveaux.map(n => n.niveau),
+      facultes,
+      departements,
+      specialites,
+      sections
+    };
   } catch (err) {
-    console.error('Error in getTimetable:', err.message);
+    console.error('Error in getFilterOptions:', err.message);
     throw err;
   }
 },
-
-  getFilterOptions: async ({ faculte = null, departement = null, specialite = null } = {}) => {
-    try {
-      const [niveaux] = await pool.query('SELECT DISTINCT niveau FROM Section ORDER BY niveau');
-      const [facultes] = await pool.query('SELECT ID_faculte, nom_faculte FROM faculte ORDER BY nom_faculte');
-      let departementsQuery = 'SELECT ID_departement, Nom_departement FROM Departement';
-      const departementsParams = [];
-      if (faculte) {
-        departementsQuery += ' WHERE ID_faculte = ?';
-        departementsParams.push(faculte);
-      }
-      departementsQuery += ' ORDER BY Nom_departement';
-      const [departements] = await pool.query(departementsQuery, departementsParams);
-
-      let specialitesQuery = 'SELECT ID_specialite, nom_specialite FROM Specialite';
-      const specialitesParams = [];
-      if (departement) {
-        specialitesQuery += ' WHERE ID_departement = ?';
-        specialitesParams.push(departement);
-      }
-      specialitesQuery += ' ORDER BY nom_specialite';
-      const [specialites] = await pool.query(specialitesQuery, specialitesParams);
-
-      let sectionsQuery = 'SELECT ID_section, num_section FROM Section';
-      const sectionsParams = [];
-      if (specialite) {
-        sectionsQuery += ' WHERE ID_specialite = ?';
-        sectionsParams.push(specialite);
-      }
-      sectionsQuery += ' ORDER BY num_section';
-      const [sections] = await pool.query(sectionsQuery, sectionsParams);
-
-      return {
-        niveaux: niveaux.map(n => n.niveau),
-        facultes,
-        departements,
-        specialites,
-        sections
-      };
-    } catch (err) {
-      throw err;
-    }
-  },
-
-  deleteSession: async (id) => {
-    try {
-      await pool.query('DELETE FROM Seance WHERE ID_seance = ?', [id]);
-      return { success: true, message: 'Séance supprimée avec succès' };
-    } catch (err) {
-      throw err;
-    }
-  },
 
   updateSession: async (id, { ID_salle, Matricule, type_seance, ID_groupe, ID_module }) => {
     try {
@@ -118,6 +162,24 @@ createSession: async ({ ID_salle, Matricule, type_seance, ID_groupe, ID_module, 
     return { success: true, ID_seance: result.insertId, message: 'Séance ajoutée avec succès' };
   } catch (err) {
     console.error('Error in createSession:', err.message);
+    throw err;
+  }
+},
+
+deleteSession: async (id) => {
+  try {
+    if (!id) {
+      throw new Error('ID_seance est requis');
+    }
+    console.log('Executing DELETE for ID_seance:', id);
+    const [result] = await pool.query('DELETE FROM Seance WHERE ID_seance = ?', [id]);
+    console.log('DELETE result:', result);
+    if (result.affectedRows === 0) {
+      throw new Error('Aucune séance trouvée avec cet ID');
+    }
+    return { success: true, message: 'Séance supprimée avec succès' };
+  } catch (err) {
+    console.error('Error in deleteSession:', err.message);
     throw err;
   }
 },

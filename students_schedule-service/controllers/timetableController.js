@@ -13,20 +13,27 @@ export const getTimetable = async (req, res) => {
 
 export const getFilterOptions = async (req, res) => {
   try {
-    const { faculte, departement, specialite } = req.query;
-    const results = await Timetable.getFilterOptions({ faculte, departement, specialite });
+    const { niveau, faculte, departement, specialite } = req.query;
+    console.log('getFilterOptions called with query:', req.query);
+    const results = await Timetable.getFilterOptions({ niveau, faculte, departement, specialite });
+    console.log('getFilterOptions results:', results);
     res.json({ success: true, options: results });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Error in getFilterOptions:', err.message);
+    res.status(500).json({ success: false, error: err.message });
   }
 };
 
 export const deleteSession = async (req, res) => {
   try {
-    const result = await Timetable.deleteSession(req.params.id);
+    const { id } = req.params;
+    console.log('deleteSession called with ID:', id);
+    const result = await Timetable.deleteSession(id);
+    console.log('deleteSession result:', result);
     res.json(result);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Error in deleteSession:', err.message);
+    res.status(500).json({ success: false, error: err.message });
   }
 };
 
