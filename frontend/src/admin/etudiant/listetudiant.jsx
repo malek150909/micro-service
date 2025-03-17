@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import FilterPanel from './FilterPanel.jsx';
-import StudentSection from './StudentSection.jsx';
+import FilterPanel from './FilterPanel';
+import StudentSection from './StudentSection';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { motion, AnimatePresence } from 'framer-motion';

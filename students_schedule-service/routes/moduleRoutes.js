@@ -1,6 +1,7 @@
-const express = require('express');
+import express from 'express';
+import * as moduleController from '../controllers/moduleController.js'; // Adjust path as needed
+
 const router = express.Router();
-const moduleController = require('../controllers/moduleController');
 
 router.get('/', moduleController.getModules);
 router.post('/', moduleController.addModule);
@@ -14,4 +15,4 @@ router.get('/specialites', moduleController.getSpecialites);
 router.get('/sections', moduleController.getSections);
 router.get('/semestres', moduleController.getSemestres);
 
-module.exports = router;
+export default router;

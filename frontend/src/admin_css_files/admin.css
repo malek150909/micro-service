@@ -1,6 +1,10 @@
 body {
     font-family: 'Poppins', sans-serif;
-    background: linear-gradient(180deg, #b3e5fc, #0d47a1); /* Premier fichier */
+    background: linear-gradient(180deg, #b3e5fc, #0d47a1); 
+    background-size: cover; /* Ajuste l'image pour couvrir tout l'écran */
+    background-position: center; /* Centre l'image */
+    background-repeat: no-repeat; /* Empêche la répétition */
+    height: 100vh;
     margin: 0;
     padding: 0;
     color: #093980;
@@ -26,8 +30,8 @@ body::before {
     justify-content: space-between;
     align-items: center;
     padding: 16px;
-    background-color: #2563eb; /* Bleu foncé */
-    color: white;
+    background: linear-gradient(90deg, #4a90e2, #50e3c2); /* Dégradé corrigé */
+    color: #0043d5;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -136,7 +140,7 @@ body::before {
     align-items: center;
     justify-content: center;
     padding: 24px;
-    background-color: #f3f4f6;
+    background-color: whitesmoke;
     min-height: 100vh;
 }
 
@@ -213,4 +217,41 @@ body::before {
 
 .card-button:hover {
     background: #1e40af;
+}
+
+.user-details {
+    display: flex;
+    gap: 16px; /* Espacement entre matricule et poste */
+    align-items: center;
+}
+
+.info-box {
+    background: rgba(255, 255, 255, 0.9); /* Fond blanc légèrement transparent */
+    padding: 8px 12px; /* Espacement interne */
+    border-radius: 12px; /* Coins arrondis */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Ombre douce */
+    display: flex;
+    flex-direction: column; /* Label au-dessus de la valeur */
+    align-items: center;
+    min-width: 100px; /* Largeur minimale pour uniformité */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.info-box:hover {
+    transform: translateY(-2px); /* Légère élévation au survol */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); /* Ombre plus prononcée */
+}
+
+.info-label {
+    font-size: 0.75rem; /* Taille plus petite pour le label */
+    font-weight: 600;
+    color: #1e3a8a; /* Bleu foncé assorti au thème */
+    text-transform: uppercase; /* Majuscules pour un look moderne */
+    margin-bottom: 4px; /* Espacement entre label et valeur */
+}
+
+.info-value {
+    font-size: 1rem; /* Taille normale pour la valeur */
+    font-weight: bold;
+    color: #2563eb; /* Bleu vif pour les valeurs */
 }

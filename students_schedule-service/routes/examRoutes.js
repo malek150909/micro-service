@@ -1,7 +1,8 @@
 // routes/examRoutes.js
-const express = require('express');
+import express from 'express';
+import * as examController from '../controllers/examController.js';
+
 const router = express.Router();
-const examController = require('../controllers/examController');
 
 router.get('/', examController.getExams);
 router.post('/', examController.addExam);
@@ -16,4 +17,4 @@ router.get('/niveaux', examController.getNiveaux);
 router.get('/specialites', examController.getSpecialites);
 router.get('/sections', examController.getSections);
 
-module.exports = router;
+export default router;

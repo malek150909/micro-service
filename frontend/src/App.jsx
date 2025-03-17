@@ -12,6 +12,7 @@ import ExamPlanning from "./admin/planning/pages/ExamPlanning";
 import TeacherSection from "./admin/enseignant/listenseignant";
 import StudentSection from "./admin/etudiant/listetudiant";
 import ModifieProfilAdmin from "./main/modifierProfilAdmin";
+import EmploiDuTemps from "./admin/emploi/pages/TimetablePage";
 
 
 const PrivateRoute = ({ element }) => {
@@ -38,6 +39,7 @@ function App() {
                 <Route path="/enseignants" element={<TeacherSection />} />
                 <Route path="/etudiants" element={<StudentSection />} />
                 <Route path="/modifierProfilAdmin" element={<ModifieProfilAdmin />} />
+                <Route path="/emploidutemps" element={<EmploiDuTemps />} />
             </Routes>
         </Router>
     );

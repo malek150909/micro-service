@@ -43,7 +43,7 @@ const convertDate = (dateValue) => {
 router.get('/specialites/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const [specialite] = await db.query('SELECT * FROM Specialite WHERE ID_specialite = ?', [id]);
+    const [specialite] = await db.query('SELECT * FROM specialite WHERE ID_specialite = ?', [id]);
     if (specialite.length === 0) {
       return res.status(404).json({ error: 'Spécialité introuvable. Vérifiez l\'identifiant.' });
     }
@@ -53,15 +53,38 @@ router.get('/specialites/:id', async (req, res) => {
   }
 });
 
-// Route pour récupérer les filtres
-router.get('/filters', async (req, res) => {
+// Route pour récupérer toutes les facultés
+router.get('/facultes', async (req, res) => {
   try {
-    const [facultes] = await db.query('SELECT * FROM faculte');
-    const [departements] = await db.query('SELECT * FROM Departement');
-    const [specialites] = await db.query('SELECT * FROM Specialite');
-    res.json({ facultes, departements, specialites });
+      const [facultes] = await db.query('SELECT * FROM faculte');
+      res.json(facultes);
   } catch (err) {
-    res.status(500).json({ error: 'Une erreur s’est produite. Veuillez réessayer.' });
+      console.error('Erreur lors de la récupération des facultés:', err);
+      res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+// Route pour récupérer les départements d'une faculté
+router.get('/departements/:idFaculte', async (req, res) => {
+  const { idFaculte } = req.params;
+  try {
+      const [departements] = await db.query('SELECT * FROM Departement WHERE ID_faculte = ?', [idFaculte]);
+      res.json(departements);
+  } catch (err) {
+      console.error('Erreur lors de la récupération des départements:', err);
+      res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+// Route pour récupérer les spécialités d'un département
+router.get('/specialites/:idDepartement', async (req, res) => {
+  const { idDepartement } = req.params;
+  try {
+      const [specialites] = await db.query('SELECT * FROM Specialite WHERE ID_departement = ?', [idDepartement]);
+      res.json(specialites);
+  } catch (err) {
+      console.error('Erreur lors de la récupération des spécialités:', err);
+      res.status(500).json({ error: 'Erreur serveur' });
   }
 });
 // Route pour filtrer les sections
@@ -104,6 +127,32 @@ router.post('/etudiants/filtrer', async (req, res) => {
     res.status(500).json({ error: 'Une erreur s’est produite lors du filtrage. Veuillez réessayer.' });
   }
 });
+
+router.get('/sections/:idSpecialite', async (req, res) => {
+  const { idSpecialite } = req.params;
+  
+  try {
+      console.log("Requête pour récupérer les sections de la spécialité:", idSpecialite); // Debug
+
+      const [sections] = await db.query(
+          'SELECT ID_section, niveau FROM Section WHERE ID_specialite = ?',
+          [idSpecialite]
+      );
+
+      console.log("Sections récupérées:", sections); // Debug
+
+      if (sections.length === 0) {
+          return res.status(404).json({ error: 'Aucune section trouvée.' });
+      }
+
+      res.json(sections);
+  } catch (err) {
+      console.error('Erreur SQL lors de la récupération des sections:', err); // 🔴 Log SQL error
+      res.status(500).json({ error: 'Erreur serveur lors de la récupération des sections' });
+  }
+});
+
+
 
 // Route pour ajouter une section
 router.post('/sections', async (req, res) => {
