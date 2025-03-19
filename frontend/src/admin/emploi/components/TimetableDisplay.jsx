@@ -187,7 +187,7 @@ function TimetableDisplay({ timetable, sectionId, onRefresh }) {
     <div className="timetable-container">
       <h2 className="timetable-title">Emploi du Temps</h2>
       <button onClick={handleBackToHome} className="timetable-btn back">
-        Retour à l'accueil
+        Retour à l&apos;accueil
       </button>
       {error && <p className="timetable-error">{error}</p>}
       <table className="timetable-table">

@@ -121,9 +121,7 @@ router.post('/enseignants/filtrer', async (req, res) => {
             SELECT e.Matricule, u.nom, u.prenom, u.email
             FROM Enseignant e
             JOIN User u ON e.Matricule = u.Matricule
-            JOIN Departement d ON e.ID_departement = d.ID_departement
-            WHERE d.ID_faculte = ? AND e.ID_departement = ?
-
+            WHERE e.ID_faculte = ? AND e.ID_departement = ?
         `, [idFaculte, idDepartement]);
         res.json(enseignants);
     } catch (err) {
@@ -262,7 +260,7 @@ router.get('/sections/:idSpecialite', async (req, res) => {
     const { idSpecialite } = req.params;
     try {
         const [sections] = await db.query(`
-            SELECT ID_section, niveau, 
+            SELECT ID_section, niveau 
             FROM Section 
             WHERE ID_specialite = ?
         `, [idSpecialite]);

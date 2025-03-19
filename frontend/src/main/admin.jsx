@@ -28,6 +28,10 @@ const Admin = () => {
         navigate("/modifierProfilAdmin");
     };
 
+    const handleMessages = () => {
+        navigate("/messagesAdmin");
+    };
+
     const items = [
         { title: "📍 Événements", description: "Consulter et créer les événements", route: "/gestionEvenements" },
         { title: "📅 Exams Planning", description: "Consulter et créer les plannings des exams", route: "/consult" },
@@ -66,7 +70,7 @@ const Admin = () => {
                     {menuOpen && (
                         <div className="dropdown-menu">
                             <button onClick={handleEditProfile}>Compte</button>
-                            <button>Messages</button>
+                            <button onClick={handleMessages}>Messages</button>
                             <button onClick={handleLogout} className="logout-button">Déconnexion</button>
                         </div>
                     )}

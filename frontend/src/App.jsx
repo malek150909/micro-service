@@ -13,6 +13,11 @@ import TeacherSection from "./admin/enseignant/listenseignant";
 import StudentSection from "./admin/etudiant/listetudiant";
 import ModifieProfilAdmin from "./main/modifierProfilAdmin";
 import EmploiDuTemps from "./admin/emploi/pages/TimetablePage";
+import MessagesAdmin from "./main/messagesAdmin";
+import ModifieProfilEnseignant from "./main/modifierProfilEnseignant";
+import MessagesEnseignant from "./main/messagesEnseignant";
+import ModifierProfilEtudiant from "./main/modifierProfilEtudiant";
+import MessagesEtudiant from "./main/messagesEtudiant";
 
 
 const PrivateRoute = ({ element }) => {
@@ -40,6 +45,11 @@ function App() {
                 <Route path="/etudiants" element={<StudentSection />} />
                 <Route path="/modifierProfilAdmin" element={<ModifieProfilAdmin />} />
                 <Route path="/emploidutemps" element={<EmploiDuTemps />} />
+                <Route path="/messagesAdmin" element={<MessagesAdmin />} />
+                <Route path="/modifierProfilEnseignant" element={<ModifieProfilEnseignant />} />
+                <Route path="/messagesEnseignant" element={<MessagesEnseignant />} />
+                <Route path="/modifierProfilEtudiant" element={<ModifierProfilEtudiant />} />
+                <Route path="/messagesEtudiant" element={<MessagesEtudiant />} />
             </Routes>
         </Router>
     );

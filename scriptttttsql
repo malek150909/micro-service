@@ -1,0 +1,56 @@
+INSERT INTO faculte (nom_faculte) VALUES ('Faculté des Sciences Biologiques');
+INSERT INTO faculte (nom_faculte) VALUES ('Faculté de Chimie');
+INSERT INTO faculte (nom_faculte) VALUES ('Faculté de Physique');
+INSERT INTO faculte (nom_faculte) VALUES ('Faculté de Mathématiques');
+INSERT INTO faculte (nom_faculte) VALUES ('Faculté d''Informatique');
+INSERT INTO faculte (nom_faculte) VALUES ('Faculté de Génie Civil');
+INSERT INTO faculte (nom_faculte) VALUES ('Faculté de Génie Electrique');
+INSERT INTO faculte (nom_faculte) VALUES ('Faculté de Génie Mécanique et Génie des Procédés');
+INSERT INTO faculte (nom_faculte) VALUES ('Faculté des Sciences de la Terre, de la Géographie et de l''Aménagement du Territoire');
+
+INSERT INTO departement (Nom_departement, ID_faculte) VALUES ('Département de Biologie Cellulaire et Moléculaire', 2);
+INSERT INTO departement (Nom_departement, ID_faculte) VALUES ('Département de Biologie et Physiologie des Organismes', 2);
+INSERT INTO departement (Nom_departement, ID_faculte) VALUES ('Département d''Écologie et Environnement', 2);
+INSERT INTO departement (Nom_departement, ID_faculte) VALUES ('Palier SNV Licence', 2);
+
+INSERT INTO departement (Nom_departement, ID_faculte) VALUES ('Département de Géotechnique et Hydraulique', 8);
+INSERT INTO departement (Nom_departement, ID_faculte) VALUES ('Département de Structures et Matériaux', 8);
+
+INSERT INTO departement (Nom_departement, ID_faculte) VALUES ('Les départements spécifiques ne sont pas détaillés dans les sources disponibles.', 9);
+
+INSERT INTO departement (Nom_departement, ID_faculte) VALUES ('Département de Géographie et de l''Aménagement du Territoire', 11);
+INSERT INTO departement (Nom_departement, ID_faculte) VALUES ('Département de Géologie', 11);
+INSERT INTO departement (Nom_departement, ID_faculte) VALUES ('Département de Géophysique', 11);
+
+INSERT INTO departement (Nom_departement, ID_faculte) VALUES ('Département de Construction Mécanique et Productique', 10);
+INSERT INTO departement (Nom_departement, ID_faculte) VALUES ('Département de Thermo-Énergétique', 10);
+INSERT INTO departement (Nom_departement, ID_faculte) VALUES ('Département de Science des Matériaux', 10);
+INSERT INTO departement (Nom_departement, ID_faculte) VALUES ('Département de Génie Chimique et Cryogénie', 10);
+INSERT INTO departement (Nom_departement, ID_faculte) VALUES ('Département de Génie de l''Environnement', 10);
+INSERT INTO departement (Nom_departement, ID_faculte) VALUES ('Département des Systèmes d''Information et de la Qualité ', 7);
+INSERT INTO departement (Nom_departement, ID_faculte) VALUES ('Département de l''Informatique Fondamentale', 7);
+INSERT INTO departement (Nom_departement, ID_faculte) VALUES ('Département de Génie Logiciel et Réseaux', 7);
+INSERT INTO departement (Nom_departement, ID_faculte) VALUES ('Département d''Intelligence Artificielle et de Science des Données', 7);
+
+INSERT INTO specialite (nom_specialite, ID_departement , ID_faculte) VALUES ('Biotechnologie en Santé',6 ,2);
+INSERT INTO specialite (nom_specialite, ID_departement , ID_faculte) VALUES ('Biochimie',6 ,2);
+INSERT INTO specialite (nom_specialite, ID_departement , ID_faculte) VALUES ('Microbiologie',6 ,2);
+INSERT INTO specialite (nom_specialite, ID_departement , ID_faculte) VALUES ('Génétique',6 ,2);
+INSERT INTO specialite (nom_specialite, ID_departement , ID_faculte) VALUES ('Réseaux et Systèmes Distribués',21 ,7);
+INSERT INTO specialite (nom_specialite, ID_departement , ID_faculte) VALUES ('Ingénierie Logicielle',21 ,7);
+INSERT INTO specialite (nom_specialite, ID_departement , ID_faculte) VALUES ('Sécurité des Systèmes d''Information',21 ,7);
+INSERT INTO specialite (nom_specialite, ID_departement , ID_faculte) VALUES ('Big Data',22 ,7);
+INSERT INTO specialite (nom_specialite, ID_departement , ID_faculte) VALUES ('Systèmes d''Information Intelligents',22 ,7);
+INSERT INTO specialite (nom_specialite, ID_departement , ID_faculte) VALUES ('Systèmes d''Information Intelligents',24 ,7);
+INSERT INTO specialite (nom_specialite, ID_departement , ID_faculte) VALUES ('Ingénierie des Données et des Connaissances',24 ,6);
+INSERT INTO specialite (nom_specialite, ID_departement , ID_faculte) VALUES ('Bioinformatique',24 ,7);
+INSERT INTO specialite (nom_specialite, ID_departement , ID_faculte) VALUES ('Génie des Télécommunications et Réseaux',23 ,7);
+INSERT INTO specialite (nom_specialite, ID_departement , ID_faculte) VALUES ('ACAD',22 ,7);
+INSERT INTO specialite (nom_specialite, ID_departement , ID_faculte) VALUES ('ISIL',21 ,7);
+
+
+ALTER TABLE enseignant 
+ADD COLUMN ID_faculte INT, 
+ADD COLUMN ID_departement INT, 
+ADD CONSTRAINT fk_nom_colonne1 FOREIGN KEY (ID_faculte) REFERENCES faculte(ID_faculte),
+ADD CONSTRAINT fk_nom_colonne2 FOREIGN KEY (ID_departement) REFERENCES departement(ID_departement);

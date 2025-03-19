@@ -232,3 +232,14 @@
     margin-top: 15px;
     color: #f44336;
 }
+
+
+.timetable-btn.generate {
+    background-color: #17a2b8; /* Cyan pour "générer" */
+    color: white;
+    margin-bottom: 15px;
+  }
+  
+  .timetable-btn.generate:hover {
+    background-color: #138496; /* Cyan plus foncé au survol */
+  }

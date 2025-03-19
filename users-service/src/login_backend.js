@@ -5,7 +5,6 @@ const cors = require('cors');
 const enseignantRoutes = require('../routes/enseignantRoute');
 const etudiantRoutes = require('../routes/etudiantRoute');
 
-
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -13,7 +12,7 @@ app.use('/api', enseignantRoutes);
 app.use('/api', etudiantRoutes);
 
 const PORT = 8081;
-const JWT_SECRET = process.env.JWT_SECRET || "secret_key";
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // Fonction pour récupérer un utilisateur avec toutes ses données
 async function getUserWithRole(matricule) {
@@ -31,17 +30,19 @@ async function getUserWithRole(matricule) {
                 e.ID_specialite, 
                 e.annee_inscription AS etudiant_annee_inscription, 
                 e.etat,
+                s.nom_specialite,  -- Nom de la spécialité
                 ens.annee_inscription AS enseignant_annee_inscription,
-                CASE 
-                    WHEN a.Matricule IS NOT NULL THEN 'admin'
-                    WHEN e.Matricule IS NOT NULL THEN 'etudiant'
-                    WHEN ens.Matricule IS NOT NULL THEN 'enseignant'
-                    ELSE NULL
-                END AS role
+                ens.ID_faculte,
+                ens.ID_departement,
+                f.nom_faculte,
+                d.Nom_departement
             FROM User u
             LEFT JOIN admin a ON u.Matricule = a.Matricule
             LEFT JOIN Etudiant e ON u.Matricule = e.Matricule
+            LEFT JOIN specialite s ON e.ID_specialite = s.ID_specialite  -- Jointure avec specialite
             LEFT JOIN Enseignant ens ON u.Matricule = ens.Matricule
+            LEFT JOIN faculte f ON ens.ID_faculte = f.ID_faculte
+            LEFT JOIN departement d ON ens.ID_departement = d.ID_departement
             WHERE u.Matricule = ?
         `, [matricule]);
 
@@ -64,23 +65,21 @@ app.post('/login', async (req, res) => {
     }
 
     try {
-        // Récupérer l'utilisateur avec toutes ses données
         const user = await getUserWithRole(matricule);
 
         if (!user) {
             return res.status(401).json({ error: "Utilisateur non trouvé" });
         }
 
-        // Vérifier le mot de passe (en clair, comme demandé)
         if (user.motdepasse !== password) {
             return res.status(401).json({ error: "Mot de passe incorrect" });
         }
 
         if (!user.role) {
-            return res.status(403).json({ error: "Rôle non identifié" });
+            const role = user.poste ? 'admin' : user.niveau ? 'etudiant' : user.enseignant_annee_inscription ? 'enseignant' : null;
+            user.role = role;
         }
 
-        // Préparer les données à renvoyer
         const userData = {
             Matricule: user.Matricule,
             nom: user.nom,
@@ -91,23 +90,29 @@ app.post('/login', async (req, res) => {
             ...(user.role === 'admin' && { poste: user.poste }),
             ...(user.role === 'etudiant' && {
                 niveau: user.niveau,
-                ID_specialite: user.ID_specialite,
+                ID_specialite: user.ID_specialite,  // Conserver l’ID
                 annee_inscription: user.etudiant_annee_inscription,
-                etat: user.etat
+                etat: user.etat,
+                nom_specialite: user.nom_specialite  // Ajouter le nom
             }),
-            ...(user.role === 'enseignant' && { annee_inscription: user.enseignant_annee_inscription })
+            ...(user.role === 'enseignant' && { 
+                annee_inscription: user.enseignant_annee_inscription,
+                ID_faculte: user.ID_faculte,
+                ID_departement: user.ID_departement,
+                nom_faculte: user.nom_faculte,
+                Nom_departement: user.Nom_departement
+            }),
         };
 
-        // Générer un token JWT (optionnel, mais recommandé)
         const token = jwt.sign(
             { matricule: user.Matricule, role: user.role },
             JWT_SECRET,
-            { expiresIn: '1h' }
+            { expiresIn: '24h' }
         );
 
         res.json({
             message: "Connexion réussie",
-            token, // Ajout du token pour une gestion sécurisée côté frontend
+            token,
             user: userData
         });
     } catch (error) {
