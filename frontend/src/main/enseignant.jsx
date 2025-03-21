@@ -33,6 +33,8 @@ const Enseignant = () => {
     };
 
     const items = [
+        { title: "📍 Ressources", description: "Consulter et ajouter des ressources", route: "/ressources" },
+        { title: "📍 Notes", description: "Consulter les Notes des etudiants", route: "/notes" },
     ];
 
     return (

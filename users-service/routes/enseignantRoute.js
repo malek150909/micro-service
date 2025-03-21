@@ -260,7 +260,7 @@ router.get('/sections/:idSpecialite', async (req, res) => {
     const { idSpecialite } = req.params;
     try {
         const [sections] = await db.query(`
-            SELECT ID_section, niveau 
+            SELECT ID_section, niveau, nom_section 
             FROM Section 
             WHERE ID_specialite = ?
         `, [idSpecialite]);

@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import FilterPanel from './FilterPanel';
 import StudentSection from './StudentSection';
 import { ToastContainer, toast } from 'react-toastify';
@@ -7,10 +6,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaList, FaPlus } from 'react-icons/fa';
 import Swal from 'sweetalert2';
-import '../../admin_css_files/listetudiant.css';
+import "../../admin_css_files/listetudiant.css";
 
-const listetudiant = () => {
-  const navigate = useNavigate();
+const App = () => {
   const [sections, setSections] = useState([]);
   const [selectedSection, setSelectedSection] = useState(null);
   const [currentFilters, setCurrentFilters] = useState({});
@@ -89,7 +87,7 @@ const listetudiant = () => {
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch('http://localhost:8081/api/sections', {
+        fetch('http://localhost:8081/apii/sections', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ idSpecialite, niveau }),
@@ -151,7 +149,7 @@ const listetudiant = () => {
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch(`http://localhost:8081/api/sections/${idSection}`, {
+        fetch(`http://localhost:8081/apii/sections/${idSection}`, {
           method: 'DELETE',
         })
           .then(res => {
@@ -190,19 +188,9 @@ const listetudiant = () => {
     });
   };
 
-  const handleBackToAdmin = () => {
-    navigate("/Admin"); // Navigation vers la page Admin
-  };
-
   return (
     <div id="listetudiants">
     <div className="container">
-    <button
-      onClick={handleBackToAdmin}
-      className="button" // Ajoutez cette classe personnalisée
-    >
-      Retour à l&apos;accueil
-    </button>
       <h1><FaList /> Liste des Étudiants</h1>
       <AnimatePresence mode="wait">
         {!selectedSection ? (
@@ -277,4 +265,4 @@ const listetudiant = () => {
   );
 };
 
-export default listetudiant; 
+export default App;

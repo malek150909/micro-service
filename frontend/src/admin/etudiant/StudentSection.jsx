@@ -4,7 +4,6 @@ import { toast } from 'react-toastify';
 import { FaPlus, FaTrash, FaUpload, FaArrowLeft } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 import { motion, AnimatePresence } from 'framer-motion';
-import '../../admin_css_files/listetudiant.css';
 
 const StudentSection = ({ sectionId, onBack, niveau, idSpecialite }) => {
   const [students, setStudents] = useState([]);
@@ -22,11 +21,11 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite }) => {
   });
   const [editStudent, setEditStudent] = useState(null);
   const [showAddStudentForm, setShowAddStudentForm] = useState(false);
-  const [importDetails, setImportDetails] = useState(null); // Nouvel état pour stocker les détails de l'importation
+  const [importDetails, setImportDetails] = useState(null); // État pour stocker les détails de l'importation
 
   const fetchStudents = async () => {
     try {
-      const res = await axios.get(`http://localhost:8081/api/sections/${sectionId}/etudiants`);
+      const res = await axios.get(`http://localhost:8081/apii/sections/${sectionId}/etudiants`);
       setStudents(res.data);
     } catch (err) {
       toast.error('Impossible de charger la liste des étudiants. Veuillez réessayer.', {
@@ -44,7 +43,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite }) => {
   const fetchNomSpecialite = async () => {
     if (!idSpecialite) return;
     try {
-      const res = await axios.get(`http://localhost:8081/api/specialites/${idSpecialite}`);
+      const res = await axios.get(`http://localhost:8081/apii/specialites/${idSpecialite}`);
       setNomSpecialite(res.data.nom_specialite || '');
       setNewStudent(prev => ({ ...prev, nomSpecialite: res.data.nom_specialite || '' }));
     } catch (err) {
@@ -94,7 +93,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite }) => {
     }
 
     try {
-      const res = await axios.post(`http://localhost:8081/api/sections/${sectionId}/etudiants`, newStudent);
+      const res = await axios.post(`http://localhost:8081/apii/sections/${sectionId}/etudiants`, newStudent);
       if (res.status === 200 || res.status === 201) {
         await fetchStudents(); // Rafraîchir la liste
         toast.success('Étudiant ajouté avec succès !', {
@@ -137,7 +136,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite }) => {
     if (!editStudent) return;
 
     try {
-      const res = await axios.put(`http://localhost:8081/api/etudiants/${student.Matricule}`, editStudent);
+      const res = await axios.put(`http://localhost:8081/apii/etudiants/${student.Matricule}`, editStudent);
       if (res.status === 200) {
         await fetchStudents();
         toast.success('Étudiant modifié avec succès !', {
@@ -185,7 +184,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite }) => {
 
     if (result.isConfirmed) {
       try {
-        const res = await axios.delete(`http://localhost:8081/api/etudiants/${matricule}`);
+        const res = await axios.delete(`http://localhost:8081/apii/etudiants/${matricule}`);
         if (res.status === 200) {
           await fetchStudents();
           toast.success('Étudiant supprimé avec succès !', {
@@ -233,7 +232,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite }) => {
 
     if (result.isConfirmed) {
       try {
-        await axios.delete(`http://localhost:8081/api/sections/${sectionId}`);
+        await axios.delete(`http://localhost:8081/apii/sections/${sectionId}`);
         onBack();
         toast.success('Section supprimée avec succès !', {
           position: 'top-right',
@@ -278,27 +277,25 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite }) => {
     formData.append('file', file);
 
     axios
-      .post(`http://localhost:8081/api/sections/${sectionId}/upload`, formData, {
+      .post(`http://localhost:8081/apii/sections/${sectionId}/upload`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
       .then(res => {
-        // Afficher le message renvoyé par l'API
         const toastType = res.data.importedCount > 0 ? toast.success : toast.info;
         toastType(res.data.message, {
           position: 'top-right',
-          autoClose: 5000, // Augmenter la durée pour permettre la lecture des détails
+          autoClose: 5000,
           hideProgressBar: true,
           closeOnClick: true,
           pauseOnHover: true,
           style: {
-            backgroundColor: res.data.importedCount > 0 ? '#28a745' : '#ff9800', // Vert pour succès, orange pour info
+            backgroundColor: res.data.importedCount > 0 ? '#28a745' : '#ff9800',
             color: '#ffffff',
             fontSize: '16px',
           },
           icon: res.data.importedCount > 0 ? '✅' : 'ℹ️',
         });
 
-        // Stocker les détails de l'importation pour affichage
         setImportDetails({
           importedCount: res.data.importedCount,
           skippedCount: res.data.skippedCount,
@@ -306,7 +303,6 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite }) => {
           skippedStudents: res.data.skippedStudents,
         });
 
-        // Rafraîchir la liste des étudiants uniquement si des étudiants ont été importés
         if (res.data.importedCount > 0) {
           fetchStudents();
         }
@@ -325,7 +321,13 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite }) => {
       });
   };
 
+  // Fonction pour fermer les détails de l'importation
+  const handleCloseImportDetails = () => {
+    setImportDetails(null); // Réinitialiser l'état pour masquer les détails
+  };
+
   return (
+    <div id="listetudiants">
     <div className="student-section">
       <button className="back-btn" onClick={onBack}>
         <FaArrowLeft /> Retour
@@ -345,15 +347,21 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite }) => {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.5 }}
-            style={{ marginBottom: '20px', padding: '10px', border: '1px solid #ccc', borderRadius: '5px' }}
+            style={{
+              marginBottom: '20px',
+              padding: '10px',
+              border: '1px solid #b3d4fc',
+              borderRadius: '5px',
+              backgroundColor: '#f0faff',
+            }}
           >
-            <h4>Résultat de l&apos;importation :</h4>
+            <h4 style={{ color: '#1a3c6d' }}>Résultat de l'importation :</h4>
             <p>Étudiants importés : {importDetails.importedCount}</p>
             <p>Étudiants ignorés : {importDetails.skippedCount}</p>
             {importDetails.skippedStudents.length > 0 && (
               <div>
                 <h5>Étudiants ignorés :</h5>
-                <ul>
+                <ul style={{ listStyleType: 'disc', marginLeft: '20px' }}>
                   {importDetails.skippedStudents.map((student, index) => (
                     <li key={index}>
                       {student.nom} {student.prenom} (Matricule: {student.matricule}) - {student.reason}
@@ -365,7 +373,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite }) => {
             {importDetails.importedStudents.length > 0 && (
               <div>
                 <h5>Étudiants importés :</h5>
-                <ul>
+                <ul style={{ listStyleType: 'disc', marginLeft: '20px' }}>
                   {importDetails.importedStudents.map((student, index) => (
                     <li key={index}>
                       {student.nom} {student.prenom} (Matricule: {student.matricule})
@@ -374,6 +382,14 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite }) => {
                 </ul>
               </div>
             )}
+            {/* Bouton Fermer */}
+            <button
+              className="back-btn"
+              onClick={handleCloseImportDetails}
+              style={{ marginTop: '15px', display: 'block', marginLeft: 'auto', marginRight: 'auto' }}
+            >
+              Fermer
+            </button>
           </motion.div>
         )}
 
@@ -458,6 +474,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite }) => {
           ))}
         </tbody>
       </table>
+    </div>
     </div>
   );
 };

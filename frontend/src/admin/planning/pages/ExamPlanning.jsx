@@ -1,18 +1,16 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { useNavigate } from 'react-router-dom';
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import FilterForm from "../components/FilterForm";
 import ExamForm from "../components/ExamForm";
 import ExamList from "../components/ExamList";
-import '../../../admin_css_files/exam.css';
-
-
 
 const ExamPlanning = () => {
+  const navigate = useNavigate();
   const [exams, setExams] = useState([]);
   const [error, setError] = useState(null);
   const [isFilterApplied, setIsFilterApplied] = useState(false);
@@ -25,12 +23,19 @@ const ExamPlanning = () => {
     specialite: "",
     specialiteName: "",
     section: "",
+    sectionName: "", // Ajout de sectionName
     ID_semestre: "",
   });
-  const navigate = useNavigate();
   const [modules, setModules] = useState([]);
   const [salles, setSalles] = useState([]);
   const [semestres, setSemestres] = useState([]);
+
+  const [nameCache, setNameCache] = useState({
+    faculte: {},
+    departement: {},
+    specialite: {},
+    section: {}, // Ajout de cache pour section
+  });
 
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8083";
 
@@ -44,10 +49,9 @@ const ExamPlanning = () => {
       const response = await axios.get(`${API_URL}/exams`, {
         params: currentFilters,
       });
-      // Ensure dates are in YYYY-MM-DD format
-      const normalizedExams = response.data.map(exam => ({
+      const normalizedExams = response.data.map((exam) => ({
         ...exam,
-        exam_date: exam.exam_date, // Already in YYYY-MM-DD format from backend
+        exam_date: exam.exam_date,
       }));
       setExams(normalizedExams);
       return response;
@@ -87,13 +91,73 @@ const ExamPlanning = () => {
     }
   };
 
-  const handleFilter = (newFilters) => {
+  const fetchName = async (url, id, field, cacheKey) => {
+    if (!id) return "";
+    if (nameCache[cacheKey][id]) {
+      console.log(`Cache hit for ${cacheKey} (${id}):`, nameCache[cacheKey][id]);
+      return nameCache[cacheKey][id];
+    }
+    try {
+      console.log(`Fetching ${cacheKey} from URL: ${url}`);
+      const response = await axios.get(url);
+      console.log(`Response for ${cacheKey}:`, response.data);
+      const item = response.data.find((item) => String(item[field]) === String(id));
+      console.log(`Found item for ${field} = ${id}:`, item);
+      let name;
+      if (item) {
+        const expectedField = field.replace("ID_", "nom_");
+        name = item[expectedField] || item["Nom_departement"] || "N/A"; // Fallback pour Nom_departement
+      } else {
+        name = "N/A";
+      }
+      console.log(`Extracted name for ${cacheKey} (${id}): ${name}`);
+      setNameCache((prev) => ({
+        ...prev,
+        [cacheKey]: { ...prev[cacheKey], [id]: name },
+      }));
+      return name;
+    } catch (err) {
+      console.error(`Erreur de récupération de ${cacheKey} (${id}):`, err);
+      return "N/A";
+    }
+  };
+
+  const handleFilter = async (newFilters) => {
     console.log("New filters applied:", newFilters);
+
+    const faculteName = await fetchName(
+      `${API_URL}/exams/facultes`,
+      newFilters.faculte,
+      "ID_faculte",
+      "faculte"
+    );
+    const departementName = await fetchName(
+      `${API_URL}/exams/departements?faculte=${newFilters.faculte}`,
+      newFilters.departement,
+      "ID_departement",
+      "departement"
+    );
+    const specialiteName = await fetchName(
+      `${API_URL}/exams/specialites?departement=${newFilters.departement}&niveau=${newFilters.niveau}`,
+      newFilters.specialite,
+      "ID_specialite",
+      "specialite"
+    );
+    const sectionName = await fetchName(
+      `${API_URL}/exams/sections?specialite=${newFilters.specialite}&niveau=${newFilters.niveau}`,
+      newFilters.section,
+      "ID_section",
+      "section"
+    );
+
+    console.log("Fetched names:", { faculteName, departementName, specialiteName, sectionName });
+
     const updatedFilters = {
       ...newFilters,
-      faculteName: newFilters.faculte ? getFaculteName(newFilters.faculte) : "",
-      departementName: newFilters.departement ? getDepartementName(newFilters.departement) : "",
-      specialiteName: newFilters.specialite ? getSpecialiteName(newFilters.specialite) : "",
+      faculteName,
+      departementName,
+      specialiteName,
+      sectionName, // Ajout de sectionName
     };
     setFilters(updatedFilters);
     if (newFilters.section) {
@@ -101,22 +165,6 @@ const ExamPlanning = () => {
     }
     setIsFilterApplied(true);
     fetchExams(newFilters);
-  };
-
-  // Placeholder functions to map IDs to names (replace with actual logic)
-  const getFaculteName = (faculteId) => {
-    const faculteMap = { "1": "Faculty of Computer Science" };
-    return faculteMap[faculteId] || "N/A";
-  };
-
-  const getDepartementName = (departementId) => {
-    const departementMap = { "1": "Computer Science Department" };
-    return departementMap[departementId] || "N/A";
-  };
-
-  const getSpecialiteName = (specialiteId) => {
-    const specialiteMap = { "1": "Software Engineering" };
-    return specialiteMap[specialiteId] || "N/A";
   };
 
   const handleAddExam = async (examData) => {
@@ -162,177 +210,159 @@ const ExamPlanning = () => {
     }
   };
 
-const exportToPDF = () => {
-  const doc = new jsPDF();
-  const semesterTitle = filters.ID_semestre ? `Semestre ${filters.ID_semestre}` : "";
-  const fileName = `${filters.specialiteName
-    ?.toLowerCase()
-    .replace(/ /g, "_")}_${filters.niveau?.toLowerCase()}_${filters.section?.toLowerCase()}`;
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+    const semesterTitle = filters.ID_semestre ? `Semestre ${filters.ID_semestre}` : "";
+    const fileName = `${filters.specialiteName
+      ?.toLowerCase()
+      .replace(/ /g, "_")}_${filters.niveau?.toLowerCase()}_${filters.sectionName?.toLowerCase().replace(/ /g, "_") || filters.section}`;
 
-  // Colors
-  const primaryColor = [52, 73, 94]; // #34495e (Dark Blue)
-  const secondaryColor = [220, 220, 220]; // #dcdcdc (Light Gray)
-  const backgroundColor = [245, 245, 245]; // #f5f5f5 (Very Light Gray)
-  const white = [255, 255, 255];
+    const primaryColor = [52, 73, 94];
+    const secondaryColor = [220, 220, 220];
+    const backgroundColor = [245, 245, 245];
+    const white = [255, 255, 255];
 
-  // Helper function to add header
-  const addHeader = () => {
-    doc.setFillColor(...primaryColor);
-    doc.rect(0, 0, doc.internal.pageSize.width, 20, "F"); // Header background
-    doc.setFontSize(16);
+    const addHeader = () => {
+      doc.setFillColor(...primaryColor);
+      doc.rect(0, 0, doc.internal.pageSize.width, 20, "F");
+      doc.setFontSize(16);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(...white);
+    };
+
+    const addFooter = () => {
+      const pageCount = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.setFont("helvetica", "normal");
+        const pageStr = `Page ${i} of ${pageCount}`;
+        const dateStr = new Date().toLocaleDateString("fr-FR", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+        doc.text(pageStr, doc.internal.pageSize.width - 30, doc.internal.pageSize.height - 10, { align: "right" });
+        doc.text(`Généré le ${dateStr}`, 20, doc.internal.pageSize.height - 10);
+      }
+    };
+
+    addHeader();
+
+    doc.setFontSize(20);
     doc.setFont("helvetica", "bold");
-    doc.setTextColor(...white);
-    
-  };
+    doc.setTextColor(...primaryColor);
+    doc.text(`Planning des Examens : ${semesterTitle}`, doc.internal.pageSize.width / 2, 35, { align: "center" });
 
-  // Helper function to add footer
-  const addFooter = () => {
-    const pageCount = doc.internal.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-      doc.setFontSize(10);
-      doc.setTextColor(100);
-      doc.setFont("helvetica", "normal");
-      const pageStr = `Page ${i} of ${pageCount}`;
-      const dateStr = new Date().toLocaleDateString("fr-FR", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
-      doc.text(pageStr, doc.internal.pageSize.width - 30, doc.internal.pageSize.height - 10, { align: "right" });
-      doc.text(`Généré le ${dateStr}`, 20, doc.internal.pageSize.height - 10);
+    doc.setDrawColor(...secondaryColor);
+    doc.setLineWidth(0.5);
+    doc.line(20, 40, doc.internal.pageSize.width - 20, 40);
+
+    doc.setFillColor(...backgroundColor);
+    doc.rect(20, 45, doc.internal.pageSize.width - 40, 50, "F");
+    doc.setDrawColor(...secondaryColor);
+    doc.rect(20, 45, doc.internal.pageSize.width - 40, 50, "S");
+
+    doc.setFontSize(12);
+    doc.setTextColor(100);
+    doc.setFont("helvetica", "normal");
+
+    const leftColumnX = 30;
+    const rightColumnX = 90;
+    const startY = 55;
+    const lineHeight = 8;
+
+    doc.text("Faculté:", leftColumnX, startY);
+    doc.text("Département:", leftColumnX, startY + lineHeight);
+    doc.text("Spécialité:", leftColumnX, startY + lineHeight * 2);
+    doc.text("Niveau:", leftColumnX, startY + lineHeight * 3);
+    doc.text("Section:", leftColumnX, startY + lineHeight * 4);
+
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(...primaryColor);
+    doc.text(filters.faculteName || "Non sélectionné", rightColumnX, startY);
+    doc.text(filters.departementName || "Non sélectionné", rightColumnX, startY + lineHeight);
+    doc.text(filters.specialiteName || "Non sélectionné", rightColumnX, startY + lineHeight * 2);
+    doc.text(filters.niveau || "Non sélectionné", rightColumnX, startY + lineHeight * 3);
+    doc.text(filters.sectionName || "Non sélectionné", rightColumnX, startY + lineHeight * 4); // Utiliser sectionName
+
+    const headers = [["Date", "Horaire", "Module", "Salle"]];
+    const data = exams.map((exam) => [
+      formatDate(exam.exam_date),
+      exam.time_slot,
+      exam.nom_module,
+      exam.ID_salle,
+    ]);
+
+    autoTable(doc, {
+      head: headers,
+      body: data,
+      startY: 100,
+      theme: "grid",
+      headStyles: {
+        fillColor: primaryColor,
+        textColor: white,
+        fontSize: 12,
+        fontStyle: "bold",
+        halign: "center",
+        cellPadding: 4,
+      },
+      bodyStyles: {
+        fontSize: 10,
+        textColor: [50, 50, 50],
+        halign: "center",
+        cellPadding: 4,
+      },
+      alternateRowStyles: {
+        fillColor: [230, 230, 230],
+      },
+      margin: { left: 20, right: 20 },
+      columnStyles: {
+        0: { cellWidth: "auto" },
+        1: { cellWidth: "auto" },
+        2: { cellWidth: "auto" },
+        3: { cellWidth: "auto" },
+      },
+      styles: {
+        lineWidth: 0.2,
+        lineColor: secondaryColor,
+        overflow: "linebreak",
+      },
+      didDrawPage: (data) => {
+        addHeader();
+      },
+    });
+
+    addFooter();
+    doc.save(`${fileName}_examen.pdf`);
+
+    function formatDate(dateStr) {
+      const date = new Date(dateStr);
+      const day = String(date.getDate()).padStart(2, "0");
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
     }
   };
-
-  // Add header to all pages
-  addHeader();
-
-  // Title
-  doc.setFontSize(20);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(...primaryColor);
-  doc.text(`Planning des Examens : ${semesterTitle}`, doc.internal.pageSize.width / 2, 35, { align: "center" });
-
-  // Separator line below title
-  doc.setDrawColor(...secondaryColor);
-  doc.setLineWidth(0.5);
-  doc.line(20, 40, doc.internal.pageSize.width - 20, 40);
-
-  // Metadata Section
-  doc.setFillColor(...backgroundColor);
-  doc.rect(20, 45, doc.internal.pageSize.width - 40, 50, "F"); // Background for metadata
-  doc.setDrawColor(...secondaryColor);
-  doc.rect(20, 45, doc.internal.pageSize.width - 40, 50, "S"); // Border
-
-  // Metadata Grid Layout
-  doc.setFontSize(12);
-  doc.setTextColor(100); // Dark gray for metadata text
-  doc.setFont("helvetica", "normal");
-
-  const leftColumnX = 30; // Left column for labels
-  const rightColumnX = 90; // Right column for values
-  const startY = 55; // Starting Y position
-  const lineHeight = 8; // Space between lines
-
-  // Labels (left column)
-  doc.text("Faculté:", leftColumnX, startY);
-  doc.text("Département:", leftColumnX, startY + lineHeight);
-  doc.text("Spécialité:", leftColumnX, startY + lineHeight * 2);
-  doc.text("Niveau:", leftColumnX, startY + lineHeight * 3);
-  doc.text("Section:", leftColumnX, startY + lineHeight * 4);
-
-  // Values (right column)
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(...primaryColor);
-  doc.text(filters.faculteName || "Non sélectionné", rightColumnX, startY);
-  doc.text(filters.departementName || "Non sélectionné", rightColumnX, startY + lineHeight);
-  doc.text(filters.specialiteName || "Non sélectionné", rightColumnX, startY + lineHeight * 2);
-  doc.text(filters.niveau || "Non sélectionné", rightColumnX, startY + lineHeight * 3);
-  doc.text(filters.section ? `Section ${filters.section}` : "Non sélectionné", rightColumnX, startY + lineHeight * 4);
-
-  // Table
-  const headers = [["Date", "Horaire", "Module", "Salle"]];
-  const data = exams.map((exam) => [
-    formatDate(exam.exam_date),
-    exam.time_slot,
-    exam.nom_module,
-    exam.ID_salle,
-  ]);
-
-  autoTable(doc, {
-    head: headers,
-    body: data,
-    startY: 100, // Adjusted startY after metadata
-    theme: "grid", // Use grid theme for better table structure
-    headStyles: {
-      fillColor: primaryColor, // Dark blue header
-      textColor: white, // White text in header
-      fontSize: 12,
-      fontStyle: "bold",
-      halign: "center", // Center-align header text
-      cellPadding: 4,
-    },
-    bodyStyles: {
-      fontSize: 10,
-      textColor: [50, 50, 50], // Dark gray for body text
-      halign: "center", // Center-align body text
-      cellPadding: 4,
-    },
-    alternateRowStyles: {
-      fillColor: [230, 230, 230], // Light gray for alternating rows
-    },
-    margin: { left: 20, right: 20 },
-    columnStyles: {
-      0: { cellWidth: "auto" }, // Date
-      1: { cellWidth: "auto" }, // Horaire
-      2: { cellWidth: "auto" }, // Module
-      3: { cellWidth: "auto" }, // Salle
-    },
-    styles: {
-      lineWidth: 0.2,
-      lineColor: secondaryColor, // Light gray grid lines
-      overflow: "linebreak", // Handle overflow text
-    },
-    didDrawPage: (data) => {
-      addHeader(); // Add header to each page
-    },
-  });
-
-  // Add footer after table is drawn
-  addFooter();
-
-  // Save the PDF
-  doc.save(`${fileName}_examen.pdf`);
-
-  // Helper function to format date
-  function formatDate(dateStr) {
-    const date = new Date(dateStr);
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  }
-};
 
   const exportToExcel = () => {
     const semesterTitle = filters.ID_semestre ? ` - Semestre ${filters.ID_semestre}` : "";
     const fileName = `${filters.specialiteName
       ?.toLowerCase()
-      .replace(/ /g, "_")}_${filters.niveau?.toLowerCase()}_${filters.section?.toLowerCase()}`;
+      .replace(/ /g, "_")}_${filters.niveau?.toLowerCase()}_${filters.sectionName?.toLowerCase().replace(/ /g, "_") || filters.section}`;
 
-    // Prepare data with filter information as headers
     const filterData = [
       [`Planning des Examens${semesterTitle}`],
       [""],
       [`Faculté: ${filters.faculteName || "Non sélectionné"}`],
       [`Département: ${filters.departementName || "Non sélectionné"}`],
-      [`Spécialité: ${filters.specialityName || "Non sélectionné"}`],
+      [`Spécialité: ${filters.specialiteName || "Non sélectionné"}`],
       [`Niveau: ${filters.niveau || "Non sélectionné"}`],
-      [`Section: ${filters.section ? `Section ${filters.section}` : "Non sélectionné"}`],
+      [`Section: ${filters.sectionName || "Non sélectionné"}`], // Utiliser sectionName
       [""],
     ];
 
-    // Prepare exam data
     const examData = exams.map((exam) => ({
       Date: formatDate(exam.exam_date),
       Horaire: exam.time_slot,
@@ -340,58 +370,49 @@ const exportToPDF = () => {
       Salle: exam.ID_salle,
     }));
 
-    // Create worksheet
     const ws = XLSX.utils.json_to_sheet(examData, {
       header: ["Date", "Horaire", "Module", "Salle"],
       skipHeader: false,
-      origin: { r: 8, c: 0 }, // Start exam data after filter info
+      origin: { r: 8, c: 0 },
     });
 
-    // Add filter information to the top
     XLSX.utils.sheet_add_aoa(ws, filterData, { origin: "A1" });
 
-    // Styling the worksheet (basic structure; advanced styling requires xlsx-style)
     ws["!cols"] = [
-      { wch: 15 }, // Date column width
-      { wch: 15 }, // Horaire column width
-      { wch: 20 }, // Module column width
-      { wch: 10 }, // Salle column width
+      { wch: 15 },
+      { wch: 15 },
+      { wch: 20 },
+      { wch: 10 },
     ];
 
-    // Merge cells for the title
     ws["!merges"] = [
-      { s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }, // Merge title across 4 columns
+      { s: { r: 0, c: 0 }, e: { r: 0, c: 3 } },
     ];
 
-    // Placeholder for styling (requires xlsx-style for actual application)
     Object.keys(ws).forEach((cell) => {
       if (cell === "!ref" || cell === "!cols" || cell === "!merges") return;
 
       const row = parseInt(cell.match(/\d+/)[0], 10);
       if (row === 1) {
-        // Title row
         ws[cell].s = {
           font: { sz: 16, bold: true },
           alignment: { horizontal: "center" },
-          fill: { fgColor: { rgb: "2c3e50" } }, // Darker elegant color (background)
+          fill: { fgColor: { rgb: "2c3e50" } },
         };
       } else if (row >= 3 && row <= 7) {
-        // Filter info rows
         ws[cell].s = {
           font: { sz: 12 },
-          fill: { fgColor: { rgb: "f9f9f9" } }, // Subtle background
+          fill: { fgColor: { rgb: "f9f9f9" } },
           border: { top: { style: "thin", color: { rgb: "dcdcdc" } } },
         };
       } else if (row === 9) {
-        // Header row
         ws[cell].s = {
           font: { sz: 12, bold: true },
-          fill: { fgColor: { rgb: "34495e" } }, // Dark blue background
+          fill: { fgColor: { rgb: "34495e" } },
           alignment: { horizontal: "center" },
-          color: { rgb: "FFFFFF" }, // White text
+          color: { rgb: "FFFFFF" },
         };
       } else if (row > 9) {
-        // Data rows
         ws[cell].s = {
           font: { sz: 10 },
           alignment: { horizontal: "center" },
@@ -418,52 +439,50 @@ const exportToPDF = () => {
   };
 
   const handleBackToAdmin = () => {
-    navigate("/Admin"); // Navigation vers la page Admin
+    navigate("/Admin");
   };
 
   return (
     <div id="exams">
-    <div className="container">
-    <button
-      onClick={handleBackToAdmin}
-      className="button" // Ajoutez cette classe personnalisée
-    >
-      Retour à l&apos;accueil
-    </button>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <FilterForm onFilter={handleFilter} />
-      {exams.length > 0 ? (
-        <div>
-          <ExamList
-            exams={exams}
-            onDelete={handleDeleteExam}
-            onUpdate={handleUpdateExam}
-            salles={salles}
-            semestres={semestres}
-          />
-          <div className="export-buttons">
-            <button onClick={exportToPDF}>Exporter en PDF</button>
-            <button onClick={exportToExcel}>Exporter en Excel</button>
+      <div className="container">
+        <button onClick={handleBackToAdmin} className="button">
+          Retour à l&apos;accueil
+        </button>
+        <h1>Planning des Examens{filters.ID_semestre ? ` - Semestre ${filters.ID_semestre}` : ""}</h1>
+        {error && <p style={{ color: "red" }}>{error}</p>}
+        <FilterForm onFilter={handleFilter} />
+        {exams.length > 0 ? (
+          <div>
+            <ExamList
+              exams={exams}
+              onDelete={handleDeleteExam}
+              onUpdate={handleUpdateExam}
+              salles={salles}
+              semestres={semestres}
+            />
+            <div className="export-buttons">
+              <button onClick={exportToPDF}>Exporter en PDF</button>
+              <button onClick={exportToExcel}>Exporter en Excel</button>
+            </div>
           </div>
-        </div>
-      ) : (
-        <p className="no-results">
-          {filters.section && isFilterApplied
-            ? "Aucun examen trouvé."
-            : "Veuillez sélectionner une section pour filtrer ou créer un nouveau planning."}
-        </p>
-      )}
-      <ExamForm
-        onAdd={handleAddExam}
-        disabled={!filters.section}
-        modules={modules}
-        salles={salles}
-        semestres={semestres}
-        sectionId={filters.section}
-        selectedSemestre={filters.ID_semestre}
-        onFilterReset={() => true}
-      />
-    </div>
+        ) : (
+          <p className="no-results">
+            {filters.section && isFilterApplied
+              ? "Aucun examen trouvé."
+              : "Veuillez sélectionner une section pour filtrer ou créer un nouveau planning."}
+          </p>
+        )}
+        <ExamForm
+          onAdd={handleAddExam}
+          disabled={!filters.section}
+          modules={modules}
+          salles={salles}
+          semestres={semestres}
+          sectionId={filters.section}
+          selectedSemestre={filters.ID_semestre}
+          onFilterReset={() => true}
+        />
+      </div>
     </div>
   );
 };

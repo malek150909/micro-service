@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import '../../admin_css_files/prof.css';
 
 const TeacherSection = ({ teacher, onBack }) => {
     const [teacherDetails, setTeacherDetails] = useState(null);
@@ -166,9 +165,10 @@ const TeacherSection = ({ teacher, onBack }) => {
     };
 
     return (
+        <div id="profs">
         <div className="teacher-section">
             <button className="back-btn" onClick={onBack}>Retour</button>
-            <h2>Détails de l&apos;enseignant</h2>
+            <h2>Détails de l'enseignant</h2>
             {teacherDetails && (
                 <div>
                     {!editMode ? (
@@ -364,6 +364,7 @@ const TeacherSection = ({ teacher, onBack }) => {
                 </div>
             )}
             <ToastContainer />
+        </div>
         </div>
     );
 };

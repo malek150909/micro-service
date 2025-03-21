@@ -1,5 +1,6 @@
 // controllers/timetableController.js
 import Timetable from '../models/timetableModel.js';
+import pool from '../config/db.js';
 
 export const getTimetable = async (req, res) => {
   try {
@@ -39,10 +40,14 @@ export const deleteSession = async (req, res) => {
 
 export const updateSession = async (req, res) => {
   try {
-    const result = await Timetable.updateSession(req.params.id, req.body);
+    const { ID_salle, Matricule, type_seance, ID_groupe, ID_module, jour, time_slot } = req.body;
+    const result = await Timetable.updateSession(req.params.id, { ID_salle, Matricule, type_seance, ID_groupe, ID_module, jour, time_slot });
+    if (!result.success) {
+      return res.status(400).json(result); // Renvoie l'erreur de conflit
+    }
     res.json(result);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ success: false, error: err.message });
   }
 };
 
@@ -60,14 +65,53 @@ export const createSession = async (req, res) => {
   try {
     const { ID_salle, Matricule, type_seance, ID_groupe, ID_module, jour, time_slot, ID_section } = req.body;
     console.log('Controller: Received createSession with body:', req.body);
-    if (!ID_salle || !Matricule || !type_seance || !ID_groupe || !ID_module || !jour || !time_slot || !ID_section) {
+    if (!ID_salle || !Matricule || !type_seance || !ID_module || !jour || !time_slot || !ID_section) {
       return res.status(400).json({ success: false, error: 'Tous les champs sont requis' });
     }
+    if (type_seance !== 'cours' && (ID_groupe === null || ID_groupe === undefined)) {
+      return res.status(400).json({ success: false, error: 'ID_groupe est requis pour TD ou TP' });
+    }
     const result = await Timetable.createSession(req.body);
+    if (!result.success) {
+      return res.status(400).json(result); // Renvoie l'erreur de conflit
+    }
     console.log('Controller: Sending response:', result);
     res.json(result);
   } catch (err) {
     console.error('Controller error in createSession:', err.message);
     res.status(500).json({ success: false, error: `Erreur lors de la création de la séance: ${err.message}` });
+  }
+};
+
+export const getSectionDetails = async (req, res) => {
+  try {
+    const { sectionId } = req.query;
+    if (!sectionId) {
+      return res.status(400).json({ success: false, error: 'sectionId est requis' });
+    }
+
+    const query = `
+      SELECT 
+        f.nom_faculte AS faculty,
+        d.Nom_departement AS department,
+        s.nom_specialite AS specialty,
+        sec.niveau AS niveau,
+        sec.nom_section AS section
+      FROM Section sec
+      JOIN Specialite s ON sec.ID_specialite = s.ID_specialite
+      JOIN Departement d ON s.ID_departement = d.ID_departement
+      JOIN faculte f ON s.ID_faculte = f.ID_faculte
+      WHERE sec.ID_section = ?
+    `;
+    const [rows] = await pool.query(query, [sectionId]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Section non trouvée' });
+    }
+
+    res.json({ success: true, details: rows[0] });
+  } catch (err) {
+    console.error('Error in getSectionDetails:', err);
+    res.status(500).json({ success: false, error: err.message });
   }
 };

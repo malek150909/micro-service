@@ -8,7 +8,7 @@ const Module = {
 
     if (section) {
       sql = `
-        SELECT DISTINCT m.*, ms.semestre 
+        SELECT DISTINCT m.*, ms.semestre , sec.nom_section
         FROM Module m
         JOIN Module_Section ms ON m.ID_module = ms.ID_module
         JOIN Section sec ON ms.ID_section = sec.ID_section
@@ -30,6 +30,13 @@ const Module = {
       if (niveau) {
         sql += ' AND sec.niveau = ?';
         params.push(niveau);
+        if (niveau === 'L1') {
+          sql += ' AND ms.semestre IN (1, 2)';
+        } else if (niveau === 'L2') {
+          sql += ' AND ms.semestre IN (3, 4)';
+        } else if (niveau === 'L3') {
+          sql += ' AND ms.semestre IN (5, 6)';
+        }
       }
       if (specialite) {
         sql += ' AND s.ID_specialite = ?';
@@ -43,7 +50,10 @@ const Module = {
       sql = `SELECT * FROM Module WHERE 1=0`;
     }
 
+    console.log('SQL Query:', sql); // Vérifiez la requête générée
+    console.log('Params:', params); // Vérifiez les paramètres
     const [rows] = await pool.query(sql, params);
+    console.log('Results:', rows); // Vérifiez les résultats
     return rows;
   },
 
@@ -162,7 +172,7 @@ const Module = {
 
   async getSpecialites(filters) {
     let sql = `
-      SELECT sp.ID_specialite, sp.nom_specialite 
+      SELECT DISTINCT sp.ID_specialite, sp.nom_specialite
       FROM Specialite sp
       JOIN Section s ON sp.ID_specialite = s.ID_specialite
       JOIN Departement d ON sp.ID_departement = d.ID_departement
@@ -180,7 +190,7 @@ const Module = {
   },
 
   async getSections(filters) {
-    let sql = `SELECT ID_section, niveau FROM Section`;
+    let sql = `SELECT ID_section , nom_section FROM Section`;
     const params = [];
     if (filters) {
       const conditions = [];

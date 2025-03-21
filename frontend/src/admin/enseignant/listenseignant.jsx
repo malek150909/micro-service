@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import FilterPanel from './FilterPanel';
 import TeacherSection from './TeacherSection';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
-import '../../admin_css_files/prof.css';
+import "../../admin_css_files/prof.css";
 
 const App = () => {
-    const navigate = useNavigate();
     const [teachers, setTeachers] = useState([]);
     const [selectedTeacher, setSelectedTeacher] = useState(null);
     const [showNewTeacherForm, setShowNewTeacherForm] = useState(false);
@@ -188,20 +186,10 @@ const App = () => {
           });
   };
 
-  const handleBackToAdmin = () => {
-    navigate("/Admin"); // Navigation vers la page Admin
-  };
-
     return (
         <div id="profs">
         <div className="container">
-        <button
-        onClick={handleBackToAdmin}
-        className="button" // Ajoutez cette classe personnalisée
-        >
-        Retour à l&apos;accueil
-        </button>
-            <h1>Listes des Enseignants</h1>
+            <h1>Gestion des Enseignants</h1>
             {showNewTeacherForm ? (
                 <div className="teacher-section" style={{ marginBottom: '20px' }}>
                     <h2>Ajouter un nouvel enseignant</h2>

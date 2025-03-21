@@ -4,7 +4,8 @@ import dotenv from 'dotenv';
 import moduleRoutes from './routes/moduleRoutes.js';
 import examRoutes from './routes/examRoutes.js';
 import timetableRoutes from './routes/timetableRoutes.js';
-import timetable from './routes/timetable.js';
+import gradeRoutes from './routes/gradeRoutes.js';
+import db from './config/db.js';
 
 dotenv.config();
 process.env.TZ = 'UTC';
@@ -15,8 +16,8 @@ app.use(cors());
 
 app.use('/modules', moduleRoutes);
 app.use('/exams', examRoutes);
-app.use('/api', timetableRoutes);
-app.use('/api', timetable);
+app.use('/timetable', timetableRoutes);
+app.use('/grades', gradeRoutes);
 
 class Timetable {
   constructor(courses, professors, classrooms, timeslots, course_prof_map, room_availability, professor_availability, student_groups) {

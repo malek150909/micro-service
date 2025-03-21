@@ -149,7 +149,7 @@ export const getSpecialites = async (req, res) => {
 
 export const getSections = async (req, res) => {
   const { specialite, niveau } = req.query;
-  let sql = 'SELECT ID_section, niveau FROM Section';
+  let sql = 'SELECT ID_section, nom_section FROM Section';
   const params = [];
   if (specialite) {
     sql += ' WHERE ID_specialite = ?';

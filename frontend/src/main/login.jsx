@@ -30,6 +30,7 @@ const Login = () => {
                 setMessageType("success");
                 localStorage.setItem("user", JSON.stringify(data.user));
                 localStorage.setItem("token", data.token);
+                localStorage.setItem("matricule", data.user.Matricule);
 
                 setTimeout(() => {
                     if (data.user.role === "admin") navigate("/admin");

@@ -1,0 +1,459 @@
+/* Home Page Styles */
+#ressources{
+.container {
+    max-width: 1200px;
+    width: 90%;
+    margin: 10px auto;
+    padding: 10px;
+    background: #a3bffa; /* Medium muted blue background */
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    animation: containerGlow 7s ease infinite;
+    min-height: calc(100vh - 20px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Prevent container from scrolling */
+}
+
+h2, h3 {
+    font-weight: 600;
+    color: #ffffff; /* White text for headings */
+    text-align: center;
+    padding: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.2); /* White border with opacity */
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    margin: 0 0 10px;
+    font-size: 1.3rem;
+}
+
+.resources-list h3 {
+    margin: 0;
+    padding: 8px;
+    background: #6495ed; /* Soft cornflower blue background */
+    color: #ffffff; /* White text */
+    font-weight: 600;
+    font-size: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: left;
+    border-radius: 10px 10px 0 0;
+}
+
+/* Button Container for "Retourner" Button */
+.button-container {
+    display: flex;
+    justify-content: flex-start; /* Align button to the left */
+    margin-bottom: 15px; /* Add space below to prevent touching the home-layout */
+    background: transparent; /* No background to avoid clashing with the container */
+    padding: 0; /* Remove padding to avoid extra width */
+}
+
+/* Two-Column Layout for Home Page */
+.home-layout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: stretch;
+    flex: 1;
+    overflow: hidden; /* Prevent home-layout from scrolling */
+}
+
+.form-column {
+    flex: 1;
+    min-width: 300px;
+    max-width: 350px;
+    overflow: hidden; /* Prevent form-column from scrolling */
+}
+
+.resources-column {
+    flex: 2;
+    min-width: 300px;
+    max-height: calc(100vh - 150px); /* Adjusted to fit within viewport */
+    overflow-y: auto; /* Allow scrolling for resources */
+    -webkit-overflow-scrolling: touch; /* Improve scrolling on touch devices */
+}
+
+/* Centered Message Styles */
+.centered-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    width: 100%;
+}
+
+.centered-message p {
+    font-size: 1.1rem;
+    color: #1e3a8a; /* Dark blue text */
+    background: rgba(100, 149, 237, 0.2); /* Subtle blue background */
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    max-width: 80%;
+}
+
+/* Resources List Styles */
+.resources-list {
+    background: #c3dafe; /* Light muted blue background */
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    animation: fadeIn 0.5s ease-out;
+    min-height: 100%; /* Ensure it takes the full height of the parent */
+}
+
+.resource-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 8px;
+}
+
+.resource-section {
+    margin-bottom: 8px;
+    background: #dbe9fe; /* Very light muted blue background */
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+.resource-section:hover {
+    transform: translateY(-3px);
+}
+
+.resources-list ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.resources-list li {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid rgba(100, 149, 237, 0.2); /* Subtle blue border */
+    background-color: #e6f0fa; /* Very light blue background */
+    border-radius: 8px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-bottom: 8px; /* Add space between list items */
+}
+
+.resources-list li:hover {
+    background-color: #c3dafe; /* Light muted blue on hover */
+    transform: translateX(5px);
+}
+
+/* Resource Info Styles */
+.resource-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.resource-name {
+    font-size: 1.1rem;
+    color: #1e3a8a; /* Dark blue for the resource name */
+    font-weight: 600;
+}
+
+.resource-description {
+    font-size: 0.9rem;
+    color: #64748b; /* Muted grayish-blue for description */
+    margin: 0;
+    line-height: 1.4;
+}
+
+.resource-date {
+    font-size: 0.85rem;
+    color: #1e3a8a; /* Dark blue for the date */
+    margin: 0;
+}
+
+.resource-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.download-link {
+    color: #4682b4; /* Steel blue for links */
+    text-decoration: none;
+    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: 5px;
+    background: rgba(100, 149, 237, 0.1); /* Subtle blue background */
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+.download-link:hover {
+    color: #1e3a8a; /* Dark blue on hover */
+    background: rgba(100, 149, 237, 0.3); /* Slightly darker background on hover */
+    text-decoration: underline; /* Add underline on hover for clarity */
+}
+
+/* Form Group Styles (for Home Page) */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.8rem;
+    background-color: #c3dafe; /* Light muted blue background */
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+.form-group label {
+    font-size: 1rem;
+    color: #1e3a8a; /* Dark blue for labels */
+    font-weight: bold;
+}
+
+.form-group .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    width: 100%;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 8px;
+    border: 1px solid rgba(100, 149, 237, 0.3); /* Subtle blue border */
+    border-radius: 8px;
+    font-size: 0.9rem;
+    background: #e6f0fa; /* Very light blue background */
+    color: #1e3a8a; /* Dark blue text */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-group input::placeholder {
+    color: #94a3b8; /* Muted grayish-blue placeholder */
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #6495ed; /* Soft cornflower blue border on focus */
+    box-shadow: 0 0 6px rgba(100, 149, 237, 0.3);
+    outline: none;
+}
+
+.form-group .error-message {
+    font-size: 0.8rem;
+    color: #ef4444; /* Red for error messages */
+    margin: 0;
+    text-align: center;
+}
+
+.form-group button {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+    background: linear-gradient(to right, #4682b4, #6495ed); /* Steel blue to cornflower blue gradient */
+    color: #ffffff; /* White text */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+    width: 100%;
+    max-width: 120px;
+    position: relative;
+    z-index: 2;
+}
+
+.form-group button:hover {
+    background: linear-gradient(to right, #1e3a8a, #4682b4); /* Dark blue to steel blue gradient on hover */
+    transform: scale(1.05);
+}
+
+/* Button Styles */
+button {
+    background: linear-gradient(135deg, #4682b4, #6495ed); /* Steel blue to cornflower blue gradient */
+    color: #ffffff; /* White text */
+    padding: 6px 12px;
+    border: none;
+    border-radius: 18px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    margin: 0 4px;
+    max-width: 120px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+button:hover {
+    background: linear-gradient(135deg, #1e3a8a, #4682b4); /* Dark blue to steel blue gradient on hover */
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+button.delete-button {
+    background: linear-gradient(135deg, #ef4444, #f87171); /* Red gradient for delete buttons */
+}
+
+button.delete-button:hover {
+    background: linear-gradient(135deg, #dc2626, #ef4444); /* Slightly darker red gradient on hover */
+}
+
+/* Message Styles */
+.message {
+    padding: 8px;
+    margin-top: 8px;
+    border-radius: 8px;
+    text-align: center;
+    background-color: #22c55e; /* Green for success messages */
+    color: #ffffff; /* White text */
+    font-size: 0.9rem;
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    animation: fadeOut 3s ease forwards;
+}
+
+.message.error {
+    background-color: #ef4444; /* Red for error messages */
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6); /* Darker overlay for contrast */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.modal-content {
+    background: #c3dafe; /* Light muted blue background */
+    padding: 12px;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    width: 380px;
+    max-width: 90%;
+    animation: formPop 0.5s ease-out;
+}
+
+.modal-content h3 {
+    font-weight: 600;
+    color: #1e3a8a; /* Dark blue for headings */
+    text-align: center;
+    margin-bottom: 8px;
+    font-size: 1.2rem;
+}
+
+.modal-field {
+    margin-bottom: 8px;
+}
+
+.modal-field label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 500;
+    color: #1e3a8a; /* Dark blue for labels */
+    font-size: 0.9rem;
+}
+
+.modal-field input,
+.modal-field select,
+.modal-field textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid rgba(100, 149, 237, 0.3); /* Subtle blue border */
+    border-radius: 8px;
+    font-size: 0.9rem;
+    background: #e6f0fa; /* Very light blue background */
+    color: #1e3a8a; /* Dark blue text */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.modal-field input:focus,
+.modal-field select:focus,
+.modal-field textarea:focus {
+    border-color: #6495ed; /* Soft cornflower blue border on focus */
+    box-shadow: 0 0 6px rgba(100, 149, 237, 0.3);
+    outline: none;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    gap: 8px;
+}
+
+.modal-actions button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 18px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    flex: 1;
+}
+
+.modal-actions button:first-child {
+    background: linear-gradient(135deg, #22c55e, #4ade80); /* Green gradient for confirm buttons */
+    color: #ffffff;
+}
+
+.modal-actions button:first-child:hover {
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+}
+
+.modal-actions button:last-child {
+    background: linear-gradient(135deg, #ef4444, #f87171); /* Red gradient for cancel buttons */
+    color: #ffffff;
+}
+
+.modal-actions button:last-child:hover {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+}
+
+}
+
+/* Animations */
+@keyframes waveMove {
+    0% { background-position: 0 100%; }
+    100% { background-position: -1440px 100%; }
+}
+
+@keyframes containerGlow {
+    0%, 100% { box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); }
+    50% { box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1), 0 0 10px rgba(100, 149, 237, 0.2); }
+}
+
+@keyframes formPop {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    0% { opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { opacity: 0; }
+}

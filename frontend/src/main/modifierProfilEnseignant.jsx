@@ -25,7 +25,7 @@ const EditProfile = () => {
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
         if (!storedUser) {
-            navigate("/login");
+            navigate("/");
         } else {
             setUser(storedUser);
             setFormData({

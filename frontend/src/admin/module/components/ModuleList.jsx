@@ -1,12 +1,28 @@
-// components/ModuleList.jsx
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import ModuleModal from './ModuleModal';
 import '../../../admin_css_files/module.css';
 
-const ModuleList = ({ modules, onDelete, onUpdate }) => {
-  const semestre1 = modules.filter(module => module.semestre === '1');
-  const semestre2 = modules.filter(module => module.semestre === '2');
+const ModuleList = ({ modules, onDelete, onUpdate, niveau }) => {
+  console.log('Niveau received in ModuleList:', niveau);
+  console.log('Modules received:', modules);
+  // Définir les semestres à afficher en fonction du niveau
+  let semestreA, semestreB;
+  if (niveau === 'L1') {
+    semestreA = modules.filter(module => module.semestre === '1');
+    semestreB = modules.filter(module => module.semestre === '2');
+  } else if (niveau === 'L2') {
+    semestreA = modules.filter(module => module.semestre === '3');
+    semestreB = modules.filter(module => module.semestre === '4');
+  } else if (niveau === 'L3') {
+    semestreA = modules.filter(module => module.semestre === '5');
+    semestreB = modules.filter(module => module.semestre === '6');
+  } else {
+    // Par défaut, afficher tous les modules sans filtrage par semestre
+    semestreA = modules;
+    semestreB = [];
+  }
+
   const [selectedModule, setSelectedModule] = useState(null);
 
   const handleModuleClick = (module) => {
@@ -25,9 +41,9 @@ const ModuleList = ({ modules, onDelete, onUpdate }) => {
     <div className="module-list">
       <div className="semestre-columns">
         <div className="semestre-column">
-          <h3>Semestre 1</h3>
-          {semestre1.length > 0 ? (
-            semestre1.map((module) => (
+          <h3>{niveau === 'L1' ? 'Semestre 1' : niveau === 'L2' ? 'Semestre 3' : niveau === 'L3' ? 'Semestre 5' : 'Modules'}</h3>
+          {semestreA.length > 0 ? (
+            semestreA.map((module) => (
               <motion.div
                 key={module.ID_module}
                 className="module-item"
@@ -50,13 +66,13 @@ const ModuleList = ({ modules, onDelete, onUpdate }) => {
               </motion.div>
             ))
           ) : (
-            <p>Aucun module pour le Semestre 1</p>
+            <p>Aucun module pour ce semestre</p>
           )}
         </div>
         <div className="semestre-column">
-          <h3>Semestre 2</h3>
-          {semestre2.length > 0 ? (
-            semestre2.map((module) => (
+          <h3>{niveau === 'L1' ? 'Semestre 2' : niveau === 'L2' ? 'Semestre 4' : niveau === 'L3' ? 'Semestre 6' : ''}</h3>
+          {semestreB.length > 0 ? (
+            semestreB.map((module) => (
               <motion.div
                 key={module.ID_module}
                 className="module-item"
@@ -79,7 +95,7 @@ const ModuleList = ({ modules, onDelete, onUpdate }) => {
               </motion.div>
             ))
           ) : (
-            <p>Aucun module pour le Semestre 2</p>
+            <p>Aucun module pour ce semestre</p>
           )}
         </div>
       </div>

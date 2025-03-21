@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import TeacherSection from './TeacherSection'; // Adjust the import path as needed
-import '../../admin_css_files/prof.css';
 
 const TeacherList = () => {
     const [teachers, setTeachers] = useState([]);
@@ -97,65 +96,89 @@ const TeacherList = () => {
     };
 
     return (
-        <div>
+        <div id="profs">
+        <div style={{ padding: '20px' }}>
             <h2>Liste des enseignants</h2>
-
             {selectedTeacher ? (
                 <TeacherSection teacher={selectedTeacher} onBack={handleBack} />
             ) : (
                 <div>
                     <h3>Filtres</h3>
-                    <div className="filters-container">
+                    <div style={{ marginBottom: '20px' }}>
                         <select
                             name="idFaculte"
                             value={filters.idFaculte}
                             onChange={(e) => setFilters({ ...filters, idFaculte: e.target.value })}
-                            className="filter-select"
+                            style={{ margin: '5px', padding: '5px', width: '200px', borderRadius: '4px', border: '1px solid #ccc' }}
                         >
                             <option value="">Sélectionner une faculté</option>
                             {facultes.map(f => (
-                                <option key={f.ID_faculte} value={f.ID_faculte}>{f.nom_faculte}</option>
+                                <option key={f.ID_faculte} value={f.ID_faculte}>
+                                    {f.nom_faculte}
+                                </option>
                             ))}
                         </select>
-
                         <select
                             name="idDepartement"
                             value={filters.idDepartement}
                             onChange={(e) => setFilters({ ...filters, idDepartement: e.target.value })}
-                            className="filter-select"
+                            style={{ margin: '5px', padding: '5px', width: '200px', borderRadius: '4px', border: '1px solid #ccc' }}
                             disabled={!filters.idFaculte}
                         >
                             <option value="">Sélectionner un département</option>
                             {departements.map(d => (
-                                <option key={d.ID_departement} value={d.ID_departement}>{d.Nom_departement}</option>
+                                <option key={d.ID_departement} value={d.ID_departement}>
+                                    {d.Nom_departement}
+                                </option>
                             ))}
                         </select>
-
                         <select
                             name="idSpecialite"
                             value={filters.idSpecialite}
                             onChange={(e) => setFilters({ ...filters, idSpecialite: e.target.value })}
-                            className="filter-select"
+                            style={{ margin: '5px', padding: '5px', width: '200px', borderRadius: '4px', border: '1px solid #ccc' }}
                             disabled={!filters.idDepartement}
                         >
                             <option value="">Sélectionner une spécialité</option>
                             {specialites.map(s => (
-                                <option key={s.ID_specialite} value={s.ID_specialite}>{s.nom_specialite}</option>
+                                <option key={s.ID_specialite} value={s.ID_specialite}>
+                                    {s.nom_specialite}
+                                </option>
                             ))}
                         </select>
-
-                        <button onClick={handleFilterSubmit} className="filter-button">
+                        <button
+                            onClick={handleFilterSubmit}
+                            style={{
+                                padding: '5px 10px',
+                                backgroundColor: '#2196f3',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                margin: '5px'
+                            }}
+                        >
                             Filtrer
                         </button>
                     </div>
-
                     {showTeachers && (
                         <div>
                             <h3>Enseignants</h3>
                             {teachers.length > 0 ? (
-                                <ul className="teachers-list">
+                                <ul style={{ listStyle: 'none', padding: 0 }}>
                                     {teachers.map(teacher => (
-                                        <li key={teacher.Matricule} onClick={() => handleTeacherClick(teacher)} className="teacher-item">
+                                        <li
+                                            key={teacher.Matricule}
+                                            onClick={() => handleTeacherClick(teacher)}
+                                            style={{
+                                                padding: '10px',
+                                                borderBottom: '1px solid #ddd',
+                                                cursor: 'pointer',
+                                                backgroundColor: '#f9f9f9',
+                                                margin: '5px 0',
+                                                borderRadius: '4px'
+                                            }}
+                                        >
                                             {teacher.nom} {teacher.prenom}
                                         </li>
                                     ))}
@@ -167,6 +190,7 @@ const TeacherList = () => {
                     )}
                 </div>
             )}
+        </div>
         </div>
     );
 };

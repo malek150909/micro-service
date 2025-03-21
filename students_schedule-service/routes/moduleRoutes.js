@@ -1,12 +1,13 @@
+// routes/moduleRoutes.js
 import express from 'express';
-import * as moduleController from '../controllers/moduleController.js'; // Adjust path as needed
+import * as moduleController from '../controllers/moduleController.js';
 
 const router = express.Router();
 
 router.get('/', moduleController.getModules);
 router.post('/', moduleController.addModule);
 router.delete('/:id', moduleController.deleteModule);
-router.put('/:id', moduleController.updateModule); // New route for updating
+router.put('/:id', moduleController.updateModule); // Nouvelle route pour la mise à jour
 
 router.get('/facultes', moduleController.getFacultes);
 router.get('/departements', moduleController.getDepartements);

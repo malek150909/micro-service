@@ -61,7 +61,7 @@ const Messages = () => {
                 fetchMessages(data.Matricule);
             } else if (data.message === "Non autorisé" || data.message === "Token invalide") {
                 setError("Veuillez vous reconnecter (session expirée).");
-                navigate("/login");
+                navigate("/");
             } else {
                 setError("Utilisateur non trouvé.");
                 setRecipient(null);

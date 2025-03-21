@@ -32,10 +32,10 @@ function TimetableFilter() {
   useEffect(() => {
     const fetchNiveaux = async () => {
       try {
-        const response = await fetch('http://localhost:8083/api/filter-options'); // Ajout de /api
+        const response = await fetch('http://localhost:8083/timetable/filter-options'); // Ajout de /api
         const text = await response.text();
-        console.log('Raw response from /api/filter-options (niveaux):', text);
-        const data = safeParseJson(text, '/api/filter-options');
+        console.log('Raw response from /timetable/filter-options (niveaux):', text);
+        const data = safeParseJson(text, '/timetable/filter-options');
         if (data.success) {
           setNiveaux(data.options.niveaux || []);
           setError(null);
@@ -64,10 +64,10 @@ function TimetableFilter() {
     }
     const fetchFaculties = async () => {
       try {
-        const response = await fetch(`http://localhost:8083/api/filter-options?niveau=${niveau}`);
+        const response = await fetch(`http://localhost:8083/timetable/filter-options?niveau=${niveau}`);
         const text = await response.text();
-        console.log(`Raw response from /api/filter-options?niveau=${niveau}:`, text);
-        const data = safeParseJson(text, `/api/filter-options?niveau=${niveau}`);
+        console.log(`Raw response from /timetable/filter-options?niveau=${niveau}:`, text);
+        const data = safeParseJson(text, `/timetable/filter-options?niveau=${niveau}`);
         if (data.success) {
           setFaculties(data.options.facultes || []);
           setFacultyId('');
@@ -102,10 +102,10 @@ function TimetableFilter() {
     }
     const fetchDepartments = async () => {
       try {
-        const response = await fetch(`http://localhost:8083/api/filter-options?niveau=${niveau}&faculte=${facultyId}`);
+        const response = await fetch(`http://localhost:8083/timetable/filter-options?niveau=${niveau}&faculte=${facultyId}`);
         const text = await response.text();
-        console.log(`Raw response from /api/filter-options?faculte=${facultyId}:`, text);
-        const data = safeParseJson(text, `/api/filter-options?faculte=${facultyId}`);
+        console.log(`Raw response from /timetable/filter-options?faculte=${facultyId}:`, text);
+        const data = safeParseJson(text, `/timetable/filter-options?faculte=${facultyId}`);
         if (data.success) {
           setDepartments(data.options.departements || []);
           setDepartmentId('');
@@ -136,10 +136,10 @@ function TimetableFilter() {
     }
     const fetchSpecialties = async () => {
       try {
-        const response = await fetch(`http://localhost:8083/api/filter-options?niveau=${niveau}&faculte=${facultyId}&departement=${departmentId}`);
+        const response = await fetch(`http://localhost:8083/timetable/filter-options?niveau=${niveau}&faculte=${facultyId}&departement=${departmentId}`);
         const text = await response.text();
-        console.log(`Raw response from /api/filter-options?departement=${departmentId}:`, text);
-        const data = safeParseJson(text, `/api/filter-options?departement=${departmentId}`);
+        console.log(`Raw response from /timetable/filter-options?departement=${departmentId}:`, text);
+        const data = safeParseJson(text, `/timetable/filter-options?departement=${departmentId}`);
         if (data.success) {
           setSpecialties(data.options.specialites || []);
           setSpecialtyId('');
@@ -166,10 +166,10 @@ function TimetableFilter() {
     }
     const fetchSections = async () => {
       try {
-        const response = await fetch(`http://localhost:8083/api/filter-options?niveau=${niveau}&faculte=${facultyId}&departement=${departmentId}&specialite=${specialtyId}`);
+        const response = await fetch(`http://localhost:8083/timetable/filter-options?niveau=${niveau}&faculte=${facultyId}&departement=${departmentId}&specialite=${specialtyId}`);
         const text = await response.text();
-        console.log(`Raw response from /api/filter-options?specialite=${specialtyId}:`, text);
-        const data = safeParseJson(text, `/api/filter-options?specialite=${specialtyId}`);
+        console.log(`Raw response from /timetable/filter-options?specialite=${specialtyId}:`, text);
+        const data = safeParseJson(text, `/timetable/filter-options?specialite=${specialtyId}`);
         if (data.success) {
           setSections(data.options.sections || []);
           setSectionId('');
@@ -191,10 +191,10 @@ function TimetableFilter() {
       return;
     }
     try {
-      const response = await fetch(`http://localhost:8083/api/timetable?sectionId=${sectionId}`); // Ajout de /api
+      const response = await fetch(`http://localhost:8083/timetable/timetable?sectionId=${sectionId}`); // Ajout de /api
       const text = await response.text();
-      console.log(`Raw response from /api/timetable?sectionId=${sectionId}:`, text);
-      const data = safeParseJson(text, `/api/timetable?sectionId=${sectionId}`);
+      console.log(`Raw response from /timetable/timetable?sectionId=${sectionId}:`, text);
+      const data = safeParseJson(text, `/timetable/timetable?sectionId=${sectionId}`);
       console.log('Fetched data in TimetableFilter:', data);
       if (data.success && Object.keys(data.timetable).length > 0) {
         setTimetable(data.timetable);
@@ -263,7 +263,7 @@ function TimetableFilter() {
           <select value={sectionId} onChange={(e) => setSectionId(e.target.value)} disabled={!specialtyId}>
             <option value="">Sélectionner une section</option>
             {sections.map(section => (
-              <option key={section.ID_section} value={section.ID_section}>{section.num_section}</option>
+              <option key={section.ID_section} value={section.ID_section}>{section.nom_section}</option>
             ))}
           </select>
         </div>

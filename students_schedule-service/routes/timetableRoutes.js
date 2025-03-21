@@ -1,6 +1,6 @@
 // routes/timetableRoutes.js
 import express from 'express';
-import { getTimetable, getFilterOptions, deleteSession, updateSession, getSessionOptions , createSession } from '../controllers/timetableController.js';
+import { getTimetable, getFilterOptions, deleteSession, updateSession, getSessionOptions , createSession , getSectionDetails } from '../controllers/timetableController.js';
 
 const router = express.Router();
 
@@ -10,5 +10,6 @@ router.delete('/session/:id', deleteSession);
 router.put('/session/:id', updateSession);
 router.get('/session-options', getSessionOptions);
 router.post('/session', createSession);
+router.get('/section-details', getSectionDetails);
 
 export default router;

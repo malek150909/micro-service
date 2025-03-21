@@ -4,7 +4,7 @@ const Exam = {
   getExams: async (filters) => {
     const { faculte, departement, niveau, specialite, section, ID_semestre } = filters;
     let sql = `
-      SELECT DISTINCT e.*, m.nom_module, s.ID_salle, s.capacite, se.date_debut, se.date_fin
+      SELECT DISTINCT e.*, m.nom_module, s.ID_salle, s.capacite, se.date_debut, se.date_fin , sec.nom_section
       FROM Exam e
       JOIN Module m ON e.ID_module = m.ID_module
       JOIN Section sec ON e.ID_section = sec.ID_section

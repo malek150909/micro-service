@@ -1,4 +1,3 @@
-// components/FilterForm.jsx
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
@@ -66,7 +65,9 @@ const FilterForm = ({ onFilter }) => {
         const response = await axios.get('http://localhost:8083/modules/niveaux', {
           params: { departement: filters.departement },
         });
-        setNiveauOptions(response.data);
+        // Limiter aux niveaux L1, L2, L3
+        const filteredNiveaux = response.data.filter(n => ['L1', 'L2', 'L3'].includes(n.id));
+        setNiveauOptions(filteredNiveaux);
       } catch (error) {
         console.error('Erreur de récupération des niveaux:', error);
       }
@@ -121,6 +122,7 @@ const FilterForm = ({ onFilter }) => {
             niveau: filters.niveau,
           },
         });
+        console.log('Sections fetched:', response.data);
         setSectionOptions(response.data);
       } catch (error) {
         console.error('Erreur de récupération des sections:', error);
@@ -139,14 +141,18 @@ const FilterForm = ({ onFilter }) => {
   }, [filters.specialite, filters.niveau]);
 
   const handleChange = (e) => {
+    console.log('Selected field:', e.target.name, 'Value:', e.target.value);
     setFilters({ ...filters, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log('Filters submitted:', filters);
     if (filters.section) {
+      console.log('Calling onFilter with filters:', filters);
       onFilter(filters);
     } else {
+      console.warn('No section selected');
       onFilter({ ...filters, section: '' });
     }
   };
@@ -200,7 +206,7 @@ const FilterForm = ({ onFilter }) => {
           <option value="">Sélectionner une Section</option>
           {sectionOptions.map((option) => (
             <option key={option.ID_section} value={option.ID_section}>
-              {`Section ${option.ID_section} (Niveau: ${option.niveau})`}
+              {option.nom_section}
             </option>
           ))}
         </select>

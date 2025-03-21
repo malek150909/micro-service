@@ -11,7 +11,7 @@ const Admin = () => {
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
         if (!storedUser || storedUser.role !== "admin") {
-            navigate("/login");
+            navigate("/");
         } else {
             setUser(storedUser);
             console.log("Utilisateur chargé dans Admin :", storedUser); // Log pour vérifier

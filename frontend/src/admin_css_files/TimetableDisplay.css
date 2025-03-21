@@ -243,3 +243,27 @@
   .timetable-btn.generate:hover {
     background-color: #138496; /* Cyan plus foncé au survol */
   }
+
+  .export-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .timetable-btn.export-pdf {
+    background-color: #ff4444;
+    color: white;
+  }
+  
+  .timetable-btn.export-excel {
+    background-color: #00cc00;
+    color: white;
+  }
+  
+  .timetable-btn.export-pdf:hover {
+    background-color: #cc0000;
+  }
+  
+  .timetable-btn.export-excel:hover {
+    background-color: #009900;
+  }

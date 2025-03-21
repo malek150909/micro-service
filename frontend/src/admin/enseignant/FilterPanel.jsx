@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import '../../admin_css_files/prof.css';
 
 const FilterPanel = ({ onFilter }) => {
     const [filters, setFilters] = useState({ idFaculte: '', idDepartement: '' });
@@ -57,6 +56,7 @@ const FilterPanel = ({ onFilter }) => {
     if (error) return <div>{error}</div>;
 
     return (
+        <div id="profs">
         <div className="filter-panel">
             <h2>Panneau de filtrage</h2>
             <select name="idFaculte" value={filters.idFaculte} onChange={handleChange}>
@@ -72,6 +72,7 @@ const FilterPanel = ({ onFilter }) => {
                 ))}
             </select>
             <button onClick={handleFilter}>Filtrer</button>
+        </div>
         </div>
     );
 };

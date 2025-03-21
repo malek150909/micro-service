@@ -1,4 +1,3 @@
-// pages/Home.jsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import FilterForm from '../components/FilterForm';
@@ -22,6 +21,7 @@ const Home = () => {
   const fetchModules = async (currentFilters) => {
     try {
       const data = await getModules(currentFilters);
+      console.log('Modules fetched in Home:', data);
       setModules(data);
     } catch (err) {
       console.error('Erreur de récupération des modules:', err);
@@ -31,6 +31,7 @@ const Home = () => {
   };
 
   const handleFilter = (newFilters) => {
+    console.log('Filters received in Home:', newFilters);
     setFilters(newFilters);
     fetchModules(newFilters);
   };
@@ -48,10 +49,10 @@ const Home = () => {
       };
       await addModule(addData);
       fetchModules(filters);
-      setError(null); // Effacer l'erreur en cas de succès
+      setError(null);
     } catch (err) {
       console.error('Erreur d\'ajout du module:', err);
-      setError(`Erreur d\'ajout du module: ${err.message}`);
+      setError(`Erreur d'ajout du module: ${err.message}`);
     }
   };
 
@@ -72,36 +73,35 @@ const Home = () => {
   };
 
   const handleBackToAdmin = () => {
-    navigate("/Admin"); // Navigation vers la page Admin
+    navigate("/Admin");
   };
 
   return (
     <div id="modules">
-    <div className="container">
-      <button
-        onClick={handleBackToAdmin}
-        className="button" // Ajoutez cette classe personnalisée
-      >
-        Retour à l&apos;accueil
-      </button>
-      <h1>Gestion des Modules</h1>
-      
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <FilterForm onFilter={handleFilter} />
-      {modules.length > 0 ? (
-        <ModuleList
-          modules={modules}
-          onDelete={handleDeleteModule}
-          onUpdate={handleUpdateModule}
+      <div className="container">
+        <button onClick={handleBackToAdmin} className="button">
+          Retour à l&apos;accueil
+        </button>
+        <h1>Gestion des Modules</h1>
+        
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+        <FilterForm onFilter={handleFilter} />
+        {modules.length > 0 ? (
+          <ModuleList
+            modules={modules}
+            onDelete={handleDeleteModule}
+            onUpdate={handleUpdateModule}
+            niveau={filters.niveau} // Ajouter la prop niveau ici
+          />
+        ) : (
+          <p className="no-results">Aucun module trouvé. Veuillez sélectionner une section pour filtrer ou ajouter un nouveau module.</p>
+        )}
+        <ModuleForm
+          onAdd={handleAddModule}
+          disabled={!filters.section}
+          niveau={filters.niveau} // Déjà correct ici
         />
-      ) : (
-        <p className="no-results">Aucun module trouvé. Veuillez sélectionner une section pour filtrer ou ajouter un nouveau module.</p>
-      )}
-      <ModuleForm
-        onAdd={handleAddModule}
-        disabled={!filters.section}
-      />
-    </div>
+      </div>
     </div>
   );
 };
