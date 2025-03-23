@@ -4,7 +4,8 @@ import pool from '../config/db.js';
 
 export const getTimetable = async (req, res) => {
   try {
-    const results = await Timetable.getTimetable(req.query);
+    const { sectionId, semestre } = req.query;
+    const results = await Timetable.getTimetable({ sectionId, semestre });
     console.log('Sending timetable from Seance:', results);
     res.json({ success: true, timetable: results });
   } catch (err) {
@@ -38,29 +39,37 @@ export const deleteSession = async (req, res) => {
   }
 };
 
+// controllers/timetableController.js
 export const updateSession = async (req, res) => {
   try {
     const { ID_salle, Matricule, type_seance, ID_groupe, ID_module, jour, time_slot } = req.body;
+    console.log('Controller: updateSession called with id:', req.params.id, 'and body:', req.body);
+    if (!ID_salle || !Matricule || !type_seance || !ID_module || !jour || !time_slot) {
+      return res.status(400).json({ success: false, error: 'Tous les champs sont requis' });
+    }
     const result = await Timetable.updateSession(req.params.id, { ID_salle, Matricule, type_seance, ID_groupe, ID_module, jour, time_slot });
     if (!result.success) {
       return res.status(400).json(result); // Renvoie l'erreur de conflit
     }
     res.json(result);
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error('Controller error in updateSession:', err.message);
+    res.status(500).json({ success: false, error: `Erreur lors de la mise à jour: ${err.message}` });
   }
 };
 
+// controllers/timetableController.js
 export const getSessionOptions = async (req, res) => {
   try {
-    const { sectionId } = req.query;
-    const options = await Timetable.getSessionOptions(sectionId);
+    const { sectionId, semestre } = req.query; // Remplacer niveau par semestre
+    const options = await Timetable.getSessionOptions(sectionId, semestre);
     res.json({ success: true, options });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
+// controllers/timetableController.js
 export const createSession = async (req, res) => {
   try {
     const { ID_salle, Matricule, type_seance, ID_groupe, ID_module, jour, time_slot, ID_section } = req.body;
@@ -112,6 +121,33 @@ export const getSectionDetails = async (req, res) => {
     res.json({ success: true, details: rows[0] });
   } catch (err) {
     console.error('Error in getSectionDetails:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+// controllers/timetableController.js
+export const getModuleEnseignants = async (req, res) => {
+  try {
+    const { moduleId } = req.query;
+    console.log('Controller: getModuleEnseignants called with moduleId:', moduleId);
+    if (!moduleId) {
+      return res.status(400).json({ success: false, error: 'moduleId est requis' });
+    }
+    const enseignants = await Timetable.getModuleEnseignants(moduleId);
+    res.json({ success: true, enseignants });
+  } catch (err) {
+    console.error('Controller error in getModuleEnseignants:', err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+// controllers/timetableController.js
+export const generateTimetables = async (req, res) => {
+  try {
+    console.log('Generating timetables for all sections');
+    const result = await Timetable.generateTimetablesForAllSections();
+    res.json(result);
+  } catch (err) {
+    console.error('Controller error in generateTimetables:', err.message);
     res.status(500).json({ success: false, error: err.message });
   }
 };

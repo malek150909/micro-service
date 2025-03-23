@@ -1,282 +1,358 @@
+#modules{
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(180deg, #bbdefb, #0e293f);
+  margin: 0;
+  padding: 0;
+  color: #093980;
+  overflow-x: hidden;
+  position: relative;
+}
 
-  /* Main Container */
-  #modules .container {
-    max-width: 1100px;
-    margin: 40px auto;
-    padding: 25px;
-    background: linear-gradient(135deg, #f5f5f5, #d6eaff);
-    border-radius: 20px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    position: relative;
-    overflow: hidden;
-    animation: containerGlow 5s ease infinite;
-  }
-  
-  /* Headings */
-  #modules h1, #modules h2, #modules h3 {
-    font-weight: 800;
-    background: linear-gradient(135deg, #1565c0, #5e35b1);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-align: center;
-    padding: 15px 25px;
-    border: 2px solid rgba(21, 101, 192, 0.6);
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    letter-spacing: 1px;
-  }
-  
-  /* Buttons */
-  #modules .container button {
-    background: linear-gradient(135deg, #1565c0, #42a5f5);
-    color: #fff;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 50px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.4s ease;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    position: relative;
-    overflow: hidden;
-  }
-  
-  #modules .container button:hover {
-    transform: scale(1.05) rotate(2deg);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25), 0 0 10px rgba(21, 101, 192, 0.3);
-  }
-  
-  #modules .container button::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    transition: width 0.6s ease, height 0.6s ease;
-  }
-  
-  #modules .container button:hover::after {
-    width: 150px;
-    height: 150px;
-  }
-  
-  /* Delete Button */
-  #modules .container button.delete-button {
-    background: linear-gradient(135deg, #f57c00, #e64a19);
-  }
-  
-  /* Form Container */
-  #modules .form-container {
-    background: linear-gradient(135deg, #e8f0fe, #b0bec5);
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    animation: formPop 0.8s ease-out;
-  }
-  
-  /* Inputs and Selects */
-  #modules input, #modules select, #modules textarea {
-    padding: 10px;
-    border: 2px solid rgba(189, 189, 189, 0.5);
-    border-radius: 10px;
-    font-size: 0.9rem;
-    background: #fff;
-    color: #0d47a1;
-    transition: all 0.3s ease;
-    width: 100%;
-    box-sizing: border-box;
-  }
-  
-  #modules textarea {
-    resize: vertical;
-    min-height: 80px;
-  }
-  
-  #modules input:focus, #modules select:focus, #modules textarea:focus {
-    border-color: #1565c0;
-    box-shadow: 0 0 10px rgba(21, 101, 192, 0.3);
-  }
-  
-  /* Semester Select */
-  #modules .semester-select {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    border: 2px solid rgba(189, 189, 189, 0.5);
-    border-radius: 10px;
-    background: #fff;
-    color: #0d47a1;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-  }
-  
-  #modules .semester-select:focus {
-    border-color: #1565c0;
-    box-shadow: 0 0 10px rgba(21, 101, 192, 0.3);
-  }
-  
-  /* Module List and Semester Columns */
-  #modules .module-list {
-    padding: 0;
-    margin: 20px 0;
-  }
-  
-  #modules .semestre-columns {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-  }
-  
-  #modules .semestre-column {
-    flex: 1;
-    background: linear-gradient(135deg, #e8f0fe, #699ac3);
-    padding: 15px;
-    border-radius: 15px;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-    transition: all 0.4s ease;
-    animation: cardFloat 5s ease-in-out infinite;
-  }
-  
-  #modules .semestre-column h3 {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: #0d47a1;
-    border-bottom: 2px solid #1e3a8a;
-    padding-bottom: 0.5rem;
-    margin-bottom: 1rem;
-  }
-  
-  /* Module Item */
-  #modules .module-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 12px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    margin-bottom: 8px;
-    transition: all 0.3s ease;
-  }
-  
-  #modules .module-item:hover {
-    background: rgba(255, 255, 255, 0.4);
-    transform: translateY(-2px);
-  }
-  
-  #modules .module-name {
-    font-size: 1rem;
-    color: #0d47a1;
-    cursor: pointer;
-    font-weight: 500;
-  }
-  
-  #modules .module-name:hover {
-    text-decoration: underline;
-  }
-  
-  /* Modal Styles */
-  #modules .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-  
-  #modules .modal-content {
-    background: #fff;
-    padding: 20px;
-    border-radius: 15px;
-    width: 90%;
-    max-width: 500px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-  
-  #modules .modal-content h3 {
-    font-size: 1.4rem;
-    color: #0d47a1;
-    margin: 0;
-    text-align: center;
-  }
-  
-  #modules .modal-field {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-  }
-  
-  #modules .modal-field label {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: #0d47a1;
-  }
-  
-  #modules .modal-field input:disabled {
-    background: #f0f0f0;
-    cursor: not-allowed;
-  }
-  
-  #modules .modal-actions {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-  }
-  
-  #modules .modal-actions button {
-    flex: 1;
-  }
-  
-  /* No Results Message */
-  #modules .no-results {
-    text-align: center;
-    color: #0d47a1;
-    font-size: 1.1rem;
-    padding: 15px;
-    animation: fadeIn 1s ease-out;
-  }
-  
-  /* Animations */
-  @keyframes waveMove {
-    0% { background-position: 0 100%; }
-    100% { background-position: -1440px 100%; }
-  }
-  
-  @keyframes containerGlow {
-    0%, 100% { box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); }
-    50% { box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15), 0 0 20px rgba(21, 101, 192, 0.3); }
-  }
-  
-  @keyframes formPop {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-  }
-  
-  @keyframes cardFloat {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-  }
-  
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
+body::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(126, 87, 194, 0.2)" d="M0,224L80,224C160,224,320,224,480,208C640,192,800,160,960,160C1120,160,1280,192,1360,208L1440,224V0H1360C1280,0,1120,0,960,0C800,0,640,0,480,0C320,0,160,0,80,0H0V224Z"></path></svg>') repeat-x bottom;
+  animation: waveMove 12s linear infinite;
+}
+
+/* Main Container */
+.container {
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 25px;
+  background: linear-gradient(135deg, #f5f5f5, #d6eaff);
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+  animation: containerGlow 5s ease infinite;
+  z-index: 1;
+}
+
+/* Headings */
+h1, h2, h3 {
+  font-weight: 800;
+  background: linear-gradient(135deg, #1565c0, #5e35b1);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-align: center;
+  padding: 15px 25px;
+  border: 2px solid rgba(21, 101, 192, 0.6);
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  letter-spacing: 1px;
+}
+
+/* Buttons */
+.container button {
+  background: linear-gradient(135deg, #1565c0, #42a5f5);
+  color: #fff;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  overflow: hidden;
+}
+
+.container button:hover {
+  transform: scale(1.05) rotate(2deg);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25), 0 0 10px rgba(21, 101, 192, 0.3);
+}
+
+.container button::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+
+.container button:hover::after {
+  width: 150px;
+  height: 150px;
+}
+
+/* Delete Button */
+.container button.delete-button {
+  background: linear-gradient(135deg, #f57c00, #e64a19);
+}
+
+/* Form Container */
+.form-container {
+  background: linear-gradient(135deg, #e8f0fe, #b0bec5);
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: formPop 0.8s ease-out;
+}
+
+/* Inputs and Selects */
+input, select, textarea {
+  padding: 10px;
+  border: 2px solid rgba(189, 189, 189, 0.5);
+  border-radius: 10px;
+  font-size: 0.9rem;
+  background: #fff;
+  color: #0d47a1;
+  transition: all 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: #1565c0;
+  box-shadow: 0 0 10px rgba(21, 101, 192, 0.3);
+}
+
+/* Semester Select */
+.semester-select {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  border: 2px solid rgba(189, 189, 189, 0.5);
+  border-radius: 10px;
+  background: #fff;
+  color: #0d47a1;
+  font-size措施: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.semester-select:focus {
+  border-color: #1565c0;
+  box-shadow: 0 0 10px rgba(21, 101, 192, 0.3);
+}
+
+/* Module List and Semester Columns */
+.module-list {
+  padding: 0;
+  margin: 20px 0;
+}
+
+.semestre-columns {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.semestre-column {
+  flex: 1;
+  background: linear-gradient(135deg, #e8f0fe, #699ac3);
+  padding: 15px;
+  border-radius: 15px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s ease;
+  animation: cardFloat 5s ease-in-out infinite;
+}
+
+.semestre-column h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #0d47a1 GOLD;
+  border-bottom: 2px solid #1e3a8a;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Module Item */
+.module-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  transition: all 0.3s ease;
+}
+
+.module-item:hover {
+  background: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+.module-name {
+  font-size: 1rem;
+  color: #0d47a1;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.module-name:hover {
+  text-decoration: underline;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  z-index: 9999 !important;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.modal-content h3 {
+  font-size: 1.4rem;
+  color: #0d47a1;
+  margin: 0;
+  text-align: center;
+}
+
+.modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.modal-field label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #0d47a1;
+}
+
+.modal-field input:disabled {
+  background: #f0f0f0;
+  cursor: not-allowed;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.modal-actions button {
+  flex: 1;
+}
+
+/* No Results Message */
+.no-results {
+  text-align: center;
+  color: #0d47a1;
+  font-size: 1.1rem;
+  padding: 15px;
+  animation: fadeIn 1s ease-out;
+}
+
+/* Custom Alert Styles */
+.custom-alert {
+  background: #fff;
+  padding: 25px;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  position: relative;
+  z-index: 10000 !important;
+}
+
+.alert-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  justify-content: center;
+}
+
+.alert-icon {
+  font-size: 1.8rem;
+  color: #e74c3c;
+}
+
+.custom-alert h3 {
+  color: #e74c3c;
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.alert-close-button {
+  background: #e74c3c;
+  color: white;
+  padding: 8px 20px;
+  border-radius: 25px;
+  border: none;
+  margin-top: 15px;
+  transition: all 0.3s ease;
+}
+
+.alert-close-button:hover {
+  background: #c0392b;
+  transform: scale(1.05);
+}
+
+/* Form Section */
+.form-section {
+  position: relative;
+  margin-top: 2rem;
+}
+
+/* Animations */
+@keyframes waveMove {
+  0% { background-position: 0 100%; }
+  100% { background-position: -1440px 100%; }
+}
+
+@keyframes containerGlow {
+  0%, 100% { box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); }
+  50% { box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15), 0 0 20px rgba(21, 101, 192, 0.3); }
+}
+
+@keyframes formPop {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes cardFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+}

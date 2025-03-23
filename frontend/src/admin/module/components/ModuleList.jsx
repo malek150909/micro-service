@@ -1,26 +1,30 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import ModuleModal from './ModuleModal';
-import '../../../admin_css_files/module.css';
+import "../../../admin_css_files/module.css";
 
 const ModuleList = ({ modules, onDelete, onUpdate, niveau }) => {
-  console.log('Niveau received in ModuleList:', niveau);
-  console.log('Modules received:', modules);
-  // Définir les semestres à afficher en fonction du niveau
-  let semestreA, semestreB;
+  let semestreGroup1, semestreGroup2, label1, label2;
   if (niveau === 'L1') {
-    semestreA = modules.filter(module => module.semestre === '1');
-    semestreB = modules.filter(module => module.semestre === '2');
+    semestreGroup1 = modules.filter(module => module.semestre === '1');
+    semestreGroup2 = modules.filter(module => module.semestre === '2');
+    label1 = 'Semestre 1';
+    label2 = 'Semestre 2';
   } else if (niveau === 'L2') {
-    semestreA = modules.filter(module => module.semestre === '3');
-    semestreB = modules.filter(module => module.semestre === '4');
+    semestreGroup1 = modules.filter(module => module.semestre === '3');
+    semestreGroup2 = modules.filter(module => module.semestre === '4');
+    label1 = 'Semestre 3';
+    label2 = 'Semestre 4';
   } else if (niveau === 'L3') {
-    semestreA = modules.filter(module => module.semestre === '5');
-    semestreB = modules.filter(module => module.semestre === '6');
+    semestreGroup1 = modules.filter(module => module.semestre === '5');
+    semestreGroup2 = modules.filter(module => module.semestre === '6');
+    label1 = 'Semestre 5';
+    label2 = 'Semestre 6';
   } else {
-    // Par défaut, afficher tous les modules sans filtrage par semestre
-    semestreA = modules;
-    semestreB = [];
+    semestreGroup1 = modules.filter(module => ['1', '3', '5'].includes(module.semestre));
+    semestreGroup2 = modules.filter(module => ['2', '4', '6'].includes(module.semestre));
+    label1 = 'Semestres Impairs';
+    label2 = 'Semestres Pairs';
   }
 
   const [selectedModule, setSelectedModule] = useState(null);
@@ -38,75 +42,77 @@ const ModuleList = ({ modules, onDelete, onUpdate, niveau }) => {
   };
 
   return (
-    <div className="module-list">
-      <div className="semestre-columns">
-        <div className="semestre-column">
-          <h3>{niveau === 'L1' ? 'Semestre 1' : niveau === 'L2' ? 'Semestre 3' : niveau === 'L3' ? 'Semestre 5' : 'Modules'}</h3>
-          {semestreA.length > 0 ? (
-            semestreA.map((module) => (
-              <motion.div
-                key={module.ID_module}
-                className="module-item"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                <span
-                  className="module-name"
-                  onClick={() => handleModuleClick(module)}
+    <div id="modules">
+      <div className="module-list">
+        <div className="semestre-columns">
+          <div className="semestre-column">
+            <h3>{label1}</h3>
+            {semestreGroup1.length > 0 ? (
+              semestreGroup1.map((module) => (
+                <motion.div
+                  key={module.ID_module}
+                  className="module-item"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5 }}
                 >
-                  {module.nom_module}
-                </span>
-                <button
-                  onClick={() => onDelete(module.ID_module)}
-                  className="delete-button"
+                  <span
+                    className="module-name"
+                    onClick={() => handleModuleClick(module)}
+                  >
+                    {module.nom_module} ({module.seances})
+                  </span>
+                  <button
+                    onClick={() => onDelete(module.ID_module)}
+                    className="delete-button"
+                  >
+                    Supprimer
+                  </button>
+                </motion.div>
+              ))
+            ) : (
+              <p>Aucun module pour {label1}</p>
+            )}
+          </div>
+          <div className="semestre-column">
+            <h3>{label2}</h3>
+            {semestreGroup2.length > 0 ? (
+              semestreGroup2.map((module) => (
+                <motion.div
+                  key={module.ID_module}
+                  className="module-item"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5 }}
                 >
-                  Supprimer
-                </button>
-              </motion.div>
-            ))
-          ) : (
-            <p>Aucun module pour ce semestre</p>
-          )}
+                  <span
+                    className="module-name"
+                    onClick={() => handleModuleClick(module)}
+                  >
+                    {module.nom_module} ({module.seances})
+                  </span>
+                  <button
+                    onClick={() => onDelete(module.ID_module)}
+                    className="delete-button"
+                  >
+                    Supprimer
+                  </button>
+                </motion.div>
+              ))
+            ) : (
+              <p>Aucun module pour {label2}</p>
+            )}
+          </div>
         </div>
-        <div className="semestre-column">
-          <h3>{niveau === 'L1' ? 'Semestre 2' : niveau === 'L2' ? 'Semestre 4' : niveau === 'L3' ? 'Semestre 6' : ''}</h3>
-          {semestreB.length > 0 ? (
-            semestreB.map((module) => (
-              <motion.div
-                key={module.ID_module}
-                className="module-item"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                <span
-                  className="module-name"
-                  onClick={() => handleModuleClick(module)}
-                >
-                  {module.nom_module}
-                </span>
-                <button
-                  onClick={() => onDelete(module.ID_module)}
-                  className="delete-button"
-                >
-                  Supprimer
-                </button>
-              </motion.div>
-            ))
-          ) : (
-            <p>Aucun module pour ce semestre</p>
-          )}
-        </div>
-      </div>
 
-      {selectedModule && (
-        <ModuleModal
-          module={selectedModule}
-          onClose={handleCloseModal}
-          onSave={handleSave}
-        />
-      )}
+        {selectedModule && (
+          <ModuleModal
+            module={selectedModule}
+            onClose={handleCloseModal}
+            onSave={handleSave}
+          />
+        )}
+      </div>
     </div>
   );
 };

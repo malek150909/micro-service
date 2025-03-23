@@ -6,7 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import "../../admin_css_files/prof.css";
 
-const App = () => {
+const ListEnseignant = () => {
     const [teachers, setTeachers] = useState([]);
     const [selectedTeacher, setSelectedTeacher] = useState(null);
     const [showNewTeacherForm, setShowNewTeacherForm] = useState(false);
@@ -82,9 +82,13 @@ const App = () => {
 
     // Fetch sections
     useEffect(() => {
-        if (filters.idSpecialite) {
-            axios.get(`http://localhost:8081/api/sections/${filters.idSpecialite}`)
-                .then(res => setSections(res.data || []))
+        if (filters.idSpecialite && filters.niveau) {
+            axios.get(`http://localhost:8081/api/sections/${filters.idSpecialite}`, {
+                params: { niveau: filters.niveau }
+            })
+                .then(res => {
+                    setSections(res.data || []);
+                })
                 .catch(err => {
                     toast.error('Erreur lors de la récupération des sections: ' + err.message, { autoClose: 3000 });
                     setSections([]);
@@ -92,9 +96,9 @@ const App = () => {
         } else {
             setSections([]);
             setAvailableModules([]);
-            setFilters(prev => ({ ...prev, niveau: '', idSection: '' }));
+            setFilters(prev => ({ ...prev, idSection: '' })); // Réinitialiser idSection uniquement
         }
-    }, [filters.idSpecialite]);
+    }, [filters.idSpecialite, filters.niveau]);
 
     // Fetch available modules
     useEffect(() => {
@@ -156,35 +160,44 @@ const App = () => {
     };
 
     const handleAddTeacher = () => {
-      if (!newTeacherForm.nom || !newTeacherForm.prenom || !newTeacherForm.email || !newTeacherForm.idFaculte || !newTeacherForm.idDepartement || newTeacherForm.modules.length === 0) {
-          toast.error('Veuillez remplir tous les champs et sélectionner au moins un module.', { autoClose: 3000 });
-          return;
-      }
-  
-      console.log('Submitting new teacher:', newTeacherForm);
-  
-      axios.post('http://localhost:8081/api/enseignants', newTeacherForm)
-          .then(res => {
-              console.log('Teacher added successfully:', res.data); // Log the response
-              toast.success('Enseignant ajouté avec succès!', { autoClose: 3000 });
-              setNewTeacherForm({ nom: '', prenom: '', email: '', idFaculte: '', idDepartement: '', modules: [] });
-              setFilters({ idFaculte: '', idDepartement: '', idSpecialite: '', niveau: '', idSection: '' });
-              setShowNewTeacherForm(false);
-              // Refetch teachers based on current filters
-              if (filters.idFaculte && filters.idDepartement) {
-                  axios.post('http://localhost:8081/api/enseignants/filtrer', {
-                      idFaculte: filters.idFaculte,
-                      idDepartement: filters.idDepartement
-                  })
-                      .then(res => setTeachers(res.data))
-                      .catch(err => toast.error('Erreur lors du rechargement des enseignants: ' + err.message, { autoClose: 3000 }));
-              }
-          })
-          .catch(err => {
-              console.error('Error adding teacher:', err.response?.data || err.message);
-              toast.error('Erreur lors de l\'ajout de l\'enseignant: ' + (err.response?.data?.error || err.message), { autoClose: 3000 });
-          });
-  };
+        if (!newTeacherForm.nom || !newTeacherForm.prenom || !newTeacherForm.email || !newTeacherForm.idFaculte || !newTeacherForm.idDepartement || newTeacherForm.modules.length === 0 || !filters.idSection) {
+            toast.error('Veuillez remplir tous les champs, sélectionner au moins un module et une section.', { autoClose: 3000 });
+            return;
+        }
+    
+        const teacherData = {
+            nom: newTeacherForm.nom,
+            prenom: newTeacherForm.prenom,
+            email: newTeacherForm.email,
+            idFaculte: newTeacherForm.idFaculte,
+            idDepartement: newTeacherForm.idDepartement,
+            modules: newTeacherForm.modules,
+            idSection: filters.idSection // Ajouter idSection ici
+        };
+    
+        console.log('Submitting new teacher:', teacherData);
+    
+        axios.post('http://localhost:8081/api/enseignants', teacherData)
+            .then(res => {
+                console.log('Teacher added successfully:', res.data);
+                toast.success('Enseignant ajouté avec succès!', { autoClose: 3000 });
+                setNewTeacherForm({ nom: '', prenom: '', email: '', idFaculte: '', idDepartement: '', modules: [] });
+                setFilters({ idFaculte: '', idDepartement: '', idSpecialite: '', niveau: '', idSection: '' });
+                setShowNewTeacherForm(false);
+                if (filters.idFaculte && filters.idDepartement) {
+                    axios.post('http://localhost:8081/api/enseignants/filtrer', {
+                        idFaculte: filters.idFaculte,
+                        idDepartement: filters.idDepartement
+                    })
+                        .then(res => setTeachers(res.data))
+                        .catch(err => toast.error('Erreur lors du rechargement des enseignants: ' + err.message, { autoClose: 3000 }));
+                }
+            })
+            .catch(err => {
+                console.error('Error adding teacher:', err.response?.data || err.message);
+                toast.error('Erreur lors de l\'ajout de l\'enseignant: ' + (err.response?.data?.error || err.message), { autoClose: 3000 });
+            });
+    };
 
     return (
         <div id="profs">
@@ -417,4 +430,4 @@ const App = () => {
     );
 };
 
-export default App;
+export default ListEnseignant;

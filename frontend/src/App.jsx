@@ -9,7 +9,7 @@ import Annonces from "./admin/annonce/annonces";
 import GestionEvenements from "./admin/evenement/GestionEvenements";
 import Modules from "./admin/module/pages/Home";
 import ExamPlanning from "./admin/planning/pages/ExamPlanning";
-import TeacherSection from "./admin/enseignant/listenseignant";
+import ListEnseignants from "./admin/enseignant/ListEnseignant";
 import StudentSection from "./admin/etudiant/listetudiant";
 import ModifieProfilAdmin from "./main/modifierProfilAdmin";
 import EmploiDuTemps from "./admin/emploi/pages/TimetablePage";
@@ -21,6 +21,7 @@ import MessagesEtudiant from "./main/messagesEtudiant";
 import Ressources from "./enseignant/ressources/pages/Home";
 import Notes from "./enseignant/notes/pages/ProfessorHome";
 import GestionNotes from "./enseignant/notes/pages/GestionEnseignants";
+import AnnoncesENS from "./enseignant/annonces/annonceENS";
 
 
 const PrivateRoute = ({ element }) => {
@@ -44,7 +45,7 @@ function App() {
                 <Route path="/gestionEvenements" element={<GestionEvenements />} />
                 <Route path="/modules" element={<Modules />} />
                 <Route path="/consult" element={<ExamPlanning />} />
-                <Route path="/enseignants" element={<TeacherSection />} />
+                <Route path="/enseignants" element={<ListEnseignants />} />
                 <Route path="/etudiants" element={<StudentSection />} />
                 <Route path="/modifierProfilAdmin" element={<ModifieProfilAdmin />} />
                 <Route path="/emploidutemps" element={<EmploiDuTemps />} />
@@ -56,6 +57,7 @@ function App() {
                 <Route path="/ressources" element={<Ressources />} />
                 <Route path="/notes" element={<Notes />} />
                 <Route path="/gestionNotes" element={<GestionNotes />} />
+                <Route path="/annoncesENS" element={<AnnoncesENS />} />
             </Routes>
         </Router>
     );

@@ -6,24 +6,26 @@ const Timetable = {
   // models/timetableModel.js
   getTimetable: async (filters) => {
     try {
-      const { sectionId } = filters;
+      const { sectionId, semestre } = filters;
       console.log('Filters received:', filters);
 
-      if (!sectionId) {
-        throw new Error('sectionId is required');
+      if (!sectionId || !semestre) {
+        throw new Error('sectionId et semestre sont requis');
       }
 
       const query = `
         SELECT s.ID_seance, s.jour, s.time_slot, s.type_seance,
                m.nom_module AS module, CONCAT(u.prenom, ' ', u.nom) AS teacher,
-               s.ID_salle AS room, g.num_groupe AS "group"
+               sa.nom_salle AS room, g.num_groupe AS "group"  -- Remplacer s.ID_salle par sa.nom_salle
         FROM Seance s
         LEFT JOIN Module m ON s.ID_module = m.ID_module
         LEFT JOIN User u ON s.Matricule = u.Matricule
+        LEFT JOIN Salle sa ON s.ID_salle = sa.ID_salle  -- Ajouter la jointure avec Salle
         LEFT JOIN Groupe g ON s.ID_groupe = g.ID_groupe
-        WHERE s.ID_section = ?
+        JOIN module_section ms ON s.ID_module = ms.ID_module AND s.ID_section = ms.ID_section
+        WHERE s.ID_section = ? AND ms.semestre = ?
       `;
-      const params = [sectionId];
+      const params = [sectionId, semestre];
       console.log('Executing query:', query);
       console.log('With params:', params);
 
@@ -136,52 +138,6 @@ getFilterOptions: async ({ niveau = null, faculte = null, departement = null, sp
   }
 },
 
-updateSession: async (id, { ID_salle, Matricule, type_seance, ID_groupe, ID_module, jour, time_slot }) => {
-  try {
-    // Vérifier les conflits avant la mise à jour
-    const conflict = await Timetable.checkConflicts(ID_salle, Matricule, jour, time_slot, id);
-    if (conflict) {
-      return { success: false, error: conflict };
-    }
-
-    const groupeToUpdate = type_seance === 'cours' ? null : (ID_groupe || null);
-    await pool.query(
-      'UPDATE Seance SET ID_salle = ?, Matricule = ?, type_seance = ?, ID_groupe = ?, ID_module = ?, jour = ?, time_slot = ? WHERE ID_seance = ?',
-      [ID_salle, Matricule, type_seance, groupeToUpdate, ID_module, jour, time_slot, id]
-    );
-    return { success: true, message: 'Séance mise à jour avec succès' };
-  } catch (err) {
-    throw err;
-  }
-},
-
-  // models/timetableModel.js (extrait)
-  createSession: async ({ ID_salle, Matricule, type_seance, ID_groupe, ID_module, jour, time_slot, ID_section }) => {
-    try {
-      console.log('Creating session with data:', { ID_salle, Matricule, type_seance, ID_groupe, ID_module, jour, time_slot, ID_section });
-      if (!ID_section) {
-        throw new Error('ID_section est requis');
-      }
-
-      // Vérifier les conflits avant la création
-      const conflict = await Timetable.checkConflicts(ID_salle, Matricule, jour, time_slot);
-      if (conflict) {
-        return { success: false, error: conflict };
-      }
-
-      const groupeToInsert = type_seance === 'cours' ? null : (ID_groupe || null);
-      const [result] = await pool.query(
-        'INSERT INTO Seance (ID_salle, Matricule, type_seance, ID_groupe, ID_module, jour, time_slot, ID_section) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-        [ID_salle, Matricule, type_seance, groupeToInsert, ID_module, jour, time_slot, ID_section]
-      );
-      console.log('Insert result:', result);
-      return { success: true, ID_seance: result.insertId, message: 'Séance ajoutée avec succès' };
-    } catch (err) {
-      console.error('Error in createSession:', err.message);
-      throw err;
-    }
-  },
-
 deleteSession: async (id) => {
   try {
     if (!id) {
@@ -200,12 +156,64 @@ deleteSession: async (id) => {
   }
 },
 
-getSessionOptions: async (sectionId) => {
+  // models/timetableModel.js (extrait)
+  createSession: async ({ ID_salle, Matricule, type_seance, ID_groupe, ID_module, jour, time_slot, ID_section }) => {
+    try {
+      console.log('Creating session with data:', { ID_salle, Matricule, type_seance, ID_groupe, ID_module, jour, time_slot, ID_section });
+      if (!ID_section) {
+        throw new Error('ID_section est requis');
+      }
+
+      // Passer ID_module à checkConflicts
+      const conflict = await Timetable.checkConflicts(ID_salle, Matricule, jour, time_slot, type_seance, ID_groupe, ID_section, ID_module);
+      if (conflict) {
+        return { success: false, error: conflict };
+      }
+
+      const groupeToInsert = type_seance === 'cours' ? null : (ID_groupe || null);
+      const [result] = await pool.query(
+        'INSERT INTO Seance (ID_salle, Matricule, type_seance, ID_groupe, ID_module, jour, time_slot, ID_section) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        [ID_salle, Matricule, type_seance, groupeToInsert, ID_module, jour, time_slot, ID_section]
+      );
+      return { success: true, ID_seance: result.insertId, message: 'Séance ajoutée avec succès' };
+    } catch (err) {
+      console.error('Error in createSession:', err.message);
+      throw err;
+    }
+  },
+
+  updateSession: async (id, { ID_salle, Matricule, type_seance, ID_groupe, ID_module, jour, time_slot }) => {
+    try {
+      const [existingSession] = await pool.query('SELECT ID_section FROM Seance WHERE ID_seance = ?', [id]);
+      if (!existingSession.length) {
+        throw new Error('Séance non trouvée');
+      }
+      const ID_section = existingSession[0].ID_section;
+
+      // Passer ID_module à checkConflicts
+      const conflict = await Timetable.checkConflicts(ID_salle, Matricule, jour, time_slot, type_seance, ID_groupe, ID_section, ID_module, id);
+      if (conflict) {
+        return { success: false, error: conflict };
+      }
+
+      const groupeToUpdate = type_seance === 'cours' ? null : (ID_groupe || null);
+      await pool.query(
+        'UPDATE Seance SET ID_salle = ?, Matricule = ?, type_seance = ?, ID_groupe = ?, ID_module = ?, jour = ?, time_slot = ? WHERE ID_seance = ?',
+        [ID_salle, Matricule, type_seance, groupeToUpdate, ID_module, jour, time_slot, id]
+      );
+      return { success: true, message: 'Séance mise à jour avec succès' };
+    } catch (err) {
+      throw err;
+    }
+  },
+
+// models/timetableModel.js
+getSessionOptions: async (sectionId, semestre) => {
   try {
-    console.log('Fetching session options for sectionId:', sectionId);
+    console.log('Fetching session options for sectionId:', sectionId, 'and semestre:', semestre);
 
     const [section] = await pool.query(
-      'SELECT ID_specialite FROM Section WHERE ID_section = ?',
+      'SELECT ID_specialite, niveau FROM Section WHERE ID_section = ?',
       [sectionId]
     );
     if (!section.length) {
@@ -215,12 +223,14 @@ getSessionOptions: async (sectionId) => {
     const specialiteId = section[0].ID_specialite;
     console.log('Specialite ID:', specialiteId);
 
-    if (!specialiteId) {
-      console.log('specialiteId is null or undefined');
+    if (!specialiteId || !semestre) {
+      console.log('specialiteId or semestre is null or undefined');
       return { salles: [], groupes: [], modules: [], enseignants: [] };
     }
 
-    const [salles] = await pool.query('SELECT ID_salle FROM Salle');
+    const [salles] = await pool.query(
+      'SELECT ID_salle, nom_salle, type_salle FROM Salle WHERE disponible = 1'
+    );
     console.log('Salles récupérées:', salles);
 
     const [groupes] = await pool.query(
@@ -230,10 +240,13 @@ getSessionOptions: async (sectionId) => {
     console.log('Groupes récupérés pour sectionId', sectionId, ':', groupes);
 
     const [modules] = await pool.query(
-      'SELECT ID_module, nom_module FROM Module WHERE ID_specialite = ?',
-      [specialiteId]
+      'SELECT m.ID_module, m.nom_module, m.seances ' +
+      'FROM Module m ' +
+      'JOIN module_section ms ON m.ID_module = ms.ID_module ' +
+      'WHERE ms.ID_section = ? AND ms.semestre = ?',
+      [sectionId, semestre]
     );
-    console.log('Modules récupérés:', modules);
+    console.log('Modules récupérés pour sectionId', sectionId, 'et semestre', semestre, ':', modules);
 
     const [enseignants] = await pool.query(`
       SELECT DISTINCT u.Matricule, u.nom, u.prenom 
@@ -258,32 +271,135 @@ getSessionOptions: async (sectionId) => {
   }
 },
 
-checkConflicts: async (ID_salle, Matricule, jour, time_slot, excludeSessionId = null) => {
+checkConflicts: async (ID_salle, Matricule, jour, time_slot, type_seance, ID_groupe, ID_section, ID_module, excludeSessionId = null) => {
   try {
+    // Récupérer nom_salle pour ID_salle
+    const [salleInfo] = await pool.query(
+      'SELECT nom_salle FROM Salle WHERE ID_salle = ?',
+      [ID_salle]
+    );
+    const nomSalle = salleInfo.length > 0 ? salleInfo[0].nom_salle : ID_salle;
+
+    // Récupérer nom et prenom pour Matricule
+    const [enseignantInfo] = await pool.query(
+      'SELECT nom, prenom FROM User WHERE Matricule = ?',
+      [Matricule]
+    );
+    const nomEnseignant = enseignantInfo.length > 0 ? `${enseignantInfo[0].prenom} ${enseignantInfo[0].nom}` : Matricule;
+
+    // Récupérer le semestre de la nouvelle séance (via ID_module et ID_section)
+    const [newSessionSemestre] = await pool.query(
+      'SELECT semestre FROM module_section WHERE ID_module = ? AND ID_section = ?',
+      [ID_module, ID_section]
+    );
+    const semestreNew = newSessionSemestre.length > 0 ? parseInt(newSessionSemestre[0].semestre) : null;
+    if (!semestreNew) {
+      throw new Error('Semestre non trouvé pour ce module et cette section');
+    }
+    const isNewSemestreImpair = semestreNew % 2 !== 0; // Vrai pour 1, 3, 5
+
     // Vérifier conflit de salle
     const salleQuery = `
-      SELECT ID_seance 
-      FROM Seance 
-      WHERE ID_salle = ? AND jour = ? AND time_slot = ? 
-      ${excludeSessionId ? 'AND ID_seance != ?' : ''}
+      SELECT s.ID_seance, ms.semestre 
+      FROM Seance s
+      JOIN module_section ms ON s.ID_module = ms.ID_module AND s.ID_section = ms.ID_section
+      WHERE s.ID_salle = ? AND s.jour = ? AND s.time_slot = ? 
+      ${excludeSessionId ? 'AND s.ID_seance != ?' : ''}
     `;
     const salleParams = excludeSessionId ? [ID_salle, jour, time_slot, excludeSessionId] : [ID_salle, jour, time_slot];
     const [salleRows] = await pool.query(salleQuery, salleParams);
     if (salleRows.length > 0) {
-      return `La salle ${ID_salle} est déjà utilisée pour le créneau ${jour} ${time_slot}.`;
+      const hasConflict = salleRows.some(row => {
+        const semestreExisting = parseInt(row.semestre);
+        const isExistingSemestreImpair = semestreExisting % 2 !== 0;
+        // Conflit si même groupe de semestres (impair vs impair ou pair vs pair)
+        return isNewSemestreImpair === isExistingSemestreImpair;
+      });
+      if (hasConflict) {
+        return `La salle ${nomSalle} est déjà utilisée pour le créneau ${jour} ${time_slot}.`;
+      }
     }
 
     // Vérifier conflit d'enseignant
     const teacherQuery = `
-      SELECT ID_seance 
-      FROM Seance 
-      WHERE Matricule = ? AND jour = ? AND time_slot = ? 
-      ${excludeSessionId ? 'AND ID_seance != ?' : ''}
+      SELECT s.ID_seance, ms.semestre 
+      FROM Seance s
+      JOIN module_section ms ON s.ID_module = ms.ID_module AND s.ID_section = ms.ID_section
+      WHERE s.Matricule = ? AND s.jour = ? AND s.time_slot = ? 
+      ${excludeSessionId ? 'AND s.ID_seance != ?' : ''}
     `;
     const teacherParams = excludeSessionId ? [Matricule, jour, time_slot, excludeSessionId] : [Matricule, jour, time_slot];
     const [teacherRows] = await pool.query(teacherQuery, teacherParams);
     if (teacherRows.length > 0) {
-      return `L'enseignant (Matricule: ${Matricule}) est déjà affecté à une autre séance pour le créneau ${jour} ${time_slot}.`;
+      const hasConflict = teacherRows.some(row => {
+        const semestreExisting = parseInt(row.semestre);
+        const isExistingSemestreImpair = semestreExisting % 2 !== 0;
+        return isNewSemestreImpair === isExistingSemestreImpair;
+      });
+      if (hasConflict) {
+        return `L'enseignant ${nomEnseignant} est déjà affecté à une autre séance pour le créneau ${jour} ${time_slot}.`;
+      }
+    }
+
+    // Vérifier les séances existantes dans la case (pour type_seance et groupe)
+    const existingSessionsQuery = `
+      SELECT s.ID_seance, s.type_seance, s.ID_groupe, ms.semestre 
+      FROM Seance s
+      JOIN module_section ms ON s.ID_module = ms.ID_module AND s.ID_section = ms.ID_section
+      WHERE s.jour = ? AND s.time_slot = ? AND s.ID_section = ?
+      ${excludeSessionId ? 'AND s.ID_seance != ?' : ''}
+    `;
+    const existingSessionsParams = excludeSessionId ? [jour, time_slot, ID_section, excludeSessionId] : [jour, time_slot, ID_section];
+    const [existingSessions] = await pool.query(existingSessionsQuery, existingSessionsParams);
+
+    if (type_seance === 'cours') {
+      if (existingSessions.length > 0) {
+        const hasConflict = existingSessions.some(session => {
+          const semestreExisting = parseInt(session.semestre);
+          const isExistingSemestreImpair = semestreExisting % 2 !== 0;
+          return isNewSemestreImpair === isExistingSemestreImpair;
+        });
+        if (hasConflict) {
+          return `Un cours ne peut pas être ajouté dans une case déjà occupée (${jour} ${time_slot}).`;
+        }
+      }
+    } else if (type_seance === 'TD' || type_seance === 'TP') {
+      const relevantSessions = existingSessions.filter(session => {
+        const semestreExisting = parseInt(session.semestre);
+        const isExistingSemestreImpair = semestreExisting % 2 !== 0;
+        return isNewSemestreImpair === isExistingSemestreImpair;
+      });
+
+      if (relevantSessions.length >= 4) {
+        return `Limite atteinte : maximum 4 séances TD/TP pour le créneau ${jour} ${time_slot}.`;
+      }
+      const hasCours = relevantSessions.some(session => session.type_seance === 'cours');
+      if (hasCours) {
+        return `Impossible d’ajouter un ${type_seance} dans une case contenant un cours (${jour} ${time_slot}).`;
+      }
+      if (ID_groupe) {
+        const [groupeInfo] = await pool.query(
+          'SELECT num_groupe FROM Groupe WHERE ID_groupe = ?',
+          [ID_groupe]
+        );
+        const numGroupe = groupeInfo.length > 0 ? groupeInfo[0].num_groupe : ID_groupe;
+
+        const groupConflict = relevantSessions.some(session => session.ID_groupe === ID_groupe);
+        if (groupConflict) {
+          return `Le groupe ${numGroupe} est déjà assigné à une séance dans le créneau ${jour} ${time_slot}.`;
+        }
+      }
+    }
+
+    // Vérifier si l'enseignant peut enseigner ce module (pas de changement ici)
+    const moduleTeacherQuery = `
+      SELECT COUNT(*) as count 
+      FROM module_enseignant 
+      WHERE ID_module = ? AND Matricule = ?
+    `;
+    const [moduleTeacherRows] = await pool.query(moduleTeacherQuery, [ID_module, Matricule]);
+    if (moduleTeacherRows[0].count === 0) {
+      return `L'enseignant ${nomEnseignant} n’est pas autorisé à enseigner ce module.`;
     }
 
     return null; // Pas de conflit
@@ -291,7 +407,203 @@ checkConflicts: async (ID_salle, Matricule, jour, time_slot, excludeSessionId = 
     console.error('Error in checkConflicts:', err.message);
     throw err;
   }
+},
+// models/timetableModel.js
+getModuleEnseignants: async (moduleId) => {
+  try {
+    console.log('Fetching enseignants for moduleId:', moduleId);
+    const [enseignants] = await pool.query(`
+      SELECT DISTINCT u.Matricule, u.nom, u.prenom 
+      FROM User u
+      JOIN Module_Enseignant me ON u.Matricule = me.Matricule
+      WHERE me.ID_module = ?
+    `, [moduleId]);
+    console.log('Enseignants found for moduleId', moduleId, ':', enseignants);
+    return enseignants;
+  } catch (err) {
+    console.error('Error in getModuleEnseignants:', err.message);
+    throw err;
+  }
+},
+
+// models/timetableModel.js
+generateTimetablesForAllSections: async () => {
+  try {
+    console.log('Starting automatic timetable generation for all sections');
+
+    // Étape 1 : Récupérer toutes les sections
+    const [sections] = await pool.query('SELECT ID_section, niveau FROM Section');
+    if (!sections.length) {
+      throw new Error('Aucune section trouvée');
+    }
+
+    // Étape 2 : Définir les jours et créneaux avec priorité
+    const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+    const timeSlots = [
+      '08:00 - 09:30',
+      '09:40 - 11:10',
+      '11:20 - 12:50',
+      '13:00 - 14:30',
+      '14:40 - 16:10',
+      '16:20 - 17:50'
+    ];
+    const morningSlots = timeSlots.slice(0, 3); // 08:00 - 12:50
+    const afternoonSlots = timeSlots.slice(3);   // 13:00 - 17:50
+
+    // Étape 3 : Récupérer toutes les salles disponibles
+    const [salles] = await pool.query('SELECT ID_salle, type_salle FROM Salle WHERE disponible = 1');
+    if (!salles.length) {
+      throw new Error('Aucune salle disponible dans la base de données');
+    }
+
+    // Étape 4 : Boucler sur chaque section
+    for (const section of sections) {
+      const sectionId = section.ID_section;
+
+      // Récupérer les semestres associés à cette section
+      const [semestres] = await pool.query(
+        'SELECT DISTINCT semestre FROM module_section WHERE ID_section = ?',
+        [sectionId]
+      );
+      for (const { semestre } of semestres) {
+        console.log(`Generating timetable for section ${sectionId}, semestre ${semestre}`);
+
+        // Récupérer les modules pour cette section et ce semestre
+        const [modules] = await pool.query(
+          'SELECT m.ID_module, m.seances ' +
+          'FROM Module m ' +
+          'JOIN module_section ms ON m.ID_module = ms.ID_module ' +
+          'WHERE ms.ID_section = ? AND ms.semestre = ?',
+          [sectionId, semestre]
+        );
+
+        // Récupérer les groupes pour cette section
+        const [groupes] = await pool.query(
+          'SELECT ID_groupe FROM Groupe WHERE ID_section = ?',
+          [sectionId]
+        );
+
+        // Planification par jour pour équilibrer
+        const timetablePlan = {};
+        days.forEach(day => {
+          timetablePlan[day] = { matin: [], aprem: [] };
+        });
+
+        // Pour chaque module
+        for (const module of modules) {
+          const moduleId = module.ID_module;
+          const seances = module.seances.split('/'); // Ex: "Cour/TD/TP" -> ["Cour", "TD", "TP"]
+
+          // Récupérer les enseignants pour ce module
+          const [enseignants] = await pool.query(
+            'SELECT Matricule FROM module_enseignant WHERE ID_module = ?',
+            [moduleId]
+          );
+
+          if (!enseignants.length) {
+            console.warn(`Aucun enseignant trouvé pour le module ${moduleId}, ignoré`);
+            continue;
+          }
+
+          // Générer une séance par type de séance
+          for (const typeSeance of seances) {
+            const typeSeanceNormalized = typeSeance === 'Cour' ? 'cours' : typeSeance;
+            let scheduled = false;
+
+            // Vérifier si une séance existe déjà pour ce module, type, section et semestre
+            const [existingSessions] = await pool.query(
+              'SELECT s.ID_seance ' +
+              'FROM Seance s ' +
+              'JOIN module_section ms ON s.ID_module = ms.ID_module AND s.ID_section = ms.ID_section ' +
+              'WHERE s.ID_module = ? AND s.type_seance = ? AND s.ID_section = ? AND ms.semestre = ? AND s.jour IN (?,?,?,?,?,?)',
+              [moduleId, typeSeanceNormalized, sectionId, semestre, ...days]
+            );
+            if (existingSessions.length > 0) {
+              console.log(`Une séance de ${typeSeanceNormalized} existe déjà pour le module ${moduleId}, section ${sectionId}, semestre ${semestre}`);
+              continue;
+            }
+
+            // Choisir un jour avec le moins de séances
+            const availableDays = days.filter(day => {
+              const totalSessions = timetablePlan[day].matin.length + timetablePlan[day].aprem.length;
+              return totalSessions < 4; // Limite à 4 séances par jour
+            });
+
+            if (!availableDays.length) {
+              console.warn(`Plus de jours disponibles pour ${typeSeanceNormalized}, module ${moduleId}`);
+              continue;
+            }
+
+            // Essayer tous les jours et créneaux possibles
+            for (const day of availableDays) {
+              const isMorningPreferred = Math.random() > 0.3; // 70% matin
+              const slotsToTry = isMorningPreferred ? morningSlots : afternoonSlots;
+
+              for (const timeSlot of slotsToTry) {
+                const enseignant = enseignants[Math.floor(Math.random() * enseignants.length)];
+                const salle = salles.find(s => 
+                  (typeSeanceNormalized === 'cours' && s.type_salle === 'Cour') ||
+                  (typeSeanceNormalized === 'TD' && (s.type_salle === 'TD' || s.type_salle === 'TP/TD')) ||
+                  (typeSeanceNormalized === 'TP' && (s.type_salle === 'TP' || s.type_salle === 'TP/TD'))
+                );
+
+                if (!salle) {
+                  console.warn(`Aucune salle disponible pour ${typeSeanceNormalized}, module ${moduleId}`);
+                  break;
+                }
+
+                const groupe = typeSeanceNormalized === 'cours' ? null : groupes[Math.floor(Math.random() * groupes.length)]?.ID_groupe;
+
+                const conflict = await Timetable.checkConflicts(
+                  salle.ID_salle,
+                  enseignant.Matricule,
+                  day,
+                  timeSlot,
+                  typeSeanceNormalized,
+                  groupe,
+                  sectionId,
+                  moduleId
+                );
+
+                if (!conflict) {
+                  // Ajouter la séance
+                  await pool.query(
+                    'INSERT INTO Seance (ID_salle, Matricule, type_seance, ID_groupe, ID_module, jour, time_slot, ID_section) ' +
+                    'VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                    [salle.ID_salle, enseignant.Matricule, typeSeanceNormalized, groupe, moduleId, day, timeSlot, sectionId]
+                  );
+                  scheduled = true;
+                  console.log(`Séance ajoutée: ${typeSeanceNormalized} pour module ${moduleId}, section ${sectionId}, semestre ${semestre}`);
+
+                  // Mettre à jour le plan
+                  if (morningSlots.includes(timeSlot)) {
+                    timetablePlan[day].matin.push({ moduleId, typeSeanceNormalized });
+                  } else {
+                    timetablePlan[day].aprem.push({ moduleId, typeSeanceNormalized });
+                  }
+                  break;
+                } else {
+                  console.log(`Conflit détecté: ${conflict}`);
+                }
+              }
+              if (scheduled) break;
+            }
+
+            if (!scheduled) {
+              console.warn(`Impossible de planifier ${typeSeanceNormalized} pour module ${moduleId}, section ${sectionId}, semestre ${semestre}`);
+            }
+          }
+        }
+      }
+    }
+
+    return { success: true, message: 'Emplois du temps générés avec succès pour toutes les sections' };
+  } catch (err) {
+    console.error('Error in generateTimetablesForAllSections:', err.message);
+    return { success: false, error: err.message };
+  }
 }
+
 };
 
 export default Timetable;

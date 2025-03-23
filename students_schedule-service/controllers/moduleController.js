@@ -1,92 +1,101 @@
+// controllers/moduleController.js
 import Module from '../models/moduleModel.js';
 
 export const getModules = async (req, res) => {
   try {
-    const modules = await Module.getModules(req.query);
-    res.json(modules);
-  } catch (error) {
-    res.status(500).json({ error: 'Database error' });
+    const results = await Module.getModules(req.query);
+    res.json(results);
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur de base de données' });
   }
 };
 
 export const addModule = async (req, res) => {
   try {
     const result = await Module.addModule(req.body);
-    res.status(201).json({ message: 'Module added successfully', moduleId: result.moduleId });
-  } catch (error) {
-    res.status(500).json({ error: 'Error adding module' });
+    res.status(201).json({ message: 'Module ajouté avec succès', moduleId: result.insertId });
+  } catch (err) {
+    if (err.message === 'Un module avec ce nom existe déjà dans cette section.') {
+      return res.status(400).json({ 
+        error: 'Un module avec ce nom existe déjà dans cette section.' 
+      });
+    }
+    res.status(400).json({ error: err.message });
   }
 };
 
 export const deleteModule = async (req, res) => {
   try {
-    await Module.deleteModule(req.params.id);
-    res.json({ message: 'Module deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ error: 'Error deleting module' });
+    const { id } = req.params;
+    const result = await Module.deleteModule(id);
+    res.json({ message: 'Module supprimé avec succès' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-}
+};
 
 export const getFacultes = async (req, res) => {
   try {
-    const facultes = await Module.getFacultes();
-    res.json(facultes);
-  } catch (error) {
-    res.status(500).json({ error: 'Database error' });
+    const results = await Module.getFacultes();
+    res.json(results);
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur de base de données' });
   }
-}
+};
 
 export const getDepartements = async (req, res) => {
   try {
-    const departements = await Module.getDepartements(req.query);
-    res.json(departements);
-  } catch (error) {
-    res.status(500).json({ error: 'Database error' });
+    const results = await Module.getDepartements(req.query);
+    res.json(results);
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur de base de données' });
   }
-}
+};
 
 export const getNiveaux = async (req, res) => {
   try {
-    const niveaux = await Module.getNiveaux(req.query);
-    res.json(niveaux);
-  } catch (error) {
-    res.status(500).json({ error: 'Database error' });
+    const results = await Module.getNiveaux(req.query);
+    res.json(results);
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur de base de données' });
   }
-}
+};
 
 export const getSpecialites = async (req, res) => {
   try {
-    const specialites = await Module.getSpecialites(req.query);
-    res.json(specialites);
-  } catch (error) {
-    res.status(500).json({ error: 'Database error' });
+    const results = await Module.getSpecialites(req.query);
+    res.json(results);
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur de base de données' });
   }
-}
+};
 
 export const getSections = async (req, res) => {
   try {
-    const sections = await Module.getSections(req.query);
-    res.json(sections);
-  } catch (error) {
-    res.status(500).json({ error: 'Database error' });
+    const results = await Module.getSections(req.query);
+    res.json(results);
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur de base de données' });
   }
-}
+};
 
 export const getSemestres = async (req, res) => {
   try {
-    const semestres = await Module.getSemestres(req.query);
-    res.json(semestres);
-  } catch (error) {
-    res.status(500).json({ error: 'Database error' });
+    const results = await Module.getSemestres();
+    res.json(results);
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur de base de données' });
   }
-}
-
+};
 
 export const updateModule = async (req, res) => {
   try {
-    await Module.updateModule(req.params.id, req.body);
-    res.json({ message: 'Module updated successfully' });
-  } catch (error) {
-    res.status(500).json({ error: 'Error updating module' });
+    const { id } = req.params;
+    const moduleData = req.body;
+    const result = await Module.updateModule(id, moduleData);
+    res.json({ message: 'Module mis à jour avec succès' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-}
+};
+

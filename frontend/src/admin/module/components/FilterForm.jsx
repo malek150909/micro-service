@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
-import '../../../admin_css_files/module.css';
+import "../../../admin_css_files/module.css";
 
 const FilterForm = ({ onFilter }) => {
   const [filters, setFilters] = useState({
@@ -65,9 +65,7 @@ const FilterForm = ({ onFilter }) => {
         const response = await axios.get('http://localhost:8083/modules/niveaux', {
           params: { departement: filters.departement },
         });
-        // Limiter aux niveaux L1, L2, L3
-        const filteredNiveaux = response.data.filter(n => ['L1', 'L2', 'L3'].includes(n.id));
-        setNiveauOptions(filteredNiveaux);
+        setNiveauOptions(response.data);
       } catch (error) {
         console.error('Erreur de récupération des niveaux:', error);
       }
@@ -122,7 +120,6 @@ const FilterForm = ({ onFilter }) => {
             niveau: filters.niveau,
           },
         });
-        console.log('Sections fetched:', response.data);
         setSectionOptions(response.data);
       } catch (error) {
         console.error('Erreur de récupération des sections:', error);
@@ -141,79 +138,77 @@ const FilterForm = ({ onFilter }) => {
   }, [filters.specialite, filters.niveau]);
 
   const handleChange = (e) => {
-    console.log('Selected field:', e.target.name, 'Value:', e.target.value);
     setFilters({ ...filters, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Filters submitted:', filters);
     if (filters.section) {
-      console.log('Calling onFilter with filters:', filters);
       onFilter(filters);
     } else {
-      console.warn('No section selected');
       onFilter({ ...filters, section: '' });
     }
   };
 
   return (
-    <motion.div
-      className="modules-form-container"
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      <h3>Filtrer les Modules</h3>
-      <form onSubmit={handleSubmit}>
-        <select name="faculte" value={filters.faculte} onChange={handleChange}>
-          <option value="">Sélectionner une Faculté</option>
-          {faculteOptions.map((option) => (
-            <option key={option.ID_faculte} value={option.ID_faculte}>
-              {option.nom_faculte}
-            </option>
-          ))}
-        </select>
+    <div id="modules">
+      <motion.div
+        className="form-container"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h3>Filtrer les Modules</h3>
+        <form onSubmit={handleSubmit}>
+          <select name="faculte" value={filters.faculte} onChange={handleChange}>
+            <option value="">Sélectionner une Faculté</option>
+            {faculteOptions.map((option) => (
+              <option key={option.ID_faculte} value={option.ID_faculte}>
+                {option.nom_faculte}
+              </option>
+            ))}
+          </select>
 
-        <select name="departement" value={filters.departement} onChange={handleChange}>
-          <option value="">Sélectionner un Département</option>
-          {departementOptions.map((option) => (
-            <option key={option.ID_departement} value={option.ID_departement}>
-              {option.Nom_departement}
-            </option>
-          ))}
-        </select>
+          <select name="departement" value={filters.departement} onChange={handleChange}>
+            <option value="">Sélectionner un Département</option>
+            {departementOptions.map((option) => (
+              <option key={option.ID_departement} value={option.ID_departement}>
+                {option.Nom_departement}
+              </option>
+            ))}
+          </select>
 
-        <select name="niveau" value={filters.niveau} onChange={handleChange}>
-          <option value="">Sélectionner un Niveau</option>
-          {niveauOptions.map((option) => (
-            <option key={option.id} value={option.id}>
-              {option.name}
-            </option>
-          ))}
-        </select>
+          <select name="niveau" value={filters.niveau} onChange={handleChange}>
+            <option value="">Sélectionner un Niveau</option>
+            {niveauOptions.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.name}
+              </option>
+            ))}
+          </select>
 
-        <select name="specialite" value={filters.specialite} onChange={handleChange}>
-          <option value="">Sélectionner une Spécialité</option>
-          {specialiteOptions.map((option) => (
-            <option key={option.ID_specialite} value={option.ID_specialite}>
-              {option.nom_specialite}
-            </option>
-          ))}
-        </select>
+          <select name="specialite" value={filters.specialite} onChange={handleChange}>
+            <option value="">Sélectionner une Spécialité</option>
+            {specialiteOptions.map((option) => (
+              <option key={option.ID_specialite} value={option.ID_specialite}>
+                {option.nom_specialite}
+              </option>
+            ))}
+          </select>
 
-        <select name="section" value={filters.section} onChange={handleChange}>
-          <option value="">Sélectionner une Section</option>
-          {sectionOptions.map((option) => (
-            <option key={option.ID_section} value={option.ID_section}>
-              {option.nom_section}
-            </option>
-          ))}
-        </select>
+          <select name="section" value={filters.section} onChange={handleChange}>
+            <option value="">Sélectionner une Section</option>
+            {sectionOptions.map((option) => (
+              <option key={option.ID_section} value={option.ID_section}>
+                {option.nom_section}
+              </option>
+            ))}
+          </select>
 
-        <button type="submit">Filtrer</button>
-      </form>
-    </motion.div>
+          <button type="submit">Filtrer</button>
+        </form>
+      </motion.div>
+    </div>
   );
 };
 

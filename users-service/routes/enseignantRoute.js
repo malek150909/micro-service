@@ -4,12 +4,12 @@ const db = require('../config/db');
 const bcrypt = require('bcrypt'); // Add bcrypt
 
 router.post('/enseignants', async (req, res) => {
-    const { nom, prenom, email, idFaculte, idDepartement, modules } = req.body;
+    const { nom, prenom, email, idFaculte, idDepartement, modules, idSection } = req.body;
 
     // Validate required fields
-    if (!nom || !prenom || !email || !idFaculte || !idDepartement || !Array.isArray(modules) || modules.length === 0) {
-        console.log('Validation failed:', { nom, prenom, email, idFaculte, idDepartement, modules });
-        return res.status(400).json({ error: 'Tous les champs sont requis, y compris au moins un module.' });
+    if (!nom || !prenom || !email || !idFaculte || !idDepartement || !Array.isArray(modules) || modules.length === 0 || !idSection) {
+        console.log('Validation failed:', { nom, prenom, email, idFaculte, idDepartement, modules, idSection });
+        return res.status(400).json({ error: 'Tous les champs sont requis, y compris une section et au moins un module.' });
     }
 
     let connection;
@@ -29,6 +29,12 @@ router.post('/enseignants', async (req, res) => {
             throw new Error(`Le département avec ID ${idDepartement} n'existe pas ou n'appartient pas à la faculté ${idFaculte}.`);
         }
 
+        // Validate idSection
+        const [sectionExists] = await connection.query('SELECT ID_section FROM Section WHERE ID_section = ?', [idSection]);
+        if (sectionExists.length === 0) {
+            throw new Error(`La section avec ID ${idSection} n'existe pas.`);
+        }
+
         // Validate modules
         for (const moduleId of modules) {
             const [moduleExists] = await connection.query('SELECT ID_module FROM Module WHERE ID_module = ?', [moduleId]);
@@ -37,11 +43,11 @@ router.post('/enseignants', async (req, res) => {
             }
         }
 
-        // Generate a numeric Matricule by incrementing the latest one
-        const [latestMatricule] = await connection.query('SELECT Matricule FROM User WHERE Matricule >= 1000 ORDER BY Matricule DESC LIMIT 1');
-        let matricule = 1000; // Default starting Matricule
+        // Generate a numeric Matricule
+        const [latestMatricule] = await connection.query('SELECT Matricule FROM Enseignant ORDER BY Matricule DESC LIMIT 1');
+        let matricule = 1000;
         if (latestMatricule.length > 0) {
-            matricule = latestMatricule[0].Matricule + 1; // Increment numerically
+            matricule = latestMatricule[0].Matricule + 1;
         }
         console.log('Generated Matricule:', matricule);
 
@@ -52,17 +58,17 @@ router.post('/enseignants', async (req, res) => {
         }
 
         // Hash the default password
-        const hashedPassword = await bcrypt.hash('default_password', 10); // Hash with 10 salt rounds
+        const hashedPassword = await bcrypt.hash('default_password', 10);
 
-        // Insert into User table with hashed password
+        // Insert into User table
         await connection.query(
             'INSERT INTO User (Matricule, nom, prenom, email, motdepasse) VALUES (?, ?, ?, ?, ?)',
             [matricule, nom, prenom, email, hashedPassword]
         );
         console.log('User inserted successfully for Matricule:', matricule);
 
-        // Insert into Enseignant table with annee_inscription (assuming DATE type)
-        const annee_inscription = new Date().toISOString().split('T')[0]; // e.g., '2025-03-12'
+        // Insert into Enseignant table
+        const annee_inscription = new Date().toISOString().split('T')[0];
         await connection.query(
             'INSERT INTO Enseignant (Matricule, ID_faculte, ID_departement, annee_inscription) VALUES (?, ?, ?, ?)',
             [matricule, idFaculte, idDepartement, annee_inscription]
@@ -77,6 +83,13 @@ router.post('/enseignants', async (req, res) => {
             );
             console.log('Module assigned:', moduleId);
         }
+
+        // Insert into Enseignant_Section table
+        await connection.query(
+            'INSERT INTO enseignant_section (Matricule, ID_section) VALUES (?, ?)',
+            [matricule, idSection]
+        );
+        console.log('Section assigned:', idSection);
 
         await connection.commit();
         console.log('Teacher added successfully with Matricule:', matricule);
@@ -157,52 +170,70 @@ router.get('/enseignants/:matricule', async (req, res) => {
 // Route to update a teacher
 router.put('/enseignants/:matricule', async (req, res) => {
     const { matricule } = req.params;
-    const { nom, prenom, email, modules } = req.body;
+    const { nom, prenom, email, modules, idSection } = req.body;
 
-    console.log('Updating teacher:', { matricule, nom, prenom, email, modules });
+    console.log('Updating teacher:', { matricule, nom, prenom, email, modules, idSection });
 
+    if (!nom || !prenom || !email || !modules || modules.length === 0 || !idSection) {
+        return res.status(400).json({ error: 'Tous les champs sont requis, y compris une section et au moins un module.' });
+    }
+
+    let connection; // Déclarer connection ici pour qu'elle soit accessible dans le finally
     try {
-        const connection = await db.getConnection();
+        connection = await db.getConnection();
         await connection.beginTransaction();
 
-        try {
-            const [result] = await connection.query(
-                'UPDATE User SET nom = ?, prenom = ?, email = ? WHERE Matricule = ?',
-                [nom, prenom, email, matricule]
-            );
-            console.log('User update result:', result);
-
-            await connection.query(
-                'DELETE FROM Module_Enseignant WHERE Matricule = ?',
-                [matricule]
-            );
-
-            if (modules && modules.length > 0) {
-                console.log('Modules to insert:', modules);
-                for (const moduleId of modules) {
-                    if (!moduleId) {
-                        throw new Error('ID_module cannot be null');
-                    }
-                    await connection.query(
-                        'INSERT INTO Module_Enseignant (ID_module, Matricule) VALUES (?, ?)',
-                        [moduleId, matricule]
-                    );
-                }
-            }
-
-            await connection.commit();
-            console.log('Teacher updated successfully');
-            res.json({ message: 'Enseignant mis à jour avec succès' });
-        } catch (err) {
-            await connection.rollback();
-            console.error('Transaction error:', err);
-            throw err;
-        } finally {
-            connection.release();
+        // Validate idSection
+        const [sectionExists] = await connection.query('SELECT ID_section FROM Section WHERE ID_section = ?', [idSection]);
+        if (sectionExists.length === 0) {
+            throw new Error(`La section avec ID ${idSection} n'existe pas.`);
         }
+
+        // Update User table
+        const [result] = await connection.query(
+            'UPDATE User SET nom = ?, prenom = ?, email = ? WHERE Matricule = ?',
+            [nom, prenom, email, matricule]
+        );
+        console.log('User update result:', result);
+
+        // Update Module_Enseignant table
+        await connection.query(
+            'DELETE FROM Module_Enseignant WHERE Matricule = ?',
+            [matricule]
+        );
+        if (modules && modules.length > 0) {
+            console.log('Modules to insert:', modules);
+            for (const moduleId of modules) {
+                if (!moduleId) {
+                    throw new Error('ID_module cannot be null');
+                }
+                await connection.query(
+                    'INSERT INTO Module_Enseignant (ID_module, Matricule) VALUES (?, ?)',
+                    [moduleId, matricule]
+                );
+            }
+        }
+
+        // Update Enseignant_Section table (delete and re-insert)
+        await connection.query(
+            'DELETE FROM enseignant_section WHERE Matricule = ?',
+            [matricule]
+        );
+        await connection.query(
+            'INSERT INTO enseignant_section (Matricule, ID_section) VALUES (?, ?)',
+            [matricule, idSection]
+        );
+        console.log('Section updated:', idSection);
+
+        await connection.commit();
+        console.log('Teacher updated successfully');
+        res.json({ message: 'Enseignant mis à jour avec succès' });
     } catch (err) {
-        console.error('Error updating teacher:', err);
+        if (connection) await connection.rollback();
+        console.error('Transaction error:', err);
         res.status(500).json({ error: 'Erreur lors de la mise à jour de l\'enseignant: ' + err.message });
+    } finally {
+        if (connection) connection.release(); // Libérer la connexion uniquement si elle est définie
     }
 });
 
@@ -258,12 +289,21 @@ router.get('/specialites/:idDepartement', async (req, res) => {
 // Route to get sections by specialite
 router.get('/sections/:idSpecialite', async (req, res) => {
     const { idSpecialite } = req.params;
+    const { niveau } = req.query; // Récupérer le niveau depuis les query parameters
     try {
-        const [sections] = await db.query(`
-            SELECT ID_section, niveau, nom_section 
+        let query = `
+            SELECT DISTINCT ID_section, niveau, nom_section 
             FROM Section 
             WHERE ID_specialite = ?
-        `, [idSpecialite]);
+        `;
+        const params = [idSpecialite];
+
+        if (niveau) {
+            query += ' AND niveau = ?';
+            params.push(niveau);
+        }
+
+        const [sections] = await db.query(query, params);
         res.json(sections);
     } catch (err) {
         console.error('Error fetching sections:', err);
@@ -284,6 +324,7 @@ router.get('/modules/filtered', async (req, res) => {
             JOIN Departement d ON s.ID_departement = d.ID_departement
             JOIN faculte f ON d.ID_faculte = f.ID_faculte
             LEFT JOIN Module_Section ms ON m.ID_module = ms.ID_module
+            LEFT JOIN Section sec ON ms.ID_section = sec.ID_section
             WHERE 1=1
         `;
         const params = [];
@@ -300,14 +341,13 @@ router.get('/modules/filtered', async (req, res) => {
             query += ' AND s.ID_specialite = ?';
             params.push(idSpecialite);
         }
+        if (niveau) {
+            query += ' AND sec.niveau = ?';
+            params.push(niveau);
+        }
         if (idSection) {
             query += ' AND ms.ID_section = ?';
             params.push(idSection);
-        }
-        if (niveau) {
-            const semestre = niveau.includes('1') ? '1' : '2'; // Adjust this mapping as needed
-            query += ' AND ms.semestre = ?';
-            params.push(semestre);
         }
 
         const [modules] = await db.query(query, params);

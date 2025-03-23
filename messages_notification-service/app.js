@@ -1,30 +1,32 @@
+// app.js
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const bodyParser = require('body-parser');
-const db = require('./config/db');
 const annonceRoutes = require('./routes/annonceRoutes');
 const userRoutes = require('./routes/userRoutes');
 const messageRoutes = require('./routes/messageRoutes');
 const resourceRoutes = require('./routes/resourceRoutes');
+const annonceENSroutes = require('./routes/annonceENSroutes');
+const authENSroutes = require('./routes/authENSroutes');
 
 const app = express();
 
 require("dotenv").config();
 
-// Middleware
+// Middleware globaux (avant les routes)
 app.use(cors());
+app.use(express.json()); // Parsing JSON avant les routes
+app.use(bodyParser.json()); // Parsing JSON avant les routes (optionnel si vous utilisez express.json())
+app.use(express.urlencoded({ extended: true }));
 
-// Routes (avant les middlewares qui consomment le flux)
+// Routes (après les middlewares qui consomment le flux)
 app.use('/annonces', annonceRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/", messageRoutes);
 app.use('/ressources', resourceRoutes);
-
-// Middlewares globaux (après les routes)
-app.use(express.json());
-app.use(bodyParser.json());
-app.use(express.urlencoded({ extended: true }));
+app.use('/annoncesENS', annonceENSroutes); // Routes maintenant après le parsing
+app.use('/authENSannonce', authENSroutes);
 
 // Serve static files
 app.use('/uploads', express.static(path.resolve(__dirname, 'uploads')));

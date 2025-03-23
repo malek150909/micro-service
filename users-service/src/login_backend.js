@@ -6,8 +6,8 @@ const enseignantRoutes = require('../routes/enseignantRoute');
 const etudiantRoutes = require('../routes/etudiantRoute');
 
 const app = express();
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
 app.use('/api', enseignantRoutes);
 app.use('/apii', etudiantRoutes);
 
@@ -147,7 +147,4 @@ app.post('/update-password', async (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
-    console.log('Routes enregistrées:', app._router.stack
-        .filter(r => r.route)
-        .map(r => `${r.route.path} (${Object.keys(r.route.methods).join(', ')})`));
 });

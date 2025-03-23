@@ -15,7 +15,14 @@ function TimetableFilter() {
   const [specialtyId, setSpecialtyId] = useState('');
   const [sectionId, setSectionId] = useState('');
   const [timetable, setTimetable] = useState({});
+  const [semestre, setSemestre] = useState('');
   const [error, setError] = useState(null);
+
+  const semestreOptions = {
+    L1: ['1', '2'],
+    L2: ['3', '4'],
+    L3: ['5', '6'],
+  };
 
   const safeParseJson = (text, endpoint) => {
     try {
@@ -32,7 +39,7 @@ function TimetableFilter() {
   useEffect(() => {
     const fetchNiveaux = async () => {
       try {
-        const response = await fetch('http://localhost:8083/timetable/filter-options'); // Ajout de /api
+        const response = await fetch('http://localhost:8083/timetable/filter-options');
         const text = await response.text();
         console.log('Raw response from /timetable/filter-options (niveaux):', text);
         const data = safeParseJson(text, '/timetable/filter-options');
@@ -48,6 +55,10 @@ function TimetableFilter() {
     };
     fetchNiveaux();
   }, []);
+
+  useEffect(() => {
+    setSemestre('');
+  }, [niveau]);
 
   useEffect(() => {
     if (!niveau) {
@@ -186,12 +197,12 @@ function TimetableFilter() {
   }, [specialtyId, niveau, facultyId, departmentId]);
 
   const fetchTimetable = async () => {
-    if (!sectionId) {
+    if (!sectionId || !semestre) {
       setTimetable({});
       return;
     }
     try {
-      const response = await fetch(`http://localhost:8083/timetable/timetable?sectionId=${sectionId}`); // Ajout de /api
+      const response = await fetch(`http://localhost:8083/timetable/timetable?sectionId=${sectionId}&semestre=${semestre}`);
       const text = await response.text();
       console.log(`Raw response from /timetable/timetable?sectionId=${sectionId}:`, text);
       const data = safeParseJson(text, `/timetable/timetable?sectionId=${sectionId}`);
@@ -210,12 +221,32 @@ function TimetableFilter() {
   };
 
   const handleRefresh = () => {
-    if (sectionId) fetchTimetable();
+    if (sectionId && semestre) fetchTimetable();
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     fetchTimetable();
+  };
+
+  const handleGenerateTimetables = async () => {
+    try {
+      setError(null);
+      const response = await fetch('http://localhost:8083/timetable/generate-timetables', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await response.json();
+      if (data.success) {
+        console.log('Timetables generated successfully');
+        if (sectionId && semestre) fetchTimetable(); // Rafraîchir l’affichage si une section est sélectionnée
+        alert('Emplois du temps générés avec succès pour toutes les sections !');
+      } else {
+        setError(data.error || 'Erreur lors de la génération des emplois du temps');
+      }
+    } catch (err) {
+      setError(`Erreur réseau: ${err.message}`);
+    }
   };
 
   return (
@@ -267,12 +298,36 @@ function TimetableFilter() {
             ))}
           </select>
         </div>
-        <button type="submit" className="timetable-filter-btn" disabled={!sectionId}>
-          Filtrer
-        </button>
+        <div className="form-group">
+          <label>Semestre:</label>
+          <select
+            value={semestre}
+            onChange={(e) => setSemestre(e.target.value)}
+            disabled={!niveau || !semestreOptions[niveau]}
+          >
+            <option value="">Sélectionner un semestre</option>
+            {niveau && semestreOptions[niveau]?.map(s => (
+              <option key={s} value={s}>{`Semestre ${s}`}</option>
+            ))}
+          </select>
+        </div>
+        <div className="form-buttons">
+          <button type="submit" className="timetable-filter-btn" disabled={!sectionId || !semestre}>
+            Filtrer
+          </button>
+          <button type="button" onClick={handleGenerateTimetables} className="timetable-filter-btn generate-btn">
+            Générer tous les emplois
+          </button>
+        </div>
       </form>
       {error && <p className="timetable-filter-error">{error}</p>}
-      <TimetableDisplay timetable={timetable} sectionId={sectionId} onRefresh={handleRefresh} />
+      <TimetableDisplay
+        timetable={timetable}
+        sectionId={sectionId}
+        niveau={niveau}
+        semestre={semestre}
+        onRefresh={handleRefresh}
+      /> 
     </div>
   );
 }

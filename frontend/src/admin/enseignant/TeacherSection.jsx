@@ -137,8 +137,22 @@ const TeacherSection = ({ teacher, onBack }) => {
     };
 
     const handleUpdate = () => {
-        console.log('Form data being sent:', formData);
-        axios.put(`http://localhost:8081/api/enseignants/${teacher.Matricule}`, formData)
+        if (!formData.nom || !formData.prenom || !formData.email || !filters.idSection || formData.modules.length === 0) {
+            toast.error('Veuillez remplir tous les champs, sélectionner une section et au moins un module.', { autoClose: 3000 });
+            return;
+        }
+    
+        const updateData = {
+            nom: formData.nom,
+            prenom: formData.prenom,
+            email: formData.email,
+            modules: formData.modules,
+            idSection: filters.idSection // Ajouter idSection ici
+        };
+    
+        console.log('Form data being sent:', updateData);
+    
+        axios.put(`http://localhost:8081/api/enseignants/${teacher.Matricule}`, updateData)
             .then(() => {
                 toast.success('Enseignant mis à jour avec succès', { autoClose: 3000 });
                 axios.get(`http://localhost:8081/api/enseignants/${teacher.Matricule}`)

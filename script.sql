@@ -286,3 +286,19 @@ CREATE TABLE Exam (
     FOREIGN KEY (ID_salle) REFERENCES Salle(ID_salle),
     FOREIGN KEY (ID_semestre) REFERENCES Semestre(ID_semestre)
 );
+
+CREATE TABLE type_module(
+    ID_type INT PRIMARY KEY AUTO_INCREMENT,
+    seance ENUM ('cours', 'TD', 'TP') NOT NULL,
+    nombre_seance ENUM INT NOT NULL 
+);
+
+CREATE TABLE type_module_module(
+    ID_type INT,
+    ID_module INT,
+    PRIMARY KEY (ID_type, ID_module),
+    FOREIGN KEY (ID_type) REFERENCES type_module(ID_type) ON DELETE CASCADE,
+    FOREIGN KEY (ID_module) REFERENCES Module(ID_module) ON DELETE CASCADE
+);
+
+
