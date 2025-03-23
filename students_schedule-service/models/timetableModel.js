@@ -437,8 +437,8 @@ generateTimetablesForAllSections: async () => {
       throw new Error('Aucune section trouvée');
     }
 
-    // Étape 2 : Définir les jours et créneaux avec priorité
-    const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+    // Étape 2 : Définir les jours et créneaux
+    const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Samedi', 'Dimanche'];
     const timeSlots = [
       '08:00 - 09:30',
       '09:40 - 11:10',
@@ -454,6 +454,10 @@ generateTimetablesForAllSections: async () => {
     const [salles] = await pool.query('SELECT ID_salle, type_salle FROM Salle WHERE disponible = 1');
     if (!salles.length) {
       throw new Error('Aucune salle disponible dans la base de données');
+    }
+    const hasTPSalles = salles.some(s => s.type_salle === 'TP' || s.type_salle === 'TP/TD');
+    if (!hasTPSalles) {
+      console.warn('Aucune salle de type TP ou TP/TD disponible, les séances TP ne pourront pas être planifiées');
     }
 
     // Étape 4 : Boucler sur chaque section
@@ -482,40 +486,47 @@ generateTimetablesForAllSections: async () => {
           'SELECT ID_groupe FROM Groupe WHERE ID_section = ?',
           [sectionId]
         );
+        if (groupes.length === 0) {
+          console.warn(`Aucun groupe trouvé pour la section ${sectionId}, ignorée`);
+          continue;
+        }
+        if (groupes.length < 4) {
+          console.warn(`Section ${sectionId} a seulement ${groupes.length} groupes au lieu de 4 attendus`);
+        }
+        console.log(`Groupes pour section ${sectionId}: ${groupes.length}`);
 
-        // Planification par jour pour équilibrer
+        // Planification par jour et créneau
         const timetablePlan = {};
         days.forEach(day => {
-          timetablePlan[day] = { matin: [], aprem: [] };
+          timetablePlan[day] = {};
+          timeSlots.forEach(slot => {
+            timetablePlan[day][slot] = [];
+          });
         });
 
-        // Pour chaque module
+        // Étape 5 : Planifier les cours (1 par module)
         for (const module of modules) {
           const moduleId = module.ID_module;
-          const seances = module.seances.split('/'); // Ex: "Cour/TD/TP" -> ["Cour", "TD", "TP"]
+          const seances = module.seances.split('/');
 
-          // Récupérer les enseignants pour ce module
           const [enseignants] = await pool.query(
             'SELECT Matricule FROM module_enseignant WHERE ID_module = ?',
             [moduleId]
           );
-
           if (!enseignants.length) {
             console.warn(`Aucun enseignant trouvé pour le module ${moduleId}, ignoré`);
             continue;
           }
 
-          // Générer une séance par type de séance
-          for (const typeSeance of seances) {
-            const typeSeanceNormalized = typeSeance === 'Cour' ? 'cours' : typeSeance;
+          if (seances.includes('Cour')) {
             let scheduled = false;
+            const typeSeanceNormalized = 'cours';
 
-            // Vérifier si une séance existe déjà pour ce module, type, section et semestre
             const [existingSessions] = await pool.query(
               'SELECT s.ID_seance ' +
               'FROM Seance s ' +
               'JOIN module_section ms ON s.ID_module = ms.ID_module AND s.ID_section = ms.ID_section ' +
-              'WHERE s.ID_module = ? AND s.type_seance = ? AND s.ID_section = ? AND ms.semestre = ? AND s.jour IN (?,?,?,?,?,?)',
+              'WHERE s.ID_module = ? AND s.type_seance = ? AND s.ID_section = ? AND s.ID_groupe IS NULL AND ms.semestre = ? AND s.jour IN (?,?,?,?,?,?)',
               [moduleId, typeSeanceNormalized, sectionId, semestre, ...days]
             );
             if (existingSessions.length > 0) {
@@ -523,36 +534,15 @@ generateTimetablesForAllSections: async () => {
               continue;
             }
 
-            // Choisir un jour avec le moins de séances
-            const availableDays = days.filter(day => {
-              const totalSessions = timetablePlan[day].matin.length + timetablePlan[day].aprem.length;
-              return totalSessions < 4; // Limite à 4 séances par jour
-            });
-
-            if (!availableDays.length) {
-              console.warn(`Plus de jours disponibles pour ${typeSeanceNormalized}, module ${moduleId}`);
-              continue;
-            }
-
-            // Essayer tous les jours et créneaux possibles
-            for (const day of availableDays) {
-              const isMorningPreferred = Math.random() > 0.3; // 70% matin
-              const slotsToTry = isMorningPreferred ? morningSlots : afternoonSlots;
-
+            for (const day of days) {
+              const slotsToTry = [...morningSlots, ...afternoonSlots];
               for (const timeSlot of slotsToTry) {
                 const enseignant = enseignants[Math.floor(Math.random() * enseignants.length)];
-                const salle = salles.find(s => 
-                  (typeSeanceNormalized === 'cours' && s.type_salle === 'Cour') ||
-                  (typeSeanceNormalized === 'TD' && (s.type_salle === 'TD' || s.type_salle === 'TP/TD')) ||
-                  (typeSeanceNormalized === 'TP' && (s.type_salle === 'TP' || s.type_salle === 'TP/TD'))
-                );
-
+                const salle = salles.find(s => s.type_salle === 'Cour');
                 if (!salle) {
                   console.warn(`Aucune salle disponible pour ${typeSeanceNormalized}, module ${moduleId}`);
                   break;
                 }
-
-                const groupe = typeSeanceNormalized === 'cours' ? null : groupes[Math.floor(Math.random() * groupes.length)]?.ID_groupe;
 
                 const conflict = await Timetable.checkConflicts(
                   salle.ID_salle,
@@ -560,38 +550,123 @@ generateTimetablesForAllSections: async () => {
                   day,
                   timeSlot,
                   typeSeanceNormalized,
-                  groupe,
+                  null,
                   sectionId,
                   moduleId
                 );
 
                 if (!conflict) {
-                  // Ajouter la séance
                   await pool.query(
                     'INSERT INTO Seance (ID_salle, Matricule, type_seance, ID_groupe, ID_module, jour, time_slot, ID_section) ' +
                     'VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-                    [salle.ID_salle, enseignant.Matricule, typeSeanceNormalized, groupe, moduleId, day, timeSlot, sectionId]
+                    [salle.ID_salle, enseignant.Matricule, typeSeanceNormalized, null, moduleId, day, timeSlot, sectionId]
                   );
                   scheduled = true;
-                  console.log(`Séance ajoutée: ${typeSeanceNormalized} pour module ${moduleId}, section ${sectionId}, semestre ${semestre}`);
-
-                  // Mettre à jour le plan
-                  if (morningSlots.includes(timeSlot)) {
-                    timetablePlan[day].matin.push({ moduleId, typeSeanceNormalized });
-                  } else {
-                    timetablePlan[day].aprem.push({ moduleId, typeSeanceNormalized });
-                  }
+                  console.log(`Séance ajoutée: ${typeSeanceNormalized} pour module ${moduleId}, section ${sectionId}, semestre ${semestre}, groupe aucun`);
+                  timetablePlan[day][timeSlot].push({ moduleId, typeSeanceNormalized, groupe: null });
                   break;
-                } else {
-                  console.log(`Conflit détecté: ${conflict}`);
                 }
               }
               if (scheduled) break;
             }
-
             if (!scheduled) {
               console.warn(`Impossible de planifier ${typeSeanceNormalized} pour module ${moduleId}, section ${sectionId}, semestre ${semestre}`);
             }
+          }
+        }
+
+        // Étape 6 : Collecter toutes les séances TD/TP à planifier
+        const tdTpSessions = [];
+        for (const module of modules) {
+          const moduleId = module.ID_module;
+          const seances = module.seances.split('/');
+
+          const [enseignants] = await pool.query(
+            'SELECT Matricule FROM module_enseignant WHERE ID_module = ?',
+            [moduleId]
+          );
+          if (!enseignants.length) continue;
+
+          for (const typeSeance of seances.filter(s => s === 'TD' || s === 'TP')) {
+            const typeSeanceNormalized = typeSeance;
+            for (const groupe of groupes.map(g => g.ID_groupe)) {
+              const [existingSessions] = await pool.query(
+                'SELECT s.ID_seance ' +
+                'FROM Seance s ' +
+                'JOIN module_section ms ON s.ID_module = ms.ID_module AND s.ID_section = ms.ID_section ' +
+                'WHERE s.ID_module = ? AND s.type_seance = ? AND s.ID_section = ? AND s.ID_groupe = ? AND ms.semestre = ? AND s.jour IN (?,?,?,?,?,?)',
+                [moduleId, typeSeanceNormalized, sectionId, groupe, semestre, ...days]
+              );
+              if (existingSessions.length === 0) {
+                tdTpSessions.push({ moduleId, typeSeanceNormalized, groupe, enseignants });
+              }
+            }
+          }
+        }
+
+        // Étape 7 : Regrouper les TD/TP dans les cases (2 à 4 par case si possible)
+        while (tdTpSessions.length > 0) {
+          let scheduledSome = false;
+        
+          for (const day of days) {
+            const slotsToTry = [...morningSlots, ...afternoonSlots];
+            for (const timeSlot of slotsToTry) {
+              const currentCase = timetablePlan[day][timeSlot];
+              if (currentCase.length >= 4 || currentCase.some(s => s.typeSeanceNormalized === 'cours')) continue;
+        
+              // Tenter de remplir la case jusqu'à 4 séances
+              const maxToSchedule = Math.min(4 - currentCase.length, tdTpSessions.length);
+              const sessionsToSchedule = tdTpSessions.splice(0, maxToSchedule);
+        
+              for (const session of sessionsToSchedule) {
+                const { moduleId, typeSeanceNormalized, groupe, enseignants } = session;
+                const enseignant = enseignants[Math.floor(Math.random() * enseignants.length)];
+                const salleOptions = salles.filter(s => 
+                  (typeSeanceNormalized === 'TD' && (s.type_salle === 'TD' || s.type_salle === 'TP/TD')) ||
+                  (typeSeanceNormalized === 'TP' && (s.type_salle === 'TP' || s.type_salle === 'TP/TD'))
+                );
+        
+                let scheduled = false;
+                for (const salle of salleOptions) {
+                  const conflict = await Timetable.checkConflicts(
+                    salle.ID_salle,
+                    enseignant.Matricule,
+                    day,
+                    timeSlot,
+                    typeSeanceNormalized,
+                    groupe,
+                    sectionId,
+                    moduleId
+                  );
+        
+                  if (!conflict) {
+                    await pool.query(
+                      'INSERT INTO Seance (ID_salle, Matricule, type_seance, ID_groupe, ID_module, jour, time_slot, ID_section) ' +
+                      'VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                      [salle.ID_salle, enseignant.Matricule, typeSeanceNormalized, groupe, moduleId, day, timeSlot, sectionId]
+                    );
+                    console.log(`Séance ajoutée: ${typeSeanceNormalized} pour module ${moduleId}, section ${sectionId}, semestre ${semestre}, groupe ${groupe} (${day} ${timeSlot})`);
+                    currentCase.push({ moduleId, typeSeanceNormalized, groupe });
+                    scheduled = true;
+                    scheduledSome = true;
+                    break;
+                  } else {
+                    console.log(`Conflit détecté: ${conflict} pour ${typeSeanceNormalized}, module ${moduleId}, groupe ${groupe}`);
+                  }
+                }
+                if (!scheduled) {
+                  tdTpSessions.push(session); // Remettre dans la liste si échec
+                }
+              }
+        
+              // Ne pas sortir prématurément : continuer à explorer d'autres créneaux si nécessaire
+            }
+            if (scheduledSome) break; // Sortir des jours si au moins une séance a été planifiée
+          }
+        
+          if (!scheduledSome && tdTpSessions.length > 0) {
+            console.warn(`Impossible de planifier les séances restantes: ${tdTpSessions.length} TD/TP non planifiées`);
+            break;
           }
         }
       }
