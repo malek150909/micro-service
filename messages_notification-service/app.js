@@ -9,6 +9,7 @@ const messageRoutes = require('./routes/messageRoutes');
 const resourceRoutes = require('./routes/resourceRoutes');
 const annonceENSroutes = require('./routes/annonceENSroutes');
 const authENSroutes = require('./routes/authENSroutes');
+const annonceETDRoutes = require('./routes/annonceEtudiantRoutes');
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use("/api/", messageRoutes);
 app.use('/ressources', resourceRoutes);
 app.use('/annoncesENS', annonceENSroutes); // Routes maintenant après le parsing
 app.use('/authENSannonce', authENSroutes);
+app.use('/annoncesETD', annonceETDRoutes);
 
 // Serve static files
 app.use('/uploads', express.static(path.resolve(__dirname, 'uploads')));

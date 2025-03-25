@@ -1,13 +1,8 @@
-// backend/controllers/evenementController.js
-const db = require('../config/db');
+const pool = require('../config/db');
 
-exports.getAllEvenements = (req, res) => {
-    const sql = 'SELECT * FROM Evenement';
-    db.query(sql, (err, results) => {
-        if (err) {
-            console.error('Erreur lors de la récupération des événements :', err);
-            return res.status(500).json({ message: 'Erreur serveur' });
-        }
+exports.getAllEvenements = async (req, res) => {
+    try {
+        const [results] = await pool.query('SELECT * FROM Evenement');
 
         const evenementsWithFullUrl = results.map(evenement => ({
             ...evenement,
@@ -17,10 +12,13 @@ exports.getAllEvenements = (req, res) => {
         }));
 
         res.json(evenementsWithFullUrl);
-    });
+    } catch (err) {
+        console.error('Erreur lors de la récupération des événements :', err);
+        res.status(500).json({ message: 'Erreur serveur' });
+    }
 };
 
-exports.createEvenement = (req, res) => {
+exports.createEvenement = async (req, res) => {
     const { nom_evenement, description_evenement, date_evenement, lieu, capacite, organisateur_admin } = req.body;
     const image_url = req.file ? `/uploads/${req.file.filename}` : (req.body.image_url || null);
 
@@ -30,13 +28,9 @@ exports.createEvenement = (req, res) => {
     `;
     const eventValues = [nom_evenement, description_evenement, date_evenement, lieu, capacite, image_url, organisateur_admin];
 
-    db.query(eventSql, eventValues, (err, result) => {
-        if (err) {
-            console.error('Erreur lors de la création de l\'événement :', err);
-            return res.status(500).json({ message: 'Erreur serveur' });
-        }
-
-        const eventId = result.insertId;
+    try {
+        const [eventResult] = await pool.query(eventSql, eventValues);
+        const eventId = eventResult.insertId;
 
         const annonceSql = `
             INSERT INTO Annonce (title, content, image_url, event_id, admin_id)
@@ -44,21 +38,20 @@ exports.createEvenement = (req, res) => {
         `;
         const annonceValues = [nom_evenement, 'Nouveau événement est là !', image_url || '', eventId, organisateur_admin || 0];
 
-        db.query(annonceSql, annonceValues, (err, annonceResult) => {
-            if (err) {
-                console.error('Erreur lors de la création de l\'annonce :', err);
-            }
+        await pool.query(annonceSql, annonceValues);
 
-            res.status(201).json({ 
-                message: 'Événement créé avec succès', 
-                eventId: eventId,
-                image_url: image_url ? `http://localhost:8084${image_url}` : ''
-            });
+        res.status(201).json({ 
+            message: 'Événement créé avec succès', 
+            eventId: eventId,
+            image_url: image_url ? `http://localhost:8084${image_url}` : ''
         });
-    });
+    } catch (err) {
+        console.error('Erreur lors de la création de l\'événement :', err);
+        res.status(500).json({ message: 'Erreur serveur' });
+    }
 };
 
-exports.updateEvenement = (req, res) => {
+exports.updateEvenement = async (req, res) => {
     const { id } = req.params;
     const { nom_evenement, description_evenement, date_evenement, lieu, capacite, organisateur_admin } = req.body;
     const image_url = req.file ? `/uploads/${req.file.filename}` : (req.body.image_url || null);
@@ -68,34 +61,26 @@ exports.updateEvenement = (req, res) => {
         SET nom_evenement = ?, description_evenement = ?, date_evenement = ?, lieu = ?, capacite = ?, organisateur_admin = ?, image_url = ? 
         WHERE ID_evenement = ?
     `;
-
     const values = [nom_evenement, description_evenement, date_evenement, lieu, capacite, organisateur_admin, image_url, id];
 
-    db.query(sql, values, (err, result) => {
-        if (err) {
-            console.error('Erreur lors de la mise à jour de l\'événement :', err);
-            return res.status(500).json({ message: 'Erreur serveur' });
-        }
+    try {
+        await pool.query(sql, values);
         res.json({ message: 'Événement mis à jour avec succès' });
-    });
+    } catch (err) {
+        console.error('Erreur lors de la mise à jour de l\'événement :', err);
+        res.status(500).json({ message: 'Erreur serveur' });
+    }
 };
 
-exports.deleteEvenement = (req, res) => {
+exports.deleteEvenement = async (req, res) => {
     const { id } = req.params;
 
-    const deleteAnnonceSql = 'DELETE FROM Annonce WHERE event_id = ?';
-    db.query(deleteAnnonceSql, [id], (err, annonceResult) => {
-        if (err) {
-            console.error('Erreur lors de la suppression de l\'annonce :', err);
-        }
-
-        const deleteEventSql = 'DELETE FROM Evenement WHERE ID_evenement = ?';
-        db.query(deleteEventSql, [id], (err, result) => {
-            if (err) {
-                console.error('Erreur lors de la suppression de l\'événement :', err);
-                return res.status(500).json({ message: 'Erreur serveur' });
-            }
-            res.json({ message: 'Événement et annonce supprimés avec succès' });
-        });
-    });
+    try {
+        await pool.query('DELETE FROM Annonce WHERE event_id = ?', [id]);
+        await pool.query('DELETE FROM Evenement WHERE ID_evenement = ?', [id]);
+        res.json({ message: 'Événement et annonce supprimés avec succès' });
+    } catch (err) {
+        console.error('Erreur lors de la suppression de l\'événement :', err);
+        res.status(500).json({ message: 'Erreur serveur' });
+    }
 };

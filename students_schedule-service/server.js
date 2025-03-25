@@ -6,6 +6,7 @@ import examRoutes from './routes/examRoutes.js';
 import timetableRoutes from './routes/timetableRoutes.js';
 import gradeRoutes from './routes/gradeRoutes.js';
 import db from './config/db.js';
+import documentRoutes from './routes/documentRoutes.js';
 
 dotenv.config();
 process.env.TZ = 'UTC';
@@ -18,6 +19,8 @@ app.use('/modules', moduleRoutes);
 app.use('/exams', examRoutes);
 app.use('/timetable', timetableRoutes);
 app.use('/grades', gradeRoutes);
+app.use('/uploads', express.static('uploads')); // Serve uploaded files
+app.use('/documents', documentRoutes);
 
 class Timetable {
   constructor(courses, professors, classrooms, timeslots, course_prof_map, room_availability, professor_availability, student_groups) {

@@ -2,7 +2,7 @@ const db = require('../config/db');
 
 const getAllAnnonces = async (req, res) => {
   try {
-    const [rows] = await db.query('SELECT * FROM Annonce');
+    const [rows] = await db.query('SELECT * FROM Annonce WHERE admin_matricule IS NOT NULL');
     const annonces = rows.map(annonce => {
       let image_url = annonce.image_url || '';
       if (image_url && !image_url.startsWith('http')) {
@@ -24,7 +24,7 @@ const getAllAnnonces = async (req, res) => {
 };
 
 const createAnnonce = async (req, res) => {
-  const { title, content, Matricule, target_type, target_filter, event_id } = req.body;
+  const { title, content, admin_matricule, target_type, target_filter, event_id } = req.body;
   let image_url = req.body.image_url || '';
 
   console.log('Requête POST /api/annonces reçue :', {
@@ -32,7 +32,7 @@ const createAnnonce = async (req, res) => {
     file: req.file ? { filename: req.file.filename, size: req.file.size, path: req.file.path } : 'Aucun fichier'
   });
 
-  if (!title || !content || !Matricule || !target_type) {
+  if (!title || !content || !admin_matricule || !target_type) {
     return res.status(400).json({ message: 'Tous les champs obligatoires sont requis' });
   }
 
@@ -60,12 +60,11 @@ const createAnnonce = async (req, res) => {
     console.log('effectiveTargetFilter pour insertion :', effectiveTargetFilter);
 
     const [result] = await db.query(
-      'INSERT INTO Annonce (title, content, image_url, Matricule, event_id, target_type, target_filter) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [title, content, image_url, Matricule, event_id || null, target_type, effectiveTargetFilter]
+      'INSERT INTO Annonce (title, content, image_url, admin_matricule, event_id, target_type, target_filter, enseignant_matricule) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [title, content, image_url, admin_matricule, event_id || null, target_type, effectiveTargetFilter, null]
     );
     console.log('Annonce créée avec succès :', { id: result.insertId, image_url });
 
-    // Envoyer les notifications pour la création
     const [annonces] = await db.query('SELECT * FROM Annonce WHERE id = ?', [result.insertId]);
     const annonce = annonces[0];
     await sendNotificationsForAnnonce(annonce, 'created');
@@ -75,7 +74,7 @@ const createAnnonce = async (req, res) => {
       title,
       content,
       image_url: image_url ? `http://localhost:5001${image_url}` : '',
-      Matricule,
+      admin_matricule,
       target_type,
       target_filter: targetFilterParsed,
       event_id
@@ -86,22 +85,21 @@ const createAnnonce = async (req, res) => {
   }
 };
 
-// Fonction interne pour envoyer ou gérer les notifications
 const sendNotificationsForAnnonce = async (annonce, action) => {
-  const { id, title, content, Matricule, target_type, target_filter } = annonce;
+  const { id, title, admin_matricule, target_type, target_filter } = annonce;
   const targetFilterParsed = typeof target_filter === 'string' ? JSON.parse(target_filter) : target_filter;
 
   let destinataires = [];
   let notificationMessage;
   switch (action) {
     case 'created':
-      notificationMessage = `Nouvelle annonce: ${title} - ${content}`;
+      notificationMessage = `Nouvelle annonce: ${title}`; // Modifié pour inclure uniquement le titre
       break;
     case 'updated':
-      notificationMessage = `Annonce modifiée: ${title} - ${content}`;
+      notificationMessage = `Annonce modifiée: ${title}`; // Modifié pour inclure uniquement le titre
       break;
     default:
-      return; // Pas de notification pour d'autres actions par défaut
+      return;
   }
 
   if (target_type === 'Etudiants') {
@@ -130,9 +128,8 @@ const sendNotificationsForAnnonce = async (annonce, action) => {
   }
 
   if (destinataires.length > 0 && (action === 'created' || action === 'updated')) {
-    // Supprimer les anciennes notifications basées sur le titre
     await db.query('DELETE FROM Notification WHERE contenu LIKE ?', [`%${title}%`]);
-    const notificationValues = destinataires.map(d => [new Date(), notificationMessage, Matricule, d.Matricule]);
+    const notificationValues = destinataires.map(d => [new Date(), notificationMessage, admin_matricule, d.Matricule]);
     await db.query('INSERT INTO Notification (date_envoi, contenu, expediteur, destinataire) VALUES ?', [notificationValues]);
     console.log(`Notifications ${action === 'created' ? 'créées' : 'modifiées'} pour ${destinataires.length} destinataires pour l'annonce ${id}`);
   } else {
@@ -158,7 +155,7 @@ const sendNotifications = async (req, res) => {
 
 const updateAnnonce = async (req, res) => {
   const { id } = req.params;
-  const { title, content, Matricule, target_type, target_filter, event_id } = req.body;
+  const { title, content, admin_matricule, target_type, target_filter, event_id } = req.body;
   const image_url = req.file ? `/uploads/${req.file.filename}` : req.body.image_url;
 
   try {
@@ -169,15 +166,14 @@ const updateAnnonce = async (req, res) => {
 
     const effectiveTargetFilter = target_filter ? JSON.stringify(target_filter) : existing[0].target_filter;
     const [result] = await db.query(
-      'UPDATE Annonce SET title = ?, content = ?, image_url = ?, Matricule = ?, event_id = ?, target_type = ?, target_filter = ? WHERE id = ?',
-      [title || existing[0].title, content || existing[0].content, image_url || existing[0].image_url, Matricule || existing[0].Matricule, event_id || existing[0].event_id, target_type || existing[0].target_type, effectiveTargetFilter, id]
+      'UPDATE Annonce SET title = ?, content = ?, image_url = ?, admin_matricule = ?, event_id = ?, target_type = ?, target_filter = ?, enseignant_matricule = ? WHERE id = ?',
+      [title || existing[0].title, content || existing[0].content, image_url || existing[0].image_url, admin_matricule || existing[0].admin_matricule, event_id || existing[0].event_id, target_type || existing[0].target_type, effectiveTargetFilter, null, id]
     );
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: 'Aucune modification effectuée' });
     }
 
-    // Envoyer les notifications pour la modification (remplace la notification existante)
     const [updatedAnnonce] = await db.query('SELECT * FROM Annonce WHERE id = ?', [id]);
     await sendNotificationsForAnnonce(updatedAnnonce[0], 'updated');
 
@@ -202,7 +198,6 @@ const deleteAnnonce = async (req, res) => {
       return res.status(404).json({ message: 'Aucune suppression effectuée' });
     }
 
-    // Supprimer les notifications associées basées sur le titre
     const title = existing[0].title;
     await db.query('DELETE FROM Notification WHERE contenu LIKE ?', [`%${title}%`]);
     console.log(`Notifications supprimées pour l'annonce ${id} basée sur le titre "${title}"`);

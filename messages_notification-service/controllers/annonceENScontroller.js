@@ -1,3 +1,4 @@
+// backend/controllers/annonceENScontroller.js
 const pool = require('../config/db');
 
 // Récupérer les annonces de l'administration destinées directement aux enseignants
@@ -33,8 +34,8 @@ const getAdminAnnonces = async (req, res) => {
             let image_url = annonce.image_url || '';
             if (image_url && !image_url.startsWith('http')) {
                 image_url = annonce.event_id
-                    ? `http://localhost:5000${image_url}`
-                    : `http://localhost:5001${image_url}`;
+                    ? `http://localhost:9000${image_url}`
+                    : `http://localhost:8082${image_url}`;
                 console.log(`Annonce ID ${annonce.id} - event_id: ${annonce.event_id}, URL ajustée: ${image_url}`);
             } else {
                 console.log(`Annonce ID ${annonce.id} - URL inchangée: ${image_url}`);
@@ -118,6 +119,8 @@ const createAnnonce = async (req, res) => {
 
     try {
         const targetFilter = { sections };
+        console.log('target_filter avant enregistrement:', targetFilter);
+
         const [result] = await pool.query(
             `INSERT INTO annonce (title, content, enseignant_matricule, target_type, target_filter)
              VALUES (?, ?, ?, 'Etudiants', ?)`,
@@ -149,7 +152,7 @@ const createAnnonce = async (req, res) => {
             await pool.query(
                 `INSERT INTO Notification (contenu, expediteur, destinataire)
                  VALUES (?, ?, ?)`,
-                [`${title} - ${content}`, matricule, etudiant.Matricule] // Sans l'ID
+                [`${title} - ${content}`, matricule, etudiant.Matricule]
             );
         }
 
@@ -184,17 +187,23 @@ const updateAnnonce = async (req, res) => {
         }
 
         const oldTitle = oldAnnonce[0].title;
-        let oldTargetFilter;
         let oldSections = [];
 
-        // Vérifier si target_filter est une chaîne non vide avant de parser
-        if (oldAnnonce[0].target_filter && typeof oldAnnonce[0].target_filter === 'string' && oldAnnonce[0].target_filter.trim() !== '') {
-            try {
-                oldTargetFilter = JSON.parse(oldAnnonce[0].target_filter);
-                oldSections = oldTargetFilter.sections || [];
-            } catch (error) {
-                console.error('Erreur lors du parsing de target_filter:', error, 'Valeur:', oldAnnonce[0].target_filter);
-                // Si le parsing échoue, on continue avec oldSections comme tableau vide
+        // Vérifier si target_filter est un objet ou une chaîne JSON
+        if (oldAnnonce[0].target_filter) {
+            if (typeof oldAnnonce[0].target_filter === 'string' && oldAnnonce[0].target_filter.trim() !== '') {
+                try {
+                    const oldTargetFilter = JSON.parse(oldAnnonce[0].target_filter);
+                    oldSections = oldTargetFilter.sections || [];
+                } catch (error) {
+                    console.error('Erreur lors du parsing de target_filter:', error, 'Valeur:', oldAnnonce[0].target_filter);
+                    oldSections = [];
+                }
+            } else if (typeof oldAnnonce[0].target_filter === 'object' && oldAnnonce[0].target_filter !== null) {
+                // Si target_filter est déjà un objet, utiliser directement ses sections
+                oldSections = oldAnnonce[0].target_filter.sections || [];
+            } else {
+                console.warn('target_filter est vide ou invalide:', oldAnnonce[0].target_filter);
                 oldSections = [];
             }
         } else {
@@ -252,7 +261,7 @@ const updateAnnonce = async (req, res) => {
             await pool.query(
                 `INSERT INTO Notification (contenu, expediteur, destinataire)
                  VALUES (?, ?, ?)`,
-                [`${title} - ${content}`, matricule, etudiant.Matricule] // Sans l'ID
+                [`${title} - ${content}`, matricule, etudiant.Matricule]
             );
         }
 
@@ -285,16 +294,23 @@ const deleteAnnonce = async (req, res) => {
         }
 
         const { title, content, target_filter } = annonces[0];
-        let targetFilterParsed;
         let sections = [];
 
-        // Vérifier si target_filter est une chaîne non vide avant de parser
-        if (target_filter && typeof target_filter === 'string' && target_filter.trim() !== '') {
-            try {
-                targetFilterParsed = JSON.parse(target_filter);
-                sections = targetFilterParsed.sections || [];
-            } catch (error) {
-                console.error('Erreur lors du parsing de target_filter dans deleteAnnonce:', error, 'Valeur:', target_filter);
+        // Vérifier si target_filter est un objet ou une chaîne JSON
+        if (target_filter) {
+            if (typeof target_filter === 'string' && target_filter.trim() !== '') {
+                try {
+                    const targetFilterParsed = JSON.parse(target_filter);
+                    sections = targetFilterParsed.sections || [];
+                } catch (error) {
+                    console.error('Erreur lors du parsing de target_filter dans deleteAnnonce:', error, 'Valeur:', target_filter);
+                    sections = [];
+                }
+            } else if (typeof target_filter === 'object' && target_filter !== null) {
+                // Si target_filter est déjà un objet, utiliser directement ses sections
+                sections = target_filter.sections || [];
+            } else {
+                console.warn('target_filter est vide ou invalide dans deleteAnnonce:', target_filter);
                 sections = [];
             }
         } else {

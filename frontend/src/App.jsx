@@ -22,7 +22,11 @@ import Ressources from "./enseignant/ressources/pages/Home";
 import Notes from "./enseignant/notes/pages/ProfessorHome";
 import GestionNotes from "./enseignant/notes/pages/GestionEnseignants";
 import AnnoncesENS from "./enseignant/annonces/annonceENS";
-
+import DocsAdmin from "./admin/docs/AdminDashboard";
+import DocsEtudiant from "./etudiant/docs/StudentDashboard";
+import AnnoncesETD from "./etudiant/annonce/AnnonceEtudiant";
+import ClubsETD from "./etudiant/club/EtudiantDashboard";
+import ClubsADM from "./admin/club/ClubAdmin";
 
 const PrivateRoute = ({ element }) => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -58,6 +62,12 @@ function App() {
                 <Route path="/notes" element={<Notes />} />
                 <Route path="/gestionNotes" element={<GestionNotes />} />
                 <Route path="/annoncesENS" element={<AnnoncesENS />} />
+                <Route path="/docsAdmin" element={<DocsAdmin />} />
+                <Route path="/docsEtudiant" element={<DocsEtudiant />} />
+                <Route path="/annoncesETD" element={<AnnoncesETD />} />
+                <Route path="/clubsETD" element={<ClubsETD />} />
+                <Route path="/clubsADM" element={<ClubsADM />} />
+                
             </Routes>
         </Router>
     );

@@ -36,14 +36,11 @@ const EditProfile = () => {
                 prenom: storedUser.prenom || "",
                 email: storedUser.email || "",
                 Matricule: storedUser.Matricule || "",
-                poste: storedUser.role === "admin" ? storedUser.poste || "" : "",
                 annee_inscription: storedUser.role === "enseignant" || storedUser.role === "etudiant" 
                     ? storedUser.annee_inscription 
                         ? new Date(storedUser.annee_inscription).toLocaleDateString("fr-FR") 
                         : "" 
                     : "",
-                nom_faculte: storedUser.role === "enseignant" ? storedUser.nom_faculte || "" : "",
-                Nom_departement: storedUser.role === "enseignant" ? storedUser.Nom_departement || "" : "",
                 niveau: storedUser.role === "etudiant" ? storedUser.niveau || "" : "",
                 nom_specialite: storedUser.role === "etudiant" ? storedUser.nom_specialite || "" : "",
                 etat: storedUser.role === "etudiant" ? storedUser.etat || "" : "",
