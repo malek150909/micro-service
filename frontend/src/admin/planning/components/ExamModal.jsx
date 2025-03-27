@@ -1,15 +1,18 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
-import '../../../admin_css_files/exam.css';
+import { createPortal } from 'react-dom';
+import "../../../admin_css_files/exam.css";
+
 
 const ExamModal = ({ exam, onClose, onSave, modules, salles: initialSalles, semestres }) => {
   const [formData, setFormData] = useState({
     ID_module: exam.ID_module,
     ID_section: exam.ID_section,
-    exam_date: exam.exam_date, // Already in YYYY-MM-DD format
+    exam_date: exam.exam_date,
     time_slot: exam.time_slot,
-    ID_salle: exam.ID_salle,
+    ID_salle: exam.ID_salle || '',
+    mode: exam.mode || 'presentiel',
   });
   const [errorMessage, setErrorMessage] = useState('');
   const [salles, setSalles] = useState(initialSalles);
@@ -17,7 +20,7 @@ const ExamModal = ({ exam, onClose, onSave, modules, salles: initialSalles, seme
 
   useEffect(() => {
     const fetchSalles = async () => {
-      if (formData.exam_date && formData.time_slot) {
+      if (formData.exam_date && formData.time_slot && formData.mode === 'presentiel') {
         try {
           const response = await axios.get('http://localhost:8083/exams/salles', {
             params: {
@@ -34,7 +37,7 @@ const ExamModal = ({ exam, onClose, onSave, modules, salles: initialSalles, seme
       }
     };
     fetchSalles();
-  }, [formData.exam_date, formData.time_slot, initialSalles]);
+  }, [formData.exam_date, formData.time_slot, formData.mode, initialSalles]);
 
   useEffect(() => {
     const validateForm = async () => {
@@ -59,10 +62,9 @@ const ExamModal = ({ exam, onClose, onSave, modules, salles: initialSalles, seme
 
   const handleSave = () => {
     if (isValid) {
-      // Ensure the exam_date is in YYYY-MM-DD format
       const normalizedFormData = {
         ...formData,
-        exam_date: formData.exam_date, // Already in YYYY-MM-DD format from <input type="date">
+        exam_date: formData.exam_date,
         ID_semestre: exam.ID_semestre,
       };
       onSave(normalizedFormData);
@@ -70,13 +72,14 @@ const ExamModal = ({ exam, onClose, onSave, modules, salles: initialSalles, seme
     }
   };
 
-  return (
-    <motion.div
-      className="modal-overlay"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-    >
+  return createPortal(
+    <div id="exams">
+      <motion.div
+        className="modal-overlay"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
       <motion.div
         className="modal-content"
         initial={{ scale: 0.8, opacity: 0 }}
@@ -92,7 +95,7 @@ const ExamModal = ({ exam, onClose, onSave, modules, salles: initialSalles, seme
             <option value="">Sélectionner un Module</option>
             {modules.map((module, index) => (
               <option key={`${module.ID_module}-${index}`} value={module.ID_module}>
-                {module.nom_module}
+                {`${module.nom_module} (${module.seances})`}
               </option>
             ))}
           </select>
@@ -117,8 +120,21 @@ const ExamModal = ({ exam, onClose, onSave, modules, salles: initialSalles, seme
           </select>
         </div>
         <div className="modal-field">
+          <label>Mode :</label>
+          <select name="mode" value={formData.mode} onChange={handleChange} required>
+            <option value="presentiel">Présentiel</option>
+            <option value="en ligne">En Ligne</option>
+          </select>
+        </div>
+        <div className="modal-field">
           <label>Salle :</label>
-          <select name="ID_salle" value={formData.ID_salle} onChange={handleChange} required>
+          <select
+            name="ID_salle"
+            value={formData.ID_salle}
+            onChange={handleChange}
+            required={formData.mode === 'presentiel'}
+            disabled={formData.mode === 'en ligne'}
+          >
             <option value="">Sélectionner une Salle</option>
             {salles.map((salle, index) => (
               <option key={`${salle.ID_salle}-${index}`} value={salle.ID_salle} disabled={!salle.available}>
@@ -133,6 +149,10 @@ const ExamModal = ({ exam, onClose, onSave, modules, salles: initialSalles, seme
         </div>
       </motion.div>
     </motion.div>
+    </div>
+   ,
+    document.body
+    
   );
 };
 

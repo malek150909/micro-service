@@ -1,0 +1,269 @@
+/* src/admin_css_files/TimetableDisplay.css */
+
+.timetable-page {
+    padding-top: 15px;
+}
+
+.timetable-filter-btn {
+    margin-bottom: 15px;
+}
+
+.timetable-container {
+    max-width: 1200px; /* Ajusté pour un tableau plus large */
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 100%;
+}
+
+/* Titre */
+.timetable-title {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Tableau */
+.timetable-table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+
+.timetable-table th,
+.timetable-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
+.timetable-table th {
+    background-color: #f0f0f0;
+    font-weight: 500;
+}
+
+.timetable-table td {
+    cursor: pointer;
+    background-color: #f0f0f0;
+    transition: background-color 0.3s;
+}
+
+.timetable-table td.session-occupied {
+    background-color: #e0e0e0;
+}
+
+.timetable-table td:hover {
+    background-color: #d0d0d0;
+}
+
+/* Modale */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px; /* Aligné avec le style existant */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+/* Détails de la séance */
+.session-details {
+    text-align: center;
+}
+
+.details-card {
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #f9f9f9;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.detail-label {
+    font-weight: 500;
+    color: #333;
+}
+
+.detail-value {
+    color: #666;
+}
+
+.detail-actions {
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-around;
+}
+
+.no-session {
+    padding: 15px;
+}
+
+/* Formulaire */
+.session-form h3 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #444;
+}
+
+.form-group select,
+.form-group input {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    font-size: 1rem;
+    width: 100%;
+}
+
+.form-group input[readonly] {
+    background: #f0f0f0;
+}
+
+.form-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Boutons */
+.timetable-btn {
+    padding: 10px;
+    border-radius: 6px;
+    border: none;
+    font-size: 1rem;
+    color: #fff;
+    cursor: pointer;
+    font-weight: 500;
+    margin: 5px;
+    transition: background-color 0.3s;
+}
+
+.timetable-btn.save,
+.timetable-btn.add {
+    background-color: #4CAF50; /* Vert pour ajouter/enregistrer */
+}
+
+.timetable-btn.save:hover,
+.timetable-btn.add:hover {
+    background-color: #45a049;
+}
+
+.timetable-btn.edit {
+    background-color: #007bff; /* Bleu pour modifier */
+}
+
+.timetable-btn.edit:hover {
+    background-color: #0069d9;
+}
+
+.timetable-btn.delete {
+    background-color: #f44336; /* Rouge existant */
+}
+
+.timetable-btn.delete:hover {
+    background-color: #d32f2f;
+}
+
+.timetable-btn.cancel,
+.timetable-btn.close-modal {
+    background-color: #ccc; /* Gris existant */
+}
+
+.timetable-btn.cancel:hover,
+.timetable-btn.close-modal:hover {
+    background-color: #bbb;
+}
+
+.timetable-btn.back {
+    background-color: #4a90e2; /* Bleu pour "retour" */
+    color: white;
+}
+
+.timetable-btn.back:hover {
+    background-color: #357abd; /* Bleu plus foncé au survol */
+}
+
+/* Messages d'erreur */
+.timetable-error {
+    color: red;
+    font-family: 'Roboto', sans-serif;
+}
+
+.timetable-error.modal-error {
+    margin-top: 15px;
+    color: #f44336;
+}
+
+
+.timetable-btn.generate {
+    background-color: #17a2b8; /* Cyan pour "générer" */
+    color: white;
+    margin-bottom: 15px;
+  }
+  
+  .timetable-btn.generate:hover {
+    background-color: #138496; /* Cyan plus foncé au survol */
+  }
+
+  .export-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .timetable-btn.export-pdf {
+    background-color: #ff4444;
+    color: white;
+  }
+  
+  .timetable-btn.export-excel {
+    background-color: #00cc00;
+    color: white;
+  }
+  
+  .timetable-btn.export-pdf:hover {
+    background-color: #cc0000;
+  }
+  
+  .timetable-btn.export-excel:hover {
+    background-color: #009900;
+  }

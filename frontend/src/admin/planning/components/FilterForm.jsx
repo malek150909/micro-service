@@ -2,7 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 import debounce from 'lodash/debounce';
-import '../../../admin_css_files/exam.css';
+import { FaFilter } from 'react-icons/fa';
+import "../../../admin_css_files/exam.css";
+
 
 const FilterForm = ({ onFilter }) => {
   const [filters, setFilters] = useState({
@@ -28,11 +30,12 @@ const FilterForm = ({ onFilter }) => {
     niveaux: {},
     specialites: {},
     sections: {},
-    semestres: null,
+    semestres: {},
   });
 
   const API_URL = 'http://localhost:8083';
 
+  // Fetch Facultes
   useEffect(() => {
     const fetchFacultes = async () => {
       if (cache.facultes) {
@@ -49,25 +52,41 @@ const FilterForm = ({ onFilter }) => {
       }
     };
 
+    fetchFacultes();
+  }, [cache]);
+
+  // Fetch Semestres
+  useEffect(() => {
     const fetchSemestres = async () => {
-      if (cache.semestres) {
-        setSemestreOptions(cache.semestres);
+      if (!filters.niveau) {
+        setSemestreOptions([]);
+        setFilters((prev) => ({ ...prev, ID_semestre: '' }));
+        return;
+      }
+      const cacheKey = filters.niveau;
+      if (cache.semestres[cacheKey]) {
+        setSemestreOptions(cache.semestres[cacheKey]);
         return;
       }
       try {
-        const response = await axios.get(`${API_URL}/exams/semestres`);
+        const response = await axios.get(`${API_URL}/exams/semestres`, {
+          params: { niveau: filters.niveau },
+        });
         setSemestreOptions(response.data);
-        setCache((prev) => ({ ...prev, semestres: response.data }));
+        setCache((prev) => ({
+          ...prev,
+          semestres: { ...prev.semestres, [cacheKey]: response.data },
+        }));
       } catch (error) {
         console.error('Erreur de récupération des semestres:', error);
         setError('Erreur de chargement des semestres.');
       }
     };
 
-    fetchFacultes();
     fetchSemestres();
-  }, [cache]);
+  }, [filters.niveau, cache]);
 
+  // Fetch Departements
   useEffect(() => {
     const fetchDepartements = async () => {
       if (!filters.faculte) {
@@ -94,8 +113,9 @@ const FilterForm = ({ onFilter }) => {
       }
     };
     fetchDepartements();
-  }, [filters.faculte, cache.departements]);
+  }, [filters.faculte, cache]);
 
+  // Fetch Niveaux
   useEffect(() => {
     const fetchNiveaux = async () => {
       if (!filters.departement) {
@@ -123,8 +143,9 @@ const FilterForm = ({ onFilter }) => {
       }
     };
     fetchNiveaux();
-  }, [filters.departement, cache.niveaux]);
+  }, [filters.departement, cache]);
 
+  // Fetch Specialites
   useEffect(() => {
     const fetchSpecialites = async () => {
       if (!filters.departement || !filters.niveau) {
@@ -152,8 +173,9 @@ const FilterForm = ({ onFilter }) => {
       }
     };
     fetchSpecialites();
-  }, [filters.departement, filters.niveau, cache.specialites]);
+  }, [filters.departement, filters.niveau, cache]);
 
+  // Fetch Sections
   useEffect(() => {
     const fetchSections = async () => {
       if (!filters.specialite || !filters.niveau) {
@@ -181,13 +203,14 @@ const FilterForm = ({ onFilter }) => {
       }
     };
     fetchSections();
-  }, [filters.specialite, filters.niveau, cache.sections]);
+  }, [filters.specialite, filters.niveau, cache]);
 
   const handleChange = (e) => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
-    setError('');
+    setError(''); // Clear error on change
   };
 
+  // Debounce the onFilter callback to prevent rapid submissions
   const debouncedOnFilter = useCallback(
     debounce((filters) => {
       onFilter(filters);
@@ -209,24 +232,18 @@ const FilterForm = ({ onFilter }) => {
     debouncedOnFilter(filters);
   };
 
-  // Filtrer les semestres en fonction du niveau
-  const filteredSemestreOptions = semestreOptions.filter((semestre) => {
-    const semestreId = parseInt(semestre.ID_semestre, 10);
-    if (filters.niveau === 'L1') return semestreId === 1 || semestreId === 2;
-    if (filters.niveau === 'L2') return semestreId === 3 || semestreId === 4;
-    if (filters.niveau === 'L3') return semestreId === 5 || semestreId === 6;
-    return true; // Si aucun niveau n'est sélectionné, afficher tous les semestres
-  });
-
   return (
+    <div id="exams">
     <motion.div
       className="form-container"
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
     >
-      <h3>Filtrer les Examens</h3>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <h3>
+        <FaFilter style={{ marginRight: '8px' }} /> Filtrer les Examens
+      </h3>
+      {error && <p style={{ color: '#ff4d4f' }}>{error}</p>}
       <form onSubmit={handleSubmit}>
         <select name="faculte" value={filters.faculte} onChange={handleChange}>
           <option value="">Sélectionner une Faculté</option>
@@ -264,21 +281,24 @@ const FilterForm = ({ onFilter }) => {
           <option value="">Sélectionner une Section</option>
           {sectionOptions.map((option) => (
             <option key={option.ID_section} value={option.ID_section}>
-              {option.nom_section}
+              {`${option.nom_section} (Étudiants: ${option.num_etudiant})`}
             </option>
           ))}
         </select>
         <select name="ID_semestre" value={filters.ID_semestre} onChange={handleChange} required>
           <option value="">Sélectionner un Semestre</option>
-          {filteredSemestreOptions.map((semestre, index) => (
-            <option key={`${semestre.ID_semestre}-${index}`} value={semestre.ID_semestre}>
+          {semestreOptions.map((semestre) => (
+            <option key={semestre.ID_semestre} value={semestre.ID_semestre}>
               {`Semestre ${semestre.ID_semestre} (${semestre.date_debut} - ${semestre.date_fin})`}
             </option>
           ))}
         </select>
-        <button type="submit">Filtrer</button>
+        <button type="submit">
+          <FaFilter style={{ marginRight: '8px' }} /> Filtrer
+        </button>
       </form>
     </motion.div>
+    </div>
   );
 };
 

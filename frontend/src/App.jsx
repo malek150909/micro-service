@@ -27,6 +27,8 @@ import DocsEtudiant from "./etudiant/docs/StudentDashboard";
 import AnnoncesETD from "./etudiant/annonce/AnnonceEtudiant";
 import ClubsETD from "./etudiant/club/EtudiantDashboard";
 import ClubsADM from "./admin/club/ClubAdmin";
+import ENSemploi from "./enseignant/emploi/components/Timetable";
+import ETDemploi from "./etudiant/emploi/StudentTimetableFeed";
 
 const PrivateRoute = ({ element }) => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -67,6 +69,8 @@ function App() {
                 <Route path="/annoncesETD" element={<AnnoncesETD />} />
                 <Route path="/clubsETD" element={<ClubsETD />} />
                 <Route path="/clubsADM" element={<ClubsADM />} />
+                <Route path="/ENSemploi" element={<ENSemploi />} />
+                <Route path="/ETDemploi" element={<ETDemploi />} />
                 
             </Routes>
         </Router>

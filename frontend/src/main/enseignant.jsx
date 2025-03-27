@@ -33,9 +33,10 @@ const Enseignant = () => {
     };
 
     const items = [
-        { title: "📍 Ressources", description: "Consulter et ajouter des ressources", route: "/ressources" },
-        { title: "📍 Notes", description: "Consulter les Notes des etudiants", route: "/notes" },
-        { title: "📍 Annonces", description: "Consulter les annonces", route: "/annoncesENS" },
+        { title: "📚 Ressources", description: "Consulter et ajouter des ressources", route: "/ressources" },
+        { title: "🎓 Notes", description: "Consulter les Notes des etudiants", route: "/notes" },
+        { title: "📢 Annonces", description: "Consulter les annonces", route: "/annoncesENS" },
+        { title: "📢 Emploi du Temps", description: "Consulter votre Emploi du Temps", route: "/ENSemploi" },
     ];
 
     return (

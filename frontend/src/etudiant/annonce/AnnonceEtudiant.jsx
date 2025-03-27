@@ -17,7 +17,7 @@ const AnnonceEtudiant = () => { // Suppression de handleLogout en prop
   const [error, setError] = useState(null);
 
   const navigate = useNavigate(); // Initialisation de useNavigate
-  const API_URL = 'http://localhost:8084';
+  const API_URL = 'http://localhost:8082';
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,7 +46,7 @@ const AnnonceEtudiant = () => { // Suppression de handleLogout en prop
         const adminData = await adminResponse.json();
         setAdminAnnonces(Array.isArray(adminData) ? adminData : []);
         setFilteredAdminAnnonces(Array.isArray(adminData) ? adminData : []);
-        
+
         const teacherResponse = await fetch(`${API_URL}/annoncesETD/teacher/${matricule}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem("token")}`

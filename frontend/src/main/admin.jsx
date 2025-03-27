@@ -40,8 +40,8 @@ const Admin = () => {
         { title: "🧑‍🎓 Étudiants", description: "Consulter la liste des étudiants", route: "/etudiants" },
         { title: "🧑‍🏫 Profs", description: "Listes des enseignants", route: "/enseignants" },
         { title: "📅 Emploi du temps", description: "Consulter et créer des emplois", route: "/emploidutemps" },
-        { title: "Documents Administratif", description: "Consulter et créer des documents", route: "/docsAdmin" },
-        { title: "Clubs", description: "Consulter les Clubs", route: "/clubsADM" }
+        { title: "📁 Documents Administratif", description: "Consulter et créer des documents", route: "/docsAdmin" },
+        { title: "👥 Clubs", description: "Consulter les Clubs", route: "/clubsADM" }
     ];
 
     return (

@@ -141,10 +141,15 @@ export const getModuleEnseignants = async (req, res) => {
 };
 
 // controllers/timetableController.js
+// controllers/timetableController.js
 export const generateTimetables = async (req, res) => {
   try {
-    console.log('Generating timetables for all sections');
-    const result = await Timetable.generateTimetablesForAllSections();
+    const { semestreGroup } = req.body; // Récupérer le choix du frontend ("1" ou "2")
+    if (!semestreGroup || !['1', '2'].includes(semestreGroup)) {
+      return res.status(400).json({ success: false, error: 'semestreGroup doit être "1" ou "2"' });
+    }
+    console.log(`Generating timetables for semestre group ${semestreGroup}`);
+    const result = await Timetable.generateTimetablesForAllSections(semestreGroup);
     res.json(result);
   } catch (err) {
     console.error('Controller error in generateTimetables:', err.message);

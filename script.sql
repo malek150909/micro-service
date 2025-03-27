@@ -44,8 +44,11 @@ CREATE TABLE Etudiant (
     ID_specialite INT NOT NULL,
     annee_inscription DATE NOT NULL,
     etat ENUM('Ajourne', 'Admis', 'Admis avec dettes', 'Reintegrer') NOT NULL,
+    niveau VARCHAR(50) NOT NULL,
+    ID_groupe INT,
     FOREIGN KEY (Matricule) REFERENCES User(Matricule) ON DELETE CASCADE,
-    FOREIGN KEY (ID_specialite) REFERENCES Specialite(ID_specialite) ON DELETE CASCADE
+    FOREIGN KEY (ID_specialite) REFERENCES Specialite(ID_specialite) ON DELETE CASCADE,
+    FOREIGN KEY (ID_groupe) REFERENCES Groupe(ID_groupe) ON DELETE SET NULL
 );
 
 -- Create Enseignant Table with Faculty and Department
@@ -60,15 +63,47 @@ CREATE TABLE Enseignant (
 );
 
 -- Create Section Table
-CREATE TABLE Section (
-    ID_section INT PRIMARY KEY AUTO_INCREMENT,
-	nom_section VARCHAR(50),
-    niveau ENUM('L1', 'ING1', 'L2', 'ING2', 'L3', 'ING3', 'M1', 'M2') NOT NULL,
-    Matricule BIGINT,
-    ID_specialite INT,
-    FOREIGN KEY (Matricule) REFERENCES Enseignant(Matricule) ON DELETE SET NULL,
-    FOREIGN KEY (ID_specialite) REFERENCES Specialite(ID_specialite) ON DELETE CASCADE
-);
+CREATE TABLE section (
+  ID_section int NOT NULL AUTO_INCREMENT,
+  niveau varchar(50) NOT NULL,
+  ID_specialite int DEFAULT NULL,
+  nom_section varchar(50) NOT NULL,
+  num_etudiant int DEFAULT '0',
+  PRIMARY KEY (ID_sectio),
+  KEY ID_specialite (ID_specialite),
+  CONSTRAINT section_ibfk_2 FOREIGN KEY (ID_specialite) REFERENCES specialite (ID_specialite) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci |
+
+--initialiser les valeurs basées sur la table etudiant_section
+UPDATE section s
+LEFT JOIN (
+    SELECT ID_section, COUNT(*) as count_students
+    FROM etudiant_section
+    GROUP BY ID_section
+) es ON s.ID_section = es.ID_section
+SET s.num_etudiant = COALESCE(es.count_students, 0);
+
+--maintenir cette colonne à jour
+DELIMITER //
+CREATE TRIGGER update_num_etudiant_insert
+AFTER INSERT ON etudiant_section
+FOR EACH ROW
+BEGIN
+    UPDATE section
+    SET num_etudiant = num_etudiant + 1
+    WHERE ID_section = NEW.ID_section;
+END;//
+
+CREATE TRIGGER update_num_etudiant_delete
+AFTER DELETE ON etudiant_section
+FOR EACH ROW
+BEGIN
+    UPDATE section
+    SET num_etudiant = num_etudiant - 1
+    WHERE ID_section = OLD.ID_section;
+END;//
+
+DELIMITER ;
 
 -- Create Module Table
 CREATE TABLE Module (
@@ -78,7 +113,8 @@ CREATE TABLE Module (
     credit INT NOT NULL,
     coefficient INT NOT NULL,
     ID_specialite INT,
-    FOREIGN KEY (ID_specialite) REFERENCES Specialite(ID_specialite) ON DELETE CASCADE
+    FOREIGN KEY (ID_specialite) REFERENCES Specialite(ID_specialite) ON DELETE CASCADE ,
+    seances ENUM('Cour','Cour/TD','Cour/TP','Cour/TD/TP','En ligne') NOT NULL 
 );
 
 -- Create Module_Enseignant Table to Link Professors to Modules
@@ -120,7 +156,9 @@ CREATE TABLE Groupe (
 CREATE TABLE Salle (
     ID_salle INT PRIMARY KEY,
     disponible BOOLEAN NOT NULL DEFAULT TRUE,
-    capacite INT NOT NULL
+    capacite INT NOT NULL,
+    type_salle ENUM('Cour','TD','TP','TP/TD') ,
+    nom_salle VARCHAR(10) NOT NULL
 );
 
 -- Create Salle_Section Table
@@ -139,14 +177,16 @@ CREATE TABLE Module_Etudiant (
     Moyenne FLOAT NOT NULL,
     PRIMARY KEY (ID_module, Matricule),
     FOREIGN KEY (ID_module) REFERENCES Module(ID_module) ON DELETE CASCADE,
-    FOREIGN KEY (Matricule) REFERENCES Etudiant(Matricule) ON DELETE CASCADE
+    FOREIGN KEY (Matricule) REFERENCES Etudiant(Matricule) ON DELETE CASCADE,
+    semestre TEXT ,
+    Moyenne float NOT NULL 
 );
 
 -- Create Module_Section Table
 CREATE TABLE Module_Section (
     ID_module INT,
     ID_section INT,
-    semestre ENUM('1', '2') NOT NULL,
+    semestre ENUM('1', '2','3','4','5','6') NOT NULL,
     PRIMARY KEY (ID_module, ID_section, semestre),
     FOREIGN KEY (ID_module) REFERENCES Module(ID_module) ON DELETE CASCADE,
     FOREIGN KEY (ID_section) REFERENCES Section(ID_section) ON DELETE CASCADE
@@ -179,30 +219,13 @@ CREATE TABLE Seance (
     ID_module INT,
     jour ENUM('Samedi', 'Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi') NOT NULL,
     time_slot ENUM('08:00 - 09:30', '09:40 - 11:10', '11:20 - 12:50', '13:00 - 14:30', '14:40 - 16:10', '16:20 - 17:50') NOT NULL,
+    ID_section INT ,
+    FOREIGN KEY (ID_section) REFERENCES section(ID_section) ON DELETE CASCADE,
     FOREIGN KEY (Matricule) REFERENCES Enseignant(Matricule) ON DELETE SET NULL,
     FOREIGN KEY (ID_salle) REFERENCES Salle(ID_salle) ON DELETE SET NULL,
     FOREIGN KEY (ID_module) REFERENCES Module(ID_module) ON DELETE CASCADE,
     FOREIGN KEY (ID_groupe) REFERENCES Groupe(ID_groupe) ON DELETE CASCADE
-);
-
--- Create Emploi_du_temps_prof Table
-CREATE TABLE Emploi_du_temps_prof (
-    ID_emploi INT PRIMARY KEY AUTO_INCREMENT,
-    ID_seance INT,
-    matricule BIGINT,
-    mise_a_jour DATE DEFAULT (CURRENT_DATE),
-    FOREIGN KEY (ID_seance) REFERENCES Seance(ID_seance) ON DELETE CASCADE,
-    FOREIGN KEY (matricule) REFERENCES Enseignant(Matricule) ON DELETE CASCADE
-);
-
--- Create Emploi_du_temps_etudiant Table
-CREATE TABLE Emploi_du_temps_etudiant (
-    ID_emploi INT PRIMARY KEY AUTO_INCREMENT,
-    mise_a_jour DATE DEFAULT (CURRENT_DATE),
-    ID_section INT,
-    ID_seance INT,
-    FOREIGN KEY (ID_seance) REFERENCES Seance(ID_seance) ON DELETE CASCADE,
-    FOREIGN KEY (ID_section) REFERENCES Section(ID_section) ON DELETE CASCADE
+    
 );
 
 -- Create Message Table
@@ -253,7 +276,9 @@ CREATE TABLE Participant (
 CREATE TABLE Club (
     ID_club INT PRIMARY KEY AUTO_INCREMENT,
     nom VARCHAR(100) NOT NULL,
-    description_club TEXT
+    description_club TEXT,
+    image_url VARCHAR(255),
+    gerant_matricule bigint
 );
 
 -- Create Membre Table
@@ -287,18 +312,106 @@ CREATE TABLE Exam (
     FOREIGN KEY (ID_semestre) REFERENCES Semestre(ID_semestre)
 );
 
-CREATE TABLE type_module(
-    ID_type INT PRIMARY KEY AUTO_INCREMENT,
-    seance ENUM ('cours', 'TD', 'TP') NOT NULL,
-    nombre_seance ENUM INT NOT NULL 
+CREATE TABLE annonce (
+  id int NOT NULL AUTO_INCREMENT,
+  title varchar(255) NOT NULL,
+  content text NOT NULL,
+  image_url varchar(255) DEFAULT '',
+  event_id int DEFAULT NULL,
+  created_at timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  target_type enum('Etudiants','Enseignants') DEFAULT NULL,
+  target_filter json DEFAULT NULL,
+  enseignant_matricule bigint DEFAULT NULL,
+  admin_matricule bigint DEFAULT NULL,
+  PRIMARY KEY (id),
+  KEY event_id (event_id),
+  KEY admin_matricule (admin_matricule),
+  KEY enseignant_matricule (enseignant_matricule),
+  CONSTRAINT annonce_ibfk_1 FOREIGN KEY (event_id) REFERENCES evenement (ID_evenement) ON DELETE CASCADE,
+  CONSTRAINT annonce_ibfk_3 FOREIGN KEY (admin_matricule) REFERENCES admin (Matricule) ON DELETE CASCADE,
+  CONSTRAINT annonce_ibfk_4 FOREIGN KEY (enseignant_matricule) REFERENCES enseignant (Matricule) ON DELETE CASCADE
 );
 
-CREATE TABLE type_module_module(
-    ID_type INT,
-    ID_module INT,
-    PRIMARY KEY (ID_type, ID_module),
-    FOREIGN KEY (ID_type) REFERENCES type_module(ID_type) ON DELETE CASCADE,
-    FOREIGN KEY (ID_module) REFERENCES Module(ID_module) ON DELETE CASCADE
+CREATE TABLE clubevenement (
+  ID_club_evenement int NOT NULL AUTO_INCREMENT,
+  nom_evenement varchar(255) NOT NULL,
+  description_evenement text,
+  date_evenement datetime NOT NULL,
+  lieu varchar(255) NOT NULL,
+  capacite int NOT NULL,
+  image_url varchar(255) DEFAULT NULL,
+  organisateur_admin bigint DEFAULT NULL,
+  ID_club int NOT NULL,
+  PRIMARY KEY (ID_club_evenement),
+  KEY organisateur_admin (organisateur_admin),
+  KEY ID_club (ID_club),
+  CONSTRAINT clubevenement_ibfk_1 FOREIGN KEY (organisateur_admin) REFERENCES user (Matricule) ON DELETE CASCADE,
+  CONSTRAINT clubevenement_ibfk_2 FOREIGN KEY (ID_club) REFERENCES club (ID_club) ON DELETE CASCADE
 );
 
+CREATE TABLE DemandeCreationClub (
+    ID_demande INT AUTO_INCREMENT PRIMARY KEY,
+    matricule_etudiant BIGINT NOT NULL,
+    nom_club VARCHAR(255) NOT NULL,
+    description_club TEXT,
+    date_demande DATETIME DEFAULT CURRENT_TIMESTAMP,
+    etat ENUM('en_attente', 'acceptee', 'refusee') DEFAULT 'en_attente',
+  FOREIGN KEY (matricule_etudiant) REFERENCES User(Matricule)
+);
 
+CREATE TABLE MembreClub (
+    ID_membre INT AUTO_INCREMENT PRIMARY KEY,
+    matricule_etudiant BIGINT NOT NULL,
+    ID_club INT NOT NULL,
+    date_ajout DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (matricule_etudiant) REFERENCES User(Matricule),
+    FOREIGN KEY (ID_club) REFERENCES Club(ID_club),
+    UNIQUE (matricule_etudiant, ID_club) -- Un étudiant ne peut être membre qu'une fois par club
+);
+
+CREATE TABLE Publication (
+    ID_publication INT AUTO_INCREMENT PRIMARY KEY,
+    ID_club INT NOT NULL,
+    contenu TEXT NOT NULL,
+    date_publication DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (ID_club) REFERENCES Club(ID_club)
+);
+
+CREATE TABLE PublicationImages (
+    ID_image INT AUTO_INCREMENT PRIMARY KEY,
+    ID_publication INT NOT NULL,
+    image_url VARCHAR(255) NOT NULL,
+    FOREIGN KEY (ID_publication) REFERENCES Publication(ID_publication) ON DELETE CASCADE
+);
+
+CREATE TABLE Reaction (
+    ID_reaction INT AUTO_INCREMENT PRIMARY KEY,
+    ID_publication INT NOT NULL,
+    matricule_etudiant BIGINT NOT NULL,
+    type_reaction ENUM('like') DEFAULT 'like',
+    date_reaction DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (ID_publication) REFERENCES Publication(ID_publication),
+    FOREIGN KEY (matricule_etudiant) REFERENCES User(Matricule),
+    UNIQUE (ID_publication, matricule_etudiant) -- Un étudiant ne peut réagir qu'une fois par publication
+);
+
+CREATE TABLE Commentaire (
+    ID_commentaire INT AUTO_INCREMENT PRIMARY KEY,
+    ID_publication INT NOT NULL,
+    matricule_etudiant BIGINT NOT NULL,
+    contenu TEXT NOT NULL,
+    date_commentaire DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (ID_publication) REFERENCES Publication(ID_publication),
+    FOREIGN KEY (matricule_etudiant) REFERENCES User(Matricule)
+);
+
+CREATE TABLE DemandeRejoindreClub (
+    ID_demande INT AUTO_INCREMENT PRIMARY KEY,
+    matricule_etudiant BIGINT NOT NULL,
+    ID_club INT NOT NULL,
+    date_demande DATETIME DEFAULT CURRENT_TIMESTAMP,
+    etat ENUM('en_attente', 'acceptee', 'refusee') DEFAULT 'en_attente',
+    FOREIGN KEY (matricule_etudiant) REFERENCES User(Matricule),
+    FOREIGN KEY (ID_club) REFERENCES Club(ID_club),
+    UNIQUE (matricule_etudiant, ID_club) -- Une seule demande par étudiant et par club
+);

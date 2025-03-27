@@ -4,7 +4,11 @@ const Exam = {
   getExams: async (filters) => {
     const { faculte, departement, niveau, specialite, section, ID_semestre } = filters;
     let sql = `
-      SELECT DISTINCT e.*, m.nom_module, s.ID_salle, s.capacite, se.date_debut, se.date_fin , sec.nom_section
+      SELECT DISTINCT e.*, 
+                     m.nom_module, m.seances, 
+                     s.ID_salle, s.capacite, 
+                     se.date_debut, se.date_fin,
+                     f.nom_faculte
       FROM Exam e
       JOIN Module m ON e.ID_module = m.ID_module
       JOIN Section sec ON e.ID_section = sec.ID_section
@@ -12,7 +16,7 @@ const Exam = {
       JOIN Departement d ON sp.ID_departement = d.ID_departement
       JOIN Faculte f ON d.ID_faculte = f.ID_faculte
       JOIN Semestre se ON e.ID_semestre = se.ID_semestre
-      JOIN Salle s ON e.ID_salle = s.ID_salle
+      LEFT JOIN Salle s ON e.ID_salle = s.ID_salle
       WHERE 1=1
     `;
     const params = [];
@@ -47,7 +51,6 @@ const Exam = {
       params
     );
   
-    // Normalize dates before sending to the frontend
     return results.map(exam => ({
       ...exam,
       exam_date: new Date(exam.exam_date).toISOString().split('T')[0],
@@ -57,9 +60,36 @@ const Exam = {
   },
 
   addExam: async (examData) => {
-    const { ID_module, ID_section, exam_date, time_slot, ID_salle, ID_semestre } = examData;
+    const { ID_module, ID_section, exam_date, time_slot, ID_salle, ID_semestre, mode } = examData;
 
-    // Semester date validation
+    const [section] = await pool.query(
+      'SELECT num_etudiant FROM Section WHERE ID_section = ?',
+      [ID_section]
+    );
+    if (section.length === 0) {
+      return { success: false, message: 'Section introuvable.' };
+    }
+    const numEtudiant = section[0].num_etudiant;
+
+    let roomCapacity = Infinity;
+    if (mode === 'presentiel') {
+      if (!ID_salle) {
+        return { success: false, message: 'Une salle est requise pour un examen présentiel.' };
+      }
+      const [salle] = await pool.query(
+        'SELECT capacite FROM Salle WHERE ID_salle = ?',
+        [ID_salle]
+      );
+      if (salle.length === 0) {
+        return { success: false, message: 'Salle introuvable.' };
+      }
+      roomCapacity = salle[0].capacite;
+    }
+
+    if (mode === 'presentiel' && numEtudiant > roomCapacity) {
+      return { success: false, message: `La salle sélectionnée n'a pas assez de capacité (capacité: ${roomCapacity}, étudiants: ${numEtudiant}).` };
+    }
+
     const [semester] = await pool.query(
       'SELECT date_debut, date_fin FROM Semestre WHERE ID_semestre = ?',
       [ID_semestre]
@@ -75,20 +105,23 @@ const Exam = {
       return { success: false, message: 'La date de l’examen est en dehors de la plage du semestre.' };
     }
 
-    // Room conflict check
-    const [roomConflict] = await pool.query(
-      `SELECT COUNT(*) AS conflict 
-       FROM Exam 
-       WHERE ID_salle = ? 
-         AND exam_date = ? 
-         AND time_slot = ?`,
-      [ID_salle, exam_date, time_slot]
-    );
-    if (roomConflict[0].conflict > 0) {
-      return { success: false, message: 'La salle est déjà réservée à ce moment.' };
+    if (mode === 'presentiel') {
+      const [roomConflict] = await pool.query(
+        `SELECT COUNT(*) AS conflict 
+         FROM Exam 
+         WHERE ID_salle = ? 
+           AND exam_date = ? 
+           AND time_slot = ?
+           AND mode = 'presentiel'`,
+        [ID_salle, exam_date, time_slot]
+      );
+      if (roomConflict[0].conflict > 0) {
+        return { success: false, message: 'La salle est déjà réservée à ce moment.' };
+      }
+    } else if (mode === 'en ligne' && ID_salle) {
+      return { success: false, message: 'Une salle ne peut pas être sélectionnée pour un examen en ligne.' };
     }
 
-    // Module uniqueness check
     const [moduleConflict] = await pool.query(
       `SELECT COUNT(*) AS conflict 
        FROM Exam 
@@ -100,7 +133,6 @@ const Exam = {
       return { success: false, message: 'Ce module a déjà un examen pour cette section.' };
     }
 
-    // New condition: No two exams in the same section at the same date and time
     const [sectionConflict] = await pool.query(
       `SELECT COUNT(*) AS conflict 
        FROM Exam 
@@ -115,20 +147,46 @@ const Exam = {
 
     const [result] = await pool.query(
       `INSERT INTO Exam 
-       (ID_module, ID_section, exam_date, time_slot, ID_salle, ID_semestre)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [ID_module, ID_section, exam_date, time_slot, ID_salle, ID_semestre]
+       (ID_module, ID_section, exam_date, time_slot, ID_salle, ID_semestre, mode)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [ID_module, ID_section, exam_date, time_slot, mode === 'en ligne' ? null : ID_salle, ID_semestre, mode]
     );
     return { success: true, insertId: result.insertId };
   },
 
   updateExam: async (id, examData) => {
-    const { ID_module, ID_section, exam_date, time_slot, ID_salle, ID_semestre } = examData;
+    const { ID_module, ID_section, exam_date, time_slot, ID_salle, ID_semestre, mode } = examData;
   
-    // Normalize the exam_date to ensure it's in YYYY-MM-DD format
-    const normalizedExamDate = exam_date; // Already in YYYY-MM-DD format from the frontend
-  
-    // Semester date validation
+    const normalizedExamDate = exam_date;
+
+    const [section] = await pool.query(
+      'SELECT num_etudiant FROM Section WHERE ID_section = ?',
+      [ID_section]
+    );
+    if (section.length === 0) {
+      return { success: false, message: 'Section introuvable.' };
+    }
+    const numEtudiant = section[0].num_etudiant;
+
+    let roomCapacity = Infinity;
+    if (mode === 'presentiel') {
+      if (!ID_salle) {
+        return { success: false, message: 'Une salle est requise pour un examen présentiel.' };
+      }
+      const [salle] = await pool.query(
+        'SELECT capacite FROM Salle WHERE ID_salle = ?',
+        [ID_salle]
+      );
+      if (salle.length === 0) {
+        return { success: false, message: 'Salle introuvable.' };
+      }
+      roomCapacity = salle[0].capacite;
+    }
+
+    if (mode === 'presentiel' && numEtudiant > roomCapacity) {
+      return { success: false, message: `La salle sélectionnée n'a pas assez de capacité (capacité: ${roomCapacity}, étudiants: ${numEtudiant}).` };
+    }
+
     const [semester] = await pool.query(
       'SELECT date_debut, date_fin FROM Semestre WHERE ID_semestre = ?',
       [ID_semestre]
@@ -137,7 +195,6 @@ const Exam = {
       return { success: false, message: 'Semestre introuvable.' };
     }
   
-    // Compare dates as strings to avoid timezone issues
     const examDateStr = normalizedExamDate;
     const startDateStr = semester[0].date_debut.toISOString().split('T')[0];
     const endDateStr = semester[0].date_fin.toISOString().split('T')[0];
@@ -145,21 +202,24 @@ const Exam = {
       return { success: false, message: 'La date de l’examen est en dehors de la plage du semestre.' };
     }
   
-    // Room conflict check (excluding current exam)
-    const [roomConflict] = await pool.query(
-      `SELECT COUNT(*) AS conflict 
-       FROM Exam 
-       WHERE ID_salle = ? 
-         AND exam_date = ? 
-         AND time_slot = ?
-         AND ID_exam != ?`,
-      [ID_salle, normalizedExamDate, time_slot, id]
-    );
-    if (roomConflict[0].conflict > 0) {
-      return { success: false, message: 'La salle est déjà réservée à ce moment.' };
+    if (mode === 'presentiel') {
+      const [roomConflict] = await pool.query(
+        `SELECT COUNT(*) AS conflict 
+         FROM Exam 
+         WHERE ID_salle = ? 
+           AND exam_date = ? 
+           AND time_slot = ?
+           AND mode = 'presentiel'
+           AND ID_exam != ?`,
+        [ID_salle, normalizedExamDate, time_slot, id]
+      );
+      if (roomConflict[0].conflict > 0) {
+        return { success: false, message: 'La salle est déjà réservée à ce moment.' };
+      }
+    } else if (mode === 'en ligne' && ID_salle) {
+      return { success: false, message: 'Une salle ne peut pas être sélectionnée pour un examen en ligne.' };
     }
   
-    // Module uniqueness check (excluding current exam)
     const [moduleConflict] = await pool.query(
       `SELECT COUNT(*) AS conflict 
        FROM Exam 
@@ -172,7 +232,6 @@ const Exam = {
       return { success: false, message: 'Ce module a déjà un examen pour cette section.' };
     }
   
-    // No two exams in the same section at the same date and time
     const [sectionConflict] = await pool.query(
       `SELECT COUNT(*) AS conflict 
        FROM Exam 
@@ -193,9 +252,10 @@ const Exam = {
         exam_date = ?,
         time_slot = ?,
         ID_salle = ?,
-        ID_semestre = ?
+        ID_semestre = ?,
+        mode = ?
        WHERE ID_exam = ?`,
-      [ID_module, ID_section, normalizedExamDate, time_slot, ID_salle, ID_semestre, id]
+      [ID_module, ID_section, normalizedExamDate, time_slot, mode === 'en ligne' ? null : ID_salle, ID_semestre, mode, id]
     );
     return { success: true };
   },
@@ -211,7 +271,7 @@ const Exam = {
 
   getModulesBySection: async (sectionId, semesterId) => {
     let sql = `
-      SELECT m.ID_module, m.nom_module
+      SELECT m.ID_module, m.nom_module, m.seances
       FROM Module m
       JOIN Module_Section ms ON m.ID_module = ms.ID_module
       WHERE ms.ID_section = ?
@@ -234,7 +294,8 @@ const Exam = {
        FROM Exam e 
        WHERE e.ID_salle = s.ID_salle 
          AND e.exam_date = ? 
-         AND e.time_slot = ?) AS is_booked
+         AND e.time_slot = ?
+         AND e.mode = 'presentiel') AS is_booked
       FROM Salle s
       WHERE s.disponible = TRUE
     `;
@@ -246,11 +307,29 @@ const Exam = {
     }));
   },
 
-  getSemestres: async () => {
+  getSemestres: async (niveau) => {
+    let semesters;
+    if (niveau === 'L1') {
+      semesters = ['1', '2'];
+    } else if (niveau === 'L2') {
+      semesters = ['3', '4'];
+    } else if (niveau === 'L3') {
+      semesters = ['5', '6'];
+    } else {
+      semesters = ['1', '2'];
+    }
+
     const [results] = await pool.query(
-      'SELECT ID_semestre, date_debut, date_fin FROM Semestre'
+      `SELECT ID_semestre, date_debut, date_fin 
+       FROM Semestre 
+       WHERE ID_semestre IN (${semesters.map(() => '?').join(',')})`,
+      semesters
     );
-    return results;
+    return results.map(semestre => ({
+      ...semestre,
+      date_debut: new Date(semestre.date_debut).toISOString().split('T')[0],
+      date_fin: new Date(semestre.date_fin).toISOString().split('T')[0],
+    }));
   }
 };
 

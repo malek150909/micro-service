@@ -1,7 +1,6 @@
 import pool from '../config/db.js';
 import Exam from '../models/examModel.js';
 
-
 export const getExams = async (req, res) => {
   try {
     const results = await Exam.getExams(req.query);
@@ -72,15 +71,14 @@ export const getSalles = async (req, res) => {
 };
 
 export const getSemestres = async (req, res) => {
+  const { niveau } = req.query; // Added back the niveau parameter
   try {
-    const results = await Exam.getSemestres();
+    const results = await Exam.getSemestres(niveau); // Pass niveau to the model
     res.json(results);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
-
-// Other methods remain unchanged
 
 export const getFacultes = async (req, res) => {
   try {
@@ -149,7 +147,7 @@ export const getSpecialites = async (req, res) => {
 
 export const getSections = async (req, res) => {
   const { specialite, niveau } = req.query;
-  let sql = 'SELECT ID_section, nom_section FROM Section';
+  let sql = 'SELECT ID_section, nom_section, num_etudiant FROM Section'; // Added back num_etudiant
   const params = [];
   if (specialite) {
     sql += ' WHERE ID_specialite = ?';

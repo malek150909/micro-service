@@ -91,7 +91,7 @@ const EtudiantDashboard = () => {
         >
           <FaEnvelope /> Demande de Création
         </button>
-        <button className="sidebar-button" onClick={handleLogout}>
+        <button className="sidebar-button" onClick={()=> navigate('/etudiant')}>
           <FaSignOutAlt /> Déconnexion
         </button>
       </aside>

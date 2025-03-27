@@ -17,6 +17,7 @@ function TimetableFilter() {
   const [timetable, setTimetable] = useState({});
   const [semestre, setSemestre] = useState('');
   const [error, setError] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   const semestreOptions = {
     L1: ['1', '2'],
@@ -229,18 +230,25 @@ function TimetableFilter() {
     fetchTimetable();
   };
 
-  const handleGenerateTimetables = async () => {
+  const handleGenerateTimetables = () => {
+    setShowModal(true); // Ouvre la modale
+  };
+
+  const handleModalChoice = async (choice) => {
+    setShowModal(false); // Ferme la modale après le choix
+    const semestreGroup = choice ? '1' : '2'; // "1" pour 1, 3, 5 ; "2" pour 2, 4, 6
     try {
       setError(null);
       const response = await fetch('http://localhost:8083/timetable/generate-timetables', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ semestreGroup }),
       });
       const data = await response.json();
       if (data.success) {
-        console.log('Timetables generated successfully');
+        console.log('Timetables generated successfully for semestre group:', semestreGroup);
         if (sectionId && semestre) fetchTimetable(); // Rafraîchir l’affichage si une section est sélectionnée
-        alert('Emplois du temps générés avec succès pour toutes les sections !');
+        alert(`Emplois du temps générés avec succès pour le groupe de semestres ${semestreGroup} !`);
       } else {
         setError(data.error || 'Erreur lors de la génération des emplois du temps');
       }
@@ -315,11 +323,37 @@ function TimetableFilter() {
           <button type="submit" className="timetable-filter-btn" disabled={!sectionId || !semestre}>
             Filtrer
           </button>
-          <button type="button" onClick={handleGenerateTimetables} className="timetable-filter-btn generate-btn">
+          <button
+            type="button"
+            onClick={handleGenerateTimetables}
+            className="timetable-filter-btn generate-btn"
+          >
             Générer tous les emplois
           </button>
         </div>
       </form>
+
+      {/* Modale pour choisir le semestre */}
+      {showModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Génération des emplois</h3>
+            <p>Génération pour semestre 1 ou semestre 2 ?</p>
+            <div className="modal-actions">
+              <button onClick={() => handleModalChoice(true)} className="timetable-btn save">
+                Semestre 1
+              </button>
+              <button onClick={() => handleModalChoice(false)} className="timetable-btn save">
+                Semestre 2
+              </button>
+              <button onClick={() => setShowModal(false)} className="timetable-btn cancel">
+                Annuler
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {error && <p className="timetable-filter-error">{error}</p>}
       <TimetableDisplay
         timetable={timetable}
@@ -327,7 +361,7 @@ function TimetableFilter() {
         niveau={niveau}
         semestre={semestre}
         onRefresh={handleRefresh}
-      /> 
+      />
     </div>
   );
 }
