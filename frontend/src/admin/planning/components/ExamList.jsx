@@ -1,10 +1,8 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { createPortal } from 'react-dom';
-import { FaEdit, FaTrash, FaList, FaExclamationTriangle } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaList, FaExclamationTriangle, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import axios from 'axios';
-import "../../../admin_css_files/exam.css";
-
 
 const ExamList = ({ exams, onDelete, onUpdate, salles, semestres, modules = [] }) => {
   const [editExam, setEditExam] = useState(null);
@@ -12,36 +10,78 @@ const ExamList = ({ exams, onDelete, onUpdate, salles, semestres, modules = [] }
   const [errorMessage, setErrorMessage] = useState('');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [examToDelete, setExamToDelete] = useState(null);
+  const [availableSalles, setAvailableSalles] = useState(salles);
+  const [isSalleDropdownOpen, setIsSalleDropdownOpen] = useState(false);
 
-  const API_URL = "http://localhost:8083"; // Adjust based on your API URL
+  const API_URL = "http://localhost:8083";
 
-  // Reset error message when closing the modal
   const closeModal = () => {
     setShowModal(false);
     setEditExam(null);
-    setErrorMessage(''); // Clear error message on close
+    setErrorMessage('');
+    setIsSalleDropdownOpen(false);
   };
 
-  const handleEdit = (exam) => {
-    setEditExam({ ...exam });
-    setShowModal(true);
-    setErrorMessage(''); // Clear error message when opening the modal
+  const handleEdit = async (exam) => {
+    try {
+      const response = await axios.get(`${API_URL}/exams`);
+      const currentExam = response.data.find(e => e.ID_exam === exam.ID_exam);
+      if (!currentExam) {
+        throw new Error('Examen introuvable.');
+      }
+
+      const salleNames = currentExam.nom_salle ? currentExam.nom_salle.split(' + ') : [];
+      const salleIds = salleNames
+        .map(name => {
+          const salle = salles.find(s => s.nom_salle === name.trim());
+          return salle ? String(salle.ID_salle) : null;
+        })
+        .filter(id => id !== null);
+
+      let availableRooms = [];
+      if (exam.exam_date && exam.time_slot && exam.mode === 'presentiel') {
+        const salleAvailabilityResponse = await axios.get(`${API_URL}/exams/salles`, {
+          params: {
+            exam_date: exam.exam_date,
+            time_slot: exam.time_slot,
+            exclude_exam_id: exam.ID_exam,
+          },
+        });
+        availableRooms = salleAvailabilityResponse.data;
+      } else {
+        availableRooms = salles;
+      }
+
+      const updatedAvailableSalles = availableRooms.map(salle => {
+        if (salleIds.includes(String(salle.ID_salle))) {
+          return { ...salle, available: true };
+        }
+        return salle;
+      });
+
+      setAvailableSalles(updatedAvailableSalles);
+      setEditExam({
+        ...exam,
+        ID_salles: salleIds,
+      });
+      setShowModal(true);
+      setErrorMessage('');
+    } catch (err) {
+      setErrorMessage(err.message || 'Erreur lors du chargement des données de l’examen.');
+    }
   };
 
-  // Real-time validation function
   const validateForm = async (examData) => {
     if (!examData) return;
 
     const { ID_module, exam_date, time_slot, ID_exam } = examData;
 
-    // Skip validation if required fields are not filled
     if (!ID_module || !exam_date || !time_slot) {
       setErrorMessage('');
       return;
     }
 
     try {
-      // Check for duplicate exam (same date, time, and module, excluding the current exam)
       const response = await axios.get(`${API_URL}/exams`, {
         params: {
           ID_section: examData.ID_section,
@@ -49,7 +89,7 @@ const ExamList = ({ exams, onDelete, onUpdate, salles, semestres, modules = [] }
         },
       });
 
-      const existingExams = response.data.filter((exam) => exam.ID_exam !== ID_exam); // Exclude the current exam
+      const existingExams = response.data.filter((exam) => exam.ID_exam !== ID_exam);
 
       const hasDuplicate = existingExams.some((exam) => {
         return (
@@ -66,14 +106,12 @@ const ExamList = ({ exams, onDelete, onUpdate, salles, semestres, modules = [] }
         return;
       }
 
-      // If no errors, clear the error message
       setErrorMessage('');
     } catch (err) {
       setErrorMessage('Erreur lors de la validation des données.');
     }
   };
 
-  // Run validation whenever editExam changes
   useEffect(() => {
     if (editExam) {
       validateForm(editExam);
@@ -87,7 +125,6 @@ const ExamList = ({ exams, onDelete, onUpdate, salles, semestres, modules = [] }
       return;
     }
 
-    // If there's an error message, prevent submission
     if (errorMessage) {
       return;
     }
@@ -97,6 +134,7 @@ const ExamList = ({ exams, onDelete, onUpdate, salles, semestres, modules = [] }
       setShowModal(false);
       setEditExam(null);
       setErrorMessage('');
+      setIsSalleDropdownOpen(false);
     } catch (err) {
       setErrorMessage(err.message || 'Une erreur est survenue lors de la mise à jour.');
     }
@@ -108,6 +146,15 @@ const ExamList = ({ exams, onDelete, onUpdate, salles, semestres, modules = [] }
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleSalleChange = (salleId) => {
+    setEditExam((prev) => {
+      const ID_salles = prev.ID_salles.includes(salleId)
+        ? prev.ID_salles.filter((id) => id !== salleId)
+        : [...prev.ID_salles, salleId];
+      return { ...prev, ID_salles };
+    });
   };
 
   const handleDeletePrompt = (id) => {
@@ -129,9 +176,13 @@ const ExamList = ({ exams, onDelete, onUpdate, salles, semestres, modules = [] }
     }
   };
 
+  const toggleSalleDropdown = () => {
+    setIsSalleDropdownOpen((prev) => !prev);
+  };
+
   return (
     <>
-      <div id="exams">
+    <div id="exams">
       <motion.div
         className="exam-list"
         initial={{ opacity: 0, y: 20 }}
@@ -147,7 +198,7 @@ const ExamList = ({ exams, onDelete, onUpdate, salles, semestres, modules = [] }
               <th>Date</th>
               <th>Horaire</th>
               <th>Module</th>
-              <th>Salle</th>
+              <th>Salle(s)</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -157,7 +208,7 @@ const ExamList = ({ exams, onDelete, onUpdate, salles, semestres, modules = [] }
                 <td>{new Date(exam.exam_date).toLocaleDateString()}</td>
                 <td>{exam.time_slot}</td>
                 <td>{exam.nom_module}</td>
-                <td>{exam.mode === 'en ligne' ? 'En Ligne' : exam.ID_salle}</td>
+                <td>{exam.mode === 'en ligne' ? 'En Ligne' : exam.nom_salle || 'N/A'}</td>
                 <td>
                   <button onClick={() => handleEdit(exam)} disabled={!modules || modules.length === 0}>
                     <FaEdit style={{ marginRight: '5px' }} /> Modifier
@@ -172,7 +223,6 @@ const ExamList = ({ exams, onDelete, onUpdate, salles, semestres, modules = [] }
         </table>
       </motion.div>
 
-      {/* Edit Exam Modal */}
       {showModal && createPortal(
         <motion.div
           className="modal-overlay"
@@ -237,21 +287,33 @@ const ExamList = ({ exams, onDelete, onUpdate, salles, semestres, modules = [] }
                   </select>
                 </div>
                 <div className="modal-field">
-                  <label>Salle</label>
-                  <select
-                    name="ID_salle"
-                    value={editExam?.ID_salle || ''}
-                    onChange={handleChange}
-                    required={editExam?.mode === 'presentiel'}
-                    disabled={editExam?.mode === 'en ligne'}
-                  >
-                    <option value="">Sélectionner une Salle</option>
-                    {salles.map((salle) => (
-                      <option key={salle.ID_salle} value={salle.ID_salle}>
-                        {salle.ID_salle} (Capacité: {salle.capacite})
-                      </option>
-                    ))}
-                  </select>
+                  <label>Salle(s)</label>
+                  <div className={`custom-dropdown ${isSalleDropdownOpen ? 'open' : ''}`}>
+                    <div className="dropdown-header" onClick={toggleSalleDropdown}>
+                      <span>
+                        {editExam?.ID_salles.length > 0
+                          ? `${editExam.ID_salles.length} salle(s) sélectionnée(s)`
+                          : 'Sélectionner des Salles'}
+                      </span>
+                      {isSalleDropdownOpen ? <FaChevronUp /> : <FaChevronDown />}
+                    </div>
+                    {isSalleDropdownOpen && editExam?.mode === 'presentiel' && (
+                      <div className="dropdown-menu">
+                        {availableSalles.map((salle) => (
+                          <label key={salle.ID_salle} className="checkbox-label">
+                            <input
+                              type="checkbox"
+                              value={salle.ID_salle}
+                              checked={editExam?.ID_salles.includes(String(salle.ID_salle))}
+                              onChange={() => handleSalleChange(String(salle.ID_salle))}
+                              disabled={!salle.available}
+                            />
+                            {salle.nom_salle} (Capacité: {salle.capacite}) {salle.available ? '' : '- Indisponible'}
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div className="modal-actions">
                   <button type="submit" disabled={!!errorMessage}>Enregistrer</button>
@@ -264,7 +326,6 @@ const ExamList = ({ exams, onDelete, onUpdate, salles, semestres, modules = [] }
         document.body
       )}
 
-      {/* Delete Confirmation Modal */}
       {showDeleteModal && createPortal(
         <motion.div
           className="modal-overlay"

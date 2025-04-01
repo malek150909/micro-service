@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { FaFilter } from 'react-icons/fa'; // Icône pour le filtre
+import { FaFilter, FaSearch } from 'react-icons/fa'; // Ajout de FaSearch
+import "../../admin_css_files/listetudiant.css" ;
 
 const FilterPanel = ({ onFilter }) => {
   const [filters, setFilters] = useState({
@@ -14,12 +15,36 @@ const FilterPanel = ({ onFilter }) => {
   const [departements, setDepartements] = useState([]);
   const [specialites, setSpecialites] = useState([]);
 
+  const iconColor = '#021A3F'; // Bleu très foncé
+
   useEffect(() => {
-    axios.get('http://localhost:8081/apii/filters')
+    console.log('FilterPanel monté');
+  }, []);
+
+  useEffect(() => {
+    setFacultes([]);
+    setDepartements([]);
+    setSpecialites([]);
+
+    axios.get('http://localhost:8081/listeETD/filters')
       .then(res => {
-        setFacultes(res.data.facultes || []);
-        setDepartements(res.data.departements || []);
-        setSpecialites(res.data.specialites || []);
+        const fetchedFacultes = res.data.facultes || [];
+        const fetchedDepartements = res.data.departements || [];
+        const fetchedSpecialites = res.data.specialites || [];
+
+        const uniqueFacultes = [...new Map(fetchedFacultes.map(f => [f.ID_faculte, f])).values()];
+        const uniqueDepartements = [...new Map(fetchedDepartements.map(d => [d.ID_departement, d])).values()];
+        const uniqueSpecialites = [...new Map(fetchedSpecialites.map(s => [s.ID_specialite, s])).values()];
+
+        console.log('Facultés uniques chargées :', uniqueFacultes);
+        console.log('Départements uniques chargés :', uniqueDepartements);
+        console.log('Spécialités uniques chargées :', uniqueSpecialites);
+
+        console.log('Mise à jour des états :', { facultes: uniqueFacultes, departements: uniqueDepartements, specialites: uniqueSpecialites });
+
+        setFacultes(uniqueFacultes);
+        setDepartements(uniqueDepartements);
+        setSpecialites(uniqueSpecialites);
       })
       .catch(err => {
         const errorMessage = err.response?.data?.error || 'Impossible de charger les filtres. Veuillez réessayer.';
@@ -29,7 +54,7 @@ const FilterPanel = ({ onFilter }) => {
           hideProgressBar: true,
           closeOnClick: true,
           pauseOnHover: true,
-          style: { backgroundColor: '#ff4444', color: '#ffffff', fontSize: '16px' },
+          style: { backgroundColor: '#FF6B6B', color: '#fff', fontSize: '16px' },
           icon: '❌',
         });
       });
@@ -37,10 +62,22 @@ const FilterPanel = ({ onFilter }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFilters(prev => ({ ...prev, [name]: value }));
+    setFilters(prev => {
+      const updatedFilters = { ...prev, [name]: value };
+
+      if (name === 'idFaculte') {
+        updatedFilters.idDepartement = '';
+        updatedFilters.idSpecialite = '';
+      } else if (name === 'idDepartement') {
+        updatedFilters.idSpecialite = '';
+      }
+
+      console.log('Filtres mis à jour :', updatedFilters);
+      return updatedFilters;
+    });
   };
 
-  const handleFilter = () => {
+  const handleFilterSubmit = async () => {
     if (!filters.niveau || !filters.idFaculte || !filters.idDepartement || !filters.idSpecialite) {
       toast.error('Veuillez remplir tous les champs de filtrage.', {
         position: 'top-right',
@@ -48,64 +85,138 @@ const FilterPanel = ({ onFilter }) => {
         hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
-        style: { backgroundColor: '#ff4444', color: '#ffffff', fontSize: '16px' },
+        style: { backgroundColor: '#FF6B6B', color: '#fff', fontSize: '16px' },
         icon: '❌',
       });
       return;
     }
 
-    axios.post('http://localhost:8081/apii/etudiants/filtrer', filters)
-      .then(res => {
-        onFilter(res.data, filters); // Passer les données au parent
-      })
-      .catch(err => {
-        const errorMessage = err.response?.data?.error || 'Une erreur s’est produite lors du filtrage. Veuillez réessayer.';
-        toast.error(errorMessage, {
-          position: 'top-right',
-          autoClose: 3000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          style: { backgroundColor: '#ff4444', color: '#ffffff', fontSize: '16px' },
-          icon: '❌',
-        });
-        onFilter({ message: 'Une erreur s’est produite lors du filtrage.' }, filters);
+    try {
+      const res = await axios.post('http://localhost:8081/listeETD/etudiants/filtrer', {
+        niveau: filters.niveau,
+        idFaculte: parseInt(filters.idFaculte),
+        idDepartement: parseInt(filters.idDepartement),
+        idSpecialite: parseInt(filters.idSpecialite),
       });
+
+      console.log('Réponse du filtrage :', res.data);
+
+      if (res.data.message) {
+        onFilter(res.data, filters);
+      } else if (Array.isArray(res.data) && res.data.length > 0) {
+        onFilter(res.data, filters);
+      } else {
+        onFilter({ message: 'Aucune section trouvée avec ces critères.' }, filters);
+      }
+    } catch (err) {
+      const errorMessage = err.response?.data?.error || 'Erreur lors du filtrage. Veuillez réessayer.';
+      console.error('Erreur lors du filtrage :', err);
+      toast.error(errorMessage, {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        style: { backgroundColor: '#FF6B6B', color: '#fff', fontSize: '16px' },
+        icon: '❌',
+      });
+    }
   };
+
+  const filteredDepartements = departements.filter(d => {
+    const matches = !filters.idFaculte || d.ID_faculte === parseInt(filters.idFaculte);
+    console.log(`Filtrage département : ID_faculte=${d.ID_faculte}, filters.idFaculte=${filters.idFaculte}, matches=${matches}`);
+    return matches;
+  });
+
+  const filteredSpecialites = specialites.filter(s => {
+    const matches = !filters.idDepartement || s.ID_departement === parseInt(filters.idDepartement);
+    console.log(`Filtrage spécialité : ID_departement=${s.ID_departement}, filters.idDepartement=${filters.idDepartement}, matches=${matches}`);
+    return matches;
+  });
 
   return (
     <div id="listetudiants">
     <div className="filter-panel">
-      <h2>Filtrer les sections <FaFilter style={{ verticalAlign: 'middle', color: '#1565c0' }} /></h2>
-      <select name="niveau" value={filters.niveau} onChange={handleChange} className="filter-select">
-        <option value="">Sélectionner un niveau</option>
-        <option value="L1">L1</option>
-        <option value="L2">L2</option>
-        <option value="L3">L3</option>
-        <option value="M1">M1</option>
-        <option value="M2">M2</option>
-      </select>
-      <select name="idFaculte" value={filters.idFaculte} onChange={handleChange} className="filter-select">
-        <option value="">Sélectionner une faculté</option>
-        {facultes.map(fac => (
-          <option key={fac.ID_faculte} value={fac.ID_faculte}>{fac.nom_faculte || 'Nom non défini'}</option>
-        ))}
-      </select>
-      <select name="idDepartement" value={filters.idDepartement} onChange={handleChange} className="filter-select">
-        <option value="">Sélectionner un département</option>
-        {departements.map(dep => (
-          <option key={dep.ID_departement} value={dep.ID_departement}>{dep.Nom_departement || 'Nom non défini'}</option>
-        ))}
-      </select>
-      <select name="idSpecialite" value={filters.idSpecialite} onChange={handleChange} className="filter-select">
-        <option value="">Sélectionner une spécialité</option>
-        {specialites.map(spec => (
-          <option key={spec.ID_specialite} value={spec.ID_specialite}>{spec.nom_specialite || 'Nom non défini'}</option>
-        ))}
-      </select>
-      <button onClick={handleFilter} className="filter-btn">
-        <FaFilter style={{ marginRight: '5px' }} /> Filtrer
-      </button>
+      <h3>Filtrer les sections <FaSearch style={{ color: iconColor, fill: iconColor, verticalAlign: 'middle' }} /></h3>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
+        <select
+          name="niveau"
+          value={filters.niveau}
+          onChange={handleChange}
+          className="filter-select"
+        >
+          <option value="">-- Sélectionner un niveau --</option>
+          {['L1', 'L2', 'L3', 'M1', 'M2'].map(n => (
+            <option key={n} value={n}>{n}</option>
+          ))}
+        </select>
+
+        <select
+          name="idFaculte"
+          value={filters.idFaculte}
+          onChange={handleChange}
+          className="filter-select"
+        >
+          <option value="">-- Sélectionner une faculté --</option>
+          {facultes.map(f => {
+            console.log(`Rendu faculté : ID=${f.ID_faculte}, nom=${f.nom_faculte}`);
+            return (
+              <option key={f.ID_faculte} value={f.ID_faculte}>
+                {f.nom_faculte}
+              </option>
+            );
+          })}
+        </select>
+
+        <select
+          name="idDepartement"
+          value={filters.idDepartement}
+          onChange={handleChange}
+          className="filter-select"
+          disabled={!filters.idFaculte}
+        >
+          <option value="">-- Sélectionner un département --</option>
+          {filteredDepartements.length > 0 ? (
+            filteredDepartements.map(d => {
+              console.log(`Rendu département : ID=${d.ID_departement}, nom=${d.Nom_departement}`);
+              return (
+                <option key={d.ID_departement} value={d.ID_departement}>
+                  {d.Nom_departement || 'Nom non défini'}
+                </option>
+              );
+            })
+          ) : (
+            <option value="" disabled>Aucun département disponible</option>
+          )}
+        </select>
+
+        <select
+          name="idSpecialite"
+          value={filters.idSpecialite}
+          onChange={handleChange}
+          className="filter-select"
+          disabled={!filters.idDepartement}
+        >
+          <option value="">-- Sélectionner une spécialité --</option>
+          {filteredSpecialites.length > 0 ? (
+            filteredSpecialites.map(s => {
+              console.log(`Rendu spécialité : ID=${s.ID_specialite}, nom=${s.nom_specialite}`);
+              return (
+                <option key={s.ID_specialite} value={s.ID_specialite}>
+                  {s.nom_specialite || 'Nom non défini'}
+                </option>
+              );
+            })
+          ) : (
+            <option value="" disabled>Aucune spécialité disponible</option>
+          )}
+        </select>
+
+        <button onClick={handleFilterSubmit} className="filter-btn">
+          <FaFilter /> Filtrer
+        </button>
+      </div>
     </div>
     </div>
   );

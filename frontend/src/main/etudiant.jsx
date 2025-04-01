@@ -36,7 +36,8 @@ const Etudiant = () => {
         { title: "📁 Documents Administratif", description: "Consulter et créer des documents", route: "/docsEtudiant" },
         { title: "📢 Annonces", description: "Consulter les Annonces", route: "/AnnoncesETD" },
         { title: "👥 Clubs", description: "Consulter les Clubs", route: "/clubsETD" },
-        { title: " Emploi du Temps", description: "Consulter l'emploi du temp", route: "/ETDemploi" }
+        { title: " Emploi du Temps", description: "Consulter l'emploi du temp", route: "/ETDemploi" },
+        { title: " Notes", description: "Consulter les Notes", route: "/ETD" }
     ];
 
     return (

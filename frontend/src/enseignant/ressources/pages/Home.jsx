@@ -1,9 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ResourceUploadForm from '../components/ResourceUploadForm';
+import { FaHome, FaBook, FaDownload, FaTrash, FaEdit, FaInfoCircle, FaUser, FaFileAlt, FaFileUpload, FaUsers, FaCalendarAlt, FaTimes, FaPlus } from 'react-icons/fa';
 import "../ressources.css";
-import apiRequest from '../utils/api.js';
-import debounce from 'lodash/debounce';
 
 function Home() {
     const [matricule, setMatricule] = useState(localStorage.getItem('matricule') || '');
@@ -12,16 +11,48 @@ function Home() {
     const [selectedModule, setSelectedModule] = useState('');
     const [selectedResource, setSelectedResource] = useState(null);
     const [message, setMessage] = useState('');
-    const [isLoadingResources, setIsLoadingResources] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
+    useEffect(() => {
+        const storedMatricule = localStorage.getItem('matricule');
+        const token = localStorage.getItem('token');
+        if (!storedMatricule || !token) {
+            navigate('/');
+        } else if (selectedSection && selectedModule) {
+            fetchResources();
+        } else {
+            setResources([]);
+        }
+    }, [matricule, selectedSection, selectedModule, navigate]);
+
     const fetchResources = async () => {
-        setIsLoadingResources(true);
         try {
-            console.log('Fetching resources avec matricule:', matricule);
-            const data = await apiRequest('http://localhost:8082/ressources/resources');
-            console.log('Resources récupérées:', data);
+            const token = localStorage.getItem('token');
+            if (!token) {
+                setMessage('Erreur : Vous devez être connecté.');
+                navigate('/');
+                return;
+            }
+
+            const response = await fetch('http://localhost:8082/ressources/resources', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'matricule': matricule
+                }
+            });
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    setMessage('Session expirée. Veuillez vous reconnecter.');
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('matricule');
+                    navigate('/');
+                    return;
+                }
+                throw new Error('Failed to fetch resources');
+            }
+
+            const data = await response.json();
             const filteredResources = data.filter(resource =>
                 resource.ID_section === parseInt(selectedSection) &&
                 resource.ID_module === parseInt(selectedModule)
@@ -29,42 +60,43 @@ function Home() {
             setResources(filteredResources);
         } catch (error) {
             console.error('Error fetching resources:', error);
-            setMessage('Erreur lors du chargement des ressources: ' + error.message);
+            setMessage('Erreur lors du chargement des ressources.');
             setTimeout(() => setMessage(''), 3000);
-        } finally {
-            setIsLoadingResources(false);
         }
     };
-
-    const debouncedFetchResources = useCallback(debounce(fetchResources, 300), [selectedSection, selectedModule]);
-
-    useEffect(() => {
-        const storedMatricule = localStorage.getItem('matricule');
-        if (!storedMatricule) {
-            navigate('/');
-        } else if (selectedSection && selectedModule) {
-            debouncedFetchResources();
-        } else {
-            setResources([]);
-        }
-    }, [matricule, selectedSection, selectedModule, navigate, debouncedFetchResources]);
 
     const handleReturn = () => {
         navigate('/enseignant');
     };
 
     const handleDeleteResource = async (id) => {
-        setIsLoading(true);
         try {
-            await apiRequest(`http://localhost:8082/ressources/resources/${id}`, { method: 'DELETE' });
-            setMessage('Ressource supprimée avec succès !');
-            setTimeout(() => setMessage(''), 3000);
-            fetchResources();
+            const token = localStorage.getItem('token');
+            if (!token) {
+                setMessage('Erreur : Vous devez être connecté.');
+                navigate('/');
+                return;
+            }
+
+            const response = await fetch(`http://localhost:8082/ressources/resources/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'matricule': matricule
+                }
+            });
+
+            if (response.ok) {
+                setMessage('Ressource supprimée avec succès !');
+                setTimeout(() => setMessage(''), 3000);
+                fetchResources();
+            } else {
+                setMessage('Erreur lors de la suppression');
+                setTimeout(() => setMessage(''), 3000);
+            }
         } catch (error) {
-            setMessage('Erreur lors de la suppression: ' + error.message);
+            setMessage('Erreur: ' + error.message);
             setTimeout(() => setMessage(''), 3000);
-        } finally {
-            setIsLoading(false);
         }
     };
 
@@ -78,41 +110,56 @@ function Home() {
         TP: resources.filter(r => r.type_ressource === 'TP')
     };
 
-    console.log('Selected Section:', selectedSection, 'Selected Module:', selectedModule, 'Resources:', resources);
-
     return (
         <div id="ressources">
-        <div className="container">
-            <h2>Gérer les Ressources Pédagogiques </h2>
-            <div className="button-container">
-                <button onClick={handleReturn}>Retourner</button>
-            </div>
-            <div className="home-layout">
-                <div className="form-column">
-                    <ResourceUploadForm
-                        matricule={matricule}
-                        onUploadSuccess={fetchResources}
-                        onSectionChange={(sectionId) => {
-                            setSelectedSection(sectionId);
-                            setSelectedModule('');
-                        }}
-                        onModuleChange={setSelectedModule}
-                        message={message}
-                        setMessage={setMessage}
-                    />
+            <div className="container">
+                <div className="sidebar">
+                    <div className="logo">
+                        <FaUser className="icon" />
+                        <h2>Professeur</h2>
+                    </div>
+                    <button className="sidebar-button" onClick={handleReturn}>
+                        <FaHome className="icon" />
+                        Retour à l'accueil
+                    </button>
                 </div>
-                <div className="resources-column">
-                    {selectedSection && selectedModule ? (
-                        isLoadingResources ? (
-                            <div className="centered-message">
-                                <p>Chargement des ressources...</p>
-                            </div>
-                        ) : resources.length === 0 ? (
-                            <div className="centered-message">
-                                <p>Aucune ressource téléchargée pour cette section et ce module.</p>
-                            </div>
-                        ) : (
-                            <div className="resources-list">
+                <div className="main-content">
+                    <div className="header">
+                        <h1>Gestion des Ressources Pédagogiques</h1>
+                        <p>Gérer les ressources des sections et modules</p>
+                    </div>
+                    <div className="content-grid">
+                        <div className="form-container">
+                            <h2 className="form-title">
+                                <FaPlus className="icon" />
+                                Ajouter une Ressource
+                            </h2>
+                            <ResourceUploadForm
+                                matricule={matricule}
+                                onUploadSuccess={fetchResources}
+                                onSectionChange={(sectionId) => {
+                                    setSelectedSection(sectionId);
+                                    setSelectedModule('');
+                                }}
+                                onModuleChange={setSelectedModule}
+                                message={message}
+                                setMessage={setMessage}
+                            />
+                        </div>
+                        <div className="resources-list">
+                            <h3>
+                                <FaBook className="icon" />
+                                Ressources
+                            </h3>
+                            {!selectedSection || !selectedModule ? (
+                                <div className="no-results">
+                                    Sélectionnez une section et un module pour afficher les ressources.
+                                </div>
+                            ) : resources.length === 0 ? (
+                                <div className="no-results">
+                                    Aucune ressource disponible pour cette section et ce module.
+                                </div>
+                            ) : (
                                 <div className="resource-grid">
                                     {['Cours', 'TD', 'TP'].map((type) => {
                                         if (groupedResources[type].length === 0) {
@@ -125,38 +172,40 @@ function Home() {
                                                     {groupedResources[type].map(resource => (
                                                         <li
                                                             key={resource.ID_ressource}
+                                                            className="resource-item"
                                                             onClick={() => setSelectedResource(resource)}
                                                             style={{ cursor: 'pointer' }}
                                                         >
                                                             <div className="resource-info">
-                                                                <strong className="resource-name">{resource.nom_ressource}</strong>
+                                                                <h3>{resource.nom_ressource}</h3>
                                                                 {resource.description && (
-                                                                    <p className="resource-description">{resource.description}</p>
+                                                                    <p>{resource.description}</p>
                                                                 )}
-                                                                <p className="resource-date">
+                                                                <p>
                                                                     Date de soumission: {new Date(resource.date_upload).toLocaleDateString()}
                                                                 </p>
-                                                                <div className="resource-actions">
-                                                                    <a
-                                                                        href={`http://localhost:8082${resource.fichier_url}`}
-                                                                        target="_blank"
-                                                                        rel="noopener noreferrer"
-                                                                        className="download-link"
-                                                                        onClick={handleDownloadClick}
-                                                                    >
-                                                                        Télécharger
-                                                                    </a>
-                                                                    <button
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            handleDeleteResource(resource.ID_ressource);
-                                                                        }}
-                                                                        className="delete-button"
-                                                                        disabled={isLoading}
-                                                                    >
-                                                                        {isLoading ? 'Suppression...' : 'Supprimer'}
-                                                                    </button>
-                                                                </div>
+                                                            </div>
+                                                            <div className="resource-actions">
+                                                                <a
+                                                                    href={`http://localhost:8082${resource.fichier_url}`}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="download-link"
+                                                                    onClick={handleDownloadClick}
+                                                                >
+                                                                    <FaDownload className="icon" />
+                                                                    Télécharger
+                                                                </a>
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        handleDeleteResource(resource.ID_ressource);
+                                                                    }}
+                                                                    className="delete-button"
+                                                                >
+                                                                    <FaTrash className="icon" />
+                                                                    Supprimer
+                                                                </button>
                                                             </div>
                                                         </li>
                                                     ))}
@@ -165,25 +214,20 @@ function Home() {
                                         );
                                     })}
                                 </div>
-                            </div>
-                        )
-                    ) : (
-                        <div className="centered-message">
-                            <p>Veuillez sélectionner une section et un module pour afficher les ressources.</p>
+                            )}
                         </div>
-                    )}
+                    </div>
                 </div>
-            </div>
 
-            {selectedResource && (
-                <ResourceModal
-                    resource={selectedResource}
-                    onClose={() => setSelectedResource(null)}
-                    onUpdate={fetchResources}
-                    matricule={matricule}
-                />
-            )}
-        </div>
+                {selectedResource && (
+                    <ResourceModal
+                        resource={selectedResource}
+                        onClose={() => setSelectedResource(null)}
+                        onUpdate={fetchResources}
+                        matricule={matricule}
+                    />
+                )}
+            </div>
         </div>
     );
 }
@@ -196,7 +240,6 @@ const ResourceModal = ({ resource, onClose, onUpdate, matricule }) => {
         description: resource.description || '',
         file: null
     });
-    const [isLoading, setIsLoading] = useState(false);
 
     const handleInputChange = (e) => {
         const { name, value, files } = e.target;
@@ -208,7 +251,13 @@ const ResourceModal = ({ resource, onClose, onUpdate, matricule }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setIsLoading(true);
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('Erreur : Vous devez être connecté.');
+            onClose();
+            return;
+        }
+
         const formDataToSend = new FormData();
         formDataToSend.append('ID_module', resource.ID_module);
         formDataToSend.append('ID_section', resource.ID_section);
@@ -221,124 +270,168 @@ const ResourceModal = ({ resource, onClose, onUpdate, matricule }) => {
         }
 
         try {
-            await apiRequest(`http://localhost:8082/ressources/resources/${resource.ID_ressource}`, {
+            const response = await fetch(`http://localhost:8082/ressources/resources/${resource.ID_ressource}`, {
                 method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'matricule': matricule
+                },
                 body: formDataToSend
             });
-            onUpdate();
-            setIsEditing(false);
-            onClose();
+
+            const result = await response.json();
+            if (response.ok) {
+                onUpdate();
+                setIsEditing(false);
+                onClose();
+            } else {
+                alert(`Erreur: ${result.error || 'Failed to update resource'}`);
+            }
         } catch (error) {
-            console.error('Error updating resource:', error);
             alert('Erreur lors de la mise à jour: ' + error.message);
-        } finally {
-            setIsLoading(false);
         }
     };
 
     return (
-        <div id="ressources">
-        <div className="modal-overlay">
-            <div className="modal-content">
-                <h3>Détails de la Ressource</h3>
-                {!isEditing ? (
-                    <div className="modal-view">
-                        <div className="modal-field">
-                            <label>Nom de la Ressource</label>
-                            <input type="text" value={formData.nom_ressource} disabled />
+        <div id="ressoures">
+            <div className="modal-overlay">
+                <div className="modal-content">
+                    <h3>
+                        <FaInfoCircle className="icon" />
+                        Détails de la Ressource
+                    </h3>
+                    {!isEditing ? (
+                        <div className="modal-view">
+                            <div className="modal-field">
+                                <label>
+                                    <FaFileAlt className="input-icon" />
+                                    Nom de la Ressource
+                                </label>
+                                <input type="text" value={formData.nom_ressource} disabled />
+                            </div>
+                            <div className="modal-field">
+                                <label>
+                                    <FaBook className="input-icon" />
+                                    Type de Ressource
+                                </label>
+                                <input type="text" value={formData.type_ressource} disabled />
+                            </div>
+                            <div className="modal-field">
+                                <label>
+                                    <FaInfoCircle className="input-icon" />
+                                    Description
+                                </label>
+                                <textarea value={formData.description} disabled rows="2" />
+                            </div>
+                            <div className="modal-field">
+                                <label>
+                                    <FaFileUpload className="input-icon" />
+                                    Fichier Actuel
+                                </label>
+                                <a href={`http://localhost:8082${resource.fichier_url}`} target="_blank" rel="noopener noreferrer">
+                                    {resource.fichier_url.split('/').pop()}
+                                </a>
+                            </div>
+                            <div className="modal-field">
+                                <label>
+                                    <FaBook className="input-icon" />
+                                    Module
+                                </label>
+                                <input type="text" value={resource.nom_module} disabled />
+                            </div>
+                            <div className="modal-field">
+                                <label>
+                                    <FaUsers className="input-icon" />
+                                    Section
+                                </label>
+                                <input type="text" value={`${resource.nom_section} - ${resource.niveau} - ${resource.nom_specialite}`} disabled />
+                            </div>
+                            <div className="modal-field">
+                                <label>
+                                    <FaCalendarAlt className="input-icon" />
+                                    Date de Soumission
+                                </label>
+                                <input type="text" value={new Date(resource.date_upload).toLocaleString()} disabled />
+                            </div>
+                            <div className="modal-actions">
+                                <button onClick={() => setIsEditing(true)}>
+                                    <FaEdit className="icon" />
+                                    Modifier
+                                </button>
+                                <button onClick={onClose}>
+                                    <FaTimes className="icon" />
+                                    Fermer
+                                </button>
+                            </div>
                         </div>
-                        <div className="modal-field">
-                            <label>Type de Ressource</label>
-                            <input type="text" value={formData.type_ressource} disabled />
-                        </div>
-                        <div className="modal-field">
-                            <label>Description</label>
-                            <textarea value={formData.description} disabled rows="3" />
-                        </div>
-                        <div className="modal-field">
-                            <label>Fichier Actuel</label>
-                            <a href={`http://localhost:8082${resource.fichier_url}`} target="_blank" rel="noopener noreferrer">
-                                {resource.fichier_url.split('/').pop()}
-                            </a>
-                        </div>
-                        <div className="modal-field">
-                            <label>Module</label>
-                            <input type="text" value={resource.nom_module} disabled />
-                        </div>
-                        <div className="modal-field">
-                            <label>Section</label>
-                            <input type="text" value={`${resource.ID_section}: ${resource.niveau} - ${resource.nom_specialite}`} disabled />
-                        </div>
-                        <div className="modal-field">
-                            <label>Date de Soumission</label>
-                            <input type="text" value={new Date(resource.date_upload).toLocaleString()} disabled />
-                        </div>
-                        <div className="modal-actions">
-                            <button onClick={() => setIsEditing(true)}>Modifier</button>
-                            <button onClick={onClose}>Fermer</button>
-                        </div>
-                    </div>
-                ) : (
-                    <form onSubmit={handleSubmit}>
-                        <div className="modal-field">
-                            <label>Nom de la Ressource</label>
-                            <input
-                                type="text"
-                                name="nom_ressource"
-                                value={formData.nom_ressource}
-                                onChange={handleInputChange}
-                                required
-                            />
-                        </div>
-                        <div className="modal-field">
-                            <label>Type de Ressource</label>
-                            <select name="type_ressource" value={formData.type_ressource} onChange={handleInputChange} required>
-                                <option value="Cours">Cours</option>
-                                <option value="TD">TD</option>
-                                <option value="TP">TP</option>
-                            </select>
-                        </div>
-                        <div className="modal-field">
-                            <label>Description</label>
-                            <textarea name="description" value={formData.description} onChange={handleInputChange} rows="3" />
-                        </div>
-                        <div className="modal-field">
-                            <label>Fichier Actuel</label>
-                            <a href={`http://localhost:8082${resource.fichier_url}`} target="_blank" rel="noopener noreferrer">
-                                {resource.fichier_url.split('/').pop()}
-                            </a>
-                        </div>
-                        <div className="modal-field">
-                            <label>Remplacer le Fichier (Optionnel)</label>
-                            <input
-                                type="file"
-                                name="file"
-                                accept=".pdf,.doc,.docx,.ppt,.pptx,.png"
-                                onChange={handleInputChange}
-                            />
-                        </div>
-                        <div className="modal-field">
-                            <label>Module</label>
-                            <input type="text" value={resource.nom_module} disabled />
-                        </div>
-                        <div className="modal-field">
-                            <label>Section</label>
-                            <input type="text" value={`${resource.ID_section}: ${resource.niveau} - ${resource.nom_specialite}`} disabled />
-                        </div>
-                        <div className="modal-field">
-                            <label>Date de Soumission</label>
-                            <input type="text" value={new Date(resource.date_upload).toLocaleString()} disabled />
-                        </div>
-                        <div className="modal-actions">
-                            <button type="submit" disabled={isLoading}>
-                                {isLoading ? 'Mise à jour...' : 'Mettre à Jour'}
-                            </button>
-                            <button type="button" onClick={() => setIsEditing(false)} disabled={isLoading}>Annuler</button>
-                        </div>
-                    </form>
-                )}
+                    ) : (
+                        <form onSubmit={handleSubmit}>
+                            <div className="modal-field">
+                                <label>
+                                    <FaFileAlt className="input-icon" />
+                                    Nom de la Ressource
+                                </label>
+                                <input
+                                    type="text"
+                                    name="nom_ressource"
+                                    value={formData.nom_ressource}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+                            </div>
+                            <div className="modal-field">
+                                <label>
+                                    <FaBook className="input-icon" />
+                                    Type de Ressource
+                                </label>
+                                <select name="type_ressource" value={formData.type_ressource} onChange={handleInputChange} required>
+                                    <option value="Cours">Cours</option>
+                                    <option value="TD">TD</option>
+                                    <option value="TP">TP</option>
+                                </select>
+                            </div>
+                            <div className="modal-field">
+                                <label>
+                                    <FaInfoCircle className="input-icon" />
+                                    Description
+                                </label>
+                                <textarea name="description" value={formData.description} onChange={handleInputChange} rows="2" />
+                            </div>
+                            <div className="modal-field">
+                                <label>
+                                    <FaFileUpload className="input-icon" />
+                                    Fichier Actuel
+                                </label>
+                                <a href={`http://localhost:8082${resource.fichier_url}`} target="_blank" rel="noopener noreferrer">
+                                    {resource.fichier_url.split('/').pop()}
+                                </a>
+                            </div>
+                            <div className="modal-field">
+                                <label>
+                                    <FaFileUpload className="input-icon" />
+                                    Remplacer le Fichier (Optionnel)
+                                </label>
+                                <input
+                                    type="file"
+                                    name="file"
+                                    accept=".pdf,.doc,.docx,.ppt,.pptx,.png"
+                                    onChange={handleInputChange}
+                                />
+                            </div>
+                            <div className="modal-actions">
+                                <button type="submit">
+                                    <FaEdit className="icon" />
+                                    Mettre à Jour
+                                </button>
+                                <button type="button" onClick={() => setIsEditing(false)}>
+                                    <FaTimes className="icon" />
+                                    Annuler
+                                </button>
+                            </div>
+                        </form>
+                    )}
+                </div>
             </div>
-        </div>
         </div>
     );
 };

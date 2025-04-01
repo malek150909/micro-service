@@ -14,16 +14,27 @@ const storage = multer.diskStorage({
     }
 });
 
-// Filter to accept only image files
+// Filter to accept images, PDFs, and Word documents
 const fileFilter = (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) {
+    const allowedTypes = [
+        'image/jpeg',
+        'image/png',
+        'application/pdf',
+        'application/msword', // .doc
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' // .docx
+    ];
+    if (allowedTypes.includes(file.mimetype)) {
         cb(null, true);
     } else {
-        cb(new Error('Only image files are allowed!'), false);
+        cb(new Error('Seuls les fichiers JPG, PNG, PDF, DOC et DOCX sont autorisés !'), false);
     }
 };
 
-// Initialize multer with the storage and file filter
-const upload = multer({ storage, fileFilter });
+// Initialize multer with the storage, file filter, and size limit
+const upload = multer({
+    storage,
+    fileFilter,
+    limits: { fileSize: 5 * 1024 * 1024 } // Limite à 5 Mo
+});
 
 module.exports = upload;

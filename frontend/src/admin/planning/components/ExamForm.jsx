@@ -1,38 +1,44 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 import { createPortal } from 'react-dom';
-import { FaPlusCircle } from 'react-icons/fa';
+import { FaPlusCircle, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import "../../../admin_css_files/exam.css";
 
-const ExamForm = ({ onAdd, disabled, modules, salles: initialSalles, semestres, sectionId, selectedSemestre, onFilterReset }) => {
+const ExamForm = ({ onAdd, disabled, modules, salles: initialSalles, semestres, sectionId, selectedSemestre, onFilterReset, isFilterApplied }) => {
   const [examData, setExamData] = useState({
     ID_module: '',
     ID_section: sectionId || '',
     exam_date: '',
     time_slot: '',
-    ID_salle: '',
+    ID_salles: [],
     ID_semestre: selectedSemestre || '',
     mode: 'presentiel',
   });
   const [errorMessage, setErrorMessage] = useState('');
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [salles, setSalles] = useState(initialSalles);
+  const [isSalleDropdownOpen, setIsSalleDropdownOpen] = useState(false);
 
+  // Determine if the form should be disabled
+  const isFormDisabled = !sectionId || !isFilterApplied;
+
+  // Reset form when sectionId changes or filters are reset
   useEffect(() => {
-    if (onFilterReset) {
-      setExamData({
-        ID_module: '',
-        ID_section: sectionId || '',
-        exam_date: '',
-        time_slot: '',
-        ID_salle: '',
-        ID_semestre: selectedSemestre || '',
-        mode: 'presentiel',
-      });
-    }
+    setExamData({
+      ID_module: '',
+      ID_section: sectionId || '',
+      exam_date: '',
+      time_slot: '',
+      ID_salles: [],
+      ID_semestre: selectedSemestre || '',
+      mode: 'presentiel',
+    });
+    setIsSalleDropdownOpen(false);
+    setErrorMessage('');
   }, [sectionId, selectedSemestre, onFilterReset]);
 
+  // Fetch available rooms based on date and time slot
   useEffect(() => {
     const fetchSalles = async () => {
       if (examData.exam_date && examData.time_slot && examData.mode === 'presentiel') {
@@ -46,6 +52,7 @@ const ExamForm = ({ onAdd, disabled, modules, salles: initialSalles, semestres, 
           setSalles(response.data);
         } catch (err) {
           console.error('Erreur de récupération des salles:', err);
+          setSalles(initialSalles);
         }
       } else {
         setSalles(initialSalles);
@@ -54,38 +61,58 @@ const ExamForm = ({ onAdd, disabled, modules, salles: initialSalles, semestres, 
     fetchSalles();
   }, [examData.exam_date, examData.time_slot, examData.mode, initialSalles]);
 
+  // Handle form input changes
   const handleChange = (e) => {
-    setExamData({ ...examData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setExamData((prev) => ({ ...prev, [name]: value }));
     setErrorMessage('');
   };
 
+  // Handle room selection/deselection
+  const handleSalleChange = (salleId) => {
+    if (examData.mode === 'en ligne' || isFormDisabled) return; // Prevent changes if mode is "en ligne" or form is disabled
+    setExamData((prev) => {
+      const ID_salles = prev.ID_salles.includes(salleId)
+        ? prev.ID_salles.filter((id) => id !== salleId)
+        : [...prev.ID_salles, salleId];
+      return { ...prev, ID_salles };
+    });
+  };
+
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!disabled && examData.ID_section) {
-      try {
-        await onAdd(examData);
-        setExamData({
-          ID_module: '',
-          ID_section: sectionId || '',
-          exam_date: '',
-          time_slot: '',
-          ID_salle: '',
-          ID_semestre: selectedSemestre || '',
-          mode: 'presentiel',
-        });
-        setErrorMessage('');
-      } catch (err) {
-        setErrorMessage(err.message || 'Une erreur est survenue lors de l’ajout de l’examen.');
-        setShowErrorModal(true);
-      }
+    if (isFormDisabled || disabled) return; // Prevent submission if form is disabled
+    try {
+      await onAdd(examData);
+      setExamData({
+        ID_module: '',
+        ID_section: sectionId || '',
+        exam_date: '',
+        time_slot: '',
+        ID_salles: [],
+        ID_semestre: selectedSemestre || '',
+        mode: 'presentiel',
+      });
+      setErrorMessage('');
+      setIsSalleDropdownOpen(false);
+    } catch (err) {
+      setErrorMessage(err.message || 'Une erreur est survenue lors de l’ajout de l’examen.');
+      setShowErrorModal(true);
     }
+  };
+
+  // Toggle dropdown visibility
+  const toggleSalleDropdown = () => {
+    if (examData.mode === 'en ligne' || isFormDisabled) return; // Prevent toggling if mode is "en ligne" or form is disabled
+    setIsSalleDropdownOpen((prev) => !prev);
   };
 
   return (
     <>
     <div id="exams">
       <motion.div
-        className="form-container"
+        className={`form-container ${isFormDisabled ? 'disabled' : ''}`}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
@@ -95,11 +122,17 @@ const ExamForm = ({ onAdd, disabled, modules, salles: initialSalles, semestres, 
         </h3>
         <form onSubmit={handleSubmit}>
           <input type="hidden" name="ID_section" value={examData.ID_section} />
-          <select name="ID_module" value={examData.ID_module} onChange={handleChange} required disabled={disabled}>
+          <select
+            name="ID_module"
+            value={examData.ID_module}
+            onChange={handleChange}
+            required
+            disabled={isFormDisabled || disabled}
+          >
             <option value="">Sélectionner un Module</option>
             {modules.map((module, index) => (
               <option key={`${module.ID_module}-${index}`} value={module.ID_module}>
-                {`${module.nom_module} (${module.seances})`}
+                {`${module.nom_module}`}
               </option>
             ))}
           </select>
@@ -109,33 +142,69 @@ const ExamForm = ({ onAdd, disabled, modules, salles: initialSalles, semestres, 
             value={examData.exam_date}
             onChange={handleChange}
             required
-            disabled={disabled}
+            disabled={isFormDisabled || disabled}
           />
-          <select name="time_slot" value={examData.time_slot} onChange={handleChange} required disabled={disabled}>
-            <option value="">Sélectionner un Horaire</option>
-            {['08:00 - 09:30', '09:40 - 11:10', '11:20 - 12:50', '13:00 - 14:30', '14:40 - 16:10', '16:20 - 17:50'].map(slot => (
-              <option key={slot} value={slot}>{slot}</option>
-            ))}
-          </select>
-          <select name="mode" value={examData.mode} onChange={handleChange} required disabled={disabled}>
-            <option value="presentiel">Présentiel</option>
-            <option value="en ligne">En Ligne</option>
-          </select>
           <select
-            name="ID_salle"
-            value={examData.ID_salle}
+            name="time_slot"
+            value={examData.time_slot}
             onChange={handleChange}
-            required={examData.mode === 'presentiel'}
-            disabled={disabled || examData.mode === 'en ligne'}
+            required
+            disabled={isFormDisabled || disabled}
           >
-            <option value="">Sélectionner une Salle</option>
-            {salles.map((salle, index) => (
-              <option key={`${salle.ID_salle}-${index}`} value={salle.ID_salle} disabled={!salle.available}>
-                {salle.ID_salle} (Capacité: {salle.capacite}) {salle.available ? '' : '- Indisponible'}
+            <option value="">Sélectionner un Horaire</option>
+            {[
+              '08:00 - 09:30',
+              '09:40 - 11:10',
+              '11:20 - 12:50',
+              '13:00 - 14:30',
+              '14:40 - 16:10',
+              '16:20 - 17:50',
+            ].map((slot) => (
+              <option key={slot} value={slot}>
+                {slot}
               </option>
             ))}
           </select>
-          <button type="submit" disabled={disabled}>
+          <select
+            name="mode"
+            value={examData.mode}
+            onChange={handleChange}
+            required
+            disabled={isFormDisabled || disabled}
+          >
+            <option value="presentiel">Présentiel</option>
+            <option value="en ligne">En Ligne</option>
+          </select>
+          <div className={`custom-dropdown ${isSalleDropdownOpen ? 'open' : ''} ${examData.mode === 'en ligne' || isFormDisabled ? 'disabled' : ''}`}>
+            <div className="dropdown-header" onClick={toggleSalleDropdown}>
+              <span>
+                {examData.ID_salles.length > 0
+                  ? `${examData.ID_salles.length} salle(s) sélectionnée(s)`
+                  : 'Sélectionner des Salles'}
+              </span>
+              {isSalleDropdownOpen ? <FaChevronUp /> : <FaChevronDown />}
+            </div>
+            {isSalleDropdownOpen && examData.mode === 'presentiel' && !isFormDisabled && (
+              <div className="dropdown-menu">
+                {salles.map((salle, index) => (
+                  <label
+                    key={`${salle.ID_salle}-${index}`}
+                    className="checkbox-label"
+                  >
+                    <input
+                      type="checkbox"
+                      value={salle.ID_salle}
+                      checked={examData.ID_salles.includes(String(salle.ID_salle))}
+                      onChange={() => handleSalleChange(String(salle.ID_salle))}
+                      disabled={!salle.available}
+                    />
+                    {salle.nom_salle} (Capacité: {salle.capacite}) {salle.available ? '' : '- Indisponible'}
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+          <button type="submit" disabled={isFormDisabled || disabled}>
             <FaPlusCircle style={{ marginRight: '8px' }} /> Ajouter Examen
           </button>
         </form>
@@ -165,7 +234,7 @@ const ExamForm = ({ onAdd, disabled, modules, salles: initialSalles, semestres, 
         </motion.div>,
         document.body
       )}
-      </div>
+    </div>
     </>
   );
 };

@@ -39,80 +39,68 @@ const ModuleList = ({ modules, onDelete, onUpdate, niveau }) => {
 
   const handleSave = (updatedData) => {
     onUpdate(selectedModule.ID_module, updatedData);
+    setSelectedModule(null);
   };
 
   return (
     <div id="modules">
-      <div className="module-list">
-        <div className="semestre-columns">
-          <div className="semestre-column">
-            <h3>{label1}</h3>
-            {semestreGroup1.length > 0 ? (
-              semestreGroup1.map((module) => (
-                <motion.div
-                  key={module.ID_module}
-                  className="module-item"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <span
-                    className="module-name"
-                    onClick={() => handleModuleClick(module)}
-                  >
-                    {module.nom_module} ({module.seances})
-                  </span>
-                  <button
-                    onClick={() => onDelete(module.ID_module)}
-                    className="delete-button"
-                  >
-                    Supprimer
-                  </button>
-                </motion.div>
-              ))
-            ) : (
-              <p>Aucun module pour {label1}</p>
-            )}
-          </div>
-          <div className="semestre-column">
-            <h3>{label2}</h3>
-            {semestreGroup2.length > 0 ? (
-              semestreGroup2.map((module) => (
-                <motion.div
-                  key={module.ID_module}
-                  className="module-item"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <span
-                    className="module-name"
-                    onClick={() => handleModuleClick(module)}
-                  >
-                    {module.nom_module} ({module.seances})
-                  </span>
-                  <button
-                    onClick={() => onDelete(module.ID_module)}
-                    className="delete-button"
-                  >
-                    Supprimer
-                  </button>
-                </motion.div>
-              ))
-            ) : (
-              <p>Aucun module pour {label2}</p>
-            )}
-          </div>
+    <div className="module-list">
+      <div className="semestre-columns">
+        <div className="semestre-column">
+          <h3>{label1}</h3>
+          {semestreGroup1.length > 0 ? (
+            semestreGroup1.map((module) => (
+              <motion.div
+                key={module.ID_module}
+                className="module-item"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                <span className="module-name" onClick={() => handleModuleClick(module)}>
+                  {module.nom_module} ({module.seances})
+                </span>
+                <button onClick={() => onDelete(module.ID_module)} className="delete-button">
+                  Supprimer
+                </button>
+              </motion.div>
+            ))
+          ) : (
+            <p>Aucun module pour {label1}</p>
+          )}
         </div>
-
-        {selectedModule && (
-          <ModuleModal
-            module={selectedModule}
-            onClose={handleCloseModal}
-            onSave={handleSave}
-          />
-        )}
+        <div className="semestre-column">
+          <h3>{label2}</h3>
+          {semestreGroup2.length > 0 ? (
+            semestreGroup2.map((module) => (
+              <motion.div
+                key={module.ID_module}
+                className="module-item"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                <span className="module-name" onClick={() => handleModuleClick(module)}>
+                  {module.nom_module} ({module.seances})
+                </span>
+                <button onClick={() => onDelete(module.ID_module)} className="delete-button">
+                  Supprimer
+                </button>
+              </motion.div>
+            ))
+          ) : (
+            <p>Aucun module pour {label2}</p>
+          )}
+        </div>
       </div>
+      {selectedModule && (
+        <ModuleModal
+          module={selectedModule}
+          onClose={handleCloseModal}
+          onSave={handleSave}
+        />
+      )}
+    </div>
     </div>
   );
 };

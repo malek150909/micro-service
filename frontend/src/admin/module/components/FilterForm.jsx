@@ -152,14 +152,14 @@ const FilterForm = ({ onFilter }) => {
 
   return (
     <div id="modules">
+    <div className="form-container">
       <motion.div
-        className="form-container"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h3>Filtrer les Modules</h3>
-        <form onSubmit={handleSubmit}>
+        <h3>Chercher les modules d'une Section</h3>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
           <select name="faculte" value={filters.faculte} onChange={handleChange}>
             <option value="">Sélectionner une Faculté</option>
             {faculteOptions.map((option) => (
@@ -208,6 +208,7 @@ const FilterForm = ({ onFilter }) => {
           <button type="submit">Filtrer</button>
         </form>
       </motion.div>
+    </div>
     </div>
   );
 };

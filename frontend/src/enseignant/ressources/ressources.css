@@ -1,309 +1,510 @@
-/* Home Page Styles */
 #ressources{
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Poppins", sans-serif;
+    background: linear-gradient(135deg, #ffffff 0%, #86b4ec 50%, #082e54 100%);
+    background-attachment: fixed;
+    margin: 0;
+    padding: 0;
+    color: #021024;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Main Container */
 .container {
-    max-width: 1200px;
-    width: 90%;
-    margin: 10px auto;
-    padding: 10px;
-    background: #a3bffa; /* Medium muted blue background */
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    text-align: center;
+    max-width: 1600px;
+    margin: 30px auto;
+    padding: 0;
     position: relative;
-    z-index: 1;
-    animation: containerGlow 7s ease infinite;
-    min-height: calc(100vh - 20px);
+}
+
+/* Sidebar */
+.sidebar {
+    background: linear-gradient(135deg, rgba(91, 135, 179, 0.95) 0%, rgba(17, 69, 148, 0.95) 100%);
+    border-radius: 0;
+    padding: 25px;
+    color: #ffffff;
     display: flex;
     flex-direction: column;
-    overflow: hidden; /* Prevent container from scrolling */
-}
-
-h2, h3 {
-    font-weight: 600;
-    color: #ffffff; /* White text for headings */
-    text-align: center;
-    padding: 6px;
-    border: 1px solid rgba(255, 255, 255, 0.2); /* White border with opacity */
-    border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    margin: 0 0 10px;
-    font-size: 1.3rem;
-}
-
-.resources-list h3 {
-    margin: 0;
-    padding: 8px;
-    background: #6495ed; /* Soft cornflower blue background */
-    color: #ffffff; /* White text */
-    font-weight: 600;
-    font-size: 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    text-align: left;
-    border-radius: 10px 10px 0 0;
-}
-
-/* Button Container for "Retourner" Button */
-.button-container {
-    display: flex;
-    justify-content: flex-start; /* Align button to the left */
-    margin-bottom: 15px; /* Add space below to prevent touching the home-layout */
-    background: transparent; /* No background to avoid clashing with the container */
-    padding: 0; /* Remove padding to avoid extra width */
-}
-
-/* Two-Column Layout for Home Page */
-.home-layout {
-    display: flex;
-    flex-wrap: wrap;
     gap: 15px;
-    align-items: stretch;
-    flex: 1;
-    overflow: hidden; /* Prevent home-layout from scrolling */
+    position: fixed;
+    top: 0;
+    left: 30px;
+    width: 220px; /* Increased from 180px for a wider sidebar */
+    height: 100vh;
+    box-shadow: 0 15px 40px rgba(37, 100, 194, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    animation: slideIn 0.5s ease-out;
 }
 
-.form-column {
-    flex: 1;
-    min-width: 300px;
-    max-width: 350px;
-    overflow: hidden; /* Prevent form-column from scrolling */
+@keyframes slideIn {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
 }
 
-.resources-column {
-    flex: 2;
-    min-width: 300px;
-    max-height: calc(100vh - 150px); /* Adjusted to fit within viewport */
-    overflow-y: auto; /* Allow scrolling for resources */
-    -webkit-overflow-scrolling: touch; /* Improve scrolling on touch devices */
-}
-
-/* Centered Message Styles */
-.centered-message {
+.logo {
     display: flex;
     align-items: center;
-    justify-content: center;
-    height: 100%;
-    text-align: center;
-    width: 100%;
+    gap: 10px;
+    margin-bottom: 15px;
 }
 
-.centered-message p {
-    font-size: 1.1rem;
-    color: #1e3a8a; /* Dark blue text */
-    background: rgba(100, 149, 237, 0.2); /* Subtle blue background */
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    max-width: 80%;
-}
-
-/* Resources List Styles */
-.resources-list {
-    background: #c3dafe; /* Light muted blue background */
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    animation: fadeIn 0.5s ease-out;
-    min-height: 100%; /* Ensure it takes the full height of the parent */
-}
-
-.resource-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 8px;
-    padding: 8px;
-}
-
-.resource-section {
-    margin-bottom: 8px;
-    background: #dbe9fe; /* Very light muted blue background */
-    border-radius: 10px;
-    overflow: hidden;
-    transition: transform 0.3s ease;
-}
-
-.resource-section:hover {
-    transform: translateY(-3px);
-}
-
-.resources-list ul {
-    list-style-type: none;
-    padding: 0;
+.logo h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
     margin: 0;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.resources-list li {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid rgba(100, 149, 237, 0.2); /* Subtle blue border */
-    background-color: #e6f0fa; /* Very light blue background */
-    border-radius: 8px;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    margin-bottom: 8px; /* Add space between list items */
+.logo .icon {
+    font-size: 1.5rem; /* Match h2 size for consistency */
+    color: #ffffff; /* Ensure the user icon is visible */
 }
 
-.resources-list li:hover {
-    background-color: #c3dafe; /* Light muted blue on hover */
-    transform: translateX(5px);
+/* Sidebar Button */
+.sidebar-button {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
 }
 
-/* Resource Info Styles */
-.resource-info {
+.sidebar-button:hover {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(125, 160, 202, 0.5));
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+.sidebar-button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: all 0.5s ease;
+}
+
+.sidebar-button:hover::before {
+    left: 100%;
+}
+
+/* Main Content */
+.main-content {
+    margin-left: 350px; /* Adjusted for wider sidebar (220px + 30px left + 100px spacing) */
+    margin-right: 30px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 30px;
 }
 
-.resource-name {
-    font-size: 1.1rem;
-    color: #1e3a8a; /* Dark blue for the resource name */
+/* Header */
+.header {
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15), 0 0 20px rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+}
+
+.header h1 {
+    font-size: 1.8rem;
     font-weight: 600;
-}
-
-.resource-description {
-    font-size: 0.9rem;
-    color: #64748b; /* Muted grayish-blue for description */
+    color: #052659;
     margin: 0;
-    line-height: 1.4;
-}
-
-.resource-date {
-    font-size: 0.85rem;
-    color: #1e3a8a; /* Dark blue for the date */
-    margin: 0;
-}
-
-.resource-actions {
     display: flex;
-    gap: 8px;
-    margin-top: 6px;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 3px rgba(5, 38, 89, 0.1);
 }
 
-.download-link {
-    color: #4682b4; /* Steel blue for links */
-    text-decoration: none;
-    font-weight: 500;
-    padding: 4px 8px;
-    border-radius: 5px;
-    background: rgba(100, 149, 237, 0.1); /* Subtle blue background */
-    transition: background 0.3s ease, color 0.3s ease;
+.header p {
+    font-size: 1rem;
+    color: #5483b3;
+    margin: 8px 0 0;
 }
 
-.download-link:hover {
-    color: #1e3a8a; /* Dark blue on hover */
-    background: rgba(100, 149, 237, 0.3); /* Slightly darker background on hover */
-    text-decoration: underline; /* Add underline on hover for clarity */
+/* Content Grid */
+.content-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 30px;
 }
 
-/* Form Group Styles (for Home Page) */
+/* Form Section */
+.form-container {
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15), 0 0 20px rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.form-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #052659;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: 0.5px;
+    position: relative;
+    padding-bottom: 10px;
+    background: linear-gradient(90deg, #0d3155, #7DA0CA);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: all 0.4s ease;
+}
+
+.form-title:hover {
+    transform: scale(1.02);
+}
+
+.form-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 2px;
+    background: linear-gradient(90deg, #06223e, #7DA0CA);
+    transition: width 0.4s ease;
+}
+
+.form-title:hover::after {
+    width: 100%;
+}
+
+/* Form Group Styles */
 .form-group {
     display: flex;
     flex-direction: column;
-    align-items: stretch;
-    gap: 0.8rem;
-    background-color: #c3dafe; /* Light muted blue background */
-    padding: 1rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 100%;
+    gap: 20px;
 }
 
-.form-group label {
-    font-size: 1rem;
-    color: #1e3a8a; /* Dark blue for labels */
-    font-weight: bold;
-}
-
-.form-group .form-field {
+.input-group {
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
-    width: 100%;
+    gap: 10px;
+}
+
+.input-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    color: #052659;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.input-group label .input-icon {
+    font-size: 1.1rem;
+    color: #5483b3;
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
-    padding: 8px;
-    border: 1px solid rgba(100, 149, 237, 0.3); /* Subtle blue border */
-    border-radius: 8px;
-    font-size: 0.9rem;
-    background: #e6f0fa; /* Very light blue background */
-    color: #1e3a8a; /* Dark blue text */
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    padding: 15px;
+    border: 1px solid rgba(84, 131, 179, 0.2);
+    border-radius: 12px;
+    font-size: 0.95rem;
+    background: #f0f7ff;
+    color: #052659;
     width: 100%;
+    box-shadow: 0 4px 15px rgba(5, 38, 89, 0.05);
+    transition: all 0.3s ease;
     box-sizing: border-box;
-}
-
-.form-group input::placeholder {
-    color: #94a3b8; /* Muted grayish-blue placeholder */
 }
 
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
-    border-color: #6495ed; /* Soft cornflower blue border on focus */
-    box-shadow: 0 0 6px rgba(100, 149, 237, 0.3);
+    border-color: #5483b3;
+    box-shadow: 0 0 15px rgba(84, 131, 179, 0.2);
     outline: none;
 }
 
-.form-group .error-message {
-    font-size: 0.8rem;
-    color: #ef4444; /* Red for error messages */
-    margin: 0;
-    text-align: center;
+.form-group textarea,
+.form-group select {
+    padding-left: 15px;
 }
 
-.form-group button {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.9rem;
-    background: linear-gradient(to right, #4682b4, #6495ed); /* Steel blue to cornflower blue gradient */
-    color: #ffffff; /* White text */
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease;
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: #7da0ca;
+}
+
+/* Custom File Input */
+.custom-file-input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     width: 100%;
-    max-width: 120px;
-    position: relative;
-    z-index: 2;
 }
 
-.form-group button:hover {
-    background: linear-gradient(to right, #1e3a8a, #4682b4); /* Dark blue to steel blue gradient on hover */
-    transform: scale(1.05);
+.custom-file-input input[type="file"] {
+    display: none;
 }
 
-/* Button Styles */
-button {
-    background: linear-gradient(135deg, #4682b4, #6495ed); /* Steel blue to cornflower blue gradient */
-    color: #ffffff; /* White text */
-    padding: 6px 12px;
-    border: none;
-    border-radius: 18px;
-    font-size: 0.9rem;
+.custom-file-label {
+    background: #5483b3;
+    color: #ffffff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
     font-weight: 500;
     cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-    margin: 0 4px;
-    max-width: 120px;
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 8px;
+    box-shadow: 0 2px 5px rgba(5, 38, 89, 0.1);
+    transition: background 0.3s ease;
+}
+
+.custom-file-label:hover {
+    background: #7da0ca;
+}
+
+.file-name {
+    font-size: 0.85rem;
+    color: #5483b3;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Resources List */
+.resources-list {
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15), 0 0 20px rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    position: relative;
+    height: 825px; /*  for the resources list container */
+    display: flex;
+    flex-direction: column;
+}
+
+.resources-list h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #052659;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: 0.5px;
+    position: relative;
+    padding-bottom: 10px;
+    background: linear-gradient(90deg, #0c3156, #7DA0CA);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: all 0.4s ease;
+}
+
+.resources-list h3:hover {
+    transform: scale(1.02);
+}
+
+.resources-list h3::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 2px;
+    background: linear-gradient(90deg, #042649, #7DA0CA);
+    transition: width 0.4s ease;
+}
+
+.resources-list h3:hover::after {
+    width: 100%;
+}
+
+.resource-grid {
+    flex: 1; /* Take up remaining space in the resources-list */
+    overflow-y: auto; /* Enable scrolling for the entire grid if needed */
+    padding-right: 10px; /* Add padding to avoid content touching the scrollbar */
+}
+
+.resource-grid::-webkit-scrollbar {
+    width: 6px;
+}
+
+.resource-grid::-webkit-scrollbar-track {
+    background: #f0f7ff;
+    border-radius: 10px;
+}
+
+.resource-grid::-webkit-scrollbar-thumb {
+    background: #7da0ca;
+    border-radius: 10px;
+}
+
+.resource-section {
+    margin-bottom: 20px;
+}
+
+.resource-section h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #173d78;
+    margin-bottom: 10px;
+    letter-spacing: 0.3px;
+}
+
+.resource-section ul {
+    list-style: none;
+    padding: 0;
+    max-height: 200px; /* Fixed height for each section (Cours, TD, TP) */
+    overflow-y: auto; /* Enable scrolling within each section */
+}
+
+.resource-section ul::-webkit-scrollbar {
+    width: 6px;
+}
+
+.resource-section ul::-webkit-scrollbar-track {
+    background: #f0f7ff;
+    border-radius: 10px;
+}
+
+.resource-section ul::-webkit-scrollbar-thumb {
+    background: #7da0ca;
+    border-radius: 10px;
+}
+
+.resource-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.7);
+    margin-bottom: 12px;
+    box-shadow: 0 4px 15px rgba(5, 38, 89, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(5px);
+}
+
+.resource-info h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #173d78;
+    margin: 0;
+    letter-spacing: 0.3px;
+}
+
+.resource-info p {
+    font-size: 0.9rem;
+    color: #5483b3;
+    margin: 10px 0 0;
+}
+
+.resource-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.download-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #335c86;
+    color: #ffffff;
+    padding: 8px 16px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    box-shadow: 0 4px 15px rgba(5, 38, 89, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.download-link:hover {
+    transform: translateY(-2px);
+    background: #5483b3;
+    color: #ffffff;
+}
+
+/* Buttons */
+button {
+    background: linear-gradient(135deg, #5483b3 0%, #052659 100%);
+    color: #ffffff;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 8px 20px rgba(5, 38, 89, 0.1);
+    transition: all 0.3s ease;
+    letter-spacing: 0.3px;
+    position: relative;
+    overflow: hidden;
 }
 
 button:hover {
-    background: linear-gradient(135deg, #1e3a8a, #4682b4); /* Dark blue to steel blue gradient on hover */
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(5, 38, 89, 0.15), 0 0 15px rgba(125, 160, 202, 0.4);
 }
 
-button.delete-button {
-    background: linear-gradient(135deg, #ef4444, #f87171); /* Red gradient for delete buttons */
+button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: all 0.5s ease;
 }
 
-button.delete-button:hover {
-    background: linear-gradient(135deg, #dc2626, #ef4444); /* Slightly darker red gradient on hover */
+button:hover::before {
+    left: 100%;
+}
+
+.delete-button {
+    background: linear-gradient(135deg, #052659 0%, #021024 100%);
 }
 
 /* Message Styles */
@@ -312,8 +513,8 @@ button.delete-button:hover {
     margin-top: 8px;
     border-radius: 8px;
     text-align: center;
-    background-color: #22c55e; /* Green for success messages */
-    color: #ffffff; /* White text */
+    background-color: #22c55e;
+    color: #ffffff;
     font-size: 0.9rem;
     max-width: 300px;
     margin-left: auto;
@@ -322,7 +523,13 @@ button.delete-button:hover {
 }
 
 .message.error {
-    background-color: #ef4444; /* Red for error messages */
+    background-color: #ef4444;
+}
+
+@keyframes fadeOut {
+    0% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; }
 }
 
 /* Modal Styles */
@@ -330,130 +537,220 @@ button.delete-button:hover {
     position: fixed;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.6); /* Darker overlay for contrast */
+    width: 100%;
+    height: 100%;
+    background: rgba(5, 38, 89, 0.5);
+    backdrop-filter: blur(8px);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
-    animation: fadeIn 0.3s ease-out;
+    padding: 20px;
+    box-sizing: border-box;
+    animation: fadeIn 0.3s ease-in-out; /* Add fade-in animation for the overlay */
 }
 
 .modal-content {
-    background: #c3dafe; /* Light muted blue background */
-    padding: 12px;
-    border-radius: 12px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-    width: 380px;
-    max-width: 90%;
-    animation: formPop 0.5s ease-out;
+    width: 100%;
+    max-width: 500px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 15px 40px rgba(5, 38, 89, 0.2), 0 0 20px rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(84, 131, 179, 0.2);
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: scaleIn 0.3s ease-in-out; /* Add scale-in animation for the content */
+}
+
+/* Fade-in animation for the modal overlay */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Scale-in animation for the modal content */
+@keyframes scaleIn {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 .modal-content h3 {
+    font-size: 1.4rem;
     font-weight: 600;
-    color: #1e3a8a; /* Dark blue for headings */
+    color: #052659;
+    margin-bottom: 15px;
     text-align: center;
-    margin-bottom: 8px;
-    font-size: 1.2rem;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 3px rgba(5, 38, 89, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
 }
 
 .modal-field {
-    margin-bottom: 8px;
+    margin-bottom: 12px;
+    width: 100%; /* Ensure the field takes the full width of the centered container */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center the label and input within the field */
 }
 
 .modal-field label {
-    display: block;
-    margin-bottom: 4px;
-    font-weight: 500;
-    color: #1e3a8a; /* Dark blue for labels */
+    display: flex;
+    align-items: center;
+    gap: 8px;
     font-size: 0.9rem;
+    color: #052659;
+    font-weight: 500;
+    margin-bottom: 6px;
+    justify-content: center; /* Center the label text and icon */
+}
+
+.modal-field label .input-icon {
+    font-size: 1.1rem;
+    color: #5483b3;
 }
 
 .modal-field input,
 .modal-field select,
 .modal-field textarea {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid rgba(100, 149, 237, 0.3); /* Subtle blue border */
-    border-radius: 8px;
+    padding: 10px;
+    border: 1px solid rgba(84, 131, 179, 0.2);
+    border-radius: 12px;
     font-size: 0.9rem;
-    background: #e6f0fa; /* Very light blue background */
-    color: #1e3a8a; /* Dark blue text */
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    background: #f0f7ff;
+    color: #052659;
+    width: 80%; /* Reduce width to center the input visually */
+    box-shadow: 0 4px 15px rgba(5, 38, 89, 0.05);
+    transition: all 0.3s ease;
+    text-align: center; /* Center the text inside inputs */
 }
 
 .modal-field input:focus,
 .modal-field select:focus,
 .modal-field textarea:focus {
-    border-color: #6495ed; /* Soft cornflower blue border on focus */
-    box-shadow: 0 0 6px rgba(100, 149, 237, 0.3);
+    border-color: #5483b3;
+    box-shadow: 0 0 15px rgba(84, 131, 179, 0.2);
     outline: none;
+}
+
+.modal-field a {
+    font-size: 0.9rem;
+    color: #5483b3;
+    text-decoration: none;
+    text-align: center;
+    width: 80%; /* Match the width of inputs for consistency */
+    display: block; /* Ensure the link takes the full width for centering */
+}
+
+.modal-field a:hover {
+    text-decoration: underline;
 }
 
 .modal-actions {
     display: flex;
-    justify-content: space-between;
-    margin-top: 8px;
-    gap: 8px;
+    gap: 10px;
+    margin-top: 15px;
+    justify-content: center;
 }
 
-.modal-actions button {
-    padding: 6px 12px;
-    border: none;
-    border-radius: 18px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-    flex: 1;
+/* No Results Message */
+.no-results {
+    text-align: center;
+    color: #5483b3;
+    font-size: 1rem;
+    padding: 25px;
 }
 
-.modal-actions button:first-child {
-    background: linear-gradient(135deg, #22c55e, #4ade80); /* Green gradient for confirm buttons */
-    color: #ffffff;
+/* Icons */
+.icon {
+    font-size: 1rem;
+    color: inherit;
 }
 
-.modal-actions button:first-child:hover {
-    background: linear-gradient(135deg, #16a34a, #22c55e);
+/* Responsive Design */
+@media (max-width: 992px) {
+    .sidebar {
+        position: relative;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: auto;
+        margin-bottom: 30px;
+        padding: 20px;
+    }
+
+    .main-content {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+.resources-list {
+        height: 500px; /* Slightly smaller height for smaller screens */
+    }
+
+    .resource-section ul {
+        max-height: 120px; /* Slightly smaller height for smaller screens */
+    }
+
 }
 
-.modal-actions button:last-child {
-    background: linear-gradient(135deg, #ef4444, #f87171); /* Red gradient for cancel buttons */
-    color: #ffffff;
-}
+@media (max-width: 576px) {
+    .modal-content {
+        max-width: 90%;
+        padding: 15px;
+    }
 
-.modal-actions button:last-child:hover {
-    background: linear-gradient(135deg, #dc2626, #ef4444);
-}
+    .modal-content h3 {
+        font-size: 1.2rem;
+    }
 
-}
+    .modal-field label {
+        font-size: 0.85rem;
+    }
 
-/* Animations */
-@keyframes waveMove {
-    0% { background-position: 0 100%; }
-    100% { background-position: -1440px 100%; }
-}
+    .modal-field input,
+    .modal-field select,
+    .modal-field textarea {
+        font-size: 0.85rem;
+        padding: 8px;
+    }
 
-@keyframes containerGlow {
-    0%, 100% { box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); }
-    50% { box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1), 0 0 10px rgba(100, 149, 237, 0.2); }
-}
+    .modal-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
 
-@keyframes formPop {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-}
+    .custom-file-input {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
+    .custom-file-label {
+        width: 100%;
+        justify-content: center;
+    }
 
-@keyframes fadeOut {
-    0% { opacity: 0; }
-    10% { opacity: 1; }
-    90% { opacity: 1; }
-    100% { opacity: 0; }
+    .file-name {
+        width: 100%;
+        text-align: center;
+    }
+}
 }

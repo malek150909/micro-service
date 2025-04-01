@@ -10,6 +10,7 @@ const resourceRoutes = require('./routes/resourceRoutes');
 const annonceENSroutes = require('./routes/annonceENSroutes');
 const authENSroutes = require('./routes/authENSroutes');
 const annonceETDRoutes = require('./routes/annonceEtudiantRoutes');
+const sondageRoutes = require('./routes/sondageRoutes');
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use('/ressources', resourceRoutes);
 app.use('/annoncesENS', annonceENSroutes); // Routes maintenant après le parsing
 app.use('/authENSannonce', authENSroutes);
 app.use('/annoncesETD', annonceETDRoutes);
+app.use('/sondages', sondageRoutes);
 
 // Serve static files
 app.use('/uploads', express.static(path.resolve(__dirname, 'uploads')));

@@ -27,7 +27,7 @@ const ModuleForm = ({ onAdd, disabled, niveau }) => {
     credit: '',
     coefficient: '',
     semestre: defaultSemestre,
-    seances: 'Cour/TD', // Valeur par défaut reste Cour/TD
+    seances: 'Cour/TD',
   });
 
   const handleChange = (e) => {
@@ -51,14 +51,14 @@ const ModuleForm = ({ onAdd, disabled, niveau }) => {
 
   return (
     <div id="modules">
+    <div className="form-container">
       <motion.div
-        className="form-container"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
         <h3>Ajouter un Nouveau Module</h3>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
           <input
             type="text"
             name="nom_module"
@@ -99,7 +99,6 @@ const ModuleForm = ({ onAdd, disabled, niveau }) => {
             value={moduleData.semestre}
             onChange={handleChange}
             required
-            className="semester-select"
             disabled={disabled}
           >
             <option value="">Sélectionner un Semestre</option>
@@ -114,7 +113,6 @@ const ModuleForm = ({ onAdd, disabled, niveau }) => {
             value={moduleData.seances}
             onChange={handleChange}
             required
-            className="seances-select"
             disabled={disabled}
           >
             <option value="">Sélectionner les Séances</option>
@@ -127,6 +125,7 @@ const ModuleForm = ({ onAdd, disabled, niveau }) => {
           <button type="submit" disabled={disabled}>Ajouter Module</button>
         </form>
       </motion.div>
+    </div>
     </div>
   );
 };

@@ -4,12 +4,14 @@ const db = require('../config/db');
 const cors = require('cors');
 const enseignantRoutes = require('../routes/enseignantRoute');
 const etudiantRoutes = require('../routes/etudiantRoute');
+const teacherRoutes = require('../routes/etudiantENSRoute');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use('/api', enseignantRoutes);
-app.use('/apii', etudiantRoutes);
+app.use('/listeETD', etudiantRoutes);
+app.use('/ENSlisteETD', teacherRoutes);
 
 const PORT = 8081;
 const JWT_SECRET = process.env.JWT_SECRET;

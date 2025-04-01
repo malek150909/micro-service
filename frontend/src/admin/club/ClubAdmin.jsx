@@ -460,7 +460,7 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
           <FaEnvelope /> Gérer les Demandes
         </button>
         <button className="sidebar-button" onClick={() => navigate('/admin')}>
-          <FaUsers /> Déconnexion
+          <FaUsers /> Retour á l'accueil
         </button>
         {activeTab === 'clubs' && (
           <button className="sidebar-button" onClick={() => setShowModal(true)}>

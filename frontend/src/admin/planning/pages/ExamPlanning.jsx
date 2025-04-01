@@ -8,10 +8,9 @@ import { saveAs } from "file-saver";
 import FilterForm from "../components/FilterForm";
 import ExamForm from "../components/ExamForm";
 import ExamList from "../components/ExamList";
-import "../../../admin_css_files/exam.css";
-import { FaFilePdf, FaFileExcel, FaArrowLeft, FaUser } from 'react-icons/fa'; // Added FaUser
+import { FaFilePdf, FaFileExcel, FaArrowLeft, FaUser } from 'react-icons/fa';
+import "../../../admin_css_files/exam.css" ;
 
-// Memoize child components to prevent unnecessary re-renders
 const MemoizedFilterForm = memo(FilterForm);
 const MemoizedExamForm = memo(ExamForm);
 const MemoizedExamList = memo(ExamList);
@@ -59,7 +58,6 @@ const ExamPlanning = () => {
         params: currentFilters,
       });
       const normalizedExams = response.data.map((exam) => {
-        console.log("Fetched exam:", exam);
         return {
           ...exam,
           exam_date: exam.exam_date,
@@ -128,6 +126,24 @@ const ExamPlanning = () => {
     }
   }, [nameCache]);
 
+  const handleFilterChange = useCallback((newFilters) => {
+    // Reset state whenever a filter attribute changes
+    setIsFilterApplied(false);
+    setExams([]);
+    setModules([]);
+    setFilters({
+      faculte: newFilters.faculte,
+      faculteName: filters.faculteName,
+      departement: newFilters.departement,
+      departementName: filters.departementName,
+      niveau: newFilters.niveau,
+      specialite: newFilters.specialite,
+      specialiteName: filters.specialiteName,
+      section: newFilters.section,
+      ID_semestre: newFilters.ID_semestre,
+    });
+  }, [filters]);
+
   const handleFilter = useCallback(async (newFilters) => {
     const faculteName = await fetchName(
       `${API_URL}/exams/facultes`,
@@ -155,15 +171,32 @@ const ExamPlanning = () => {
       specialiteName,
     };
     setFilters(updatedFilters);
-    if (newFilters.section) {
-      await fetchModulesBySection(newFilters.section, newFilters.ID_semestre);
-    }
+
+    // Section is selected, apply filter and fetch modules/exams
     setIsFilterApplied(true);
-    await fetchExams(newFilters);
+    await fetchModulesBySection(newFilters.section, newFilters.ID_semestre);
+    await fetchExams(updatedFilters);
     if (examListRef.current) {
       examListRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [fetchName, fetchModulesBySection, fetchExams]);
+
+  const handleResetFilters = useCallback(() => {
+    setFilters({
+      faculte: "",
+      faculteName: "",
+      departement: "",
+      departementName: "",
+      niveau: "",
+      specialite: "",
+      specialiteName: "",
+      section: "",
+      ID_semestre: "",
+    });
+    setModules([]);
+    setExams([]);
+    setIsFilterApplied(false); // Reset filter applied state
+  }, []);
 
   const handleAddExam = async (examData) => {
     const selectedModuleId = parseInt(examData.ID_module);
@@ -189,15 +222,12 @@ const ExamPlanning = () => {
       throw new Error("ID de l'examen manquant.");
     }
 
-    // Convert ID_module to number for comparison
     const selectedModuleId = parseInt(examData.ID_module);
 
-    // Validate that the selected module exists in the modules list
     if (!modules.some((m) => m.ID_module === selectedModuleId)) {
       throw new Error("Le module sélectionné n'est pas valide ou n'appartient pas à la section sélectionnée.");
     }
 
-    // Validate for duplicates (same date, time, and module)
     const response = await axios.get(`${API_URL}/exams`, {
       params: {
         ID_section: examData.ID_section,
@@ -205,7 +235,7 @@ const ExamPlanning = () => {
       },
     });
 
-    const existingExams = response.data.filter((exam) => exam.ID_exam !== id); // Exclude the current exam
+    const existingExams = response.data.filter((exam) => exam.ID_exam !== id);
 
     const hasDuplicate = existingExams.some((exam) => {
       return (
@@ -228,10 +258,9 @@ const ExamPlanning = () => {
         exam_date: examData.exam_date,
         time_slot: examData.time_slot,
         mode: examData.mode,
-        ID_salle: examData.mode === 'en ligne' ? null : examData.ID_salle,
+        ID_salles: examData.mode === 'en ligne' ? [] : examData.ID_salles,
         ID_module: selectedModuleId,
       };
-      console.log("Sending update request for ID:", id, "with data:", updatedExamData);
       await axios.put(`${API_URL}/exams/${id}`, updatedExamData);
       await fetchExams(filters);
       setError(null);
@@ -248,7 +277,6 @@ const ExamPlanning = () => {
       return;
     }
     try {
-      console.log("Sending delete request for ID:", id);
       await axios.delete(`${API_URL}/exams/${id}`);
       await fetchExams(filters);
       setError(null);
@@ -263,12 +291,12 @@ const ExamPlanning = () => {
     const doc = new jsPDF();
     const semesterTitle = filters.ID_semestre ? `Semestre ${filters.ID_semestre}` : "";
     const fileName = `${filters.specialiteName?.toLowerCase().replace(/ /g, "_")}_${filters.niveau?.toLowerCase()}_${filters.section?.toLowerCase()}`;
-  
+
     const primaryColor = [52, 73, 94];
     const secondaryColor = [220, 220, 220];
     const backgroundColor = [245, 245, 245];
     const white = [255, 255, 255];
-  
+
     const addHeader = () => {
       doc.setFillColor(...primaryColor);
       doc.rect(0, 0, doc.internal.pageSize.width, 20, "F");
@@ -276,7 +304,7 @@ const ExamPlanning = () => {
       doc.setFont("helvetica", "bold");
       doc.setTextColor(...white);
     };
-  
+
     const addFooter = () => {
       const pageCount = doc.internal.getNumberOfPages();
       for (let i = 1; i <= pageCount; i++) {
@@ -294,38 +322,38 @@ const ExamPlanning = () => {
         doc.text(`Généré le ${dateStr}`, 20, doc.internal.pageSize.height - 10);
       }
     };
-  
+
     addHeader();
-  
+
     doc.setFontSize(20);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(...primaryColor);
     doc.text(`Planning des Examens : ${semesterTitle}`, doc.internal.pageSize.width / 2, 35, { align: "center" });
-  
+
     doc.setDrawColor(...secondaryColor);
     doc.setLineWidth(0.5);
     doc.line(20, 40, doc.internal.pageSize.width - 20, 40);
-  
+
     doc.setFillColor(...backgroundColor);
     doc.rect(20, 45, doc.internal.pageSize.width - 40, 50, "F");
     doc.setDrawColor(...secondaryColor);
     doc.rect(20, 45, doc.internal.pageSize.width - 40, 50, "S");
-  
+
     doc.setFontSize(12);
     doc.setTextColor(100);
     doc.setFont("helvetica", "normal");
-  
+
     const leftColumnX = 30;
     const rightColumnX = 90;
     const startY = 55;
     const lineHeight = 8;
-  
+
     doc.text("Faculté:", leftColumnX, startY);
     doc.text("Département:", leftColumnX, startY + lineHeight);
     doc.text("Spécialité:", leftColumnX, startY + lineHeight * 2);
     doc.text("Niveau:", leftColumnX, startY + lineHeight * 3);
     doc.text("Section:", leftColumnX, startY + lineHeight * 4);
-  
+
     doc.setFont("helvetica", "bold");
     doc.setTextColor(...primaryColor);
     doc.text(filters.faculteName || "Non sélectionné", rightColumnX, startY);
@@ -333,15 +361,15 @@ const ExamPlanning = () => {
     doc.text(filters.specialiteName || "Non sélectionné", rightColumnX, startY + lineHeight * 2);
     doc.text(filters.niveau || "Non sélectionné", rightColumnX, startY + lineHeight * 3);
     doc.text(filters.section ? `Section ${filters.section}` : "Non sélectionné", rightColumnX, startY + lineHeight * 4);
-  
-    const headers = [["Date", "Horaire", "Module", "Salle"]];
+
+    const headers = [["Date", "Horaire", "Module", "Salle(s)"]];
     const data = exams.map((exam) => [
       formatDate(exam.exam_date),
       exam.time_slot,
       exam.nom_module,
-      exam.mode === 'en ligne' ? 'En Ligne' : exam.ID_salle,
+      exam.mode === 'en ligne' ? 'En Ligne' : exam.nom_salle || 'N/A',
     ]);
-  
+
     autoTable(doc, {
       head: headers,
       body: data,
@@ -380,10 +408,10 @@ const ExamPlanning = () => {
         addHeader();
       },
     });
-  
+
     addFooter();
     doc.save(`${fileName}_examen.pdf`);
-  
+
     function formatDate(dateStr) {
       const date = new Date(dateStr);
       const day = String(date.getDate()).padStart(2, "0");
@@ -396,7 +424,7 @@ const ExamPlanning = () => {
   const exportToExcel = () => {
     const semesterTitle = filters.ID_semestre ? ` - Semestre ${filters.ID_semestre}` : "";
     const fileName = `${filters.specialiteName?.toLowerCase().replace(/ /g, "_")}_${filters.niveau?.toLowerCase()}_${filters.section?.toLowerCase()}`;
-  
+
     const filterData = [
       [`Planning des Examens${semesterTitle}`],
       [""],
@@ -407,36 +435,36 @@ const ExamPlanning = () => {
       [`Section: ${filters.section ? `Section ${filters.section}` : "Non sélectionné"}`],
       [""],
     ];
-  
+
     const examData = exams.map((exam) => ({
       Date: formatDate(exam.exam_date),
       Horaire: exam.time_slot,
       Module: exam.nom_module,
-      Salle: exam.mode === 'en ligne' ? 'En Ligne' : exam.ID_salle,
+      "Salle(s)": exam.mode === 'en ligne' ? 'En Ligne' : exam.nom_salle || 'N/A',
     }));
-  
+
     const ws = XLSX.utils.json_to_sheet(examData, {
-      header: ["Date", "Horaire", "Module", "Salle"],
+      header: ["Date", "Horaire", "Module", "Salle(s)"],
       skipHeader: false,
       origin: { r: 8, c: 0 },
     });
-  
+
     XLSX.utils.sheet_add_aoa(ws, filterData, { origin: "A1" });
-  
+
     ws["!cols"] = [
       { wch: 15 },
       { wch: 15 },
       { wch: 20 },
       { wch: 15 },
     ];
-  
+
     ws["!merges"] = [
       { s: { r: 0, c: 0 }, e: { r: 0, c: 3 } },
     ];
-  
+
     Object.keys(ws).forEach((cell) => {
       if (cell === "!ref" || cell === "!cols" || cell === "!merges") return;
-  
+
       const row = parseInt(cell.match(/\d+/)[0], 10);
       if (row === 1) {
         ws[cell].s = {
@@ -465,7 +493,7 @@ const ExamPlanning = () => {
         };
       }
     });
-  
+
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, `Examens${semesterTitle}`);
     const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
@@ -473,7 +501,7 @@ const ExamPlanning = () => {
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     });
     saveAs(data, `${fileName}_examen.xlsx`);
-  
+
     function formatDate(dateStr) {
       const date = new Date(dateStr);
       const day = String(date.getDate()).padStart(2, "0");
@@ -496,7 +524,7 @@ const ExamPlanning = () => {
             <FaUser style={{ marginRight: '8px', verticalAlign: 'middle' }} /> Admin
           </h2>
         </div>
-        <button className="sidebar-button" onClick={() => navigate('/')}>
+        <button className="sidebar-button" onClick={() => navigate('/admin')}>
           <FaArrowLeft /> Retour à l'accueil
         </button>
       </div>
@@ -512,18 +540,19 @@ const ExamPlanning = () => {
         )}
         <div className="form-row">
           <div className="filter-section">
-            <MemoizedFilterForm onFilter={handleFilter} />
+            <MemoizedFilterForm onFilter={handleFilter} onChange={handleFilterChange} onReset={handleResetFilters} />
           </div>
           <div className="exam-form-section">
             <MemoizedExamForm
               onAdd={handleAddExam}
-              disabled={!filters.section}
+              disabled={false} // Let ExamForm handle its own disabled logic
               modules={modules}
               salles={salles}
               semestres={semestres}
               sectionId={filters.section}
               selectedSemestre={filters.ID_semestre}
-              onFilterReset={() => true}
+              onFilterReset={handleResetFilters}
+              isFilterApplied={isFilterApplied}
             />
           </div>
         </div>
@@ -558,7 +587,7 @@ const ExamPlanning = () => {
               <p className="no-results">
                 {filters.section && isFilterApplied
                   ? "Aucun examen trouvé."
-                  : "Sélectionnez une section pour afficher ou créer un planning."}
+                  : "Sélectionnez une section et appliquez le filtre pour afficher ou créer un planning."}
               </p>
             </div>
           )}

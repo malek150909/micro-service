@@ -29,6 +29,11 @@ import ClubsETD from "./etudiant/club/EtudiantDashboard";
 import ClubsADM from "./admin/club/ClubAdmin";
 import ENSemploi from "./enseignant/emploi/components/Timetable";
 import ETDemploi from "./etudiant/emploi/StudentTimetableFeed";
+import GestionEnseignants from "./enseignant/notes/pages/GestionEnseignants";
+import ProfessorReclamations from "./enseignant/notes/pages/ProfessorReclamations";
+import StudentGrades from "./etudiant/notes/pages/StudentGrades";
+import StudentHome from "./etudiant/notes/pages/StudentHome";
+import ENSlistetudiant from "./enseignant/listetudiant/TeacherDashboard";
 
 const PrivateRoute = ({ element }) => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -71,7 +76,11 @@ function App() {
                 <Route path="/clubsADM" element={<ClubsADM />} />
                 <Route path="/ENSemploi" element={<ENSemploi />} />
                 <Route path="/ETDemploi" element={<ETDemploi />} />
-                
+                <Route path="/GESENS" element={<GestionEnseignants />} />
+                <Route path="/PROFREC" element={<ProfessorReclamations />} />
+                <Route path="/ETDGRD" element={<StudentGrades />} />
+                <Route path="/ETD" element={<StudentHome />} />
+                <Route path="/ENSlistetudiant" element={<ENSlistetudiant />} />
             </Routes>
         </Router>
     );

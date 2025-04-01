@@ -5,8 +5,7 @@ import debounce from 'lodash/debounce';
 import { FaFilter } from 'react-icons/fa';
 import "../../../admin_css_files/exam.css";
 
-
-const FilterForm = ({ onFilter }) => {
+const FilterForm = ({ onFilter, onChange }) => {
   const [filters, setFilters] = useState({
     faculte: '',
     departement: '',
@@ -206,8 +205,13 @@ const FilterForm = ({ onFilter }) => {
   }, [filters.specialite, filters.niveau, cache]);
 
   const handleChange = (e) => {
-    setFilters({ ...filters, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFilters((prev) => ({ ...prev, [name]: value }));
     setError(''); // Clear error on change
+    // Notify parent of the change immediately
+    if (onChange) {
+      onChange({ ...filters, [name]: value });
+    }
   };
 
   // Debounce the onFilter callback to prevent rapid submissions

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { createPortal } from 'react-dom';
 import axios from 'axios';
 import "../../../admin_css_files/module.css";
 
@@ -28,90 +29,89 @@ const ModuleModal = ({ module, onClose, onSave }) => {
     }
   };
 
-  return (
-    <div id="modules">
+  return createPortal(
+    <motion.div
+      className="modal-overlay"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
       <motion.div
-        className="modal-overlay"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+        className="modal-content"
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.8, opacity: 0 }}
+        transition={{ duration: 0.3 }}
       >
-        <motion.div
-          className="modal-content"
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.8, opacity: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          <h3>Détails du Module</h3>
-          <div className="modal-field">
-            <label>Nom :</label>
-            <input
-              type="text"
-              name="nom_module"
-              value={formData.nom_module}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="modal-field">
-            <label>Description :</label>
-            <textarea
-              name="description_module"
-              value={formData.description_module}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="modal-field">
-            <label>Crédit :</label>
-            <input
-              type="number"
-              name="credit"
-              value={formData.credit}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="modal-field">
-            <label>Coefficient :</label>
-            <input
-              type="number"
-              name="coefficient"
-              value={formData.coefficient}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="modal-field">
-            <label>Semestre :</label>
-            <input
-              type="text"
-              value={module.semestre}
-              disabled
-            />
-          </div>
-          <div className="modal-field">
-            <label>Séances :</label>
-            <select
-              name="seances"
-              value={formData.seances}
-              onChange={handleChange}
-              required
-            >
-              <option value="Cour">Cour</option>
-              <option value="Cour/TD">Cour/TD</option>
-              <option value="Cour/TP">Cour/TP</option>
-              <option value="Cour/TD/TP">Cour/TD/TP</option>
-              <option value="En ligne">En ligne</option>
-            </select>
-          </div>
-          <div className="modal-actions">
-            <button onClick={handleSave}>Sauvegarder</button>
-            <button onClick={onClose}>Fermer</button>
-          </div>
-        </motion.div>
+        <h3>Détails du Module</h3>
+        <div className="modal-field">
+          <label>Nom :</label>
+          <input
+            type="text"
+            name="nom_module"
+            value={formData.nom_module}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="modal-field">
+          <label>Description :</label>
+          <textarea
+            name="description_module"
+            value={formData.description_module}
+            onChange={handleChange}
+          />
+        </div>
+        <div className="modal-field">
+          <label>Crédit :</label>
+          <input
+            type="number"
+            name="credit"
+            value={formData.credit}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="modal-field">
+          <label>Coefficient :</label>
+          <input
+            type="number"
+            name="coefficient"
+            value={formData.coefficient}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="modal-field">
+          <label>Semestre :</label>
+          <input
+            type="text"
+            value={module.semestre}
+            disabled
+          />
+        </div>
+        <div className="modal-field">
+          <label>Séances :</label>
+          <select
+            name="seances"
+            value={formData.seances}
+            onChange={handleChange}
+            required
+          >
+            <option value="Cour">Cour</option>
+            <option value="Cour/TD">Cour/TD</option>
+            <option value="Cour/TP">Cour/TP</option>
+            <option value="Cour/TD/TP">Cour/TD/TP</option>
+            <option value="En ligne">En ligne</option>
+          </select>
+        </div>
+        <div className="modal-actions">
+          <button onClick={handleSave}>Sauvegarder</button>
+          <button onClick={onClose}>Fermer</button>
+        </div>
       </motion.div>
-    </div>
+    </motion.div>,
+    document.body
   );
 };
 

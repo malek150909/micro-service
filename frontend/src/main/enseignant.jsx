@@ -37,6 +37,7 @@ const Enseignant = () => {
         { title: "🎓 Notes", description: "Consulter les Notes des etudiants", route: "/notes" },
         { title: "📢 Annonces", description: "Consulter les annonces", route: "/annoncesENS" },
         { title: "📢 Emploi du Temps", description: "Consulter votre Emploi du Temps", route: "/ENSemploi" },
+        { title: "📢 Liste des etudiants", description: "Consulter les listes des etudiants", route: "/ENSlistetudiant" },
     ];
 
     return (

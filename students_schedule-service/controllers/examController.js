@@ -1,5 +1,5 @@
-import pool from '../config/db.js';
-import Exam from '../models/examModel.js';
+import pool from '../config/db.js'; // Importe le pool depuis db.js
+import Exam from '../models/examModel.js'; // Importe le modèle Exam en ES6
 
 export const getExams = async (req, res) => {
   try {
@@ -71,9 +71,9 @@ export const getSalles = async (req, res) => {
 };
 
 export const getSemestres = async (req, res) => {
-  const { niveau } = req.query; // Added back the niveau parameter
+  const { niveau } = req.query;
   try {
-    const results = await Exam.getSemestres(niveau); // Pass niveau to the model
+    const results = await Exam.getSemestres(niveau);
     res.json(results);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -147,7 +147,7 @@ export const getSpecialites = async (req, res) => {
 
 export const getSections = async (req, res) => {
   const { specialite, niveau } = req.query;
-  let sql = 'SELECT ID_section, nom_section, num_etudiant FROM Section'; // Added back num_etudiant
+  let sql = 'SELECT ID_section, nom_section, num_etudiant FROM Section';
   const params = [];
   if (specialite) {
     sql += ' WHERE ID_specialite = ?';

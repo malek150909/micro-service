@@ -5,6 +5,8 @@ import ModuleList from '../components/ModuleList';
 import { FiAlertCircle } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import axios from 'axios';
+import { FaBook, FaFilter, FaPlus, FaHome } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 import "../../../admin_css_files/module.css";
 
 const API_URL = 'http://localhost:8083/modules';
@@ -21,6 +23,7 @@ const Home = () => {
     section: '',
   });
   const [alertMessage, setAlertMessage] = useState(null);
+  const navigate = useNavigate();
 
   const fetchModules = async (currentFilters) => {
     try {
@@ -50,7 +53,7 @@ const Home = () => {
         ...moduleData,
         ID_specialite: filters.specialite || '1',
         section: filters.section,
-        niveau: filters.niveau, // Ajouter le niveau
+        niveau: filters.niveau,
       };
   
       console.log('Sending addData to backend:', addData);
@@ -86,6 +89,7 @@ const Home = () => {
 
   const CustomAlert = ({ message, onClose }) => {
     return (
+      <div id="modules">
       <motion.div
         className="modal-overlay"
         initial={{ opacity: 0 }}
@@ -113,16 +117,26 @@ const Home = () => {
           </button>
         </motion.div>
       </motion.div>
+      </div>
     );
   };
 
   return (
     <div id="modules">
-      <div className="container">
-        <h1>Gestion des Modules</h1>
+    <div className="container">
+      <div className="sidebar">
+        <div className="logo">
+          <FaBook />
+          <h2>Gestion des Modules</h2>
+        </div>
+        <button className="sidebar-button" onClick={() => navigate('/admin')}>
+          <FaHome /> Retour à l'accueil
+        </button>
+      </div>
+
+      <div className="main-content">
         {error && <p style={{ color: 'red' }}>{error}</p>}
         <FilterForm onFilter={handleFilter} />
-
         {modules.length > 0 ? (
           <ModuleList
             modules={modules}
@@ -135,17 +149,19 @@ const Home = () => {
             {filters.section && isFilterApplied ? 'Aucun module trouvé.' : 'Veuillez sélectionner une section pour filtrer ou ajouter un nouveau module.'}
           </p>
         )}
-
-        <div className="form-section">
-          <ModuleForm
-            onAdd={handleAddModule}
-            disabled={!filters.section || !filters.specialite}
-            niveau={filters.niveau} // Pass niveau to ModuleForm
-          />
-        </div>
-
+        {/* Affichage conditionnel du formulaire d'ajout de module */}
+        {filters.section && (
+          <div className="form-section">
+            <ModuleForm
+              onAdd={handleAddModule}
+              disabled={!filters.section || !filters.specialite}
+              niveau={filters.niveau}
+            />
+          </div>
+        )}
         {alertMessage && <CustomAlert message={alertMessage} onClose={handleCloseAlert} />}
       </div>
+    </div>
     </div>
   );
 };

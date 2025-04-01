@@ -637,4 +637,476 @@ button:hover::before {
   text-align: center;
   font-weight: 500;
 }
+/* Style général pour l'onglet "Gérer mes Sondages" */
+#mes-sondages-list {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+
+#mes-sondages-list .event-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--sondage-secondary);
+  border: 1px solid var(--sondage-border);
+  border-radius: 10px;
+  padding: 15px 20px;
+  margin-bottom: 15px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+#mes-sondages-list .event-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+#mes-sondages-list .event-info h4 {
+  color: var(--sondage-primary);
+  font-size: 1.2rem;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+#mes-sondages-list .event-info h4 .annonce-icon {
+  margin-right: 10px;
+  color: var(--sondage-primary);
+}
+
+#mes-sondages-list .event-info p {
+  color: var(--sondage-text);
+  font-size: 0.9rem;
+  margin: 5px 0 0;
+}
+
+/* Boutons dans la liste des sondages */
+#mes-sondages-list .edit-button,
+#mes-sondages-list .delete-button {
+  padding: 8px 12px;
+  margin-left: 10px;
+  border: none;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  display: inline-flex;
+  align-items: center;
+}
+
+#mes-sondages-list .edit-button {
+  background-color: var(--sondage-primary);
+  color: white;
+}
+
+#mes-sondages-list .edit-button:hover {
+  background-color: var(--sondage-hover);
+  transform: scale(1.05);
+}
+
+#mes-sondages-list .delete-button {
+  background-color: var(--sondage-danger);
+  color: white;
+}
+
+#mes-sondages-list .delete-button:hover {
+  background-color: #E55353;
+  transform: scale(1.05);
+}
+
+#mes-sondages-list .edit-button svg,
+#mes-sondages-list .delete-button svg {
+  margin-right: 5px;
+}
+
+/* Modale de création/modification de sondage */
+.modal-overlay.active .modal-content {
+  background-color: white;
+  border-radius: 15px;
+  padding: 30px;
+  max-width: 600px;
+  width: 90%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content h3 {
+  color: var(--sondage-primary);
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.modal-content .input-group {
+  margin-bottom: 20px;
+}
+
+.modal-content .input-group label {
+  display: block;
+  color: var(--sondage-text);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.modal-content .input-group input,
+.modal-content .input-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--sondage-border);
+  border-radius: 5px;
+  font-size: 1rem;
+  color: var(--sondage-text);
+  transition: border-color 0.3s ease;
+}
+
+.modal-content .input-group input:focus,
+.modal-content .input-group textarea:focus {
+  border-color: var(--sondage-primary);
+  outline: none;
+}
+
+.modal-content .input-group textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* Options du sondage */
+.option-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.option-group input {
+  flex: 1;
+  margin-right: 10px;
+}
+
+.option-group .remove-option-button {
+  background-color: var(--sondage-danger);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.option-group .remove-option-button:hover {
+  background-color: #E55353;
+}
+
+.add-option-button {
+  background-color: var(--sondage-primary);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.add-option-button:hover {
+  background-color: var(--sondage-hover);
+}
+
+.add-option-button svg {
+  margin-right: 5px;
+}
+
+/* Filtres (sections et groupes) */
+.filter-section h4 {
+  color: var(--sondage-primary);
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+}
+
+.filter-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.filter-group {
+  flex: 1;
+  min-width: 200px;
+}
+
+.filter-group label {
+  color: var(--sondage-text);
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.filter-group select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--sondage-border);
+  border-radius: 5px;
+  font-size: 1rem;
+  color: var(--sondage-text);
+  background-color: white;
+  transition: border-color 0.3s ease;
+}
+
+.filter-group select:focus {
+  border-color: var(--sondage-primary);
+  outline: none;
+}
+
+/* Boutons de la modale */
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.button-group button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  display: inline-flex;
+  align-items: center;
+}
+
+.button-group button[type="submit"] {
+  background-color: var(--sondage-primary);
+  color: white;
+}
+
+.button-group button[type="submit"]:hover {
+  background-color: var(--sondage-hover);
+  transform: scale(1.05);
+}
+
+.button-group .close-button {
+  background-color: #ccc;
+  color: white;
+}
+
+.button-group .close-button:hover {
+  background-color: #b3b3b3;
+  transform: scale(1.05);
+}
+
+.button-group button svg {
+  margin-right: 5px;
+}
+
+/* Modale de détails du sondage */
+.modal-body p {
+  color: var(--sondage-text);
+  font-size: 1rem;
+  margin: 10px 0;
+}
+
+.modal-body p strong {
+  color: var(--sondage-primary);
+}
+
+/* Modale de résultats du sondage */
+.modal-body h4 {
+  color: var(--sondage-primary);
+  font-size: 1.2rem;
+  margin: 20px 0 10px;
+}
+
+
+/* Conteneur des résultats */
+.sondage-results {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: var(--sondage-secondary);
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Message si aucun vote */
+.no-votes {
+  color: var(--sondage-text);
+  font-style: italic;
+  text-align: center;
+  margin: 20px 0;
+}
+
+/* Élément de résultat individuel */
+.result-item {
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.result-item:hover {
+  transform: translateY(-2px);
+}
+
+/* En-tête du résultat (option et stats) */
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.result-option {
+  font-weight: 600;
+  color: var(--sondage-text);
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+}
+
+.most-voted-icon {
+  color: var(--most-voted);
+  margin-left: 8px;
+  font-size: 1.2rem;
+}
+
+.result-stats {
+  font-size: 0.95rem;
+  color: var(--sondage-text);
+  font-weight: 500;
+  background-color: var(--sondage-border);
+  padding: 4px 8px;
+  border-radius: 12px;
+}
+
+/* Barre de progression */
+.result-bar {
+  background-color: var(--sondage-border);
+  border-radius: 10px;
+  height: 30px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #e0e0e0;
+}
+
+.result-bar-fill {
+  height: 100%;
+  transition: width 1s ease-in-out;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Couleurs variées pour chaque option */
+.result-bar-fill.option-0 {
+  background: #4A90E2; /* Bleu doux, cohérent avec le thème */
+}
+
+.result-bar-fill.option-1 {
+  background: #50C878; /* Vert, utilisé pour les succès dans votre app */
+}
+
+.result-bar-fill.option-2 {
+  background: #FF6B6B; /* Rouge corail, pour une touche vibrante */
+}
+
+.result-bar-fill.option-3 {
+  background: #FFD93D; /* Jaune, proche de --most-voted mais plus doux */
+}
+
+.result-bar-fill.option-4 {
+  background: #A569BD; /* Violet, pour une variété élégante */
+}
+
+/* Étiquette dans la barre */
+.result-bar-label {
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  position: absolute;
+  right: 10px;
+}
+
+/* Total des votes */
+.total-votes {
+  text-align: center;
+  font-weight: 600;
+  color: var(--sondage-primary);
+  margin-top: 20px;
+  font-size: 1.1rem;
+}
+
+/* Animation au survol de la barre */
+.result-bar-fill:hover {
+  filter: brightness(1.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .result-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 5px;
+  }
+
+  .result-stats {
+      font-size: 0.85rem;
+  }
+
+  .result-bar {
+      height: 25px;
+  }
+
+  .result-bar-label {
+      font-size: 0.8rem;
+  }
+}
+/* Message d'erreur */
+.error-message {
+  color: var(--sondage-danger);
+  font-size: 0.9rem;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  #mes-sondages-list .event-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+  }
+
+  #mes-sondages-list .edit-button,
+  #mes-sondages-list .delete-button {
+      margin-left: 0;
+      width: 100%;
+      justify-content: center;
+  }
+
+  .filter-options {
+      flex-direction: column;
+      gap: 15px;
+  }
+
+  .button-group {
+      flex-direction: column;
+      gap: 10px;
+  }
+
+  .button-group button {
+      width: 100%;
+  }
+}
+.event-item {
+  cursor: default;
+}
 }

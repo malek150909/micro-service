@@ -235,6 +235,7 @@ CREATE TABLE Message (
     contenu TEXT NOT NULL,
     expediteur BIGINT,
     destinataire BIGINT,
+    isRead tinyint(1) DEFAULT 0;
     FOREIGN KEY (expediteur) REFERENCES User(Matricule) ON DELETE CASCADE,
     FOREIGN KEY (destinataire) REFERENCES User(Matricule) ON DELETE CASCADE
 );
@@ -405,6 +406,21 @@ CREATE TABLE Commentaire (
     FOREIGN KEY (matricule_etudiant) REFERENCES User(Matricule)
 );
 
+CREATE TABLE commentaire_annonce (
+  ID_commentaire int NOT NULL AUTO_INCREMENT,
+  ID_annonce int NOT NULL,
+  matricule_etudiant bigint NOT NULL,
+  contenu text NOT NULL,
+  date_commentaire datetime DEFAULT CURRENT_TIMESTAMP,
+  reponse_enseignant text,
+  date_reponse datetime DEFAULT NULL,
+  PRIMARY KEY (ID_commentaire),
+  KEY ID_annonce (ID_annonce),
+  KEY matricule_etudiant (matricule_etudiant),
+  CONSTRAINT commentaire_annonce_ibfk_1 FOREIGN KEY (ID_annonce) REFERENCES annonce (id),
+  CONSTRAINT commentaire_annonce_ibfk_2 FOREIGN KEY (matricule_etudiant) REFERENCES etudiant (Matricule)
+)
+
 CREATE TABLE DemandeRejoindreClub (
     ID_demande INT AUTO_INCREMENT PRIMARY KEY,
     matricule_etudiant BIGINT NOT NULL,
@@ -415,3 +431,78 @@ CREATE TABLE DemandeRejoindreClub (
     FOREIGN KEY (ID_club) REFERENCES Club(ID_club),
     UNIQUE (matricule_etudiant, ID_club) -- Une seule demande par étudiant et par club
 );
+
+CREATE TABLE `documents` (
+  `ID_document` int NOT NULL AUTO_INCREMENT,
+  `ID_faculte` int NOT NULL,
+  `titre` varchar(255) NOT NULL,
+  `description` text,
+  `fichier_url` varchar(255) NOT NULL,
+  `date_upload` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`ID_document`),
+  KEY `ID_faculte` (`ID_faculte`),
+  CONSTRAINT `documents_ibfk_1` FOREIGN KEY (`ID_faculte`) REFERENCES `faculte` (`ID_faculte`) ON DELETE CASCADE
+);
+
+CREATE TABLE `reclamation` (
+  `ID_reclamation` int NOT NULL AUTO_INCREMENT,
+  `ID_module` int NOT NULL,
+  `Matricule_etudiant` bigint NOT NULL,
+  `Semestre` enum('S1','S2') NOT NULL,
+  `reclamation_text` text NOT NULL,
+  `date_reclamation` datetime DEFAULT CURRENT_TIMESTAMP,
+  `prof_response` text,
+  `date_response` datetime DEFAULT NULL,
+  PRIMARY KEY (`ID_reclamation`),
+  KEY `ID_module` (`ID_module`),
+  KEY `Matricule_etudiant` (`Matricule_etudiant`),
+  CONSTRAINT `reclamation_ibfk_1` FOREIGN KEY (`ID_module`) REFERENCES `module` (`ID_module`),
+  CONSTRAINT `reclamation_ibfk_2` FOREIGN KEY (`Matricule_etudiant`) REFERENCES `etudiant` (`Matricule`)
+);
+
+CREATE TABLE `reponse_sondage` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `sondage_id` int NOT NULL,
+  `matricule_etudiant` bigint NOT NULL,
+  `reponse` varchar(255) NOT NULL,
+  `repondu_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `sondage_id` (`sondage_id`,`matricule_etudiant`),
+  KEY `matricule_etudiant` (`matricule_etudiant`),
+  CONSTRAINT `reponse_sondage_ibfk_1` FOREIGN KEY (`sondage_id`) REFERENCES `sondage` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `reponse_sondage_ibfk_2` FOREIGN KEY (`matricule_etudiant`) REFERENCES `etudiant` (`Matricule`) ON DELETE CASCADE
+);
+
+CREATE TABLE `ressource` (
+  `ID_ressource` int NOT NULL AUTO_INCREMENT,
+  `ID_module` int NOT NULL,
+  `ID_section` int NOT NULL,
+  `Matricule` bigint NOT NULL,
+  `nom_ressource` varchar(255) NOT NULL,
+  `fichier_url` varchar(255) NOT NULL,
+  `description` text,
+  `date_upload` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `type_ressource` enum('Cours','TD','TP') DEFAULT 'Cours',
+  PRIMARY KEY (`ID_ressource`),
+  UNIQUE KEY `unique_ressource` (`ID_module`,`ID_section`,`nom_ressource`),
+  KEY `ID_section` (`ID_section`),
+  KEY `Matricule` (`Matricule`),
+  CONSTRAINT `ressource_ibfk_1` FOREIGN KEY (`ID_module`) REFERENCES `module` (`ID_module`) ON DELETE CASCADE,
+  CONSTRAINT `ressource_ibfk_2` FOREIGN KEY (`ID_section`) REFERENCES `section` (`ID_section`) ON DELETE CASCADE,
+  CONSTRAINT `ressource_ibfk_3` FOREIGN KEY (`Matricule`) REFERENCES `enseignant` (`Matricule`) ON DELETE CASCADE
+);
+
+CREATE TABLE `sondage` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `question` text NOT NULL,
+  `options` json NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `enseignant_matricule` bigint NOT NULL,
+  `target_type` enum('Etudiants') DEFAULT 'Etudiants',
+  `target_filter` json DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `enseignant_matricule` (`enseignant_matricule`),
+  CONSTRAINT `sondage_ibfk_1` FOREIGN KEY (`enseignant_matricule`) REFERENCES `enseignant` (`Matricule`) ON DELETE CASCADE
+);
+
