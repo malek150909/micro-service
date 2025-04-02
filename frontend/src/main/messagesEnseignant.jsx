@@ -1,298 +1,383 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaHome, FaSearch, FaUser, FaPaperPlane, FaTimes } from "react-icons/fa";
+import { FaHome, FaSearch, FaPaperPlane, FaTimes, FaUser, FaPaperclip } from "react-icons/fa";
 import "../admin_css_files/messages.css";
 
 const Messages = () => {
-    const navigate = useNavigate();
-    const [user, setUser] = useState(null);
-    const [emailInput, setEmailInput] = useState("");
-    const [recipient, setRecipient] = useState(null);
-    const [messages, setMessages] = useState([]);
-    const [receivedMessages, setReceivedMessages] = useState([]);
-    const [newMessage, setNewMessage] = useState("");
-    const [selectedFile, setSelectedFile] = useState(null);
-    const [error, setError] = useState("");
-    const [showSearch, setShowSearch] = useState(false);
-    const messagesEndRef = useRef(null);
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const [emailInput, setEmailInput] = useState("");
+  const [recipient, setRecipient] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [receivedMessages, setReceivedMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState("");
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [error, setError] = useState("");
+  const messagesListRef = useRef(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchResults, setSearchResults] = useState(null);
 
-    useEffect(() => {
-        const storedUser = JSON.parse(localStorage.getItem("user"));
-        if (!storedUser || storedUser.role !== "enseignant") {
-            navigate("/");
-        } else {
-            setUser(storedUser);
-            fetchReceivedMessages(storedUser.Matricule);
-        }
-    }, [navigate]);
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (!storedUser || storedUser.role !== "enseignant") {
+      navigate("/");
+    } else {
+      setUser(storedUser);
+      fetchReceivedMessages(storedUser.Matricule);
+    }
+  }, [navigate]);
 
-    const fetchReceivedMessages = async (matricule) => {
-        const token = localStorage.getItem("token");
-        try {
-            const response = await fetch("http://localhost:8082/api/messages/received", {
-                headers: { "Authorization": `Bearer ${token}` }
-            });
-            const data = await response.json();
-            if (response.ok) {
-                setReceivedMessages(data);
-            } else {
-                setError(`Erreur: ${data.message || response.statusText}`);
-            }
-        } catch (err) {
-            setError(`Erreur réseau: ${err.message}`);
-        }
-    };
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
-    const handleSearchRecipient = async () => {
-        const token = localStorage.getItem("token");
-        const normalizedEmail = emailInput.trim().toLowerCase();
-        try {
-            const response = await fetch(`http://localhost:8082/api/users/search?email=${normalizedEmail}`, {
-                headers: { "Authorization": `Bearer ${token}` }
-            });
-            const data = await response.json();
-            if (response.ok && data && data.Matricule) {
-                setRecipient(data);
-                setError("");
-                fetchMessages(data.Matricule);
-            } else {
-                setError("Utilisateur non trouvé.");
-                setRecipient(null);
-            }
-        } catch (err) {
-            setError("Erreur lors de la recherche.");
-        }
-    };
+  const fetchReceivedMessages = async (matricule) => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch("http://localhost:8082/api/messages/received", {
+        headers: { "Authorization": `Bearer ${token}` },
+      });
+      const data = await response.json();
+      if (response.ok) {
+        const filteredMessages = data.filter(msg => msg.destinataire === matricule && msg.expediteur !== matricule);
+        console.log("Messages reçus filtrés :", filteredMessages);
+        setReceivedMessages(filteredMessages);
+      } else {
+        setError(`Erreur lors du chargement des messages reçus : ${data.message || response.statusText}`);
+      }
+    } catch (err) {
+      setError(`Erreur réseau : ${err.message}`);
+    }
+  };
 
-    const fetchMessages = async (recipientMatricule) => {
-        const token = localStorage.getItem("token");
-        try {
-            const response = await fetch(
-                `http://localhost:8082/api/messages?expediteur=${user.Matricule}&destinataire=${recipientMatricule}`,
-                { headers: { "Authorization": `Bearer ${token}` } }
-            );
-            const data = await response.json();
-            setMessages(data);
+  const handleSearchRecipient = async () => {
+    setError("");
+    const token = localStorage.getItem("token");
+    const normalizedEmail = emailInput.trim().toLowerCase();
+    try {
+      const response = await fetch(`http://localhost:8082/api/users/search?email=${normalizedEmail}`, {
+        headers: { "Authorization": `Bearer ${token}` },
+      });
+      const data = await response.json();
+      if (response.ok && data && data.Matricule) {
+        setSearchResults(data);
+        setError("");
+      } else {
+        setError("Utilisateur non trouvé.");
+        setSearchResults(null);
+      }
+    } catch (err) {
+      setError("Erreur lors de la recherche.");
+      setSearchResults(null);
+    }
+  };
 
-            const unreadMessages = receivedMessages.filter(m => 
-                m.expediteur === recipientMatricule && !m.isRead
-            );
-            if (unreadMessages.length > 0) {
-                const messageIds = unreadMessages.map(m => m.ID_message);
-                await markMessagesAsRead(messageIds);
-                await fetchReceivedMessages(user.Matricule);
-            }
-        } catch (err) {
-            setError("Erreur lors du chargement des messages.");
-        }
-    };
+  const handleSelectRecipient = (selectedRecipient) => {
+    setRecipient(selectedRecipient);
+    setIsModalOpen(false);
+    setEmailInput("");
+    setSearchResults(null);
+    fetchMessages(selectedRecipient.Matricule);
+    markMessagesAsRead(selectedRecipient.Matricule);
+  };
 
-    const markMessagesAsRead = async (messageIds) => {
-        const token = localStorage.getItem("token");
-        try {
-            const response = await fetch("http://localhost:8082/api/messages/markAsRead", {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify({ messageIds })
-            });
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || "Erreur lors du marquage des messages comme lus");
-            }
-        } catch (err) {
-            console.error("Erreur lors du marquage des messages comme lus:", err);
-            setError(`Erreur: ${err.message}`);
-        }
-    };
+  const fetchMessages = async (recipientMatricule) => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch(
+        `http://localhost:8082/api/messages?expediteur=${user.Matricule}&destinataire=${recipientMatricule}`,
+        { headers: { "Authorization": `Bearer ${token}` } }
+      );
+      const data = await response.json();
+      setMessages(data);
+    } catch (err) {
+      setError("Erreur lors du chargement des messages.");
+    }
+  };
 
-    const handleSendMessage = async () => {
-        if (!newMessage.trim() && !selectedFile) return;
-        if (!recipient) return;
+  const handleSendMessage = async () => {
+    if (!newMessage.trim() && !selectedFile) return;
+    const token = localStorage.getItem("token");
+    const formData = new FormData();
+    formData.append("expediteur", user.Matricule);
+    formData.append("destinataire", recipient.Matricule);
+    formData.append("contenu", newMessage || "");
+    formData.append("date_envoi", new Date().toISOString());
+    if (selectedFile) {
+      formData.append("file", selectedFile);
+    }
 
-        const token = localStorage.getItem("token");
-        const formData = new FormData();
-        formData.append("expediteur", user.Matricule);
-        formData.append("destinataire", recipient.Matricule);
-        formData.append("contenu", newMessage || "");
-        formData.append("isRead", false);
-        if (selectedFile) {
-            formData.append("file", selectedFile);
-        }
-
-        try {
-            const response = await fetch("http://localhost:8082/api/messages", {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                },
-                body: formData
-            });
-            const data = await response.json();
-            if (response.ok) {
-                setMessages(prevMessages => [...prevMessages, data]); // Ajout à la fin
-                setNewMessage("");
-                setSelectedFile(null);
-                fetchMessages(recipient.Matricule); // Rafraîchir la liste complète
-                fetchReceivedMessages(user.Matricule); // Mettre à jour les contacts
-            } else {
-                setError(`Erreur: ${data.message || response.statusText}`);
-            }
-        } catch (err) {
-            setError(`Erreur réseau: ${err.message}`);
-        }
-    };
-
-    const handleContactClick = (message) => {
-        const selectedRecipient = {
-            Matricule: message.expediteur,
-            nom: message.nom,
-            prenom: message.prenom,
-            email: message.email || ""
+    try {
+      const response = await fetch("http://localhost:8082/api/messages", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+        body: formData,
+      });
+      const data = await response.json();
+      if (response.ok) {
+        const newMessageData = {
+          ID_message: data.ID_message || Date.now(),
+          expediteur: user.Matricule,
+          destinataire: recipient.Matricule,
+          contenu: newMessage || "",
+          date_envoi: new Date().toISOString(),
+          filePath: data.filePath || null,
+          fileName: selectedFile ? selectedFile.name : null, // Utiliser le nom d'origine du fichier
+          isRead: 0,
         };
-        setRecipient(selectedRecipient);
-        fetchMessages(message.expediteur);
-    };
-
-    const handleCloseChat = () => {
-        setRecipient(null);
-        setMessages([]);
+        console.log("Nouveau message ajouté :", newMessageData);
+        setMessages([...messages, newMessageData]);
         setNewMessage("");
         setSelectedFile(null);
+      } else {
+        setError(`Erreur lors de l'envoi du message : ${data.message || response.statusText}`);
+      }
+    } catch (err) {
+      setError(`Erreur réseau : ${err.message}`);
+    }
+  };
+
+  const handleFileChange = (e) => {
+    setSelectedFile(e.target.files[0]);
+  };
+
+  const handleRemoveFile = () => {
+    setSelectedFile(null);
+  };
+
+  const markMessagesAsRead = async (expediteurMatricule) => {
+    const token = localStorage.getItem("token");
+    try {
+      await fetch(`http://localhost:8082/api/messages/mark-as-read`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          expediteur: expediteurMatricule,
+          destinataire: user.Matricule,
+        }),
+      });
+      fetchReceivedMessages(user.Matricule);
+    } catch (err) {
+      console.error("Erreur lors de la mise à jour de isRead :", err);
+    }
+  };
+
+  const handleMessageClick = (message) => {
+    const selectedRecipient = {
+      Matricule: message.expediteur,
+      nom: message.nom,
+      prenom: message.prenom,
+      email: message.email || "",
     };
+    setRecipient(selectedRecipient);
+    fetchMessages(message.expediteur);
+    markMessagesAsRead(message.expediteur);
+  };
 
-    const handleFileChange = (e) => {
-        setSelectedFile(e.target.files[0]);
-    };
+  const handleCloseChat = () => {
+    setRecipient(null);
+    setMessages([]);
+    setNewMessage("");
+    setSelectedFile(null);
+  };
 
-    return (
-        <div id="messages">
-            <div className="container">
-                <div className="background-shapes">
-                    <div className="shape shape1"></div>
-                    <div className="shape shape2"></div>
-                </div>
+  const uniqueContacts = () => {
+    const contactsMap = new Map();
+    const filteredReceived = receivedMessages.filter(msg => msg.expediteur !== user.Matricule && msg.destinataire === user.Matricule);
+    filteredReceived.forEach((msg) => {
+      if (!contactsMap.has(msg.expediteur) || new Date(msg.date_envoi) > new Date(contactsMap.get(msg.expediteur).date_envoi)) {
+        contactsMap.set(msg.expediteur, msg);
+      }
+    });
+    return Array.from(contactsMap.values()).sort((a, b) => new Date(b.date_envoi) - new Date(a.date_envoi));
+  };
 
-                <aside className="sidebar">
-                    <div className="logo">
-                        <h2>Messagerie</h2>
-                    </div>
-                    <button className="sidebar-button" onClick={() => navigate("/enseignant")}>
-                        <FaHome /> Retour à l'accueil
-                    </button>
-                    <button className="sidebar-button" onClick={() => setShowSearch(!showSearch)}>
-                        <FaSearch /> {showSearch ? "Masquer la recherche" : "Chercher un utilisateur"}
-                    </button>
-                </aside>
-
-                <div className="contacts-panel">
-                    <div className="contacts-section">
-                        <h4>Derniers contacts</h4>
-                        {receivedMessages.length === 0 ? (
-                            <p className="no-results">Aucune conversation récente</p>
-                        ) : (
-                            <ul>
-                                {Array.from(
-                                    new Map(
-                                        receivedMessages.map(msg => [msg.expediteur, msg])
-                                    ).values()
-                                ).map((msg) => (
-                                    <li 
-                                        key={msg.ID_message} 
-                                        className={`event-item ${!msg.isRead ? 'unread' : ''}`}
-                                        onClick={() => handleContactClick(msg)}
-                                    >
-                                        <div className="event-info">
-                                            <h4>{msg.nom} {msg.prenom}</h4>
-                                            <p>{msg.contenu.substring(0, 30)}...</p>
-                                        </div>
-                                        <div className="event-stats">
-                                            <p>{new Date(msg.date_envoi).toLocaleDateString()}</p>
-                                        </div>
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                    </div>
-                </div>
-
-                <main className="main-content">
-                    <header className="header">
-                        <h1><FaUser /> Messagerie enseignant</h1>
-                        <p>Gérez vos conversations efficacement</p>
-                    </header>
-
-                    {showSearch && (
-                        <div className="search-bar">
-                            <span className="search-icon"><FaSearch /></span>
-                            <input
-                                type="email"
-                                placeholder="Rechercher par email..."
-                                value={emailInput}
-                                onChange={(e) => setEmailInput(e.target.value)}
-                                onKeyPress={(e) => e.key === 'Enter' && handleSearchRecipient()}
-                            />
-                            <button onClick={handleSearchRecipient}>Rechercher</button>
-                        </div>
-                    )}
-
-                    {error && <p className="error-message">{error}</p>}
-
-                    {recipient && (
-                        <div className="chat-section">
-                            <div className="chat-header">
-                                <h3>Discussion avec {recipient.nom} {recipient.prenom}</h3>
-                                <button className="close-button" onClick={handleCloseChat}>
-                                    <FaTimes /> Fermer
-                                </button>
-                            </div>
-                            <div className="messages-list">
-                                {messages.map((msg) => (
-                                    <div 
-                                        key={msg.ID_message}
-                                        className={`message-item ${msg.expediteur === user.Matricule ? 'sent' : 'received'}`}
-                                    >
-                                        {msg.contenu && <p>{msg.contenu}</p>}
-                                        {msg.filePath && (
-                                            <div className="file-preview">
-                                                {msg.filePath.match(/\.(jpg|jpeg|png)$/i) ? (
-                                                    <img src={`http://localhost:8082/${msg.filePath}`} alt="Prévisualisation" />
-                                                ) : (
-                                                    <a href={`http://localhost:8082/${msg.filePath}`} target="_blank" rel="noopener noreferrer">
-                                                        Télécharger le fichier
-                                                    </a>
-                                                )}
-                                            </div>
-                                        )}
-                                        <span>{new Date(msg.date_envoi).toLocaleTimeString()}</span>
-                                    </div>
-                                ))}
-                                <div ref={messagesEndRef} /> {/* Point d'ancrage pour le défilement */}
-                            </div>
-                            <div className="message-input">
-                                <textarea
-                                    value={newMessage}
-                                    onChange={(e) => setNewMessage(e.target.value)}
-                                    placeholder="Tapez votre message..."
-                                />
-                                <input
-                                    type="file"
-                                    accept="image/jpeg,image/png,application/pdf,.doc,.docx"
-                                    onChange={handleFileChange}
-                                    className="file-input"
-                                />
-                                <button onClick={handleSendMessage}>
-                                    <FaPaperPlane /> Envoyer
-                                </button>
-                            </div>
-                        </div>
-                    )}
-                </main>
-            </div>
-        </div>
+  const hasUnreadMessages = (expediteurMatricule) => {
+    return receivedMessages.some(
+      (msg) => msg.expediteur === expediteurMatricule && msg.isRead === 0 && msg.destinataire === user.Matricule
     );
+  };
+
+  const scrollToBottom = () => {
+    if (messagesListRef.current) {
+      messagesListRef.current.scrollTop = messagesListRef.current.scrollHeight;
+    }
+  };
+
+  const contacts = uniqueContacts();
+
+  return (
+    <div id="messages">
+      <div className="messages-page">
+        <div className="messages-container">
+          <aside className="sidebar">
+            <div className="logo">
+              <h2>Messagerie`  Messagerie</h2>
+            </div>
+            <button className="sidebar-button" onClick={() => navigate("/enseignant")}>
+              <FaHome /> Retour à l'accueil
+            </button>
+            <button className="sidebar-button" onClick={() => setIsModalOpen(true)}>
+              <FaSearch /> Rechercher
+            </button>
+          </aside>
+
+          <section className="contacts-list">
+            <h3>
+              <FaUser /> Derniers Contacts
+            </h3>
+            {contacts.length > 0 ? (
+              contacts.map((msg) => (
+                <div
+                  key={msg.ID_message}
+                  className="contact-item"
+                  onClick={() => handleMessageClick(msg)}
+                >
+                  <div className="contact-info">
+                    <h4 className={hasUnreadMessages(msg.expediteur) ? "unread" : ""}>
+                      {msg.nom} {msg.prenom}
+                      {hasUnreadMessages(msg.expediteur) && <span className="unread-dot"></span>}
+                    </h4>
+                    <p>{msg.contenu.substring(0, 30)}...</p>
+                  </div>
+                  <span>{new Date(msg.date_envoi).toLocaleDateString()}</span>
+                </div>
+              ))
+            ) : (
+              <p className="no-contacts">Aucun message reçu.</p>
+            )}
+          </section>
+
+          <main className="main-content">
+            <header className="header">
+              <h1>
+                <FaPaperPlane /> Messagerie Admin
+              </h1>
+              <p>Gérez vos conversations ici</p>
+            </header>
+
+            {error && <p className="messages-error">{error}</p>}
+
+            {recipient && (
+              <div className="chat-section">
+                <div className="recipient-info">
+                  <h3>
+                    Discussion avec {recipient.nom} {recipient.prenom}
+                  </h3>
+                  <button className="messages-btn close" onClick={handleCloseChat}>
+                    <FaTimes /> Fermer
+                  </button>
+                </div>
+                <div className="messages-list" ref={messagesListRef}>
+                  {messages.length > 0 ? (
+                    messages.map((msg) => (
+                      <div
+                        key={msg.ID_message}
+                        className={`message-item ${
+                          msg.expediteur === user.Matricule ? "sent" : "received"
+                        }`}
+                      >
+                        <p>{msg.contenu}</p>
+                        {msg.filePath && (
+                          <div className="file-attachment">
+                            <span>Fichier : {msg.fileName || "Fichier sans nom"}</span>
+                            <a
+                              href={`http://localhost:8082/uploads/${msg.filePath}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              Voir le fichier
+                            </a>
+                          </div>
+                        )}
+                        <span>{new Date(msg.date_envoi).toLocaleTimeString()}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="no-messages">Aucun message pour l'instant.</p>
+                  )}
+                </div>
+                <div className="message-input">
+                  {selectedFile && (
+                    <div className="selected-file">
+                      <span>{selectedFile.name}</span>
+                      <button className="remove-file-btn" onClick={handleRemoveFile}>
+                        <FaTimes />
+                      </button>
+                    </div>
+                  )}
+                  <textarea
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    placeholder="Tapez votre message..."
+                  />
+                  <label className="file-upload-btn">
+                    <FaPaperclip />
+                    <input
+                      type="file"
+                      onChange={handleFileChange}
+                      style={{ display: "none" }}
+                    />
+                  </label>
+                  <button className="messages-btn send" onClick={handleSendMessage}>
+                    <FaPaperPlane /> Envoyer
+                  </button>
+                </div>
+              </div>
+            )}
+          </main>
+        </div>
+      </div>
+
+      {isModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2>Rechercher un utilisateur</h2>
+              <button className="modal-close-btn" onClick={() => setIsModalOpen(false)}>
+                <FaTimes />
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="form-group">
+                <label>Rechercher par email</label>
+                <input
+                  type="email"
+                  value={emailInput}
+                  onChange={(e) => setEmailInput(e.target.value)}
+                  placeholder="Entrez l'email"
+                />
+              </div>
+              <button className="modal-search-btn" onClick={handleSearchRecipient}>
+                <FaSearch /> Rechercher
+              </button>
+              {searchResults && (
+                <div className="search-result">
+                  <div
+                    className="contact-item"
+                    onClick={() => handleSelectRecipient(searchResults)}
+                  >
+                    <div className="contact-info">
+                      <h4>
+                        {searchResults.nom} {searchResults.prenom}
+                      </h4>
+                      <p>{searchResults.email}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {error && <p className="messages-error">{error}</p>}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default Messages;

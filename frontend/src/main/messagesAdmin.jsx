@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaHome, FaSearch, FaPaperPlane, FaTimes, FaUser } from "react-icons/fa";
+import { FaHome, FaSearch, FaPaperPlane, FaTimes, FaUser, FaPaperclip } from "react-icons/fa";
 import "../admin_css_files/messages.css";
 
 const Messages = () => {
@@ -11,10 +11,11 @@ const Messages = () => {
   const [messages, setMessages] = useState([]);
   const [receivedMessages, setReceivedMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+  const [selectedFile, setSelectedFile] = useState(null);
   const [error, setError] = useState("");
   const messagesListRef = useRef(null);
-  const [isModalOpen, setIsModalOpen] = useState(false); // État pour la fenêtre modale
-  const [searchResults, setSearchResults] = useState(null); // Résultats de la recherche
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchResults, setSearchResults] = useState(null);
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -38,7 +39,9 @@ const Messages = () => {
       });
       const data = await response.json();
       if (response.ok) {
-        setReceivedMessages(data);
+        const filteredMessages = data.filter(msg => msg.destinataire === matricule && msg.expediteur !== matricule);
+        console.log("Messages reçus filtrés :", filteredMessages);
+        setReceivedMessages(filteredMessages);
       } else {
         setError(`Erreur lors du chargement des messages reçus : ${data.message || response.statusText}`);
       }
@@ -48,6 +51,7 @@ const Messages = () => {
   };
 
   const handleSearchRecipient = async () => {
+    setError("");
     const token = localStorage.getItem("token");
     const normalizedEmail = emailInput.trim().toLowerCase();
     try {
@@ -56,7 +60,7 @@ const Messages = () => {
       });
       const data = await response.json();
       if (response.ok && data && data.Matricule) {
-        setSearchResults(data); // Affiche les résultats dans la modale
+        setSearchResults(data);
         setError("");
       } else {
         setError("Utilisateur non trouvé.");
@@ -70,10 +74,11 @@ const Messages = () => {
 
   const handleSelectRecipient = (selectedRecipient) => {
     setRecipient(selectedRecipient);
-    setIsModalOpen(false); // Ferme la modale
-    setEmailInput(""); // Réinitialise le champ
-    setSearchResults(null); // Réinitialise les résultats
-    fetchMessages(selectedRecipient.Matricule); // Charge les messages
+    setIsModalOpen(false);
+    setEmailInput("");
+    setSearchResults(null);
+    fetchMessages(selectedRecipient.Matricule);
+    markMessagesAsRead(selectedRecipient.Matricule);
   };
 
   const fetchMessages = async (recipientMatricule) => {
@@ -91,33 +96,74 @@ const Messages = () => {
   };
 
   const handleSendMessage = async () => {
-    if (!newMessage.trim() || !recipient) return;
+    if (!newMessage.trim() && !selectedFile) return;
     const token = localStorage.getItem("token");
+    const formData = new FormData();
+    formData.append("expediteur", user.Matricule);
+    formData.append("destinataire", recipient.Matricule);
+    formData.append("contenu", newMessage || "");
+    formData.append("date_envoi", new Date().toISOString());
+    if (selectedFile) {
+      formData.append("file", selectedFile);
+    }
+
     try {
-      const messageData = {
-        expediteur: user.Matricule,
-        destinataire: recipient.Matricule,
-        contenu: newMessage,
-        date_envoi: new Date().toISOString(),
-      };
       const response = await fetch("http://localhost:8082/api/messages", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`,
         },
-        body: JSON.stringify(messageData),
+        body: formData,
       });
       const data = await response.json();
       if (response.ok) {
-        setMessages([...messages, data]);
+        const newMessageData = {
+          ID_message: data.ID_message || Date.now(),
+          expediteur: user.Matricule,
+          destinataire: recipient.Matricule,
+          contenu: newMessage || "",
+          date_envoi: new Date().toISOString(),
+          filePath: data.filePath || null,
+          fileName: selectedFile ? selectedFile.name : null, // Utiliser le nom d'origine du fichier
+          isRead: 0,
+        };
+        console.log("Nouveau message ajouté :", newMessageData);
+        setMessages([...messages, newMessageData]);
         setNewMessage("");
-        fetchReceivedMessages(user.Matricule);
+        setSelectedFile(null);
       } else {
         setError(`Erreur lors de l'envoi du message : ${data.message || response.statusText}`);
       }
     } catch (err) {
       setError(`Erreur réseau : ${err.message}`);
+    }
+  };
+
+  const handleFileChange = (e) => {
+    setSelectedFile(e.target.files[0]);
+  };
+
+  const handleRemoveFile = () => {
+    setSelectedFile(null);
+  };
+
+  const markMessagesAsRead = async (expediteurMatricule) => {
+    const token = localStorage.getItem("token");
+    try {
+      await fetch(`http://localhost:8082/api/messages/mark-as-read`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          expediteur: expediteurMatricule,
+          destinataire: user.Matricule,
+        }),
+      });
+      fetchReceivedMessages(user.Matricule);
+    } catch (err) {
+      console.error("Erreur lors de la mise à jour de isRead :", err);
     }
   };
 
@@ -130,22 +176,31 @@ const Messages = () => {
     };
     setRecipient(selectedRecipient);
     fetchMessages(message.expediteur);
+    markMessagesAsRead(message.expediteur);
   };
 
   const handleCloseChat = () => {
     setRecipient(null);
     setMessages([]);
     setNewMessage("");
+    setSelectedFile(null);
   };
 
   const uniqueContacts = () => {
     const contactsMap = new Map();
-    receivedMessages.forEach((msg) => {
+    const filteredReceived = receivedMessages.filter(msg => msg.expediteur !== user.Matricule && msg.destinataire === user.Matricule);
+    filteredReceived.forEach((msg) => {
       if (!contactsMap.has(msg.expediteur) || new Date(msg.date_envoi) > new Date(contactsMap.get(msg.expediteur).date_envoi)) {
         contactsMap.set(msg.expediteur, msg);
       }
     });
     return Array.from(contactsMap.values()).sort((a, b) => new Date(b.date_envoi) - new Date(a.date_envoi));
+  };
+
+  const hasUnreadMessages = (expediteurMatricule) => {
+    return receivedMessages.some(
+      (msg) => msg.expediteur === expediteurMatricule && msg.isRead === 0 && msg.destinataire === user.Matricule
+    );
   };
 
   const scrollToBottom = () => {
@@ -162,7 +217,7 @@ const Messages = () => {
         <div className="messages-container">
           <aside className="sidebar">
             <div className="logo">
-              <h2>Messagerie</h2>
+              <h2>Messagerie`  Messagerie</h2>
             </div>
             <button className="sidebar-button" onClick={() => navigate("/admin")}>
               <FaHome /> Retour à l'accueil
@@ -184,8 +239,9 @@ const Messages = () => {
                   onClick={() => handleMessageClick(msg)}
                 >
                   <div className="contact-info">
-                    <h4>
+                    <h4 className={hasUnreadMessages(msg.expediteur) ? "unread" : ""}>
                       {msg.nom} {msg.prenom}
+                      {hasUnreadMessages(msg.expediteur) && <span className="unread-dot"></span>}
                     </h4>
                     <p>{msg.contenu.substring(0, 30)}...</p>
                   </div>
@@ -227,6 +283,18 @@ const Messages = () => {
                         }`}
                       >
                         <p>{msg.contenu}</p>
+                        {msg.filePath && (
+                          <div className="file-attachment">
+                            <span>Fichier : {msg.fileName || "Fichier sans nom"}</span>
+                            <a
+                              href={`http://localhost:8082/uploads/${msg.filePath}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              Voir le fichier
+                            </a>
+                          </div>
+                        )}
                         <span>{new Date(msg.date_envoi).toLocaleTimeString()}</span>
                       </div>
                     ))
@@ -235,11 +303,27 @@ const Messages = () => {
                   )}
                 </div>
                 <div className="message-input">
+                  {selectedFile && (
+                    <div className="selected-file">
+                      <span>{selectedFile.name}</span>
+                      <button className="remove-file-btn" onClick={handleRemoveFile}>
+                        <FaTimes />
+                      </button>
+                    </div>
+                  )}
                   <textarea
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
                     placeholder="Tapez votre message..."
                   />
+                  <label className="file-upload-btn">
+                    <FaPaperclip />
+                    <input
+                      type="file"
+                      onChange={handleFileChange}
+                      style={{ display: "none" }}
+                    />
+                  </label>
                   <button className="messages-btn send" onClick={handleSendMessage}>
                     <FaPaperPlane /> Envoyer
                   </button>
@@ -250,7 +334,6 @@ const Messages = () => {
         </div>
       </div>
 
-      {/* Fenêtre modale pour la recherche */}
       {isModalOpen && (
         <div className="modal-overlay">
           <div className="modal-content">
