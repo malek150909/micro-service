@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import axios from 'axios';
 import debounce from 'lodash/debounce';
 import { FaFilter } from 'react-icons/fa';
-import "../../../admin_css_files/exam.css";
+import "../exam.css";
 
 const FilterForm = ({ onFilter, onChange }) => {
   const [filters, setFilters] = useState({

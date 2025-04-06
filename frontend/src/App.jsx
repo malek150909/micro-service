@@ -11,13 +11,9 @@ import Modules from "./admin/module/pages/Home";
 import ExamPlanning from "./admin/planning/pages/ExamPlanning";
 import ListEnseignants from "./admin/enseignant/ListEnseignant";
 import StudentSection from "./admin/etudiant/listetudiant";
-import ModifieProfilAdmin from "./main/modifierProfilAdmin";
+import ModifieProfil from "./main/modifierProfil";
 import EmploiDuTemps from "./admin/emploi/pages/TimetablePage";
-import MessagesAdmin from "./main/messagesAdmin";
-import ModifieProfilEnseignant from "./main/modifierProfilEnseignant";
-import MessagesEnseignant from "./main/messagesEnseignant";
-import ModifierProfilEtudiant from "./main/modifierProfilEtudiant";
-import MessagesEtudiant from "./main/messagesEtudiant";
+import Messagerie from "./main/Messages";
 import Ressources from "./enseignant/ressources/pages/Home";
 import Notes from "./enseignant/notes/pages/ProfessorHome";
 import GestionNotes from "./enseignant/notes/pages/GestionEnseignants";
@@ -32,8 +28,8 @@ import ETDemploi from "./etudiant/emploi/StudentTimetableFeed";
 import GestionEnseignants from "./enseignant/notes/pages/GestionEnseignants";
 import ProfessorReclamations from "./enseignant/notes/pages/ProfessorReclamations";
 import StudentGrades from "./etudiant/notes/pages/StudentGrades";
-import StudentHome from "./etudiant/notes/pages/StudentHome";
 import ENSlistetudiant from "./enseignant/listetudiant/TeacherDashboard";
+import ETDressources from "./etudiant/ressource/StudentDashboard";
 
 const PrivateRoute = ({ element }) => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -58,13 +54,9 @@ function App() {
                 <Route path="/consult" element={<ExamPlanning />} />
                 <Route path="/enseignants" element={<ListEnseignants />} />
                 <Route path="/etudiants" element={<StudentSection />} />
-                <Route path="/modifierProfilAdmin" element={<ModifieProfilAdmin />} />
+                <Route path="/modifierProfil" element={<ModifieProfil />} />
                 <Route path="/emploidutemps" element={<EmploiDuTemps />} />
-                <Route path="/messagesAdmin" element={<MessagesAdmin />} />
-                <Route path="/modifierProfilEnseignant" element={<ModifieProfilEnseignant />} />
-                <Route path="/messagesEnseignant" element={<MessagesEnseignant />} />
-                <Route path="/modifierProfilEtudiant" element={<ModifierProfilEtudiant />} />
-                <Route path="/messagesEtudiant" element={<MessagesEtudiant />} />
+                <Route path="/messagerie" element={<Messagerie />} />
                 <Route path="/ressources" element={<Ressources />} />
                 <Route path="/notes" element={<Notes />} />
                 <Route path="/gestionNotes" element={<GestionNotes />} />
@@ -79,8 +71,8 @@ function App() {
                 <Route path="/GESENS" element={<GestionEnseignants />} />
                 <Route path="/PROFREC" element={<ProfessorReclamations />} />
                 <Route path="/ETDGRD" element={<StudentGrades />} />
-                <Route path="/ETD" element={<StudentHome />} />
                 <Route path="/ENSlistetudiant" element={<ENSlistetudiant />} />
+                <Route path="/ETDressources" element={<ETDressources />} />
             </Routes>
         </Router>
     );

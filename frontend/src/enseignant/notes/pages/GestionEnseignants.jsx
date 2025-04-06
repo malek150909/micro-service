@@ -349,12 +349,6 @@ const GestionEnseignants = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    navigate('/');
-  };
-
   return (
     <>
     <div id="notes">
@@ -374,9 +368,6 @@ const GestionEnseignants = () => {
         </button>
         <button className="sidebar-button" onClick={() => navigate('/PROFREC')}>
           <FontAwesomeIcon icon={faFileAlt} /> Réclamations
-        </button>
-        <button className="sidebar-button" onClick={handleLogout}>
-          <FontAwesomeIcon icon={faSignOutAlt} /> Déconnexion
         </button>
       </div>
       <div className="container">

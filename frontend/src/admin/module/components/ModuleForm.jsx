@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
-import "../../../admin_css_files/module.css";
+import "../module.css";
 
 const ModuleForm = ({ onAdd, disabled, niveau }) => {
   let semesterOptions = [];

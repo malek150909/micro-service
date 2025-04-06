@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import axios from 'axios';
 import { createPortal } from 'react-dom';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
-import '../../../admin_css_files/exam.css';
+import '../exam.css';
 
 const ExamModal = ({ exam, onClose, onSave, modules, salles: initialSalles, semestres }) => {
   const [formData, setFormData] = useState({

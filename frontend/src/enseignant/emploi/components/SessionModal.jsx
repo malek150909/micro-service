@@ -147,7 +147,7 @@ const SessionModal = ({ session, onClose }) => {
   };
 
   if (loading) {
-    return <div className="modal-overlay"><div className="modal-content">Chargement...</div></div>;
+    return <div className="modal-content">Chargement...</div>;
   }
 
   return (
@@ -155,7 +155,7 @@ const SessionModal = ({ session, onClose }) => {
       <div className="modal-content">
         {formData.ID_seance && !isEditing ? (
           <div className="session-details">
-            <h3>Détails de la séance</h3>
+            <h3 className="timetable-title">Détails de la séance</h3>
             <div className="details-card">
               <div className="detail-item">
                 <span className="detail-label">Type :</span>
@@ -196,7 +196,7 @@ const SessionModal = ({ session, onClose }) => {
           </div>
         ) : (
           <form className="session-form" onSubmit={formData.ID_seance ? handleUpdate : handleAdd}>
-            <h3>{formData.ID_seance ? 'Modifier la séance' : 'Ajouter une séance'}</h3>
+            <h3 className="timetable-title">{formData.ID_seance ? 'Modifier la séance' : 'Ajouter une séance'}</h3>
             <div className="form-grid">
               <div className="form-group">
                 <label>Jour</label>

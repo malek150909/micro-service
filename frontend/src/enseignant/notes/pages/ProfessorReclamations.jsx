@@ -56,10 +56,10 @@ const ProfessorReclamations = () => {
     }
   };
 
-  const handleLogout = () => {
+  const handleBack = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
-    navigate('/');
+    navigate('/GESENS');
   };
 
   return (
@@ -76,8 +76,8 @@ const ProfessorReclamations = () => {
         <button className="sidebar-button" onClick={() => navigate('/PROFREC')}>
           <FontAwesomeIcon icon={faFileAlt} /> Réclamations
         </button>
-        <button className="sidebar-button" onClick={handleLogout}>
-          <FontAwesomeIcon icon={faSignOutAlt} /> Déconnexion
+        <button className="sidebar-button" onClick={handleBack}>
+          <FontAwesomeIcon icon={faSignOutAlt} /> Retour
         </button>
       </div>
       <div className="container">

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import ModuleModal from './ModuleModal';
-import "../../../admin_css_files/module.css";
+import "../module.css";
 
 const ModuleList = ({ modules, onDelete, onUpdate, niveau }) => {
   let semestreGroup1, semestreGroup2, label1, label2;

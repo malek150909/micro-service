@@ -1,16 +1,3 @@
-#annonces{
-body {
-  font-family: "Poppins", sans-serif;
-  background: linear-gradient(135deg, #ffffff 0%, #86b4ec 50%, #082e54 100%);
-  background-attachment: fixed;
-  margin: 0;
-  padding: 0;
-  color: #021024;
-  overflow-x: hidden;
-  position: relative;
-  min-height: 100vh;
-}
-
 /* Conteneur principal */
 .container {
   max-width: 1400px;
@@ -21,7 +8,7 @@ body {
 }
 
 /* Formes abstraites en arrière-plan */
-.background-shapes {
+.backgroundShapes {
   position: fixed;
   top: 0;
   left: 0;
@@ -96,7 +83,7 @@ body {
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.sidebar-button {
+.sidebarButton {
   background: rgba(255, 255, 255, 0.1);
   color: #ffffff;
   text-decoration: none;
@@ -117,13 +104,13 @@ body {
   margin: 0;
 }
 
-.sidebar-button:hover {
+.sidebarButton:hover {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(125, 160, 202, 0.5));
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   transform: translateY(-2px);
 }
 
-.sidebar-button::before {
+.sidebarButton::before {
   content: "";
   position: absolute;
   top: 0;
@@ -134,12 +121,12 @@ body {
   transition: all 0.5s ease;
 }
 
-.sidebar-button:hover::before {
+.sidebarButton:hover::before {
   left: 100%;
 }
 
 /* Contenu principal */
-.main-content {
+.mainContent {
   margin-left: 290px; /* 180px (largeur sidebar) + 30px (marge gauche sidebar) + 80px (espace supplémentaire) */
   margin-right: 30px;
   padding: 20px;
@@ -180,12 +167,12 @@ body {
 }
 
 /* Barre de recherche */
-.search-bar {
+.searchBar {
   position: relative;
   margin-bottom: 20px;
 }
 
-.search-bar input {
+.searchBar input {
   padding: 12px 15px 12px 40px;
   border: 1px solid rgba(84, 131, 179, 0.2);
   border-radius: 12px;
@@ -198,17 +185,17 @@ body {
   box-sizing: border-box;
 }
 
-.search-bar input:focus {
+.searchBar input:focus {
   border-color: #5483b3;
   box-shadow: 0 0 15px rgba(84, 131, 179, 0.2);
   outline: none;
 }
 
-.search-bar input::placeholder {
+.searchBar input::placeholder {
   color: #7da0ca;
 }
 
-.search-icon {
+.searchIcon {
   position: absolute;
   left: 15px;
   top: 50%;
@@ -218,7 +205,7 @@ body {
 }
 
 /* Liste des événements */
-.event-list {
+.eventList {
   background: rgba(255, 255, 255, 0.85);
   border-radius: 20px;
   padding: 25px;
@@ -228,7 +215,7 @@ body {
   z-index: 2;
 }
 
-.event-list h3 {
+.eventList h3 {
   font-size: 1.2rem;
   font-weight: 600;
   color: #052659;
@@ -245,11 +232,11 @@ body {
   transition: all 0.4s ease;
 }
 
-.event-list h3:hover {
+.eventList h3:hover {
   transform: scale(1.02);
 }
 
-.event-list h3::after {
+.eventList h3::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -260,12 +247,12 @@ body {
   transition: width 0.4s ease;
 }
 
-.event-list h3:hover::after {
+.eventList h3:hover::after {
   width: 100%;
 }
 
 /* Styles pour les sections Étudiants et Enseignants */
-.etudiants-section, .enseignants-section {
+.etudiantsSection, .enseignantsSection {
   margin-bottom: 30px;
   padding: 20px;
   border-radius: 15px;
@@ -274,15 +261,15 @@ body {
   border: 1px solid rgba(84, 131, 179, 0.2);
 }
 
-.etudiants-section {
+.etudiantsSection {
   background: rgba(200, 220, 255, 0.2); /* Fond légèrement bleuté pour les étudiants */
 }
 
-.enseignants-section {
+.enseignantsSection {
   background: rgba(255, 200, 200, 0.2); /* Fond légèrement rosé pour les enseignants */
 }
 
-.etudiants-section h4, .enseignants-section h4 {
+.etudiantsSection h4, .enseignantsSection h4 {
   font-size: 1.1rem;
   font-weight: 600;
   color: #052659;
@@ -295,7 +282,7 @@ body {
   -webkit-text-fill-color: transparent;
 }
 
-.event-list ul {
+.eventList ul {
   list-style: none;
   padding: 0;
   max-height: 400px;
@@ -305,7 +292,7 @@ body {
   gap: 15px;
 }
 
-.event-item {
+.eventItem {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -319,20 +306,20 @@ body {
   backdrop-filter: blur(5px);
 }
 
-.event-item:hover {
+.eventItem:hover {
   transform: translateY(-3px);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
   background: rgb(72, 108, 202);
   border-color: rgba(84, 131, 179, 0.4);
 }
 
-.event-info {
+.eventInfo {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.event-info h4 {
+.eventInfo h4 {
   font-size: 1.1rem;
   font-weight: 700;
   color: #0a1e3d;
@@ -342,19 +329,19 @@ body {
   gap: 8px;
 }
 
-.annonce-icon {
+.annonceIcon {
   color: #0b2f54;
   font-size: 1.2rem;
 }
 
-.event-info p {
+.eventInfo p {
   font-size: 0.9rem;
   color: #5483b3;
   margin: 0;
   line-height: 1.4;
 }
 
-.event-stats p {
+.eventStats p {
   font-size: 0.9rem;
   color: #ffffff;
   margin: 0;
@@ -365,13 +352,13 @@ body {
   transition: all 0.3s ease;
 }
 
-.event-stats p:hover {
+.eventStats p:hover {
   background: #3b669b;
   box-shadow: 0 0 10px rgba(125, 160, 202, 0.5);
 }
 
 /* Message "Aucune annonce" */
-.no-results {
+.noResults {
   text-align: center;
   color: #184976;
   font-size: 1.2rem;
@@ -382,7 +369,7 @@ body {
 }
 
 /* Formulaire */
-form {
+.form {
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -393,14 +380,14 @@ form {
   z-index: 2;
 }
 
-.input-group {
+.inputGroup {
   position: relative;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.input-icon {
+.inputIcon {
   position: absolute;
   left: 15px;
   top: 50%;
@@ -409,7 +396,7 @@ form {
   font-size: 1.1rem;
 }
 
-input, textarea, select {
+.inputGroup input, .inputGroup textarea, .inputGroup select {
   padding: 15px;
   padding-left: 45px;
   border: 1px solid rgba(84, 131, 179, 0.2);
@@ -423,21 +410,21 @@ input, textarea, select {
   box-sizing: border-box;
 }
 
-input:focus, textarea:focus, select:focus {
+.inputGroup input:focus, .inputGroup textarea:focus, .inputGroup select:focus {
   border-color: #5483b3;
   box-shadow: 0 0 15px rgba(84, 131, 179, 0.2);
   outline: none;
 }
 
-textarea, select {
+.inputGroup textarea, .inputGroup select {
   padding-left: 15px;
 }
 
-input::placeholder, textarea::placeholder {
+.inputGroup input::placeholder, .inputGroup textarea::placeholder {
   color: #7da0ca;
 }
 
-.input-group label {
+.inputGroup label {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -447,7 +434,7 @@ input::placeholder, textarea::placeholder {
 }
 
 /* Section de filtrage */
-.filter-section {
+.filterSection {
   margin: 15px 0;
   padding: 20px;
   background: #f0f7ff;
@@ -456,18 +443,18 @@ input::placeholder, textarea::placeholder {
   border: 1px solid rgba(84, 131, 179, 0.1);
 }
 
-.filter-options {
+.filterOptions {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
 }
 
-.filter-group {
+.filterGroup {
   flex: 1;
   min-width: 150px;
 }
 
-.filter-group label {
+.filterGroup label {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -477,7 +464,7 @@ input::placeholder, textarea::placeholder {
 }
 
 /* Modale */
-.modal-overlay {
+.modalOverlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -495,21 +482,21 @@ input::placeholder, textarea::placeholder {
   pointer-events: none; /* Désactive les interactions quand invisible */
 }
 
-.modal-overlay.active {
+.modalOverlay.active {
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto; /* Active les interactions quand visible */
 }
 
-.modal-overlay.slide-in {
+.modalOverlaySlideIn {
   animation: slideInFromTop 0.4s ease-out forwards;
 }
 
-.modal-overlay.fade-out {
+.modalOverlayFadeOut {
   animation: fadeOut 0.3s ease-in forwards;
 }
 
-.modal-content {
+.modalContent {
   width: 100%;
   max-width: 500px;
   max-height: 80vh;
@@ -522,7 +509,7 @@ input::placeholder, textarea::placeholder {
   backdrop-filter: blur(10px);
 }
 
-.modal-content h3 {
+.modalContent h3 {
   font-size: 1.6rem;
   font-weight: 600;
   color: #052659;
@@ -531,7 +518,7 @@ input::placeholder, textarea::placeholder {
   text-shadow: 0 1px 3px rgba(5, 38, 89, 0.1);
 }
 
-.modal-content .event-image {
+.eventImage {
   max-height: 200px;
   margin-bottom: 20px;
   border-radius: 12px;
@@ -541,7 +528,7 @@ input::placeholder, textarea::placeholder {
   border: 1px solid rgba(84, 131, 179, 0.2);
 }
 
-.modal-content .description {
+.description {
   background: #f0f7ff;
   padding: 20px;
   border-radius: 12px;
@@ -549,14 +536,14 @@ input::placeholder, textarea::placeholder {
   border: 1px solid rgba(84, 131, 179, 0.1);
 }
 
-.modal-content .description p {
+.description p {
   font-size: 0.95rem;
   margin: 0;
   color: #052659;
   line-height: 1.6;
 }
 
-.modal-content p {
+.modalContent p {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -566,14 +553,14 @@ input::placeholder, textarea::placeholder {
 }
 
 /* Boutons */
-.button-group {
+.buttonGroup {
   display: flex;
   gap: 15px;
   margin-top: 25px;
   justify-content: center;
 }
 
-button {
+.buttonGroup button {
   background: linear-gradient(135deg, #5483b3 0%, #052659 100%);
   color: #ffffff;
   padding: 12px 25px;
@@ -591,12 +578,12 @@ button {
   overflow: hidden;
 }
 
-button:hover {
+.buttonGroup button:hover {
   transform: translateY(-3px);
   box-shadow: 0 12px 25px rgba(5, 38, 89, 0.15), 0 0 15px rgba(125, 160, 202, 0.4);
 }
 
-button::before {
+.buttonGroup button::before {
   content: "";
   position: absolute;
   top: 0;
@@ -607,31 +594,31 @@ button::before {
   transition: all 0.5s ease;
 }
 
-button:hover::before {
+.buttonGroup button:hover::before {
   left: 100%;
 }
 
-.edit-button {
+.editButton {
   background: linear-gradient(135deg, #7da0ca 0%, #5483b3 100%);
 }
 
-.edit-button:hover {
+.editButton:hover {
   background: linear-gradient(135deg, #5483b3 0%, #7da0ca 100%);
 }
 
-.delete-button {
+.deleteButton {
   background: linear-gradient(135deg, #052659 0%, #021024 100%);
 }
 
-.delete-button:hover {
+.deleteButton:hover {
   background: linear-gradient(135deg, #021024 0%, #052659 100%);
 }
 
-.close-button {
+.closeButton {
   background: linear-gradient(135deg, #5483b3 0%, #7da0ca 100%);
 }
 
-.close-button:hover {
+.closeButton:hover {
   background: linear-gradient(135deg, #7da0ca 0%, #5483b3 100%);
 }
 
@@ -680,23 +667,22 @@ button:hover::before {
       margin-bottom: 30px;
   }
 
-  .main-content {
+  .mainContent {
       margin-left: 0;
       margin-right: 0;
   }
 
-  .event-list ul {
+  .eventList ul {
       grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 576px) {
-  .button-group {
+  .buttonGroup {
       flex-direction: column;
   }
 
-  .modal-content {
+  .modalContent {
       padding: 20px;
   }
-}
 }

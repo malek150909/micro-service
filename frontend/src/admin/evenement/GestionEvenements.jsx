@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { FaEdit, FaTrash, FaTimes, FaCalendar, FaMapMarkerAlt, FaUsers, FaSearch, FaList, FaPlus, FaHome, FaUser, FaChartBar } from 'react-icons/fa';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
-import '../../admin_css_files/evenement.css';
+import './evenement.css';
 
 // Enregistrer les composants nécessaires pour Chart.js
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);

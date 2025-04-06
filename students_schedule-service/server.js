@@ -9,6 +9,7 @@ import documentRoutes from './routes/documentRoutes.js';
 import teacherRoutes from './routes/ENSemploi.js';
 import timetableENSRoutes from './routes/timetableENSRoutes.js';
 import timetableETDRoutes from './routes/timetableETDRoutes.js';
+import studentRoutes from './routes/ETDressourcesRoutes.js';
 
 dotenv.config();
 process.env.TZ = 'UTC';
@@ -26,6 +27,7 @@ app.use('/documents', documentRoutes);
 app.use('/teacher', teacherRoutes);
 app.use('/timetableENS', timetableENSRoutes);
 app.use('/timetableETD', timetableETDRoutes);
+app.use('/ETDressources', studentRoutes);
 
 const PORT = 8083;
 app.listen(PORT, () => {

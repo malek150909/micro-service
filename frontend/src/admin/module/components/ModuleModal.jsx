@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { createPortal } from 'react-dom';
 import axios from 'axios';
-import "../../../admin_css_files/module.css";
+import "../module.css";
 
 const ModuleModal = ({ module, onClose, onSave }) => {
   const [formData, setFormData] = useState({

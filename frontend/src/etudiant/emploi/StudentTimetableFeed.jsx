@@ -1,16 +1,23 @@
-// StudentTimetableFeed.jsx
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import '../../admin_css_files/TimetableDisplay.css';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+import ReactDOM from 'react-dom';
+import './StudentTimetableFeed.css';
+import { FaHome, FaFilePdf, FaFileExcel } from 'react-icons/fa'; // Ajout des icônes pour PDF et Excel
 
 const StudentTimetableFeed = () => {
   const [seances, setSeances] = useState([]);
   const [selectedSession, setSelectedSession] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [matricule, setMatricule] = useState(null);
+  const sectionInfo = seances.length > 0 
+    ? `${seances[0].niveau} ${seances[0].nom_specialite} ${seances[0].nom_section}`
+    : '';
+
+  const navigate = useNavigate();
 
   const days = ['Samedi', 'Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi'];
   const timeSlots = [
@@ -145,118 +152,127 @@ const StudentTimetableFeed = () => {
     XLSX.writeFile(wb, fileName);
   };
 
+  const renderModal = () => {
+    if (!isModalOpen || !selectedSession) return null;
+
+    return ReactDOM.createPortal(
+      <div className="modal-overlay">
+        <div className="modal-content">
+          <div className="session-details">
+            <h3 className="timetable-title">Détails de la case ({selectedSession.jour} {selectedSession.timeSlot})</h3>
+            {selectedSession.sessions.length > 0 ? (
+              selectedSession.sessions.map((s, index) => (
+                <div key={index} className="details-card">
+                  <div className="detail-item">
+                    <span className="detail-label">Type :</span>
+                    <span className="detail-value">{s.type_seance === 'Cour' ? 'Cours' : s.type_seance}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Module :</span>
+                    <span className="detail-value">{s.nom_module}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Salle :</span>
+                    <span className="detail-value">{s.nom_salle}</span>
+                  </div>
+                  {(s.type_seance === 'TP' || s.type_seance === 'TD') && s.num_groupe && (
+                    <div className="detail-item">
+                      <span className="detail-label">Groupe :</span>
+                      <span className="detail-value">{s.num_groupe}</span>
+                    </div>
+                  )}
+                  <div className="detail-item">
+                    <span className="detail-label">Jour :</span>
+                    <span className="detail-value">{s.jour}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Horaire :</span>
+                    <span className="detail-value">{s.time_slot}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Section :</span>
+                    <span className="detail-value">{`(${s.niveau} ${s.nom_specialite} ${s.nom_section})`}</span>
+                  </div>
+                  {index < selectedSession.sessions.length - 1 && <hr />}
+                </div>
+              ))
+            ) : (
+              <p className="no-session">Aucune séance à cet emplacement.</p>
+            )}
+            <button className="timetable-btn close-modal" onClick={closeModal}>Fermer</button>
+          </div>
+        </div>
+      </div>,
+      document.body
+    );
+  };
+
   if (!matricule) {
     return <div>Veuillez vous connecter pour voir votre emploi du temps.</div>;
   }
 
   return (
-    <div className="timetable-container">
-      <h2 className="timetable-title">Emploi du temps</h2>
-      <div className="export-buttons">
-        <button onClick={exportToPDF} className="timetable-btn export-pdf">Exporter en PDF</button>
-        <button onClick={exportToExcel} className="timetable-btn export-excel">Exporter en Excel</button>
+    <div className="student-timetable-wrapper">
+      <div className="sidebar">
+      <div className="logo"><h2>Emplois du temps</h2></div>
+        <button className="sidebar-button" onClick={() => navigate('/etudiant')}>
+          <FaHome /> Retour
+        </button>
+        <button className="sidebar-button export-pdf" onClick={exportToPDF}>
+          <FaFilePdf /> Exporter en PDF
+        </button>
+        <button className="sidebar-button export-excel" onClick={exportToExcel}>
+          <FaFileExcel /> Exporter en Excel
+        </button>
       </div>
-      <table className="timetable-table">
-        <thead>
-          <tr>
-            <th>Jour</th>
-            {timeSlots.map((slot) => (
-              <th key={slot}>{slot}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {days.map((day) => (
-            <tr key={day}>
-              <td style={{ fontWeight: '500' }}>{day}</td>
-              {timeSlots.map((slot) => {
-                const sessions = seances.filter((s) => s.jour === day && s.time_slot === slot);
-                return (
-                  <td
-                    key={`${day}-${slot}`}
-                    className={sessions.length > 0 ? 'session-occupied' : ''}
-                    onClick={() => handleCellClick(day, slot)}
-                  >
-                    {sessions.length > 0 ? (
-                      sessions.map((session, index) => (
-                        <div key={index}>
-                          <strong>{session.type_seance === 'Cour' ? 'Cours' : session.type_seance}</strong>
-                          <br />
-                          {session.nom_module}
-                          <br />
-                          {session.nom_salle}
-                          <br />
-                          {(session.type_seance === 'TP' || session.type_seance === 'TD') && session.num_groupe && (
-                            <>Groupe {session.num_groupe}<br /></>
-                          )}
-                          {`(${session.niveau} ${session.nom_specialite} ${session.nom_section})`}
-                          {index < sessions.length - 1 && <hr />}
-                        </div>
-                      ))
-                    ) : (
-                      '-'
-                    )}
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      {isModalOpen && <SessionModal session={selectedSession} onClose={closeModal} />}
-    </div>
-  );
-};
-
-const SessionModal = ({ session, onClose }) => {
-  return (
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <div className="session-details">
-          <h3 className="timetable-title">Détails de la case ({session.jour} {session.timeSlot})</h3>
-          {session.sessions.length > 0 ? (
-            session.sessions.map((s, index) => (
-              <div key={index} className="details-card">
-                <div className="detail-item">
-                  <span className="detail-label">Type :</span>
-                  <span className="detail-value">{s.type_seance === 'Cour' ? 'Cours' : s.type_seance}</span>
-                </div>
-                <div className="detail-item">
-                  <span className="detail-label">Module :</span>
-                  <span className="detail-value">{s.nom_module}</span>
-                </div>
-                <div className="detail-item">
-                  <span className="detail-label">Salle :</span>
-                  <span className="detail-value">{s.nom_salle}</span>
-                </div>
-                {(s.type_seance === 'TP' || s.type_seance === 'TD') && s.num_groupe && (
-                  <div className="detail-item">
-                    <span className="detail-label">Groupe :</span>
-                    <span className="detail-value">{s.num_groupe}</span>
-                  </div>
-                )}
-                <div className="detail-item">
-                  <span className="detail-label">Jour :</span>
-                  <span className="detail-value">{s.jour}</span>
-                </div>
-                <div className="detail-item">
-                  <span className="detail-label">Horaire :</span>
-                  <span className="detail-value">{s.time_slot}</span>
-                </div>
-                <div className="detail-item">
-                  <span className="detail-label">Section :</span>
-                  <span className="detail-value">{`(${s.niveau} ${s.nom_specialite} ${s.nom_section})`}</span>
-                </div>
-                {index < session.sessions.length - 1 && <hr />}
-              </div>
-            ))
-          ) : (
-            <p className="no-session">Aucune séance à cet emplacement.</p>
-          )}
-          <div className="detail-actions">
-            <button className="timetable-btn close-modal" onClick={onClose}>Fermer</button>
-          </div>
+      <div className="timetable-container">
+        <div className="timetable-header">
+          <h2 className="timetable-title">Votre Emploi du temps</h2>
+          {sectionInfo && <div className="section-info">{sectionInfo}</div>}
         </div>
+        <table className="modern-timetable-table">
+          <thead>
+            <tr>
+              <th className="modern-th">Jour</th>
+              {timeSlots.map((slot) => (
+                <th key={slot} className="modern-th">{slot}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {days.map((day) => (
+              <tr key={day} className="modern-tr">
+                <td className="modern-day">{day}</td>
+                {timeSlots.map((slot) => {
+                  const sessions = seances.filter((s) => s.jour === day && s.time_slot === slot);
+                  return (
+                    <td
+                      key={`${day}-${slot}`}
+                      onClick={() => handleCellClick(day, slot)}
+                      className="modern-td"
+                    >
+                      {sessions.length > 0 ? (
+                        sessions.map((session, index) => (
+                          <div key={index} className="session-card">
+                            <span className="session-type">{session.type_seance === 'Cour' ? 'Cours' : session.type_seance}</span>
+                            <span className="session-module">{session.nom_module}</span>
+                            <span className="session-room">Salle: {session.nom_salle}</span>
+                            {(session.type_seance === 'TP' || session.type_seance === 'TD') && session.num_groupe && (
+                              <span className="session-group">Groupe: {session.num_groupe}</span>
+                            )}
+                          </div>
+                        ))
+                      ) : (
+                        <span className="empty-slot">-</span>
+                      )}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {renderModal()}
       </div>
     </div>
   );

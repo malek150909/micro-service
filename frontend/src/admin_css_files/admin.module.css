@@ -1,0 +1,434 @@
+
+.adminContainer {
+  background: linear-gradient(180deg, #5483b3, #c1e8ff); /* Remplace var(--accent) et var(--background) par des valeurs fixes */
+  transition: opacity 1s ease-in-out;
+}
+
+.adminContainerLoaded {
+  opacity: 1;
+}
+
+.sidebar {
+  width: 70px;
+  background: linear-gradient(180deg, #021024, #052659); /* Remplace var(--primary) et var(--secondary) */
+  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+  box-shadow: 5px 0 20px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 70vh;
+}
+
+.sidebarMenu {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  justify-content: center;
+  height: 100%;
+}
+
+.sidebarItem {
+  background: none;
+  border: none;
+  padding: 12px;
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.sidebarItem::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.sidebarItem:hover::before {
+  opacity: 1;
+}
+
+.sidebarItem:hover {
+  transform: scale(1.1);
+}
+
+.sidebarIcon {
+  font-size: 1.2rem;
+  color: #ffffff; /* Remplace var(--white) */
+  z-index: 1;
+}
+
+.mainContent {
+  flex: 1;
+  padding: 30px;
+  margin-left: 70px;
+  position: relative;
+}
+
+.welcomeMessage {
+  margin-bottom: 20px;
+  opacity: 0;
+  transform: translateX(-50px);
+  transition: all 1s ease-in-out;
+}
+
+.welcomeMessageSlideIn {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.welcomeMessage h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #c1e8ff; /* Remplace var(--background) */
+  margin-bottom: 5px;
+  background: linear-gradient(90deg, #ffffff, #5483b3); /* Remplace var(--white) et var(--accent) */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.welcomeMessage p {
+  font-size: 1rem;
+  color: #c1e8ff; /* Remplace var(--background) */
+  font-weight: 400;
+}
+
+.mainLayout {
+  display: flex;
+  gap: 20px;
+}
+
+.cardsSection {
+  flex: 3;
+}
+
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 15px;
+}
+
+.card {
+  background: linear-gradient(145deg, #ffffff, #c1e8ff); /* Remplace var(--card-bg) et var(--background) */
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  border: 2px solid transparent;
+}
+
+.card:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  border-color: #5483b3; /* Remplace var(--accent) */
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(84, 131, 179, 0.1), rgba(2, 16, 36, 0.1));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+.cardIcon {
+  position: absolute;
+  top: -25px;
+  left: 20px;
+  width: 50px;
+  height: 50px;
+  background: #021024; /* Remplace var(--primary) */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: #ffffff; /* Remplace var(--white) */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.cardContent {
+  margin-top: 35px;
+}
+
+.cardTitle {
+  font-size: 1.2rem;
+  color: #021024; /* Remplace var(--primary) */
+  margin-bottom: 5px;
+  font-weight: 900;
+}
+
+.cardDescription {
+  color: #052659; /* Remplace var(--secondary) */
+  font-size: 0.90rem;
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+.cardArrow {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #5483b3; /* Remplace var(--accent) */
+  font-size: 1.2rem;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.card:hover .cardArrow {
+  opacity: 1;
+  right: 10px;
+}
+
+.rightColumn {
+  flex: 1;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.calendarSection {
+  background: linear-gradient(145deg, #7da0ca, #c1e8ff); /* Remplace var(--light-accent) et var(--background) */
+  padding: 15px;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.calendarSection h3 {
+  font-size: 1.2rem;
+  color: #021024; /* Remplace var(--primary) */
+  margin-bottom: 10px;
+}
+
+.calendarGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  text-align: center;
+}
+
+.calendarDayHeader {
+  font-size: 0.75rem;
+  color: #021024; /* Remplace var(--text) */
+  font-weight: 600;
+  padding: 5px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+}
+
+.calendarDay {
+  padding: 5px;
+  font-size: 0.9rem;
+  color: #021024; /* Remplace var(--text) */
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  transition: background 0.3s ease;
+}
+
+.calendarDay:hover {
+  background: #5483b3; /* Remplace var(--accent) */
+  color: #ffffff; /* Remplace var(--white) */
+}
+
+.currentDay {
+  background: #5483b3; /* Remplace var(--accent) */
+  color: #ffffff; /* Remplace var(--white) */
+  border: 2px solid #021024; /* Remplace var(--primary) */
+}
+
+.todoSection {
+  background: linear-gradient(145deg, #7da0ca, #c1e8ff); /* Remplace var(--light-accent) et var(--background) */
+  padding: 15px;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.todoSection h3 {
+  font-size: 1.2rem;
+  color: #021024; /* Remplace var(--primary) */
+  margin-bottom: 10px;
+}
+
+.todoList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.todoInput {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  position: relative;
+}
+
+.todoInput::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 5px;
+  background: linear-gradient(180deg, #5483b3, #7da0ca); /* Remplace var(--accent) et var(--light-accent) */
+  border-radius: 5px 0 0 5px;
+}
+
+.todoInput input {
+  flex: 1;
+  padding: 8px 8px 8px 15px;
+  border: 1px solid transparent;
+  border-radius: 15px 0 0 15px;
+  font-size: 0.9rem;
+  outline: none;
+  background: #ffffff; /* Remplace var(--white) */
+  transition: border 0.3s ease;
+}
+
+.todoInput input:focus {
+  border: 1px solid #5483b3; /* Remplace var(--accent) */
+}
+
+.todoInput button {
+  background: linear-gradient(135deg, #021024, #052659); /* Remplace var(--primary) et var(--secondary) */
+  border: none;
+  padding: 8px;
+  border-radius: 0 15px 15px 0;
+  color: #ffffff; /* Remplace var(--white) */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.todoItem {
+  position: relative;
+  padding: 10px 10px 10px 15px;
+  border-radius: 15px 0 0 15px;
+  transition: background 0.3s ease;
+  background: #ffffff; /* Remplace var(--white) */
+}
+
+.todoItem::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 5px;
+  background: linear-gradient(180deg, #5483b3, #7da0ca); /* Remplace var(--accent) et var(--light-accent) */
+  border-radius: 15px 0 0 15px;
+}
+
+.todoItem:hover {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.todoDetails p {
+  font-size: 0.9rem;
+  color: #021024; /* Remplace var(--text) */
+  margin-bottom: 5px;
+}
+
+.todoProgress {
+  width: 100%;
+  height: 5px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.todoProgress .progressBar {
+  height: 100%;
+  background: linear-gradient(90deg, #5483b3, #7da0ca); /* Remplace var(--accent) et var(--light-accent) */
+  transition: width 0.5s ease;
+}
+
+.todoDetails span {
+  font-size: 0.75rem;
+  color: #7da0ca; /* Remplace var(--text-light) */
+}
+
+/* Styles pour la modale de notification */
+.notificationModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(2, 16, 36, 0.5); /* Remplace var(--primary) avec opacité */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.notificationModalActive {
+  opacity: 1;
+}
+
+.notificationModalContent {
+  background: linear-gradient(145deg, #ffffff, #c1e8ff); /* Remplace var(--card-bg) et var(--background) */
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+  position: relative;
+  min-width: 300px;
+  max-width: 500px;
+  border: 2px solid #5483b3; /* Remplace var(--accent) */
+  transform: scale(0.9);
+  transition: transform 0.3s ease-in-out;
+}
+
+.notificationModalContentActive {
+  transform: scale(1);
+}
+
+.closeModalBtn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #021024; /* Remplace var(--primary) */
+  border: none;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  font-size: 1rem;
+  color: #ffffff; /* Remplace var(--white) */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.closeModalBtn:hover {
+  background: #052659; /* Remplace var(--secondary) */
+  transform: scale(1.1);
+}

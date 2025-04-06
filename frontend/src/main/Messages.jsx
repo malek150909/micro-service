@@ -19,7 +19,7 @@ const Messages = () => {
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (!storedUser || storedUser.role !== "etudiant") {
+    if (!storedUser || !["admin", "enseignant", "etudiant"].includes(storedUser.role)) {
       navigate("/");
     } else {
       setUser(storedUser);
@@ -124,7 +124,7 @@ const Messages = () => {
           contenu: newMessage || "",
           date_envoi: new Date().toISOString(),
           filePath: data.filePath || null,
-          fileName: selectedFile ? selectedFile.name : null, // Utiliser le nom d'origine du fichier
+          fileName: selectedFile ? selectedFile.name : null,
           isRead: 0,
         };
         console.log("Nouveau message ajouté :", newMessageData);
@@ -209,6 +209,12 @@ const Messages = () => {
     }
   };
 
+  const handleNavigateHome = () => {
+    if (user?.role === "admin") navigate("/admin");
+    else if (user?.role === "enseignant") navigate("/enseignant");
+    else if (user?.role === "etudiant") navigate("/etudiant");
+  };
+
   const contacts = uniqueContacts();
 
   return (
@@ -219,7 +225,7 @@ const Messages = () => {
             <div className="logo">
               <h2>Messagerie`  Messagerie</h2>
             </div>
-            <button className="sidebar-button" onClick={() => navigate("/etudiant")}>
+            <button className="sidebar-button" onClick={handleNavigateHome}>
               <FaHome /> Retour à l'accueil
             </button>
             <button className="sidebar-button" onClick={() => setIsModalOpen(true)}>
@@ -256,7 +262,7 @@ const Messages = () => {
           <main className="main-content">
             <header className="header">
               <h1>
-                <FaPaperPlane /> Messagerie Admin
+                <FaPaperPlane /> Messagerie {user?.role === "admin" ? "Admin" : user?.role === "enseignant" ? "Enseignant" : "Étudiant"}
               </h1>
               <p>Gérez vos conversations ici</p>
             </header>

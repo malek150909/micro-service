@@ -1,16 +1,4 @@
-/* Styles généraux */
-#docs{
-    
-body {
-    font-family: "Poppins", sans-serif;
-    background: linear-gradient(135deg, #ffffff 0%, #86b4ec 50%, #082e54 100%);
-    background-attachment: fixed;
-    margin: 0;
-    padding: 0;
-    color: #021024;
-    overflow-x: hidden;
-    min-height: 100vh;
-}
+#evenements{
 
 /* Conteneur principal */
 .container {
@@ -18,6 +6,11 @@ body {
     margin: 30px auto;
     padding: 0;
     position: relative;
+}
+
+/* Supprimer le placeholder car nous n'utilisons plus la grille */
+.sidebar-placeholder {
+    display: none;
 }
 
 /* Formes abstraites en arrière-plan avec animation subtile */
@@ -190,7 +183,7 @@ body {
 /* Grille de contenu */
 .content-grid {
     display: grid;
-    grid-template-columns: 1fr 2fr; /* Changed to give more space to Documents */
+    grid-template-columns: 2fr 1fr;
     gap: 30px;
 }
 
@@ -219,7 +212,6 @@ body {
     padding-bottom: 10px;
     background: linear-gradient(90deg, #0d3155, #7DA0CA);
     -webkit-background-clip: text;
-    background-clip: text;
     -webkit-text-fill-color: transparent;
     transition: all 0.4s ease;
 }
@@ -243,8 +235,14 @@ body {
     width: 100%;
 }
 
-/* Liste des documents */
-.document-list {
+.chart-wrapper {
+    max-width: 100%;
+    height: 300px;
+    position: relative;
+}
+
+/* Liste des événements */
+.event-list {
     background: rgba(255, 255, 255, 0.85);
     border-radius: 20px;
     padding: 25px;
@@ -255,7 +253,7 @@ body {
     overflow: hidden;
 }
 
-.document-list h3 {
+.event-list h3 {
     font-size: 1.2rem;
     font-weight: 600;
     color: #052659;
@@ -268,16 +266,15 @@ body {
     padding-bottom: 10px;
     background: linear-gradient(90deg, #0c3156, #7DA0CA);
     -webkit-background-clip: text;
-    background-clip: text;
     -webkit-text-fill-color: transparent;
     transition: all 0.4s ease;
 }
 
-.document-list h3:hover {
+.event-list h3:hover {
     transform: scale(1.02);
 }
 
-.document-list h3::after {
+.event-list h3::after {
     content: '';
     position: absolute;
     bottom: 0;
@@ -288,32 +285,76 @@ body {
     transition: width 0.4s ease;
 }
 
-.document-list h3:hover::after {
+.event-list h3:hover::after {
     width: 100%;
 }
 
-.document-list ul {
+.search-container {
+    position: relative;
+    width: 100%;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 12px;
+    padding: 5px 10px;
+    box-shadow: 0 4px 15px rgba(3, 19, 44, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+}
+
+.search-container:hover {
+    box-shadow: 0 6px 20px rgba(5, 38, 89, 0.1);
+}
+
+.search-bar {
+    width: 100%;
+    padding: 12px 40px 12px 15px;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    background: transparent;
+    color: #052659;
+}
+
+.search-bar:focus {
+    outline: none;
+}
+
+.search-bar::placeholder {
+    color: #3c70af;
+}
+
+.search-icon {
+    position: absolute;
+    right: 15px;
+    color: #0c2a46;
+    font-size: 1.2rem;
+}
+
+.event-list ul {
     list-style: none;
     padding: 0;
-    max-height: 470px;
+    max-height: 400px;
     overflow-y: auto;
 }
 
-.document-list ul::-webkit-scrollbar {
+.event-list ul::-webkit-scrollbar {
     width: 6px;
 }
 
-.document-list ul::-webkit-scrollbar-track {
+.event-list ul::-webkit-scrollbar-track {
     background: #f0f7ff;
     border-radius: 10px;
 }
 
-.document-list ul::-webkit-scrollbar-thumb {
+.event-list ul::-webkit-scrollbar-thumb {
     background: #7da0ca;
     border-radius: 10px;
 }
 
-.document-item {
+.event-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -322,96 +363,53 @@ body {
     background: rgba(255, 255, 255, 0.7);
     margin-bottom: 12px;
     box-shadow: 0 4px 15px rgba(5, 38, 89, 0.05);
+    cursor: pointer;
+    transition: all 0.3s ease;
     border: 1px solid rgba(255, 255, 255, 0.3);
     backdrop-filter: blur(5px);
 }
 
-/* Increase padding for AdminDashboard document items to fill the container */
-.document-list .document-item {
-    padding: 10px; /* Increased padding for AdminDashboard */
-    min-height: 110px; /* Ensure items take up more vertical space */
+.event-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(5, 38, 89, 0.15), 0 0 15px rgba(125, 160, 202, 0.3);
+    background: rgba(145, 187, 218, 0.9);
+    border-color: rgba(84, 131, 179, 0.3);
 }
 
-/* Ensure StudentDashboard document items remain as before */
-.student-dashboard .document-item {
-    padding: 15px; /* Keep original padding for StudentDashboard */
-    min-height: auto; /* Let StudentDashboard items adjust naturally */
+.event-item:last-child {
+    margin-bottom: 0;
 }
 
-.document-info h3 {
-    font-size: 1.2rem; /* Increased font size for document titles */
+.event-info h4 {
+    font-size: 1rem;
     font-weight: 600;
     color: #173d78;
     margin: 0;
     letter-spacing: 0.3px;
 }
 
-.document-info p {
+.event-info p {
     font-size: 0.9rem;
     color: #5483b3;
-    margin: 10px 0 0; /* Increased margin to add space between title and description */
+    margin: 5px 0 0;
 }
 
-/* Style for the "Télécharger" button */
-.document-info a {
-    display: inline-flex; /* Use flex to align icon and text */
-    align-items: center;
-    gap: 8px;
-    background: #335c86; /* Solid color matching the design */
-    color: #ffffff; /* White text for contrast */
-    padding: 8px 16px; /* Padding to make it look like a button */
-    border-radius: 12px; /* Match the border-radius of other buttons */
-    text-decoration: none; /* Remove default underline */
+/* Statistiques avec survol en bleu clair au lieu de gris */
+.event-stats p {
     font-size: 0.9rem;
-    font-weight: 500;
-    box-shadow: 0 4px 15px rgba(5, 38, 89, 0.1); /* Subtle shadow for depth */
-    transition: transform 0.3s ease; /* Keep transform transition for hover */
-}
-
-/* Ensure the color doesn't change on hover, but allow a slight lift effect */
-.document-info a:hover {
-    transform: translateY(-2px); /* Slight lift on hover */
-    background: #5483b3; /* Keep the same color */
-    color: #ffffff; /* Keep the same text color */
-}
-
-/* Simplified Custom File Input */
-.custom-file-input {
-    display: flex;
-    align-items: center;
-    gap: 10px; /* Reduced gap */
-    width: 100%;
-}
-
-.custom-file-input input[type="file"] {
-    display: none; /* Hide the default file input */
-}
-
-.custom-file-label {
-    background: #5483b3; /* Solid color instead of gradient */
     color: #ffffff;
-    padding: 8px 16px; /* Adjusted padding for text-only button */
-    border-radius: 8px; /* Smaller border-radius */
-    font-size: 0.85rem; /* Smaller font size */
+    margin: 0;
     font-weight: 500;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    box-shadow: 0 2px 5px rgba(5, 38, 89, 0.1); /* Lighter shadow */
-    transition: background 0.3s ease; /* Simplified transition */
+    padding: 5px 10px;
+    background: #5483b3;
+    border-radius: 8px;
+    letter-spacing: 0.3px;
+    transition: all 0.3s ease;
 }
 
-.custom-file-label:hover {
-    background: #7da0ca; /* Lighter shade on hover */
-}
-
-.file-name {
-    font-size: 0.85rem; /* Smaller font size */
-    color: #5483b3;
-    flex: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.event-stats p:hover {
+    background: #7da0ca; /* Bleu clair au lieu de gris */
+    box-shadow: 0 0 10px rgba(125, 160, 202, 0.5);
 }
 
 /* Modale */
@@ -428,13 +426,13 @@ body {
     align-items: center;
     z-index: 1000;
     opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.4s ease;
+    transform: scale(0.95);
+    transition: all 0.3s ease;
 }
 
 .modal-overlay.active {
     opacity: 1;
-    pointer-events: auto;
+    transform: scale(1);
 }
 
 .modal-content {
@@ -449,14 +447,6 @@ body {
     border: 1px solid rgba(84, 131, 179, 0.2);
     backdrop-filter: blur(10px);
     position: relative;
-    opacity: 0;
-    transform: scale(0.9);
-    transition: opacity 0.3s ease 0.1s, transform 0.3s ease 0.1s;
-}
-
-.modal-overlay.active .modal-content {
-    opacity: 1;
-    transform: scale(1);
 }
 
 .modal-content h3 {
@@ -467,6 +457,31 @@ body {
     text-align: center;
     letter-spacing: 0.5px;
     text-shadow: 0 1px 3px rgba(5, 38, 89, 0.1);
+}
+
+.modal-content .event-image {
+    max-height: 200px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    width: 100%;
+    object-fit: cover;
+    box-shadow: 0 8px 25px rgba(5, 38, 89, 0.1);
+    border: 1px solid rgba(84, 131, 179, 0.2);
+}
+
+.modal-content .description {
+    background: #f0f7ff;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(84, 131, 179, 0.1);
+}
+
+.modal-content .description p {
+    font-size: 0.95rem;
+    margin: 0;
+    color: #052659;
+    line-height: 1.6;
 }
 
 .modal-content p {
@@ -553,6 +568,41 @@ textarea::placeholder {
     margin-bottom: 8px;
 }
 
+/* Section de filtrage */
+.filter-section {
+    margin: 15px 0;
+    padding: 20px;
+    background: #f0f7ff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(5, 38, 89, 0.05);
+    border: 1px solid rgba(84, 131, 179, 0.1);
+    transition: all 0.3s ease;
+}
+
+.filter-section:hover {
+    box-shadow: 0 6px 20px rgba(5, 38, 89, 0.1);
+}
+
+.filter-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.filter-group {
+    flex: 1;
+    min-width: 150px;
+}
+
+.filter-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    color: #052659;
+    margin-bottom: 8px;
+}
+
 /* Boutons */
 .button-group {
     display: flex;
@@ -620,66 +670,27 @@ button:hover::before {
     padding: 25px;
 }
 
-/* Style spécifique pour la modale d'erreur */
-.error-modal {
-    max-width: 300px;
-    text-align: center;
+.error-message {
+    color: #ffffff;
+    font-size: 0.85rem;
+    margin-left: 10px;
+    display: inline-block;
+    background: rgba(255, 59, 48, 0.7);
+    padding: 3px 8px;
+    border-radius: 4px;
 }
 
-.error-modal p {
-    color: #052659;
-    font-size: 0.95rem;
-    margin-bottom: 20px;
+/* Animations */
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(84, 131, 179, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(84, 131, 179, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(84, 131, 179, 0); }
 }
 
-/* Adjust document-list for student dashboard */
-.student-dashboard .document-list {
-    width: 100%;
-}
-
-/* Style for icons */
-.icon {
-    margin-right: 8px;
-    vertical-align: middle;
-}
-
-/* Style spécifique pour la modale de confirmation de suppression */
-.delete-modal {
-    max-width: 400px;
-    text-align: center;
-}
-
-.delete-modal p {
-    color: #052659;
-    font-size: 0.95rem;
-    margin-bottom: 20px;
-}
-
-/* Adjust icon size and color for specific elements */
-.sidebar-button .icon,
-.chart-title .icon,
-.document-list h3 .icon,
-.document-item h3 .icon,
-.document-info a .icon,
-.document-actions button .icon,
-.modal-content h3 .icon,
-button .icon {
-    font-size: 1rem;
-    color: inherit;
-}
-
-/* Ensure icons in labels align properly */
-.input-group label .input-icon {
-    position: static;
-    transform: none;
-    margin-right: 8px;
-    font-size: 1.1rem;
-    color: #5483b3;
-}
-
-/* Style for error modal icon */
-.error-modal h3 .icon {
-    color: #052659;
+.sidebar-button.active {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    animation: pulse 2s infinite;
 }
 
 /* Responsive */
@@ -710,21 +721,6 @@ button .icon {
 
     .modal-content {
         padding: 20px;
-    }
-
-    .custom-file-input {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .custom-file-label {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .file-name {
-        width: 100%;
-        text-align: center;
     }
 }
 }

@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import axios from 'axios';
 import { createPortal } from 'react-dom';
 import { FaPlusCircle, FaChevronDown, FaChevronUp } from 'react-icons/fa';
-import "../../../admin_css_files/exam.css";
+import "../exam.css";
 
 const ExamForm = ({ onAdd, disabled, modules, salles: initialSalles, semestres, sectionId, selectedSemestre, onFilterReset, isFilterApplied }) => {
   const [examData, setExamData] = useState({

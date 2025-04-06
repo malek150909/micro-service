@@ -42,11 +42,7 @@ const EtudiantDashboard = () => {
 
     fetchClubs();
   }, [matricule]);
-
-  const handleLogout = () => {
-    navigate('/');
-  };
-
+  
   if (loading) {
     return (
         <div id="clubs">
@@ -92,7 +88,7 @@ const EtudiantDashboard = () => {
           <FaEnvelope /> Demande de Création
         </button>
         <button className="sidebar-button" onClick={()=> navigate('/etudiant')}>
-          <FaSignOutAlt /> Déconnexion
+          <FaSignOutAlt /> Retour
         </button>
       </aside>
 

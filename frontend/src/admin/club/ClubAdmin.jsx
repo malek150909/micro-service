@@ -447,6 +447,9 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
         <div className="logo">
           <h2>Gestion des Clubs</h2>
         </div>
+        <button className="sidebar-button" onClick={() => navigate('/admin')}>
+          <FaUsers /> Retour á l'accueil
+        </button>
         <button
           className={`sidebar-button ${activeTab === 'clubs' ? 'active' : ''}`}
           onClick={() => setActiveTab('clubs')}
@@ -458,9 +461,6 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
           onClick={() => setActiveTab('demandes')}
         >
           <FaEnvelope /> Gérer les Demandes
-        </button>
-        <button className="sidebar-button" onClick={() => navigate('/admin')}>
-          <FaUsers /> Retour á l'accueil
         </button>
         {activeTab === 'clubs' && (
           <button className="sidebar-button" onClick={() => setShowModal(true)}>

@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { FaPlus, FaEdit, FaTrash, FaTimes, FaUser, FaPaperPlane, FaBullhorn, FaSearch, FaHome, FaPoll, FaStar, FaComment, FaUserTie } from 'react-icons/fa';
-import '../../admin_css_files/annonceENS.css';
+import { useNavigate } from 'react-router-dom';
+import './annonceENS.css';
 
 const AnnonceENS = ({ handleLogout }) => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     const matricule = storedUser?.Matricule;
 
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('consulter');
     const [adminAnnonces, setAdminAnnonces] = useState([]);
     const [filteredAdminAnnonces, setFilteredAdminAnnonces] = useState([]);
@@ -353,7 +355,7 @@ const AnnonceENS = ({ handleLogout }) => {
 
                 <aside className="sidebar">
                     <div className="logo"><h2>Annonces</h2></div>
-                    <button className="sidebar-button" onClick={handleLogout}><FaHome /> Retour à l'accueil</button>
+                    <button className="sidebar-button" onClick={() => navigate('/enseignant')}><FaHome /> Retour à l'accueil</button>
                     <button className="sidebar-button" onClick={() => setActiveTab('consulter')}><FaBullhorn /> Consulter les Annonces</button>
                     <button className="sidebar-button" onClick={() => setActiveTab('gerer')}><FaPaperPlane /> Gérer mes Annonces</button>
                     <button className="sidebar-button" onClick={() => setActiveTab('sondages')}><FaPoll /> Gérer mes Sondages</button>

@@ -146,12 +146,6 @@ const StudentGrades = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    navigate('/');
-  };
-
   return (
     <>
     <div id="notes">
@@ -163,14 +157,8 @@ const StudentGrades = () => {
         <div className="logo">
           <h2>Notes</h2>
         </div>
-        <button className="sidebar-button" onClick={() => navigate('/ETD')}>
-          <FontAwesomeIcon icon={faHome} /> Accueil
-        </button>
-        <button className="sidebar-button" onClick={() => navigate('/ETDGRD')}>
-          <FontAwesomeIcon icon={faClipboardList} /> Mes Notes
-        </button>
-        <button className="sidebar-button" onClick={handleLogout}>
-          <FontAwesomeIcon icon={faSignOutAlt} /> Déconnexion
+        <button className="sidebar-button" onClick={() => navigate('/etudiant')}>
+          <FontAwesomeIcon icon={faHome} /> Retour
         </button>
       </div>
       <div className="container">

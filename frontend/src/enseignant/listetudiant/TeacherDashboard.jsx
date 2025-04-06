@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { motion } from 'framer-motion';
-import { FaList, FaDownload, FaSignOutAlt, FaUsers } from 'react-icons/fa';
+import { FaList, FaDownload, FaHome, FaUsers } from 'react-icons/fa';
 import "./listetudiant.css";
 
 const TeacherDashboard = () => {
@@ -118,16 +118,7 @@ const TeacherDashboard = () => {
   };
 
   const handleLogout = () => {
-    toast.success('Déconnexion réussie !', {
-      position: 'top-right',
-      autoClose: 3000,
-      hideProgressBar: true,
-      closeOnClick: true,
-      pauseOnHover: true,
-      style: { backgroundColor: '#50C878', color: '#fff', fontSize: '16px' },
-      icon: '✅',
-    });
-    navigate('/');
+    navigate('/enseignant');
   };
 
   const handleCloseMessage = async () => {
@@ -182,7 +173,7 @@ const TeacherDashboard = () => {
             marginTop: '20px',
           }}
         >
-          <FaSignOutAlt className="sidebar-icon" style={{ marginRight: '5px', color: '#ffffff' }} /> Déconnexion
+          <FaHome className="sidebar-icon" style={{ marginRight: '5px', color: '#ffffff' }} /> Retour 
         </button>
       </div>
 

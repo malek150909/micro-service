@@ -1,18 +1,16 @@
-// src/components/TimetableDisplay.jsx
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import '../../../admin_css_files/TimetableDisplay.css';
+import ReactDOM from 'react-dom';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+import { FaFilePdf, FaFileExcel } from 'react-icons/fa';
 
 function TimetableDisplay({ timetable, sectionId, semestre, onRefresh }) {
   console.log('Rendering timetable from Seance:', timetable);
   if (!timetable) {
     return <p className="timetable-error">Veuillez sélectionner les filtres pour voir l'emploi du temps.</p>;
   }
-
-  const navigate = useNavigate();
 
   const days = ['Samedi', 'Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi'];
   const timeSlots = [
@@ -91,7 +89,7 @@ function TimetableDisplay({ timetable, sectionId, semestre, onRefresh }) {
       return [];
     }
     
-    const normalizedSeances = seances.toLowerCase().replace(/\s+/g, ''); // Supprimer espaces
+    const normalizedSeances = seances.toLowerCase().replace(/\s+/g, '');
     let result = [];
     
     if (normalizedSeances.includes('cour')) result.push('cours');
@@ -100,7 +98,7 @@ function TimetableDisplay({ timetable, sectionId, semestre, onRefresh }) {
     if (normalizedSeances.includes('enligne') || normalizedSeances.includes('en ligne')) result.push('En ligne');
     
     console.log('Types disponibles:', result);
-    return result.length > 0 ? result : ['cours']; // Fallback
+    return result.length > 0 ? result : ['cours'];
   };
 
   const exportToPDF = () => {
@@ -138,7 +136,7 @@ function TimetableDisplay({ timetable, sectionId, semestre, onRefresh }) {
       body: tableData.slice(1),
       theme: 'grid',
       styles: { fontSize: 8, cellPadding: 2 },
-      headStyles: { fillColor: [0, 102, 204] },
+      headStyles: { fillColor: [84, 131, 179] },
     });
 
     const fileName = `emploi_du_temps_${niveau || 'unknown'}_${specialty || 'unknown'}_${section || 'unknown'}.pdf`;
@@ -341,68 +339,15 @@ function TimetableDisplay({ timetable, sectionId, semestre, onRefresh }) {
     });
   };
 
-  console.log('Current selectedSession:', selectedSession);
+  const renderModal = () => {
+    if (!selectedSession) return null;
 
-  return (
-    <div className="timetable-container">
-      <h2 className="timetable-title">Emploi du Temps (Semestre {semestre})</h2>
-      <div className="export-buttons">
-        <button onClick={exportToPDF} className="timetable-btn export-pdf">Exporter en PDF</button>
-        <button onClick={exportToExcel} className="timetable-btn export-excel">Exporter en Excel</button>
-        <button onClick={() => navigate('/admin')} className="timetable-btn back">Retour à l'accueil</button>
-      </div>
-      {error && <p className="timetable-error">{error}</p>}
-      <table className="timetable-table">
-        <thead>
-          <tr>
-            <th>Jour</th>
-            {timeSlots.map(slot => (
-              <th key={slot}>{slot}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {days.map(day => (
-            <tr key={day}>
-              <td style={{ fontWeight: '500' }}>{day}</td>
-              {timeSlots.map(slot => {
-                const sessions = timetable[day]?.filter(s => s.time_slot === slot) || [];
-                return (
-                  <td
-                    key={`${day}-${slot}`}
-                    onClick={() => handleCellClick(day, slot)}
-                    className={sessions.length > 0 ? 'session-occupied' : ''}
-                  >
-                    {sessions.length > 0 ? (
-                      sessions.map((session, index) => (
-                        <div key={index}>
-                          <strong>{session.type_seance}</strong><br />
-                          {session.module}<br />
-                          {session.teacher}<br />
-                          Salle: {session.room}<br />
-                          {session.type_seance !== 'cours' && session.group && (
-                            <>Groupe: {session.group}</>
-                          )}
-                          {index < sessions.length - 1 && <hr />}
-                        </div>
-                      ))
-                    ) : (
-                      '-'
-                    )}
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      {selectedSession && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            {isEditing ? (
-              <form onSubmit={handleFormSubmit} className="session-form">
-                <h3>{isAdding ? 'Ajouter une séance' : 'Modifier la séance'}</h3>
+    return ReactDOM.createPortal(
+      <div className="modal-overlay">
+        <div className="modal-content">
+          {isEditing ? (
+            <form onSubmit={handleFormSubmit} className="session-form">
+              <h3>{isAdding ? 'Ajouter une séance' : 'Modifier la séance'}</h3>
                 <div className="form-grid">
                   <div className="form-group">
                     <label>Module</label>
@@ -501,15 +446,15 @@ function TimetableDisplay({ timetable, sectionId, semestre, onRefresh }) {
                     Annuler
                   </button>
                 </div>
-              </form>
-            ) : (
-              <div className="session-details">
-                <h3>Détails de la case ({selectedSession.jour} {selectedSession.timeSlot})</h3>
-                {selectedSession.sessions.length > 0 ? (
-                  <>
-                    {selectedSession.sessions.map((session, index) => (
-                      <div key={index} className="details-card">
-                        <div className="detail-item">
+            </form>
+          ) : (
+            <div className="session-details">
+              <h3>Détails de la case ({selectedSession.jour} {selectedSession.timeSlot})</h3>
+              {selectedSession.sessions.length > 0 ? (
+                <>
+                  {selectedSession.sessions.map((session, index) => (
+                    <div key={index} className="details-card">
+                      <div className="detail-item">
                           <span className="detail-label">Type :</span>
                           <span className="detail-value">{session.type_seance}</span>
                         </div>
@@ -540,31 +485,90 @@ function TimetableDisplay({ timetable, sectionId, semestre, onRefresh }) {
                           </button>
                         </div>
                         {index < selectedSession.sessions.length - 1 && <hr />}
-                      </div>
-                    ))}
-                    {selectedSession.sessions.length < 4 && !selectedSession.sessions.some(s => s.type_seance === 'cours') && (
-                      <button onClick={handleAdd} className="timetable-btn add">
-                        Ajouter une séance
-                      </button>
-                    )}
-                  </>
-                ) : (
-                  <div className="no-session">
-                    <p>Aucune séance à cet emplacement.</p>
+                    </div>
+                  ))}
+                  {selectedSession.sessions.length < 4 && !selectedSession.sessions.some(s => s.type_seance === 'cours') && (
                     <button onClick={handleAdd} className="timetable-btn add">
                       Ajouter une séance
                     </button>
-                  </div>
-                )}
-                <button onClick={() => { setSelectedSession(null); setError(null); }} className="timetable-btn close-modal">
-                  Fermer
-                </button>
-              </div>
-            )}
-            {error && <p className="timetable-error modal-error">{error}</p>}
-          </div>
+                  )}
+                </>
+              ) : (
+                <div className="no-session">
+                  <p>Aucune séance à cet emplacement.</p>
+                  <button onClick={handleAdd} className="timetable-btn add">
+                    Ajouter une séance
+                  </button>
+                </div>
+              )}
+              <button onClick={() => { setSelectedSession(null); setError(null); }} className="timetable-btn close-modal">
+                Fermer
+              </button>
+            </div>
+          )}
+          {error && <p className="timetable-error modal-error">{error}</p>}
         </div>
-      )}
+      </div>,
+      document.body
+    );
+  };
+
+  return (
+    <div className="timetable-container">
+      <h2 className="timetable-title">Emploi du Temps (Semestre {semestre})</h2>
+      <div className="export-buttons">
+        <button onClick={exportToExcel} className="timetable-btn export-excel">
+          <FaFileExcel /> Exporter en Excel
+        </button>
+        <button onClick={exportToPDF} className="timetable-btn export-pdf">
+          <FaFilePdf /> Exporter en PDF
+        </button>
+      </div>
+      {error && <p className="timetable-error">{error}</p>}
+      <table className="modern-timetable-table">
+        <thead>
+          <tr>
+            <th className="modern-th">Jour</th>
+            {timeSlots.map(slot => (
+              <th key={slot} className="modern-th">{slot}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {days.map(day => (
+            <tr key={day} className="modern-tr">
+              <td className="modern-day">{day}</td>
+              {timeSlots.map(slot => {
+                const sessions = timetable[day]?.filter(s => s.time_slot === slot) || [];
+                return (
+                  <td
+                    key={`${day}-${slot}`}
+                    onClick={() => handleCellClick(day, slot)}
+                    className="modern-td"
+                  >
+                    {sessions.length > 0 ? (
+                      sessions.map((session, index) => (
+                        <div key={index} className="session-card">
+                          <span className="session-type">{session.type_seance}</span>
+                          <span className="session-module">{session.module}</span>
+                          <span className="session-teacher">{session.teacher}</span>
+                          <span className="session-room">Salle: {session.room}</span>
+                          {session.type_seance !== 'cours' && session.group && (
+                            <span className="session-group">Groupe: {session.group}</span>
+                          )}
+                        </div>
+                      ))
+                    ) : (
+                      <span className="empty-slot">-</span>
+                    )}
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {renderModal()}
     </div>
   );
 }

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { FaFilter, FaSearch } from 'react-icons/fa'; // Ajout de FaSearch
-import "../../admin_css_files/listetudiant.css" ;
+import "./listetudiant.css" ;
 
 const FilterPanel = ({ onFilter }) => {
   const [filters, setFilters] = useState({

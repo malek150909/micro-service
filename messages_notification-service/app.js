@@ -11,6 +11,7 @@ const annonceENSroutes = require('./routes/annonceENSroutes');
 const authENSroutes = require('./routes/authENSroutes');
 const annonceETDRoutes = require('./routes/annonceEtudiantRoutes');
 const sondageRoutes = require('./routes/sondageRoutes');
+const notificationRoutes = require('./routes/notifications');
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use('/annoncesENS', annonceENSroutes); // Routes maintenant après le parsin
 app.use('/authENSannonce', authENSroutes);
 app.use('/annoncesETD', annonceETDRoutes);
 app.use('/sondages', sondageRoutes);
+app.use('/notifications', notificationRoutes);
 
 // Serve static files
 app.use('/uploads', express.static(path.resolve(__dirname, 'uploads')));

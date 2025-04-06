@@ -4,7 +4,7 @@ import TeacherSection from './TeacherSection';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
-import "../../admin_css_files/prof.css";
+import "./prof.css";
 
 const ListEnseignant = () => {
     const [teachers, setTeachers] = useState([]);

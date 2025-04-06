@@ -9,7 +9,7 @@ import FilterForm from "../components/FilterForm";
 import ExamForm from "../components/ExamForm";
 import ExamList from "../components/ExamList";
 import { FaFilePdf, FaFileExcel, FaArrowLeft, FaUser } from 'react-icons/fa';
-import "../../../admin_css_files/exam.css" ;
+import "../exam.css" ;
 
 const MemoizedFilterForm = memo(FilterForm);
 const MemoizedExamForm = memo(ExamForm);

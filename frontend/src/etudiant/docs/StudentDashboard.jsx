@@ -60,7 +60,7 @@ function StudentDashboard() {
     };
 
     // Fonction de déconnexion
-    const handleLogout = () => {
+    const handleBack = () => {
         navigate('/etudiant'); // Redirection vers la page racine
     };
 
@@ -76,7 +76,7 @@ function StudentDashboard() {
                 <div className="logo">
                     <h2><FaUser /> Étudiant</h2>
                 </div>
-                <button className="sidebar-button" onClick={handleLogout}>
+                <button className="sidebar-button" onClick={handleBack}>
                     <FaHome /> Retour à l’accueil
                 </button>
             </div>

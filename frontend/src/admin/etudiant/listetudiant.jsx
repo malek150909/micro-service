@@ -7,7 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaHome, FaUsers, FaPlus, FaSignOutAlt, FaList } from 'react-icons/fa'; // Ajout de FaList
 import Swal from 'sweetalert2';
-import "../../admin_css_files/listetudiant.css" ;
+import "./listetudiant.css" ;
 
 const listetudiant = () => {
   const [sections, setSections] = useState([]);
@@ -221,18 +221,6 @@ const listetudiant = () => {
             });
           });
       }
-    });
-  };
-
-  const handleLogout = () => {
-    toast.success('Déconnexion réussie !', {
-      position: 'top-right',
-      autoClose: 3000,
-      hideProgressBar: true,
-      closeOnClick: true,
-      pauseOnHover: true,
-      style: { backgroundColor: '#50C878', color: '#fff', fontSize: '16px' },
-      icon: '✅',
     });
   };
 

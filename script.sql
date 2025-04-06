@@ -235,7 +235,9 @@ CREATE TABLE Message (
     contenu TEXT NOT NULL,
     expediteur BIGINT,
     destinataire BIGINT,
-    isRead tinyint(1) DEFAULT 0;
+    isRead tinyint(1) DEFAULT 0,
+    filePath varchar(255) DEFAULT NULL,
+    fileName varchar(255) DEFAULT NULL,
     FOREIGN KEY (expediteur) REFERENCES User(Matricule) ON DELETE CASCADE,
     FOREIGN KEY (destinataire) REFERENCES User(Matricule) ON DELETE CASCADE
 );

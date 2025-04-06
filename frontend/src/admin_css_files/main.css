@@ -1,0 +1,27 @@
+body {
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(135deg, #ffffff 0%, #86b4ec 50%, #082e54 100%);
+  background-attachment: fixed;
+  margin: 0;
+  padding: 0;
+  color: #021024;
+  overflow-x: hidden;
+  position: relative;
+  min-height: 100vh;
+}
+  :root {
+    --primary: #021024;    /* Bleu très foncé */
+    --secondary: #052659;  /* Bleu foncé */
+    --accent: #5483B3;     /* Bleu moyen */
+    --light-accent: #7DA0CA; /* Bleu clair */
+    --background: #C1E8FF; /* Fond bleu très clair */
+    --card-bg: #FFFFFF;    /* Blanc pour les cartes */
+    --text: #021024;       /* Texte principal */
+    --text-light: #7DA0CA; /* Texte clair */
+    --white: #FFFFFF;
+}
+ * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}

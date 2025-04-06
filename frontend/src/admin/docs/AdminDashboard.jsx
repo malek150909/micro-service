@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FaArrowLeft, FaPlus, FaEdit, FaTrash, FaExclamationTriangle, FaBook, FaPen, FaFileUpload, FaDownload, FaHome, FaUser } from 'react-icons/fa';
 import { MdDescription } from 'react-icons/md';
-import "../../admin_css_files/doc.css";
+import "./doc.css";
 
 function AdminDashboard() {
     const navigate = useNavigate();

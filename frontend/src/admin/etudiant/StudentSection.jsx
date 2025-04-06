@@ -5,7 +5,7 @@ import { FaPlus, FaTrash, FaUpload, FaArrowLeft, FaFileExport, FaUsers } from 'r
 import Swal from 'sweetalert2';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as XLSX from 'xlsx';
-import "../../admin_css_files/listetudiant.css" ;
+import "./listetudiant.css" ;
 
 const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes }) => {
   const [students, setStudents] = useState([]);

@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaUser, FaEnvelope, FaSignOutAlt, FaBell, FaChevronRight, FaCalendar, FaBook, FaUsers, FaClipboardList, FaBullhorn, FaPlus } from "react-icons/fa";
-import NotificationBell from "./NotificationBell";
-import styles from "../admin_css_files/admin.module.css"; // Import du CSS Module
+import "../admin_css_files/admin.css";
 
 const Admin = () => {
     const navigate = useNavigate();
@@ -15,7 +14,6 @@ const Admin = () => {
     ]);
     const [newTask, setNewTask] = useState("");
     const [isLoaded, setIsLoaded] = useState(false);
-    const [showNotificationModal, setShowNotificationModal] = useState(false);
 
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -39,12 +37,8 @@ const Admin = () => {
         sessionStorage.removeItem("hasSeenWelcome");
     };
 
-    const handleEditProfile = () => navigate("/modifierProfil");
-    const handleMessages = () => navigate("/messagerie");
-
-    const handleNotificationClick = () => {
-        setShowNotificationModal(true);
-    };
+    const handleEditProfile = () => navigate("/modifierProfilAdmin");
+    const handleMessages = () => navigate("/messagesAdmin");
 
     const items = [
         { title: "Événements", description: "Consulter et créer les événements", route: "/gestionEvenements", icon: <FaCalendar /> },
@@ -58,9 +52,11 @@ const Admin = () => {
         { title: "Clubs", description: "Consulter les Clubs", route: "/clubsADM", icon: <FaUsers /> }
     ];
 
+    // Calendrier (mois d'avril 2025)
     const calendarDays = Array.from({ length: 30 }, (_, i) => i + 1); // Jours d'avril
     const currentDay = 5; // 5 avril 2025
 
+    // Gestion de la To-Do List
     const addTask = () => {
         if (newTask.trim()) {
             setTodoList([...todoList, { task: newTask, progress: 0, due: "Aujourd'hui" }]);
@@ -69,83 +65,68 @@ const Admin = () => {
     };
 
     return (
-        <div className={styles.adminContainer}>
+        <div className={`admin-container ${isLoaded ? 'loaded' : ''}`}>
             {/* Sidebar */}
-            <div className={styles.sidebar}>
-                <div className={styles.sidebarMenu}>
-                    <button onClick={handleEditProfile} className={styles.sidebarItem}>
-                        <FaUser className={styles.sidebarIcon} />
+            <div className="sidebar">
+                <div className="sidebar-menu">
+                    <button onClick={handleEditProfile} className="sidebar-item">
+                        <FaUser className="sidebar-icon" />
                     </button>
-                    <button onClick={handleMessages} className={styles.sidebarItem}>
-                        <FaEnvelope className={styles.sidebarIcon} />
+                    <button onClick={handleMessages} className="sidebar-item">
+                        <FaEnvelope className="sidebar-icon" />
                     </button>
-                    <button onClick={handleNotificationClick} className={styles.sidebarItem}>
-                        <FaBell className={styles.sidebarIcon} />
+                    <button className="sidebar-item">
+                        <FaBell className="sidebar-icon" />
                     </button>
-                    <button onClick={handleLogout} className={styles.sidebarItem}>
-                        <FaSignOutAlt className={styles.sidebarIcon} />
+                    <button onClick={handleLogout} className="sidebar-item">
+                        <FaSignOutAlt className="sidebar-icon" />
                     </button>
                 </div>
             </div>
 
             {/* Main Content */}
-            <div className={styles.mainContent}>
+            <div className="main-content">
                 {/* Welcome Message */}
                 {showWelcome && user && (
-                    <div className={`${styles.welcomeMessage} ${isLoaded ? styles.welcomeMessageSlideIn : ''}`}>
+                    <div className={`welcome-message ${isLoaded ? 'slide-in' : ''}`}>
                         <h1>Bienvenue, {user.nom} {user.prenom} !</h1>
                         <p>Que souhaitez-vous faire aujourd'hui ?</p>
                     </div>
                 )}
 
-                {/* Notification Modal */}
-                {showNotificationModal && (
-                    <div className={`${styles.notificationModal} ${showNotificationModal ? styles.notificationModalActive : ''}`}>
-                        <div className={`${styles.notificationModalContent} ${showNotificationModal ? styles.notificationModalContentActive : ''}`}>
-                            <button
-                                className={styles.closeModalBtn}
-                                onClick={() => setShowNotificationModal(false)}
-                            >
-                                X
-                            </button>
-                            <NotificationBell showModal={true} />
-                        </div>
-                    </div>
-                )}
-
                 {/* Main Layout */}
-                <div className={styles.mainLayout}>
+                <div className="main-layout">
                     {/* Cards Section */}
-                    <div className={styles.cardsSection}>
-                        <div className={styles.cardsGrid}>
+                    <div className="cards-section">
+                        <div className="cards-grid">
                             {items.map((item, index) => (
-                                <div key={index} onClick={() => navigate(item.route)} className={styles.card}>
-                                    <div className={styles.cardIcon}>{item.icon}</div>
-                                    <div className={styles.cardContent}>
-                                        <h3 className={styles.cardTitle}>{item.title}</h3>
-                                        <p className={styles.cardDescription}>{item.description}</p>
+                                <div key={index} onClick={() => navigate(item.route)} className="card">
+                                    <div className="card-icon">{item.icon}</div>
+                                    <div className="card-content">
+                                        <h3 className="card-title">{item.title}</h3>
+                                        <p className="card-description">{item.description}</p>
                                     </div>
-                                    <FaChevronRight className={styles.cardArrow} />
+                                    <FaChevronRight className="card-arrow" />
                                 </div>
                             ))}
                         </div>
                     </div>
 
                     {/* Right Column: Calendar and To-Do List */}
-                    <div className={styles.rightColumn}>
+                    <div className="right-column">
                         {/* Calendar */}
-                        <div className={styles.calendarSection}>
+                        <div className="calendar-section">
                             <h3>Avril 2025</h3>
-                            <div className={styles.calendarGrid}>
+                            <div className="calendar-grid">
                                 {["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map((day, index) => (
-                                    <div key={index} className={styles.calendarDayHeader}>
+                                    <div key={index} className="calendar-day-header">
                                         {day}
                                     </div>
                                 ))}
                                 {calendarDays.map((day, index) => (
                                     <div
                                         key={index}
-                                        className={`${styles.calendarDay} ${day === currentDay ? styles.currentDay : ''}`}
+                                        className={`calendar-day ${day === currentDay ? 'current-day' : ''}`}
                                     >
                                         {day}
                                     </div>
@@ -154,10 +135,10 @@ const Admin = () => {
                         </div>
 
                         {/* To-Do List */}
-                        <div className={styles.todoSection}>
+                        <div className="todo-section">
                             <h3>Tâches d'aujourd'hui</h3>
-                            <div className={styles.todoList}>
-                                <div className={styles.todoInput}>
+                            <div className="todo-list">
+                                <div className="todo-input">
                                     <input
                                         type="text"
                                         value={newTask}
@@ -169,12 +150,12 @@ const Admin = () => {
                                     </button>
                                 </div>
                                 {todoList.map((item, index) => (
-                                    <div key={index} className={styles.todoItem}>
-                                        <div className={styles.todoDetails}>
+                                    <div key={index} className="todo-item">
+                                        <div className="todo-details">
                                             <p>{item.task}</p>
-                                            <div className={styles.todoProgress}>
+                                            <div className="todo-progress">
                                                 <div
-                                                    className={styles.progressBar}
+                                                    className="progress-bar"
                                                     style={{ width: `${item.progress}%` }}
                                                 ></div>
                                             </div>
