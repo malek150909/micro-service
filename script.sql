@@ -508,3 +508,11 @@ CREATE TABLE `sondage` (
   CONSTRAINT `sondage_ibfk_1` FOREIGN KEY (`enseignant_matricule`) REFERENCES `enseignant` (`Matricule`) ON DELETE CASCADE
 );
 
+CREATE TABLE Notification_seen (
+     ID_notification INT,
+     matricule BIGINT,
+     seen_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+     PRIMARY KEY (ID_notification, matricule),
+     FOREIGN KEY (ID_notification) REFERENCES Notification(ID_notification) ON DELETE CASCADE,
+     FOREIGN KEY (matricule) REFERENCES User(Matricule) ON DELETE CASCADE
+);
