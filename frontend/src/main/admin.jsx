@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaUser, FaEnvelope, FaSignOutAlt, FaBell, FaChevronRight, FaCalendar, FaBook, FaUsers, FaClipboardList, FaBullhorn, FaPlus } from "react-icons/fa";
 import NotificationBell from "./NotificationBell";
-import styles from "../admin_css_files/admin.module.css"; // Import du CSS Module
+import styles from "../admin_css_files/main.module.css"; // Import du CSS Module
 
 const Admin = () => {
     const navigate = useNavigate();
@@ -69,7 +69,7 @@ const Admin = () => {
     };
 
     return (
-        <div className={styles.adminContainer}>
+        <div className={styles.mainContainer}>
             {/* Sidebar */}
             <div className={styles.sidebar}>
                 <div className={styles.sidebarMenu}>

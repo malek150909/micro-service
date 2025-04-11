@@ -1,10 +1,10 @@
-
-.adminContainer {
+.mainContainer {
   background: linear-gradient(180deg, #5483b3, #c1e8ff); /* Remplace var(--accent) et var(--background) par des valeurs fixes */
   transition: opacity 1s ease-in-out;
+  height: 100vh;
 }
 
-.adminContainerLoaded {
+.mainContainerLoaded {
   opacity: 1;
 }
 
@@ -81,7 +81,6 @@
 
 .welcomeMessage {
   margin-bottom: 20px;
-  opacity: 0;
   transform: translateX(-50px);
   transition: all 1s ease-in-out;
 }
@@ -261,116 +260,306 @@
   border: 2px solid #021024; /* Remplace var(--primary) */
 }
 
-.todoSection {
+/* Notes Section */
+.notesSection {
   background: linear-gradient(145deg, #7da0ca, #c1e8ff); /* Remplace var(--light-accent) et var(--background) */
   padding: 15px;
   border-radius: 15px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
 }
 
-.todoSection h3 {
+.notesSection h3 {
   font-size: 1.2rem;
   color: #021024; /* Remplace var(--primary) */
   margin-bottom: 10px;
 }
 
-.todoList {
+.notesList {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.todoInput {
-  display: flex;
-  gap: 10px;
+.addButton {
+  background: linear-gradient(135deg, #021024, #052659); /* Remplace var(--primary) et var(--secondary) */
+  border: none;
+  padding: 8px 15px;
+  border-radius: 15px;
+  color: #ffffff; /* Remplace var(--white) */
+  cursor: pointer;
   margin-bottom: 15px;
+  align-self: flex-start;
+  transition: all 0.3s ease;
+}
+
+.addButton:hover {
+  background: linear-gradient(135deg, #052659, #021024);
+  transform: scale(1.05);
+}
+
+.noteItem {
+  background: #fff9c4; /* Light yellow for sticky note effect */
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+  border: 1px solid #ffeb3b; /* Slightly darker yellow border */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  min-height: 120px; /* Ensure enough space for content */
+  max-height: 150px; /* Limit height to avoid overflow */
+  overflow: hidden; /* Hide overflow content */
+}
+
+.noteItem:hover {
+  transform: scale(1.02) !important; /* Slight scale on hover, override rotation */
+  box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.rotatePositive {
+  transform: rotate(2deg); /* Slight tilt to the right */
+}
+
+.rotateNegative {
+  transform: rotate(-2deg); /* Slight tilt to the left */
+}
+
+.noteContent {
+  font-family: 'Shadows Into Light', cursive; /* Handwritten font */
+  color: #333; /* Darker text for readability */
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.noteTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.noteSnippet {
+  font-size: 0.95rem;
+  margin: 0;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Limit to 2 lines */
+  -webkit-box-orient: vertical;
+}
+
+.noteDate {
+  font-size: 0.8rem;
+  color: #666; /* Slightly lighter for the date */
+  margin-top: auto; /* Push to the bottom */
+}
+
+.seeMoreButton {
+  background: linear-gradient(135deg, #021024, #052659); /* Remplace var(--primary) et var(--secondary) */
+  border: none;
+  padding: 8px 15px;
+  border-radius: 15px;
+  color: #ffffff; /* Remplace var(--white) */
+  cursor: pointer;
+  margin-top: 10px;
+  align-self: center;
+  transition: all 0.3s ease;
+}
+
+.seeMoreButton:hover {
+  background: linear-gradient(135deg, #052659, #021024);
+  transform: scale(1.05);
+}
+
+/* Modal Overlay */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(5, 38, 89, 0.5);
+  backdrop-filter: blur(8px);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalOverlayActive {
+  display: flex;
+  animation: slideInFromTop 0.4s ease-out forwards;
+}
+
+/* Fallback for centering if flex fails */
+.modalOverlay[data-modal] {
+  display: none;
+}
+
+.modalOverlayActive[data-modal] {
+  display: block;
+}
+
+.modalOverlayActive[data-modal] .modalContent {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Remove rotation for modals */
+}
+
+/* Modal Content Base Styles */
+.modalContent {
+  width: 100%;
+  max-width: 500px;
+  max-height: 80vh;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 15px 40px rgba(5, 38, 89, 0.2), 0 0 20px rgba(255, 255, 255, 0.3);
+  overflow-y: auto;
+  border: 1px solid rgba(84, 131, 179, 0.2);
+  backdrop-filter: blur(10px);
   position: relative;
 }
 
-.todoInput::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 5px;
-  background: linear-gradient(180deg, #5483b3, #7da0ca); /* Remplace var(--accent) et var(--light-accent) */
-  border-radius: 5px 0 0 5px;
+/* Sticky Note Modal */
+.stickyNote {
+  background: #fff9c4; /* Light yellow for sticky note effect */
+  border: 1px solid #ffeb3b; /* Slightly darker yellow border */
+  border-radius: 8px;
+  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  max-width: 600px;
+  font-family: 'Shadows Into Light', cursive; /* Handwritten font */
+  color: #333;
 }
 
-.todoInput input {
-  flex: 1;
-  padding: 8px 8px 8px 15px;
-  border: 1px solid transparent;
-  border-radius: 15px 0 0 15px;
-  font-size: 0.9rem;
-  outline: none;
-  background: #ffffff; /* Remplace var(--white) */
-  transition: border 0.3s ease;
+.stickyNote h3 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
 }
 
-.todoInput input:focus {
-  border: 1px solid #5483b3; /* Remplace var(--accent) */
+.modalBody {
+  font-family: 'Shadows Into Light', cursive; /* Handwritten font for modal content */
+  color: #333;
 }
 
-.todoInput button {
-  background: linear-gradient(135deg, #021024, #052659); /* Remplace var(--primary) et var(--secondary) */
-  border: none;
-  padding: 8px;
-  border-radius: 0 15px 15px 0;
-  color: #ffffff; /* Remplace var(--white) */
-  cursor: pointer;
+.noteContentText {
+  font-size: 1.1rem;
+  line-height: 1.4;
+  margin-bottom: 15px;
+}
+
+/* Add Note Modal */
+.addNoteModal {
+  max-width: 600px; /* Match sticky note modal width */
+}
+
+/* Large Modal (remove previous styles) */
+.largeModal {
+  max-width: 600px; /* Match sticky note modal width */
+}
+
+/* Buttons */
+.buttonGroup {
   display: flex;
-  align-items: center;
+  gap: 15px;
+  margin-top: 25px;
   justify-content: center;
 }
 
-.todoItem {
+.buttonGroup button {
+  background: linear-gradient(135deg, #5483b3 0%, #052659 100%);
+  color: #ffffff;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 8px 20px rgba(5, 38, 89, 0.1);
+  transition: all 0.3s ease;
   position: relative;
-  padding: 10px 10px 10px 15px;
-  border-radius: 15px 0 0 15px;
-  transition: background 0.3s ease;
-  background: #ffffff; /* Remplace var(--white) */
-}
-
-.todoItem::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 5px;
-  background: linear-gradient(180deg, #5483b3, #7da0ca); /* Remplace var(--accent) et var(--light-accent) */
-  border-radius: 15px 0 0 15px;
-}
-
-.todoItem:hover {
-  background: rgba(255, 255, 255, 0.7);
-}
-
-.todoDetails p {
-  font-size: 0.9rem;
-  color: #021024; /* Remplace var(--text) */
-  margin-bottom: 5px;
-}
-
-.todoProgress {
-  width: 100%;
-  height: 5px;
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 5px;
   overflow: hidden;
 }
 
-.todoProgress .progressBar {
-  height: 100%;
-  background: linear-gradient(90deg, #5483b3, #7da0ca); /* Remplace var(--accent) et var(--light-accent) */
-  transition: width 0.5s ease;
+.buttonGroup button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(5, 38, 89, 0.15), 0 0 15px rgba(125, 160, 202, 0.4);
 }
 
-.todoDetails span {
-  font-size: 0.75rem;
-  color: #7da0ca; /* Remplace var(--text-light) */
+.closeButtonTopRight {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: #333;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  padding: 5px;
+}
+
+.closeButtonTopRight:hover {
+  color: #ff4444;
+}
+
+/* Input and Textarea */
+.titleInput {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-family: 'Shadows Into Light', cursive; /* Handwritten font */
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.linedText {
+  width: 100%;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 29px,
+    #ccc 29px,
+    #ccc 30px
+  );
+  line-height: 30px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  font-family: 'Shadows Into Light', cursive; /* Handwritten font */
+  font-size: 1rem;
+  resize: vertical;
+  color: #333;
+}
+
+/* Animations */
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Styles pour la modale de notification */
@@ -431,4 +620,27 @@
 .closeModalBtn:hover {
   background: #052659; /* Remplace var(--secondary) */
   transform: scale(1.1);
+}
+
+.editContainer {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+}
+
+.editInput {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #5483b3;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.editContainer button {
+  background: linear-gradient(135deg, #021024, #052659);
+  color: #ffffff;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
 }

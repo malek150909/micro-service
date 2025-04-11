@@ -1,216 +1,172 @@
-@import "tailwindcss";
-/* === Image de fond animée === */
-#logins .animated-background {
-    position: absolute;
-    inset: 0;
-    background-image: url('/image.jpg'); /* Remplace par le bon chemin */
-    background-size: cover;
-    background-position: center;
-    filter: brightness(70%) contrast(1.1);
-    animation: backgroundAnimation 15s infinite alternate ease-in-out;
-}
 
-/* === Conteneur principal === */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap');
+
+/* Conteneur principal */
 #logins .l-container {
-    position: relative;
     display: flex;
     height: 100vh;
     width: 100vw;
     overflow: hidden;
-}
-
-/* === Formulaire à droite avec animation d'entrée === */
-#logins .login-container {
-    position: absolute;
-    right: 10%;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(255, 255, 255, 0.9);
-    padding: 35px;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-    width: 360px;
-    text-align: center;
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    animation: slideAndFade 1s ease-out forwards;
-}
-
-/* === Inputs === */
-#logins .login-input {
-    padding: 14px 16px;
-    border: 2px solid #e0e0e0;
-    border-radius: 25px;
-    font-size: 1rem;
-    background: #ffffff;
-    color: #333333;
-    transition: all 0.3s ease;
-    width: 100%;
-    box-sizing: border-box;
-    margin-bottom: 15px;
-}
-
-#logins .login-input:focus {
-    border-color: #4a90e2;
-    box-shadow: 0 0 8px rgba(74, 144, 226, 0.3);
-    outline: none;
-}
-
-#logins .login-input::placeholder {
-    color: #757575;
-}
-
-/* === Bouton Connexion === */
-#logins .login-btn {
-    padding: 14px 30px;
-    border: none;
-    border-radius: 25px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #ffffff;
-    background: linear-gradient(90deg, #4a90e2, #50e3c2);
-    cursor: pointer;
     position: relative;
-    overflow: hidden;
-    width: 100%;
-    transition: all 0.4s ease;
-    box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
 }
 
-#logins .login-btn::after {
-    content: '';
+/* Section de l'image de fond */
+#logins .background-section {
     position: absolute;
-    top: 0;
-    left: -100%;
     width: 100%;
     height: 100%;
-    background: rgba(255, 255, 255, 0.2);
-    transition: all 0.4s ease;
+    left: 0;
+    background-image: url("/image.jpg"); /* Image que vous utilisiez */
+    background-size: cover;
+    background-position: center;
+    z-index: 1;
 }
 
-#logins .login-btn:hover::after {
-    left: 100%;
+#logins .background-section .overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--primary); /* Overlay teal/vert */
+    opacity: 0.85;
 }
 
-#logins .login-btn:hover {
-    background: linear-gradient(90deg, #357abd, #34c9a6);
-    box-shadow: 0 7px 20px rgba(74, 144, 226, 0.6);
-}
-
-/* === Animation du background === */
-@keyframes backgroundAnimation {
-    0% {
-        transform: scale(1);
-    }
-    100% {
-        transform: scale(1.1);
-    }
-}
-
-/* === Animation d'entrée pour le conteneur === */
-@keyframes slideAndFade {
-    0% {
-        transform: translateX(100%) translateY(-50%);
-        opacity: 0;
-    }
-    100% {
-        transform: translateX(0) translateY(-50%);
-        opacity: 1;
-    }
-}
-
-/* === Animation pour les cercles de chargement === */
-#logins .loading-circles span {
-    display: inline-block;
-    width: 0.5rem;
-    height: 0.5rem;
-    margin: 0 3px;
-    background-color: white;
-    border-radius: 50%;
-    animation: grow 1.5s infinite;
-}
-
-#logins .loading-circles span:nth-child(1) {
-    animation-delay: 0s;
-}
-
-#logins .loading-circles span:nth-child(2) {
-    animation-delay: 0.3s;
-}
-
-#logins .loading-circles span:nth-child(3) {
-    animation-delay: 0.6s;
-}
-
-@keyframes grow {
-    0% {
-        transform: scale(1);
-        opacity: 1;
-    }
-    50% {
-        transform: scale(1.5);
-        opacity: 0.7;
-    }
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
-
-/* === Styles pour les messages (succès et erreur) === */
-#logins .message {
+/* Section du formulaire (déplacée à gauche) */
+#logins .form-section {
+    position: absolute;
+    width: 50%;
+    height: 100%;
+    left: 0; /* Déplacée à gauche */
     display: flex;
+    justify-content: center;
     align-items: center;
-    gap: 8px;
-    padding: 10px;
-    border-radius: 10px;
-    margin-bottom: 15px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    animation: fadeIn 0.5s ease-in forwards;
+    z-index: 2;
 }
 
-/* Message de succès */
-#logins .message.success {
-    background: rgba(46, 204, 113, 0.1); /* Vert clair */
-    color: #2ecc71;
-    border: 1px solid #2ecc71;
+/* SVG pour la découpe en S */
+#logins .wave-divider {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    left: 0;
+    top: 0;
+    z-index: 2;
+    pointer-events: none;
 }
 
-/* Message d'erreur */
-#logins .message.error {
-    background: rgba(231, 76, 60, 0.1); /* Rouge clair */
-    color: #e74c3c;
-    border: 1px solid #e74c3c;
+/* Conteneur du formulaire */
+#logins .login-container {
+    width: 100%;
+    max-width: 400px;
+    text-align: center; /* Centré pour le logo et le bouton */
+    position: relative;
+    z-index: 3;
+    padding: 0 30px;
+    margin-right: 50px; /* Décalage à droite pour éviter la courbe */
+    margin-left: 0; /* Supprimer le décalage à gauche */
 }
 
-/* Animation d'apparition du message */
-@keyframes fadeIn {
-    0% {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* === Styles pour les labels et texte === */
-#logins label {
+/* Logo */
+#logins .logo {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 20px;
     display: block;
-    margin-bottom: 8px;
-    color: #333333;
-    font-weight: 500;
+    margin-left: auto;
+    margin-right: auto;
+    filter: hue-rotate(200deg) saturate(2) brightness(0.3); /* Bleu nuit */
 }
 
+/* Titre et sous-titre */
 #logins h2 {
-    margin-bottom: 10px;
-    color: #2c3e50;
-    font-size: 1.8rem;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 5px;
+    font-family: "Poppins", sans-serif;/* Nouvelle police élégante */
+    letter-spacing: 1px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    line-height: 1.2;
 }
 
 #logins p {
-    color: #7f8c8d;
+    font-size: 1.2rem;
+    color: var(--dark-blue);
+    margin-bottom: 30px;
+}
+
+/* Champs de saisie */
+#logins .input-group {
+    position: relative;
     margin-bottom: 20px;
-    font-size: 0.9rem;
+}
+
+#logins .input-icon {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    color: var(--text-light);
+    font-size: 1.2rem;
+}
+
+/* Modification des champs pour qu'ils soient des traits simples */
+#logins .login-input {
+    width: 100%;
+    padding: 12px 15px 12px 40px;
+    border: none;
+    border-bottom: 1px solid var(--dark-blue);
+    border-radius: 0;
+    font-size: 1rem;
+    color: var(--text);
+    background: transparent;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+#logins .login-input:focus {
+    border-bottom-color: var(--primary);
+}
+
+/* Bouton "Connexion" */
+#logins .login-btn {
+    width: 150px;
+    padding: 12px;
+    border: none;
+    border-radius: 25px;
+    background: var(--primary);
+    color: var(--white);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    display: block;
+    margin: 30px auto 0;
+}
+
+/* Effet au survol du bouton */
+#logins .login-btn:hover {
+    background: var(--secondary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    #logins .form-section {
+        width: 100%;
+        position: relative;
+    }
+
+    #logins .wave-divider {
+        display: none;
+    }
+
+    #logins .l-container {
+        flex-direction: column;
+    }
+
+    #logins .background-section {
+        height: 200px;
+    }
+
+    #logins .login-container {
+        margin-right: 0;
+    }
 }

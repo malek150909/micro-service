@@ -15,7 +15,7 @@ import ModifieProfil from "./main/modifierProfil";
 import EmploiDuTemps from "./admin/emploi/pages/TimetablePage";
 import Messagerie from "./main/Messages";
 import Ressources from "./enseignant/ressources/pages/Home";
-import Notes from "./enseignant/notes/pages/ProfessorHome";
+import Grades from "./enseignant/notes/pages/ProfessorHome";
 import GestionNotes from "./enseignant/notes/pages/GestionEnseignants";
 import AnnoncesENS from "./enseignant/annonces/annonceENS";
 import DocsAdmin from "./admin/docs/AdminDashboard";
@@ -30,6 +30,7 @@ import ProfessorReclamations from "./enseignant/notes/pages/ProfessorReclamation
 import StudentGrades from "./etudiant/notes/pages/StudentGrades";
 import ENSlistetudiant from "./enseignant/listetudiant/TeacherDashboard";
 import ETDressources from "./etudiant/ressource/StudentDashboard";
+import NotesFeed from "./etudiant/note/notes";
 
 const PrivateRoute = ({ element }) => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -58,7 +59,7 @@ function App() {
                 <Route path="/emploidutemps" element={<EmploiDuTemps />} />
                 <Route path="/messagerie" element={<Messagerie />} />
                 <Route path="/ressources" element={<Ressources />} />
-                <Route path="/notes" element={<Notes />} />
+                <Route path="/notes" element={<Grades />} />
                 <Route path="/gestionNotes" element={<GestionNotes />} />
                 <Route path="/annoncesENS" element={<AnnoncesENS />} />
                 <Route path="/docsAdmin" element={<DocsAdmin />} />
@@ -73,6 +74,7 @@ function App() {
                 <Route path="/ETDGRD" element={<StudentGrades />} />
                 <Route path="/ENSlistetudiant" element={<ENSlistetudiant />} />
                 <Route path="/ETDressources" element={<ETDressources />} />
+                <Route path="/notesFeed" element={<NotesFeed />} />
             </Routes>
         </Router>
     );
