@@ -1,0 +1,464 @@
+/* StudentPlanning.module.css */
+
+/* Container */
+.sp-container {
+    width: 100vw;
+    max-width: none;
+    margin: 0;
+    padding: 30px;
+    display: flex;
+    min-height: calc(100vh - 60px);
+    position: relative;
+}
+
+/* Background Shapes */
+.sp-background-shapes {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.sp-shape {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.2;
+    animation: sp-float 12s infinite ease-in-out;
+}
+
+.sp-shape1 {
+    width: 900px;
+    height: 600px;
+    background: radial-gradient(circle, #ffffff 20%, #c1e8ff 80%);
+    top: -200px;
+    left: -150px;
+    filter: blur(60px);
+}
+
+.sp-shape2 {
+    width: 800px;
+    height: 500px;
+    background: radial-gradient(circle, #ffffff 20%, #7da0ca 80%);
+    bottom: -150px;
+    right: -100px;
+    filter: blur(50px);
+    animation-delay: 4s;
+}
+
+@keyframes sp-float {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-20px) scale(1.03); }
+}
+
+/* Animation Keyframes */
+@keyframes sp-slideIn {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
+}
+
+@keyframes sp-fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Sidebar */
+.sp-sidebar {
+    background: linear-gradient(135deg, rgba(91, 135, 179, 0.95) 0%, rgba(17, 69, 148, 0.95) 100%);
+  border-radius: 0;
+  padding: 25px;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  position: fixed;
+  top: 0;
+  left: 30px;
+  width: 200px; /* Increased from 150px to 200px */
+  height: 100vh;
+  box-shadow: 0 15px 40px rgba(37, 100, 194, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  animation: sp-slideIn 0.5s ease-out;
+  overflow-y: auto;
+  padding-bottom: 40px;
+}
+
+.sp-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.sp-logo h2 {
+    font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.sp-sidebar-button {
+    background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.9rem; /* Reduced from 1rem to 0.9rem for better fit */
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 10px 15px; /* Adjusted padding from 12px 20px to 10px 15px */
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+  white-space: normal; /* Allow text to wrap */
+  word-wrap: break-word; /* Ensure long words break to the next line */
+  line-height: 1.2; /* Improve readability with better line spacing */
+}
+
+.sp-sidebar-button:hover {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(125, 160, 202, 0.5));
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+.sp-sidebar-button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: all 0.5s ease;
+}
+
+.sp-sidebar-button:hover::before {
+    left: 100%;
+}
+
+.sp-sidebar-icon {
+    font-size: 1.5rem;
+    color: #ffffff;
+}
+
+/* Main Content */
+.sp-main-content {
+    margin-left: 280px;
+    padding: 0 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    width: calc(100vw - 280px);
+}
+
+/* Header */
+.sp-header {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(5, 38, 89, 0.1);
+    backdrop-filter: blur(6px);
+    animation: sp-fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    opacity: 0;
+    animation-delay: 0.3s;
+}
+
+.sp-header h1 {
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: #052659;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sp-header p {
+    font-size: 1.1rem;
+    color: #5483b3;
+    margin-top: 8px;
+}
+
+/* Document List */
+.sp-document-list {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(5, 38, 89, 0.1);
+    backdrop-filter: blur(6px);
+    flex-grow: 1;
+    animation: sp-fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    opacity: 0;
+    animation-delay: 0.5s;
+}
+
+.sp-document-list h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #052659;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Exam Table */
+.sp-exam-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(5, 38, 89, 0.05);
+}
+
+.sp-exam-table th,
+.sp-exam-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid rgba(5, 38, 89, 0.1);
+}
+
+.sp-exam-table th {
+    background: #5483b3;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.sp-exam-table tr:nth-child(even) {
+    background: rgba(240, 247, 255, 0.9);
+}
+
+.sp-exam-table tr:hover {
+    background: rgba(240, 247, 255, 1);
+    transform: translateY(-2px);
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+/* No Results */
+.sp-no-results {
+    text-align: center;
+    padding: 30px;
+    font-size: 1.1rem;
+    color: #5483b3;
+    font-style: italic;
+}
+
+/* Modal */
+.sp-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(5, 38, 89, 0.6);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.3s ease-in-out, visibility 0s 0.3s;
+}
+
+.sp-modal-overlay.sp-active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition: opacity 0.3s ease-in-out, visibility 0s;
+}
+
+.sp-modal-content {
+    max-width: 620px;
+    width: 90%;
+    max-height: 85vh;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 30px;
+    border-radius: 18px;
+    box-shadow: 0 12px 35px rgba(5, 38, 89, 0.2);
+    backdrop-filter: blur(10px);
+    transform: translateY(20px);
+    opacity: 0;
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+}
+
+.sp-modal-overlay.sp-active .sp-modal-content {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.sp-modal-content h3 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #052659;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+/* Buttons */
+.sp-button-group {
+    position: sticky;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.95);
+    padding-top: 10px;
+    z-index: 1;
+}
+
+.sp-close-button {
+    background: linear-gradient(135deg, #5483b3, #7da0ca);
+    color: #ffffff;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.sp-close-button:hover {
+    background: linear-gradient(135deg, #7da0ca, #5483b3);
+    transform: translateY(-3px);
+}
+
+/* Login Page Specific Styles */
+.sp-input-group {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.sp-input-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.1rem;
+    color: #052659;
+    margin-bottom: 8px;
+}
+
+.sp-input-group input {
+    width: 100%;
+    padding: 12px 40px 12px 12px;
+    border: 1px solid #7da0ca;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #021024;
+    background: rgba(255, 255, 255, 0.9);
+    transition: border-color 0.3s ease;
+}
+
+.sp-input-group input:focus {
+    border-color: #5483b3;
+    outline: none;
+}
+
+.sp-input-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #5483b3;
+    font-size: 1.2rem;
+}
+
+.sp-button-group button {
+    background: linear-gradient(135deg, #5483b3, #335c86);
+    color: #ffffff;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.sp-button-group button:hover {
+    background: linear-gradient(135deg, #7da0ca, #5483b3);
+    transform: translateY(-3px);
+}
+
+.sp-error-modal {
+    max-width: 400px;
+    text-align: center;
+}
+
+.sp-error-modal p {
+    font-size: 1rem;
+    color: #5483b3;
+    margin-bottom: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .sp-sidebar {
+        position: static;
+        width: 100%;
+        height: auto;
+        left: 0;
+        border-radius: 0 0 15px 15px;
+        padding: 25px;
+    }
+
+    .sp-main-content {
+        margin-left: 0;
+        padding: 15px;
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .sp-container {
+        padding: 15px;
+    }
+
+    .sp-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .sp-document-list h3 {
+        font-size: 1.3rem;
+    }
+
+    .sp-exam-table th,
+    .sp-exam-table td {
+        font-size: 0.9rem;
+        padding: 10px;
+    }
+}

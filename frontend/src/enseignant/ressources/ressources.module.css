@@ -1,0 +1,692 @@
+    /* Main Container */
+    .ENS-RES-container {
+      max-width: 1600px;
+      margin: 30px auto;
+      padding: 0;
+      position: relative;
+    }
+  
+    /* Sidebar */
+    .ENS-RES-sidebar {
+      background: linear-gradient(135deg, rgba(91, 135, 179, 0.95) 0%, rgba(17, 69, 148, 0.95) 100%);
+      border-radius: 0;
+      padding: 25px;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      position: fixed;
+      top: 0;
+      left: 30px;
+      width: 220px;
+      height: 100vh;
+      box-shadow: 0 15px 40px rgba(37, 100, 194, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      animation: ENS-RES-slideIn 0.5s ease-out;
+    }
+  
+    @keyframes ENS-RES-slideIn {
+      from { transform: translateX(-100%); }
+      to { transform: translateX(0); }
+    }
+  
+    .ENS-RES-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+  
+    .ENS-RES-logo h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0;
+      color: #ffffff;
+      letter-spacing: 0.5px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  
+    .ENS-RES-logo .ENS-RES-icon {
+      font-size: 1.5rem;
+      color: #ffffff;
+    }
+  
+    /* Sidebar Button */
+    .ENS-RES-sidebar-button {
+      background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.9rem; /* Reduced from 1rem to 0.9rem for better fit */
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 10px 15px; /* Adjusted padding from 12px 20px to 10px 15px */
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+  white-space: normal; /* Allow text to wrap */
+  word-wrap: break-word; /* Ensure long words break to the next line */
+  line-height: 1.2; /* Improve readability with better line spacing */
+    }
+  
+    .ENS-RES-sidebar-button:hover {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(125, 160, 202, 0.5));
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      transform: translateY(-2px);
+    }
+  
+    .ENS-RES-sidebar-button::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      transition: all 0.5s ease;
+    }
+  
+    .ENS-RES-sidebar-button:hover::before {
+      left: 100%;
+    }
+  
+    /* Main Content */
+    .ENS-RES-main-content {
+      margin-left: 350px;
+      margin-right: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+  
+    /* Header */
+    .ENS-RES-header {
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15), 0 0 20px rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(10px);
+    }
+  
+    .ENS-RES-header h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: #052659;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: 0.5px;
+      text-shadow: 0 1px 3px rgba(5, 38, 89, 0.1);
+    }
+  
+    .ENS-RES-header p {
+      font-size: 1rem;
+      color: #5483b3;
+      margin: 8px 0 0;
+    }
+  
+    /* Content Grid */
+    .ENS-RES-content-grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 30px;
+    }
+  
+    /* Form Section */
+    .ENS-RES-form-container {
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15), 0 0 20px rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+    }
+  
+    .ENS-RES-form-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #052659;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: 0.5px;
+      position: relative;
+      padding-bottom: 10px;
+      background: linear-gradient(90deg, #0d3155, #7DA0CA);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      transition: all 0.4s ease;
+    }
+  
+    .ENS-RES-form-title:hover {
+      transform: scale(1.02);
+    }
+  
+    .ENS-RES-form-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 50px;
+      height: 2px;
+      background: linear-gradient(90deg, #06223e, #7DA0CA);
+      transition: width 0.4s ease;
+    }
+  
+    .ENS-RES-form-title:hover::after {
+      width: 100%;
+    }
+  
+    /* Form Group Styles */
+    .ENS-RES-form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+  
+    .ENS-RES-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+  
+    .ENS-RES-input-group label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+      color: #052659;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+  
+    .ENS-RES-input-group label .ENS-RES-input-icon {
+      font-size: 1.1rem;
+      color: #5483b3;
+    }
+  
+    .ENS-RES-form-group input,
+    .ENS-RES-form-group select,
+    .ENS-RES-form-group textarea {
+      padding: 15px;
+      border: 1px solid rgba(84, 131, 179, 0.2);
+      border-radius: 12px;
+      font-size: 0.95rem;
+      background: #f0f7ff;
+      color: #052659;
+      width: 100%;
+      box-shadow: 0 4px 15px rgba(5, 38, 89, 0.05);
+      transition: all 0.3s ease;
+      box-sizing: border-box;
+    }
+  
+    .ENS-RES-form-group input:focus,
+    .ENS-RES-form-group select:focus,
+    .ENS-RES-form-group textarea:focus {
+      border-color: #5483b3;
+      box-shadow: 0 0 15px rgba(84, 131, 179, 0.2);
+      outline: none;
+    }
+  
+    .ENS-RES-form-group textarea,
+    .ENS-RES-form-group select {
+      padding-left: 15px;
+    }
+  
+    .ENS-RES-form-group input::placeholder,
+    .ENS-RES-form-group textarea::placeholder {
+      color: #7da0ca;
+    }
+  
+    /* Custom File Input */
+    .ENS-RES-custom-file-input {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+    }
+  
+    .ENS-RES-custom-file-input input[type="file"] {
+      display: none;
+    }
+  
+    .ENS-RES-custom-file-label {
+      background: #5483b3;
+      color: #ffffff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 2px 5px rgba(5, 38, 89, 0.1);
+      transition: background 0.3s ease;
+    }
+  
+    .ENS-RES-custom-file-label:hover {
+      background: #7da0ca;
+    }
+  
+    .ENS-RES-file-name {
+      font-size: 0.85rem;
+      color: #5483b3;
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  
+    /* Resources List */
+    .ENS-RES-resources-list {
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15), 0 0 20px rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(10px);
+      position: relative;
+      height: 825px;
+      display: flex;
+      flex-direction: column;
+    }
+  
+    .ENS-RES-resources-list h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #052659;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: 0.5px;
+      position: relative;
+      padding-bottom: 10px;
+      background: linear-gradient(90deg, #0c3156, #7DA0CA);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      transition: all 0.4s ease;
+    }
+  
+    .ENS-RES-resources-list h3:hover {
+      transform: scale(1.02);
+    }
+  
+    .ENS-RES-resources-list h3::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 50px;
+      height: 2px;
+      background: linear-gradient(90deg, #042649, #7DA0CA);
+      transition: width 0.4s ease;
+    }
+  
+    .ENS-RES-resources-list h3:hover::after {
+      width: 100%;
+    }
+  
+    .ENS-RES-resource-grid {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+  
+    .ENS-RES-resource-grid::-webkit-scrollbar {
+      width: 6px;
+    }
+  
+    .ENS-RES-resource-grid::-webkit-scrollbar-track {
+      background: #f0f7ff;
+      border-radius: 10px;
+    }
+  
+    .ENS-RES-resource-grid::-webkit-scrollbar-thumb {
+      background: #7da0ca;
+      border-radius: 10px;
+    }
+  
+    .ENS-RES-resource-section {
+      margin-bottom: 20px;
+    }
+  
+    .ENS-RES-resource-section h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #173d78;
+      margin-bottom: 10px;
+      letter-spacing: 0.3px;
+    }
+  
+    .ENS-RES-resource-section ul {
+      list-style: none;
+      padding: 0;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+  
+    .ENS-RES-resource-section ul::-webkit-scrollbar {
+      width: 6px;
+    }
+  
+    .ENS-RES-resource-section ul::-webkit-scrollbar-track {
+      background: #f0f7ff;
+      border-radius: 10px;
+    }
+  
+    .ENS-RES-resource-section ul::-webkit-scrollbar-thumb {
+      background: #7da0ca;
+      border-radius: 10px;
+    }
+  
+    .ENS-RES-resource-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.7);
+      margin-bottom: 12px;
+      box-shadow: 0 4px 15px rgba(5, 38, 89, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(5px);
+    }
+  
+    .ENS-RES-resource-info h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #173d78;
+      margin: 0;
+      letter-spacing: 0.3px;
+    }
+  
+    .ENS-RES-resource-info p {
+      font-size: 0.9rem;
+      color: #5483b3;
+      margin: 10px 0 0;
+    }
+  
+    .ENS-RES-resource-actions {
+      display: flex;
+      gap: 10px;
+    }
+  
+    .ENS-RES-download-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #335c86;
+      color: #ffffff;
+      padding: 8px 16px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      box-shadow: 0 4px 15px rgba(5, 38, 89, 0.1);
+      transition: transform 0.3s ease;
+    }
+  
+    .ENS-RES-download-link:hover {
+      transform: translateY(-2px);
+      background: #5483b3;
+      color: #ffffff;
+    }
+  
+  
+    .ENS-RES-delete-button {
+      background: linear-gradient(135deg, #052659 0%, #021024 100%);
+    }
+  
+    /* Message Styles */
+    .ENS-RES-message {
+      padding: 8px;
+      margin-top: 8px;
+      border-radius: 8px;
+      text-align: center;
+      background-color: #22c55e;
+      color: #ffffff;
+      font-size: 0.9rem;
+      max-width: 300px;
+      margin-left: auto;
+      margin-right: auto;
+      animation: ENS-RES-fadeOut 3s ease forwards;
+    }
+  
+    .ENS-RES-message.ENS-RES-error {
+      background-color: #ef4444;
+    }
+  
+    @keyframes ENS-RES-fadeOut {
+      0% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+  
+    /* Modal Styles */
+    .ENS-RES-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(5, 38, 89, 0.5);
+      backdrop-filter: blur(8px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 20px;
+      box-sizing: border-box;
+      animation: ENS-RES-fadeIn 0.3s ease-in-out;
+    }
+  
+    .ENS-RES-modal-content {
+      width: 100%;
+      max-width: 500px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 15px 40px rgba(5, 38, 89, 0.2), 0 0 20px rgba(255, 255, 255, 0.3);
+      border: 1px solid rgba(84, 131, 179, 0.2);
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: ENS-RES-scaleIn 0.3s ease-in-out;
+    }
+  
+    @keyframes ENS-RES-fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  
+    @keyframes ENS-RES-scaleIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+  
+    .ENS-RES-modal-content h3 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #052659;
+      margin-bottom: 15px;
+      text-align: center;
+      letter-spacing: 0.5px;
+      text-shadow: 0 1px 3px rgba(5, 38, 89, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: center;
+    }
+  
+    .ENS-RES-modal-field {
+      margin-bottom: 12px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .ENS-RES-modal-field label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: #052659;
+      font-weight: 500;
+      margin-bottom: 6px;
+      justify-content: center;
+    }
+  
+    .ENS-RES-modal-field label .ENS-RES-input-icon {
+      font-size: 1.1rem;
+      color: #5483b3;
+    }
+  
+    .ENS-RES-modal-field input,
+    .ENS-RES-modal-field select,
+    .ENS-RES-modal-field textarea {
+      padding: 10px;
+      border: 1px solid rgba(84, 131, 179, 0.2);
+      border-radius: 12px;
+      font-size: 0.9rem;
+      background: #f0f7ff;
+      color: #052659;
+      width: 80%;
+      box-shadow: 0 4px 15px rgba(5, 38, 89, 0.05);
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+  
+    .ENS-RES-modal-field input:focus,
+    .ENS-RES-modal-field select:focus,
+    .ENS-RES-modal-field textarea:focus {
+      border-color: #5483b3;
+      box-shadow: 0 0 15px rgba(84, 131, 179, 0.2);
+      outline: none;
+    }
+  
+    .ENS-RES-modal-field a {
+      font-size: 0.9rem;
+      color: #5483b3;
+      text-decoration: none;
+      text-align: center;
+      width: 80%;
+      display: block;
+    }
+  
+    .ENS-RES-modal-field a:hover {
+      text-decoration: underline;
+    }
+  
+    .ENS-RES-modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+      justify-content: center;
+    }
+  
+    /* No Results Message */
+    .ENS-RES-no-results {
+      text-align: center;
+      color: #5483b3;
+      font-size: 1rem;
+      padding: 25px;
+    }
+  
+    /* Icons */
+    .ENS-RES-icon {
+      font-size: 1rem;
+      color: inherit;
+    }
+  
+    /* Responsive Design */
+    @media (max-width: 992px) {
+      .ENS-RES-sidebar {
+        position: relative;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: auto;
+        margin-bottom: 30px;
+        padding: 20px;
+      }
+  
+      .ENS-RES-main-content {
+        margin-left: 0;
+        margin-right: 0;
+      }
+  
+      .ENS-RES-content-grid {
+        grid-template-columns: 1fr;
+      }
+  
+      .ENS-RES-resources-list {
+        height: 500px;
+      }
+  
+      .ENS-RES-resource-section ul {
+        max-height: 120px;
+      }
+    }
+  
+    @media (max-width: 576px) {
+      .ENS-RES-modal-content {
+        max-width: 90%;
+        padding: 15px;
+      }
+  
+      .ENS-RES-modal-content h3 {
+        font-size: 1.2rem;
+      }
+  
+      .ENS-RES-modal-field label {
+        font-size: 0.85rem;
+      }
+  
+      .ENS-RES-modal-field input,
+      .ENS-RES-modal-field select,
+      .ENS-RES-modal-field textarea {
+        font-size: 0.85rem;
+        padding: 8px;
+      }
+  
+      .ENS-RES-modal-actions {
+        flex-direction: column;
+        gap: 8px;
+      }
+  
+      .ENS-RES-custom-file-input {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+  
+      .ENS-RES-custom-file-label {
+        width: 100%;
+        justify-content: center;
+      }
+  
+      .ENS-RES-file-name {
+        width: 100%;
+        text-align: center;
+      }
+    }
+  

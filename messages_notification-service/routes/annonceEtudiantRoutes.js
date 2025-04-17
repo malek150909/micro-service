@@ -13,4 +13,8 @@ router.post('/comment', annonceController.addCommentToAnnonce);
 router.post('/comment/reply', annonceController.replyToComment);
 router.get('/comments/:annonceId', annonceController.getCommentsForAnnonce);
 
+// Routes pour le calendrier
+router.post('/calendar/add', annonceController.addAdminEventToCalendar);
+router.get('/calendar/check/:annonceId/:matricule', annonceController.checkCalendarEvent);
+
 module.exports = router;

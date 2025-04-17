@@ -112,43 +112,90 @@ const Etudiant = () => {
     };
 
     const items = [
-        { title: "Documents Administratifs", description: "Consulter et créer des documents", route: "/docsEtudiant", icon: <FaClipboardList /> },
-        { title: "Annonces", description: "Consulter les annonces", route: "/AnnoncesETD", icon: <FaBullhorn /> },
-        { title: "Clubs", description: "Consulter les clubs", route: "/clubsETD", icon: <FaUsers /> },
-        { title: "Emploi du Temps", description: "Consulter l'emploi du temps", route: "/ETDemploi", icon: <FaCalendar /> },
-        { title: "Notes", description: "Consulter les notes", route: "/ETDGRD", icon: <FaBook /> },
-        { title: "Ressources", description: "Consulter les ressources", route: "/ETDressources", icon: <FaBook /> },
-        { title: "Mes Notes", description: "Créer et gérer vos notes", route: "/notesFeed", icon: <FaBook /> },
-    ];
+        { 
+          title: "Documents Administratifs", 
+          description: "Consultez, créez et gérez vos documents administratifs.", 
+          route: "/docsEtudiant", 
+          icon: <FaClipboardList /> 
+        },
+        { 
+          title: "Annonces", 
+          description: "Accédez aux dernières annonces et informations officielles.", 
+          route: "/AnnoncesETD", 
+          icon: <FaBullhorn /> 
+        },
+        { 
+          title: "Clubs", 
+          description: "Découvrez et participez aux activités des clubs étudiants.", 
+          route: "/clubsETD", 
+          icon: <FaUsers /> 
+        },
+        { 
+          title: "Emploi du Temps", 
+          description: "Consultez votre emploi du temps personnalisé.", 
+          route: "/ETDemploi", 
+          icon: <FaCalendar /> 
+        },
+        { 
+          title: "Moyennes", 
+          description: "Visualisez vos résultats académiques et moyennes.", 
+          route: "/ETDGRD", 
+          icon: <FaBook /> 
+        },
+        { 
+          title: "Ressources", 
+          description: "Accédez aux ressources pédagogiques et supports de cours.", 
+          route: "/ETDressources", 
+          icon: <FaBook /> 
+        },
+        { 
+          title: "Mes Notes", 
+          description: "Créez, organisez et consultez vos notes personnelles.", 
+          route: "/notesFeed", 
+          icon: <FaBook /> 
+        },
+        { 
+            title: "Planning", 
+            description: "Consultez votre planning des Examens.", 
+            route: "/studentPlanning", 
+            icon: <FaBook /> 
+          },
+          { 
+            title: "calendar", 
+            description: "Consultez votre planning des Examens.", 
+            route: "/calendar", 
+            icon: <FaBook /> 
+          }
+      ];
 
     const calendarDays = Array.from({ length: 30 }, (_, i) => i + 1); // Jours d'avril
     const currentDay = 5; // 5 avril 2025
 
     return (
-        <div className={`${styles.mainContainer} ${isLoaded ? styles.mainContainerLoaded : ''}`}>
+        <div className={`${styles['MAIN-mainContainer']} ${isLoaded ? styles['MAIN-mainContainerLoaded'] : ''}`}>
             {/* Sidebar */}
-            <div className={styles.sidebar}>
-                <div className={styles.sidebarMenu}>
-                    <button onClick={handleEditProfile} className={styles.sidebarItem}>
-                        <FaUser className={styles.sidebarIcon} />
+            <div className={styles['MAIN-sidebar']}>
+                <div className={styles['MAIN-sidebarMenu']}>
+                    <button onClick={handleEditProfile} className={styles['MAIN-sidebarItem']}>
+                        <FaUser className={styles['MAIN-sidebarIcon']} />
                     </button>
-                    <button onClick={handleMessages} className={styles.sidebarItem}>
-                        <FaEnvelope className={styles.sidebarIcon} />
+                    <button onClick={handleMessages} className={styles['MAIN-sidebarItem']}>
+                        <FaEnvelope className={styles['MAIN-sidebarIcon']} />
                     </button>
-                    <button onClick={handleNotificationClick} className={styles.sidebarItem}>
-                        <FaBell className={styles.sidebarIcon} />
+                    <button onClick={handleNotificationClick} className={styles['MAIN-sidebarItem']}>
+                        <FaBell className={styles['MAIN-sidebarIcon']} />
                     </button>
-                    <button onClick={handleLogout} className={styles.sidebarItem}>
-                        <FaSignOutAlt className={styles.sidebarIcon} />
+                    <button onClick={handleLogout} className={styles['MAIN-sidebarItem']}>
+                        <FaSignOutAlt className={styles['MAIN-sidebarIcon']} />
                     </button>
                 </div>
             </div>
 
             {/* Main Content */}
-            <div className={styles.mainContent}>
+            <div className={styles['MAIN-mainContent']}>
                 {/* Welcome Message */}
                 {showWelcome && user && (
-                    <div className={`${styles.welcomeMessage} ${isLoaded ? styles.welcomeMessageSlideIn : ''}`}>
+                    <div className={`${styles['MAIN-welcomeMessage']} ${isLoaded ? styles['MAIN-welcomeMessageSlideIn'] : ''}`}>
                         <h1>Bienvenue, {user.nom} {user.prenom} !</h1>
                         <p>Que souhaitez-vous faire aujourd'hui ?</p>
                     </div>
@@ -156,47 +203,49 @@ const Etudiant = () => {
 
                 {/* Notification Modal */}
                 {showNotificationModal && (
-                    <div className={`${styles.notificationModal} ${showNotificationModal ? styles.notificationModalActive : ''}`}>
-                        <div className={`${styles.notificationModalContent} ${showNotificationModal ? styles.notificationModalContentActive : ''}`}>
+                    <div className={`${styles['MAIN-notificationModal']} ${showNotificationModal ? styles['MAIN-notificationModalActive'] : ''}`}>
+                        <div className={`${styles['MAIN-notificationModalContent']} ${showNotificationModal ? styles['MAIN-notificationModalContentActive'] : ''}`}>
                             <button
-                                className={styles.closeModalBtn}
+                                className={styles['MAIN-closeModalBtn']}
                                 onClick={() => setShowNotificationModal(false)}
                             >
                                 X
                             </button>
-                            <NotificationBell showModal={true} />
+                            <div className={styles['MAIN-notificationListWrapper']}> {/* Ajout d'un conteneur */}
+                                <NotificationBell showModal={true} />
+                            </div>
                         </div>
                     </div>
                 )}
 
                 {/* Add Note Modal */}
                 {showAddNoteModal && (
-                    <div className={`${styles.modalOverlay} ${showAddNoteModal ? styles.modalOverlayActive : ''}`} data-modal="add">
-                        <div className={`${styles.modalContent} ${styles.addNoteModal} ${styles.stickyNote}`}>
+                    <div className={`${styles['MAIN-modalOverlay']} ${showAddNoteModal ? styles['MAIN-modalOverlayActive'] : ''}`} data-modal="add">
+                        <div className={`${styles['MAIN-modalContent']} ${styles['MAIN-addNoteModal']} ${styles['MAIN-stickyNote']}`}>
                             <button
-                                className={styles.closeButtonTopRight}
+                                className={styles['MAIN-closeButtonTopRight']}
                                 onClick={(e) => closeAddNoteModal(e)}
                             >
                                 <FaTimes />
                             </button>
                             <h3>Ajouter une Note</h3>
-                            <div className={styles.modalBody}>
+                            <div className={styles['MAIN-modalBody']}>
                                 <input
                                     type="text"
                                     value={newNoteTitle}
                                     onChange={(e) => setNewNoteTitle(e.target.value)}
                                     placeholder="Titre de la note"
-                                    className={styles.titleInput}
+                                    className={styles['MAIN-titleInput']}
                                 />
                                 <textarea
                                     value={newNoteContent}
                                     onChange={(e) => setNewNoteContent(e.target.value)}
                                     placeholder="Écrivez votre note ici..."
                                     rows="10"
-                                    className={styles.linedText}
+                                    className={styles['MAIN-linedText']}
                                 />
                             </div>
-                            <div className={styles.buttonGroup}>
+                            <div className={styles['MAIN-buttonGroup']}>
                                 <button onClick={addNote}>Ajouter</button>
                             </div>
                         </div>
@@ -205,30 +254,30 @@ const Etudiant = () => {
 
                 {/* Details Modal */}
                 {showDetailsModal && selectedNote && (
-                    <div className={`${styles.modalOverlay} ${showDetailsModal ? styles.modalOverlayActive : ''}`} data-modal="details">
-                        <div className={`${styles.modalContent} ${styles.stickyNote}`}>
+                    <div className={`${styles['MAIN-modalOverlay']} ${showDetailsModal ? styles['MAIN-modalOverlayActive'] : ''}`} data-modal="details">
+                        <div className={`${styles['MAIN-modalContent']} ${styles['MAIN-stickyNote']}`}>
                             <button
-                                className={styles.closeButtonTopRight}
+                                className={styles['MAIN-closeButtonTopRight']}
                                 onClick={(e) => closeDetailsModal(e)}
                             >
                                 <FaTimes />
                             </button>
                             <h3>{selectedNote.title}</h3>
-                            <div className={styles.modalBody}>
-                                <p className={styles.noteContentText}>
+                            <div className={styles['MAIN-modalBody']}>
+                                <p className={styles['MAIN-noteContentText']}>
                                     <strong>Contenu :</strong> {selectedNote.content}
                                 </p>
-                                <p className={styles.noteContentText}>
+                                <p className={styles['MAIN-noteContentText']}>
                                     <strong>Créée le :</strong>{" "}
                                     {new Date(selectedNote.created_at).toLocaleString()}
                                 </p>
-                                <p className={styles.noteContentText}>
+                                <p className={styles['MAIN-noteContentText']}>
                                     <strong>Mise à jour le :</strong>{" "}
                                     {new Date(selectedNote.updated_at).toLocaleString()}
                                 </p>
                             </div>
-                            <div className={styles.buttonGroup}>
-                                <button className={styles.closeButton} onClick={(e) => closeDetailsModal(e)}>
+                            <div className={styles['MAIN-buttonGroup']}>
+                                <button className={styles['MAIN-closeButton']} onClick={(e) => closeDetailsModal(e)}>
                                     <FaTimes /> Fermer
                                 </button>
                             </div>
@@ -237,51 +286,33 @@ const Etudiant = () => {
                 )}
 
                 {/* Main Layout */}
-                <div className={styles.mainLayout}>
+                <div className={styles['MAIN-mainLayout']}>
                     {/* Cards Section */}
-                    <div className={styles.cardsSection}>
-                        <div className={styles.cardsGrid}>
+                    <div className={styles['MAIN-cardsSection']}>
+                        <div className={styles['MAIN-cardsGrid']}>
                             {items.map((item, index) => (
-                                <div key={index} onClick={() => navigate(item.route)} className={styles.card}>
-                                    <div className={styles.cardIcon}>{item.icon}</div>
-                                    <div className={styles.cardContent}>
-                                        <h3 className={styles.cardTitle}>{item.title}</h3>
-                                        <p className={styles.cardDescription}>{item.description}</p>
+                                <div key={index} onClick={() => navigate(item.route)} className={styles['MAIN-card']}>
+                                    <div className={styles['MAIN-cardIcon']}>{item.icon}</div>
+                                    <div className={styles['MAIN-cardContent']}>
+                                        <h3 className={styles['MAIN-cardTitle']}>{item.title}</h3>
+                                        <p className={styles['MAIN-cardDescription']}>{item.description}</p>
                                     </div>
-                                    <FaChevronRight className={styles.cardArrow} />
+                                    <FaChevronRight className={styles['MAIN-cardArrow']} />
                                 </div>
                             ))}
                         </div>
                     </div>
 
                     {/* Right Column: Calendar and Notes */}
-                    <div className={styles.rightColumn}>
-                        {/* Calendar */}
-                        <div className={styles.calendarSection}>
-                            <h3>Avril 2025</h3>
-                            <div className={styles.calendarGrid}>
-                                {["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map((day, index) => (
-                                    <div key={index} className={styles.calendarDayHeader}>
-                                        {day}
-                                    </div>
-                                ))}
-                                {calendarDays.map((day, index) => (
-                                    <div
-                                        key={index}
-                                        className={`${styles.calendarDay} ${day === currentDay ? styles.currentDay : ''}`}
-                                    >
-                                        {day}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+                    <div className={styles['MAIN-rightColumn']}>
+                        
 
                         {/* Notes Section */}
-                        <div className={styles.notesSection}>
+                        <div className={styles['MAIN-notesSection']}>
                             <h3>Dernières Notes</h3>
-                            <div className={styles.notesList}>
+                            <div className={styles['MAIN-notesList']}>
                                 {/* "Ajouter" button */}
-                                <button onClick={openAddNoteModal} className={styles.addButton}>
+                                <button onClick={openAddNoteModal} className={styles['MAIN-addButton']}>
                                     Ajouter
                                 </button>
                                 {/* List of recent notes */}
@@ -291,18 +322,18 @@ const Etudiant = () => {
                                     notes.map((note, index) => (
                                         <div
                                             key={index}
-                                            className={`${styles.noteItem} ${index % 2 === 0 ? styles.rotatePositive : styles.rotateNegative}`}
+                                            className={`${styles['MAIN-noteItem']} ${index % 2 === 0 ? styles['MAIN-rotatePositive'] : styles['MAIN-rotateNegative']}`}
                                             onClick={() => openDetailsModal(note)}
                                         >
-                                            <div className={styles.noteContent}>
-                                                <p className={styles.noteTitle}>{note.title}</p>
-                                                <p className={styles.noteSnippet}>
+                                            <div className={styles['MAIN-noteContent']}>
+                                                <p className={styles['MAIN-noteTitle']}>{note.title}</p>
+                                                <p className={styles['MAIN-noteSnippet']}>
                                                     {note.content.substring(0, 50) +
                                                         (note.content.length > 50 ? "..." : "")}
                                                 </p>
-                                                <span className={styles.noteDate}>
+                                                <p className={styles['MAIN-noteDate']}>
                                                     {new Date(note.updated_at || note.created_at).toLocaleString()}
-                                                </span>
+                                                </p>
                                             </div>
                                         </div>
                                     ))
@@ -310,7 +341,7 @@ const Etudiant = () => {
                                 {/* "Voir plus" button */}
                                 <button
                                     onClick={() => navigate("/notesFeed")}
-                                    className={styles.seeMoreButton}
+                                    className={styles['MAIN-seeMoreButton']}
                                 >
                                     Voir plus
                                 </button>

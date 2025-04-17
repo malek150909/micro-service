@@ -5,9 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaHome, FaUsers, FaPlus, FaSignOutAlt, FaList } from 'react-icons/fa'; // Ajout de FaList
+import { FaHome, FaUsers, FaPlus, FaSignOutAlt, FaList } from 'react-icons/fa';
 import Swal from 'sweetalert2';
-import "./listetudiant.css" ;
+import styles from './listetudiant.module.css';
 
 const listetudiant = () => {
   const [sections, setSections] = useState([]);
@@ -17,7 +17,7 @@ const listetudiant = () => {
   const [nomSection, setNomSection] = useState('');
   const navigate = useNavigate();
 
-  const iconColor = '#021A3F'; // Bleu très foncé
+  const iconColor = '#021A3F';
 
   const handleFilter = (filteredSections, filters) => {
     setCurrentFilters(filters);
@@ -32,6 +32,7 @@ const listetudiant = () => {
         pauseOnHover: true,
         style: { backgroundColor: '#FFD93D', color: '#fff', fontSize: '16px' },
         icon: '⚠️',
+        className: styles['ADM-ETD-custom-toast-warning']
       });
     } else if (Array.isArray(filteredSections) && filteredSections.length > 0) {
       setSections(filteredSections);
@@ -44,6 +45,7 @@ const listetudiant = () => {
         pauseOnHover: true,
         style: { backgroundColor: '#50C878', color: '#fff', fontSize: '16px' },
         icon: '✅',
+        className: styles['ADM-ETD-custom-toast-success']
       });
     } else {
       setSections([]);
@@ -56,6 +58,7 @@ const listetudiant = () => {
         pauseOnHover: true,
         style: { backgroundColor: '#FF6B6B', color: '#fff', fontSize: '16px' },
         icon: '❌',
+        className: styles['ADM-ETD-custom-toast-error']
       });
     }
   };
@@ -73,6 +76,7 @@ const listetudiant = () => {
         pauseOnHover: true,
         style: { backgroundColor: '#FF6B6B', color: '#fff', fontSize: '16px' },
         icon: '❌',
+        className: styles['ADM-ETD-custom-toast-error']
       });
       return;
     }
@@ -87,6 +91,7 @@ const listetudiant = () => {
         pauseOnHover: true,
         style: { backgroundColor: '#FF6B6B', color: '#fff', fontSize: '16px' },
         icon: '❌',
+        className: styles['ADM-ETD-custom-toast-error']
       });
       return;
     }
@@ -100,6 +105,7 @@ const listetudiant = () => {
         pauseOnHover: true,
         style: { backgroundColor: '#FF6B6B', color: '#fff', fontSize: '16px' },
         icon: '❌',
+        className: styles['ADM-ETD-custom-toast-error']
       });
       return;
     }
@@ -116,8 +122,8 @@ const listetudiant = () => {
       background: 'rgba(255, 255, 255, 0.9)',
       color: '#052659',
       customClass: {
-        confirmButton: 'swal-confirm-btn',
-        cancelButton: 'swal-cancel-btn',
+        confirmButton: styles['ADM-ETD-swal-confirm-btn'],
+        cancelButton: styles['ADM-ETD-swal-cancel-btn'],
       },
     }).then((result) => {
       if (result.isConfirmed) {
@@ -143,6 +149,7 @@ const listetudiant = () => {
               pauseOnHover: true,
               style: { backgroundColor: '#50C878', color: '#fff', fontSize: '16px' },
               icon: '✅',
+              className: styles['ADM-ETD-custom-toast-success']
             });
             setSections(prevSections => [
               ...prevSections,
@@ -161,6 +168,7 @@ const listetudiant = () => {
               pauseOnHover: true,
               style: { backgroundColor: '#FF6B6B', color: '#fff', fontSize: '16px' },
               icon: '❌',
+              className: styles['ADM-ETD-custom-toast-error']
             });
           });
       }
@@ -180,8 +188,8 @@ const listetudiant = () => {
       background: 'rgba(255, 255, 255, 0.9)',
       color: '#052659',
       customClass: {
-        confirmButton: 'swal-confirm-btn',
-        cancelButton: 'swal-cancel-btn',
+        confirmButton: styles['ADM-ETD-swal-confirm-btn'],
+        cancelButton: styles['ADM-ETD-swal-cancel-btn'],
       },
     }).then((result) => {
       if (result.isConfirmed) {
@@ -205,6 +213,7 @@ const listetudiant = () => {
               pauseOnHover: true,
               style: { backgroundColor: '#50C878', color: '#fff', fontSize: '16px' },
               icon: '✅',
+              className: styles['ADM-ETD-custom-toast-success']
             });
             setSections(sections.filter(s => s.ID_section !== idSection));
             if (selectedSection === idSection) setSelectedSection(null);
@@ -218,6 +227,7 @@ const listetudiant = () => {
               pauseOnHover: true,
               style: { backgroundColor: '#FF6B6B', color: '#fff', fontSize: '16px' },
               icon: '❌',
+              className: styles['ADM-ETD-custom-toast-error']
             });
           });
       }
@@ -235,32 +245,31 @@ const listetudiant = () => {
   };
 
   return (
-    <div id="listetudiants">
-    <div className="container">
-      <div className="background-shapes">
-        <div className="shape shape1"></div>
-        <div className="shape shape2"></div>
+    <div className={styles['ADM-ETD-container']}>
+      <div className={styles['ADM-ETD-background-shapes']}>
+        <div className={`${styles['ADM-ETD-shape']} ${styles['ADM-ETD-shape1']}`}></div>
+        <div className={`${styles['ADM-ETD-shape']} ${styles['ADM-ETD-shape2']}`}></div>
       </div>
 
-      <div className="sidebar">
-        <div className="logo">
-          <FaUsers />
+      <div className={styles['ADM-ETD-sidebar']}>
+        <div className={styles['ADM-ETD-logo']}>
           <h2>Gestion des etudiants</h2>
         </div>
         
-        <button className="sidebar-button" onClick={() => setSelectedSection(null)}>
-          <FaUsers className="sidebar-icon" /> Liste des Sections
+        <button className={styles['ADM-ETD-sidebar-button']} onClick={() => navigate('/admin')}>
+          <FaHome className={styles['ADM-ETD-sidebar-icon']} /> Retour á l'accueil
         </button>
-        <button className="sidebar-button" onClick={handleAddSectionRedirect}>
-          <FaPlus className="sidebar-icon" /> Ajouter Section
+        <button className={styles['ADM-ETD-sidebar-button']} onClick={() => setSelectedSection(null)}>
+          <FaUsers className={styles['ADM-ETD-sidebar-icon']} /> Liste des Sections
         </button>
-        <button className="sidebar-button" onClick={()=>navigate('/admin')}>
-          <FaSignOutAlt className="sidebar-icon" /> Retour á l'accueil
+        <button className={styles['ADM-ETD-sidebar-button']} onClick={handleAddSectionRedirect}>
+          <FaPlus className={styles['ADM-ETD-sidebar-icon']} /> Ajouter Section
         </button>
+        
       </div>
 
-      <div className="main-content">
-        <div className="main-header">
+      <div className={styles['ADM-ETD-main-content']}>
+        <div className={styles['ADM-ETD-main-header']}>
           <h1>Liste des Étudiants</h1>
           <p>Gérez les sections et les étudiants de votre établissement</p>
         </div>
@@ -275,10 +284,10 @@ const listetudiant = () => {
               transition={{ duration: 0.3 }}
             >
               <FilterPanel onFilter={handleFilter} />
-              <div className="sections-list">
+              <div className={styles['ADM-ETD-sections-list']}>
                 <h3>Sections filtrées : <FaList style={{ color: iconColor, fill: iconColor, verticalAlign: 'middle' }} /></h3>
                 {sections.length === 0 ? (
-                  <p className="no-sections">
+                  <p className={styles['ADM-ETD-no-sections']}>
                     Aucune section trouvée. Vous pouvez ajouter une nouvelle section ci-dessous.
                   </p>
                 ) : (
@@ -288,14 +297,14 @@ const listetudiant = () => {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.1 }}
-                      className="section-item"
+                      className={styles['ADM-ETD-section-item']}
                       onClick={() => setSelectedSection(s.ID_section)}
                     >
                       <span>
                         {s.nom_section} - {s.nom_specialite} (Niveau: {s.niveau || 'Non défini'})
                       </span>
                       <button
-                        className="delete-section-btn"
+                        className={styles['ADM-ETD-delete-section-btn']}
                         onClick={(e) => {
                           e.stopPropagation();
                           handleDeleteSection(s.ID_section, s.nom_section);
@@ -314,7 +323,7 @@ const listetudiant = () => {
                       placeholder="Nom de la section"
                       value={nomSection}
                       onChange={(e) => setNomSection(e.target.value)}
-                      style={{ padding: '15px', width: '200px' }}
+                      className={styles['ADM-ETD-input']}
                     />
                     <input
                       type="number"
@@ -322,9 +331,9 @@ const listetudiant = () => {
                       placeholder="Nombre de groupes"
                       value={nombreGroupes}
                       onChange={(e) => setNombreGroupes(e.target.value)}
-                      style={{ padding: '15px', width: '150px' }}
+                      className={styles['ADM-ETD-input']}
                     />
-                    <button type="button" onClick={handleAddSection} className="edit-btn">
+                    <button type="button" onClick={handleAddSection} className={styles['ADM-ETD-edit-btn']}>
                       <FaPlus /> Ajouter Section
                     </button>
                   </div>
@@ -358,9 +367,8 @@ const listetudiant = () => {
         closeOnClick={true}
         pauseOnHover={true}
         draggable={true}
-        className="custom-toast"
+        className={styles['ADM-ETD-custom-toast']}
       />
-    </div>
     </div>
   );
 };

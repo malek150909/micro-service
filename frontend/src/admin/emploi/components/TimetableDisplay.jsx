@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
-import '../../../admin_css_files/TimetableDisplay.css';
 import ReactDOM from 'react-dom';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { FaFilePdf, FaFileExcel } from 'react-icons/fa';
+import styles from '../ADM_EDT.module.css';
 
 function TimetableDisplay({ timetable, sectionId, semestre, onRefresh }) {
   console.log('Rendering timetable from Seance:', timetable);
   if (!timetable) {
-    return <p className="timetable-error">Veuillez sélectionner les filtres pour voir l'emploi du temps.</p>;
+    return <p className={styles['ADM-EDT-timetable-error']}>Veuillez sélectionner les filtres pour voir l'emploi du temps.</p>;
   }
 
   const days = ['Samedi', 'Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi'];
@@ -343,13 +343,13 @@ function TimetableDisplay({ timetable, sectionId, semestre, onRefresh }) {
     if (!selectedSession) return null;
 
     return ReactDOM.createPortal(
-      <div className="modal-overlay">
-        <div className="modal-content">
+      <div className={styles['ADM-EDT-modal-overlay']}>
+        <div className={styles['ADM-EDT-modal-content']}>
           {isEditing ? (
-            <form onSubmit={handleFormSubmit} className="session-form">
+            <form onSubmit={handleFormSubmit} className={styles['ADM-EDT-session-form']}>
               <h3>{isAdding ? 'Ajouter une séance' : 'Modifier la séance'}</h3>
-                <div className="form-grid">
-                  <div className="form-group">
+                <div className={styles['ADM-EDT-form-grid']}>
+                  <div className={styles['ADM-EDT-form-group']}>
                     <label>Module</label>
                     <select
                       name="ID_module"
@@ -363,7 +363,7 @@ function TimetableDisplay({ timetable, sectionId, semestre, onRefresh }) {
                       ))}
                     </select>
                   </div>
-                  <div className="form-group">
+                  <div className={styles['ADM-EDT-form-group']}>
                     <label>Type de séance</label>
                     <select
                       name="type_seance"
@@ -383,7 +383,7 @@ function TimetableDisplay({ timetable, sectionId, semestre, onRefresh }) {
                       })()}
                     </select>
                   </div>
-                  <div className="form-group">
+                  <div className={styles['ADM-EDT-form-group']}>
                     <label>Enseignant</label>
                     <select
                       name="Matricule"
@@ -397,7 +397,7 @@ function TimetableDisplay({ timetable, sectionId, semestre, onRefresh }) {
                       ))}
                     </select>
                   </div>
-                  <div className="form-group">
+                  <div className={styles['ADM-EDT-form-group']}>
                     <label>Salle</label>
                     <select
                       name="ID_salle"
@@ -411,7 +411,7 @@ function TimetableDisplay({ timetable, sectionId, semestre, onRefresh }) {
                       ))}
                     </select>
                   </div>
-                  <div className="form-group">
+                  <div className={styles['ADM-EDT-form-group']}>
                     <label>Groupe</label>
                     <select
                       name="ID_groupe"
@@ -427,60 +427,60 @@ function TimetableDisplay({ timetable, sectionId, semestre, onRefresh }) {
                   </div>
                   {isAdding && (
                     <>
-                      <div className="form-group">
+                      <div className={styles['ADM-EDT-form-group']}>
                         <label>Jour</label>
                         <input type="text" name="jour" value={editForm.jour} readOnly />
                       </div>
-                      <div className="form-group">
+                      <div className={styles['ADM-EDT-form-group']}>
                         <label>Créneau</label>
                         <input type="text" name="time_slot" value={editForm.time_slot} readOnly />
                       </div>
                     </>
                   )}
                 </div>
-                <div className="form-actions">
-                  <button type="submit" className="timetable-btn save" disabled={!editForm.ID_module}>
+                <div className={styles['ADM-EDT-form-actions']}>
+                  <button type="submit" className={`${styles['ADM-EDT-timetable-btn']} ${styles['ADM-EDT-save']}`} disabled={!editForm.ID_module}>
                     {isAdding ? 'Ajouter' : 'Enregistrer'}
                   </button>
-                  <button type="button" onClick={() => { setIsEditing(false); setSelectedSession(null); setError(null); }} className="timetable-btn cancel">
+                  <button type="button" onClick={() => { setIsEditing(false); setSelectedSession(null); setError(null); }} className={`${styles['ADM-EDT-timetable-btn']} ${styles['ADM-EDT-cancel']}`}>
                     Annuler
                   </button>
                 </div>
             </form>
           ) : (
-            <div className="session-details">
+            <div className={styles['ADM-EDT-session-details']}>
               <h3>Détails de la case ({selectedSession.jour} {selectedSession.timeSlot})</h3>
               {selectedSession.sessions.length > 0 ? (
                 <>
                   {selectedSession.sessions.map((session, index) => (
-                    <div key={index} className="details-card">
-                      <div className="detail-item">
-                          <span className="detail-label">Type :</span>
-                          <span className="detail-value">{session.type_seance}</span>
+                    <div key={index} className={styles['ADM-EDT-details-card']}>
+                      <div className={styles['ADM-EDT-detail-item']}>
+                          <span className={styles['ADM-EDT-detail-label']}>Type :</span>
+                          <span className={styles['ADM-EDT-detail-value']}>{session.type_seance}</span>
                         </div>
-                        <div className="detail-item">
-                          <span className="detail-label">Module :</span>
-                          <span className="detail-value">{session.module}</span>
+                        <div className={styles['ADM-EDT-detail-item']}>
+                          <span className={styles['ADM-EDT-detail-label']}>Module :</span>
+                          <span className={styles['ADM-EDT-detail-value']}>{session.module}</span>
                         </div>
-                        <div className="detail-item">
-                          <span className="detail-label">Enseignant :</span>
-                          <span className="detail-value">{session.teacher}</span>
+                        <div className={styles['ADM-EDT-detail-item']}>
+                          <span className={styles['ADM-EDT-detail-label']}>Enseignant :</span>
+                          <span className={styles['ADM-EDT-detail-value']}>{session.teacher}</span>
                         </div>
-                        <div className="detail-item">
-                          <span className="detail-label">Salle :</span>
-                          <span className="detail-value">{session.room}</span>
+                        <div className={styles['ADM-EDT-detail-item']}>
+                          <span className={styles['ADM-EDT-detail-label']}>Salle :</span>
+                          <span className={styles['ADM-EDT-detail-value']}>{session.room}</span>
                         </div>
                         {session.type_seance !== 'cours' && session.group && (
-                          <div className="detail-item">
-                            <span className="detail-label">Groupe :</span>
-                            <span className="detail-value">{session.group}</span>
+                          <div className={styles['ADM-EDT-detail-item']}>
+                            <span className={styles['ADM-EDT-detail-label']}>Groupe :</span>
+                            <span className={styles['ADM-EDT-detail-value']}>{session.group}</span>
                           </div>
                         )}
-                        <div className="detail-actions">
-                          <button onClick={() => handleEdit(session)} className="timetable-btn edit">
+                        <div className={styles['ADM-EDT-detail-actions']}>
+                          <button onClick={() => handleEdit(session)} className={`${styles['ADM-EDT-timetable-btn']} ${styles['ADM-EDT-edit']}`}>
                             Modifier
                           </button>
-                          <button onClick={() => handleDelete(session.ID_seance)} className="timetable-btn delete">
+                          <button onClick={() => handleDelete(session.ID_seance)} className={`${styles['ADM-EDT-timetable-btn']} ${styles['ADM-EDT-delete']}`}>
                             Supprimer
                           </button>
                         </div>
@@ -488,25 +488,25 @@ function TimetableDisplay({ timetable, sectionId, semestre, onRefresh }) {
                     </div>
                   ))}
                   {selectedSession.sessions.length < 4 && !selectedSession.sessions.some(s => s.type_seance === 'cours') && (
-                    <button onClick={handleAdd} className="timetable-btn add">
+                    <button onClick={handleAdd} className={`${styles['ADM-EDT-timetable-btn']} ${styles['ADM-EDT-add']}`}>
                       Ajouter une séance
                     </button>
                   )}
                 </>
               ) : (
-                <div className="no-session">
+                <div className={styles['ADM-EDT-no-session']}>
                   <p>Aucune séance à cet emplacement.</p>
-                  <button onClick={handleAdd} className="timetable-btn add">
+                  <button onClick={handleAdd} className={`${styles['ADM-EDT-timetable-btn']} ${styles['ADM-EDT-add']}`}>
                     Ajouter une séance
                   </button>
                 </div>
               )}
-              <button onClick={() => { setSelectedSession(null); setError(null); }} className="timetable-btn close-modal">
+              <button onClick={() => { setSelectedSession(null); setError(null); }} className={`${styles['ADM-EDT-timetable-btn']} ${styles['ADM-EDT-close-modal']}`}>
                 Fermer
               </button>
             </div>
           )}
-          {error && <p className="timetable-error modal-error">{error}</p>}
+          {error && <p className={`${styles['ADM-EDT-timetable-error']} ${styles['ADM-EDT-modal-error']}`}>{error}</p>}
         </div>
       </div>,
       document.body
@@ -514,52 +514,52 @@ function TimetableDisplay({ timetable, sectionId, semestre, onRefresh }) {
   };
 
   return (
-    <div className="timetable-container">
-      <h2 className="timetable-title">Emploi du Temps (Semestre {semestre})</h2>
-      <div className="export-buttons">
-        <button onClick={exportToExcel} className="timetable-btn export-excel">
+    <div className={styles['ADM-EDT-timetable-container']}>
+      <h2 className={styles['ADM-EDT-timetable-title']}>Emploi du Temps (Semestre {semestre})</h2>
+      <div className={styles['ADM-EDT-export-buttons']}>
+        <button onClick={exportToExcel} className={`${styles['ADM-EDT-timetable-btn']} ${styles['ADM-EDT-export-excel']}`}>
           <FaFileExcel /> Exporter en Excel
         </button>
-        <button onClick={exportToPDF} className="timetable-btn export-pdf">
+        <button onClick={exportToPDF} className={`${styles['ADM-EDT-timetable-btn']} ${styles['ADM-EDT-export-pdf']}`}>
           <FaFilePdf /> Exporter en PDF
         </button>
       </div>
-      {error && <p className="timetable-error">{error}</p>}
-      <table className="modern-timetable-table">
+      {error && <p className={styles['ADM-EDT-timetable-error']}>{error}</p>}
+      <table className={styles['ADM-EDT-modern-timetable-table']}>
         <thead>
           <tr>
-            <th className="modern-th">Jour</th>
+            <th className={styles['ADM-EDT-modern-th']}>Jour</th>
             {timeSlots.map(slot => (
-              <th key={slot} className="modern-th">{slot}</th>
+              <th key={slot} className={styles['ADM-EDT-modern-th']}>{slot}</th>
             ))}
           </tr>
         </thead>
         <tbody>
           {days.map(day => (
-            <tr key={day} className="modern-tr">
-              <td className="modern-day">{day}</td>
+            <tr key={day} className={styles['ADM-EDT-modern-tr']}>
+              <td className={styles['ADM-EDT-modern-day']}>{day}</td>
               {timeSlots.map(slot => {
                 const sessions = timetable[day]?.filter(s => s.time_slot === slot) || [];
                 return (
                   <td
                     key={`${day}-${slot}`}
                     onClick={() => handleCellClick(day, slot)}
-                    className="modern-td"
+                    className={styles['ADM-EDT-modern-td']}
                   >
                     {sessions.length > 0 ? (
                       sessions.map((session, index) => (
-                        <div key={index} className="session-card">
-                          <span className="session-type">{session.type_seance}</span>
-                          <span className="session-module">{session.module}</span>
-                          <span className="session-teacher">{session.teacher}</span>
-                          <span className="session-room">Salle: {session.room}</span>
+                        <div key={index} className={styles['ADM-EDT-session-card']}>
+                          <span className={styles['ADM-EDT-session-type']}>{session.type_seance}</span>
+                          <span className={styles['ADM-EDT-session-module']}>{session.module}</span>
+                          <span className={styles['ADM-EDT-session-teacher']}>{session.teacher}</span>
+                          <span className={styles['ADM-EDT-session-room']}>Salle: {session.room}</span>
                           {session.type_seance !== 'cours' && session.group && (
-                            <span className="session-group">Groupe: {session.group}</span>
+                            <span className={styles['ADM-EDT-session-group']}>Groupe: {session.group}</span>
                           )}
                         </div>
                       ))
                     ) : (
-                      <span className="empty-slot">-</span>
+                      <span className={styles['ADM-EDT-empty-slot']}>-</span>
                     )}
                   </td>
                 );

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaPlus, FaEdit, FaTrash, FaUsers, FaTimes, FaEnvelope, FaSearch, FaCheck, FaUser } from 'react-icons/fa';
-import './club.css';
+import { FaPlus, FaEdit, FaTrash, FaUsers, FaTimes, FaEnvelope, FaSearch, FaCheck, FaUser, FaHome } from 'react-icons/fa';
+import styles from './club.module.css'; // Mise à jour de l'importation
 
 const Toast = ({ message, type, onClose }) => {
   useEffect(() => {
@@ -12,7 +12,7 @@ const Toast = ({ message, type, onClose }) => {
   }, [onClose]);
 
   return (
-    <div className={`toast toast-${type}`}>
+    <div className={`${styles['ADM-CLUB-toast']} ${styles[`ADM-CLUB-toast-${type}`]}`}>
       {message}
     </div>
   );
@@ -418,16 +418,15 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
 
   if (loading) {
     return (
-        <div id="clubs">
-        <div className="container">Chargement...</div>
-        </div>
+      <div id="clubs">
+        <div className={styles['ADM-CLUB-container']}>Chargement...</div>
+      </div>
     );
   }
 
   return (
-    <div id="clubs">
-    <div className="container">
-      <div className="toast-container">
+    <div className={styles['ADM-CLUB-container']}>
+      <div className={styles['ADM-CLUB-toast-container']}>
         {toasts.map((toast) => (
           <Toast
             key={toast.id}
@@ -438,70 +437,70 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
         ))}
       </div>
 
-      <div className="background-shapes">
-        <div className="shape shape1"></div>
-        <div className="shape shape2"></div>
+      <div className={styles['ADM-CLUB-background-shapes']}>
+        <div className={`${styles['ADM-CLUB-shape']} ${styles['ADM-CLUB-shape1']}`}></div>
+        <div className={`${styles['ADM-CLUB-shape']} ${styles['ADM-CLUB-shape2']}`}></div>
       </div>
 
-      <aside className="sidebar">
-        <div className="logo">
+      <aside className={styles['ADM-CLUB-sidebar']}>
+        <div className={styles['ADM-CLUB-logo']}>
           <h2>Gestion des Clubs</h2>
         </div>
-        <button className="sidebar-button" onClick={() => navigate('/admin')}>
-          <FaUsers /> Retour á l'accueil
+        <button className={styles['ADM-CLUB-sidebar-button']} onClick={() => navigate('/admin')}>
+          <FaHome /> Retour à l'accueil
         </button>
         <button
-          className={`sidebar-button ${activeTab === 'clubs' ? 'active' : ''}`}
+          className={`${styles['ADM-CLUB-sidebar-button']} ${activeTab === 'clubs' ? styles['active'] : ''}`}
           onClick={() => setActiveTab('clubs')}
         >
           <FaUsers /> Gestion des Clubs
         </button>
         <button
-          className={`sidebar-button ${activeTab === 'demandes' ? 'active' : ''}`}
+          className={`${styles['ADM-CLUB-sidebar-button']} ${activeTab === 'demandes' ? styles['active'] : ''}`}
           onClick={() => setActiveTab('demandes')}
         >
           <FaEnvelope /> Gérer les Demandes
         </button>
         {activeTab === 'clubs' && (
-          <button className="sidebar-button" onClick={() => setShowModal(true)}>
+          <button className={styles['ADM-CLUB-sidebar-button']} onClick={() => setShowModal(true)}>
             <FaPlus /> Créer un Club
           </button>
         )}
       </aside>
 
-      <main className="main-content">
-        <section className="tab-content">
+      <main className={styles['ADM-CLUB-main-content']}>
+        <section className={styles['ADM-CLUB-tab-content']}>
           {activeTab === 'clubs' && (
             <>
-              <div className="header">
+              <div className={styles['ADM-CLUB-header']}>
                 <h1>
                   <FaUsers /> Gestion des Clubs
                 </h1>
                 <p>Créez, modifiez ou supprimez des clubs pour les étudiants</p>
               </div>
 
-              <div className="content-grid">
-                <div className="club-grid">
+              <div className={styles['ADM-CLUB-content-grid']}>
+                <div className={styles['ADM-CLUB-club-grid']}>
                   {clubs.length === 0 ? (
-                    <div className="no-results">Aucun club disponible</div>
+                    <div className={styles['ADM-CLUB-no-results']}>Aucun club disponible</div>
                   ) : (
                     clubs.map((club) => (
-                      <div key={club.ID_club} className="club-card">
-                        <div className="club-avatar">
-                          <div className="club-placeholder">
+                      <div key={club.ID_club} className={styles['ADM-CLUB-club-card']}>
+                        <div className={styles['ADM-CLUB-club-avatar']}>
+                          <div className={styles['ADM-CLUB-club-placeholder']}>
                             <FaUser size={40} />
                           </div>
                         </div>
-                        <div className="club-info">
+                        <div className={styles['ADM-CLUB-club-info']}>
                           <h4>{club.nom}</h4>
                           <p>{club.description_club || 'Aucune description'}</p>
                           <p>
                             <strong>Gérant :</strong> {club.gerant_nom || 'Non défini'} {club.gerant_prenom || ''}
                           </p>
                         </div>
-                        <div className="club-actions">
+                        <div className={styles['ADM-CLUB-club-actions']}>
                           <button
-                            className="view-button"
+                            className={styles['ADM-CLUB-view-button']}
                             onClick={(e) => {
                               e.stopPropagation();
                               handleView(club);
@@ -510,7 +509,7 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
                             <FaUsers />
                           </button>
                           <button
-                            className="edit-button"
+                            className={styles['ADM-CLUB-edit-button']}
                             onClick={(e) => {
                               e.stopPropagation();
                               handleEdit(club);
@@ -519,7 +518,7 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
                             <FaEdit />
                           </button>
                           <button
-                            className="delete-button"
+                            className={styles['ADM-CLUB-delete-button']}
                             onClick={(e) => {
                               e.stopPropagation();
                               setConfirmModal({
@@ -542,26 +541,26 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
 
           {activeTab === 'demandes' && (
             <>
-              <div className="header">
+              <div className={styles['ADM-CLUB-header']}>
                 <h1>
                   <FaEnvelope /> Gérer les Demandes
                 </h1>
                 <p>Acceptez ou refusez les demandes de création de clubs</p>
               </div>
 
-              <div className="content-grid">
-                <div className="demande-grid">
+              <div className={styles['ADM-CLUB-content-grid']}>
+                <div className={styles['ADM-CLUB-demande-grid']}>
                   {demandes.length === 0 ? (
-                    <div className="no-results">Aucune demande en attente</div>
+                    <div className={styles['ADM-CLUB-no-results']}>Aucune demande en attente</div>
                   ) : (
                     demandes.map((demande) => (
-                      <div key={demande.ID_demande} className="demande-card">
-                        <div className="demande-avatar">
-                          <div className="demande-placeholder">
+                      <div key={demande.ID_demande} className={styles['ADM-CLUB-demande-card']}>
+                        <div className={styles['ADM-CLUB-demande-avatar']}>
+                          <div className={styles['ADM-CLUB-demande-placeholder']}>
                             <FaEnvelope size={40} />
                           </div>
                         </div>
-                        <div className="demande-info">
+                        <div className={styles['ADM-CLUB-demande-info']}>
                           <h4>{demande.nom_club}</h4>
                           <p>{demande.description_club || 'Aucune description'}</p>
                           <p>
@@ -579,9 +578,9 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
                               : 'Date non disponible'}
                           </p>
                         </div>
-                        <div className="demande-actions">
+                        <div className={styles['ADM-CLUB-demande-actions']}>
                           <button
-                            className="accept-button"
+                            className={styles['ADM-CLUB-accept-button']}
                             onClick={() =>
                               setConfirmModal({
                                 isOpen: true,
@@ -593,7 +592,7 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
                             <FaCheck />
                           </button>
                           <button
-                            className="reject-button"
+                            className={styles['ADM-CLUB-reject-button']}
                             onClick={() =>
                               setConfirmModal({
                                 isOpen: true,
@@ -616,11 +615,11 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
       </main>
 
       {showModal && (
-        <div className="modal-overlay active">
-          <div className="modal-content">
+        <div className={`${styles['ADM-CLUB-modal-overlay']} ${styles['active']}`}>
+          <div className={styles['ADM-CLUB-modal-content']}>
             <h3>{editMode ? 'Modifier un Club' : 'Créer un Club'}</h3>
             <form onSubmit={handleSubmit}>
-              <div className="input-group">
+              <div className={styles['ADM-CLUB-input-group']}>
                 <label>Nom du Club</label>
                 <input
                   type="text"
@@ -630,7 +629,7 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
                   required
                 />
               </div>
-              <div className="input-group">
+              <div className={styles['ADM-CLUB-input-group']}>
                 <label>Description</label>
                 <textarea
                   name="description_club"
@@ -639,10 +638,10 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
                   rows="4"
                 />
               </div>
-              <div className="filter-section">
+              <div className={styles['ADM-CLUB-filter-section']}>
                 <h4>Filtrer les Étudiants pour Choisir le Gérant</h4>
-                <div className="filter-options">
-                  <div className="filter-group">
+                <div className={styles['ADM-CLUB-filter-options']}>
+                  <div className={styles['ADM-CLUB-filter-group']}>
                     <label>Faculté</label>
                     <select name="id_faculte" value={filters.id_faculte} onChange={handleFilterChange}>
                       <option value="">Sélectionner une faculté</option>
@@ -653,7 +652,7 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
                       ))}
                     </select>
                   </div>
-                  <div className="filter-group">
+                  <div className={styles['ADM-CLUB-filter-group']}>
                     <label>Département</label>
                     <select
                       name="id_departement"
@@ -669,7 +668,7 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
                       ))}
                     </select>
                   </div>
-                  <div className="filter-group">
+                  <div className={styles['ADM-CLUB-filter-group']}>
                     <label>Spécialité</label>
                     <select
                       name="id_specialite"
@@ -685,7 +684,7 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
                       ))}
                     </select>
                   </div>
-                  <div className="filter-group">
+                  <div className={styles['ADM-CLUB-filter-group']}>
                     <label>Section</label>
                     <select
                       name="id_section"
@@ -703,7 +702,7 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
                   </div>
                 </div>
               </div>
-              <div className="input-group">
+              <div className={styles['ADM-CLUB-input-group']}>
                 <label>Choisir le Gérant</label>
                 <div style={{ position: 'relative' }}>
                   <input
@@ -745,11 +744,11 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
                   ))}
                 </select>
               </div>
-              <div className="button-group">
+              <div className={styles['ADM-CLUB-button-group']}>
                 <button type="submit">
                   <FaPlus /> {editMode ? 'Modifier' : 'Créer'}
                 </button>
-                <button type="button" className="close-button" onClick={() => setShowModal(false)}>
+                <button type="button" className={styles['ADM-CLUB-close-button']} onClick={() => setShowModal(false)}>
                   <FaTimes /> Annuler
                 </button>
               </div>
@@ -759,8 +758,8 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
       )}
 
       {showViewModal && selectedClub && (
-        <div className="modal-overlay active">
-          <div className="modal-content">
+        <div className={`${styles['ADM-CLUB-modal-overlay']} ${styles['active']}`}>
+          <div className={styles['ADM-CLUB-modal-content']}>
             <h3>Détails du Club</h3>
             <div style={{ textAlign: 'center', marginBottom: '20px' }}>
               <div
@@ -780,20 +779,20 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
                 <FaUsers size={50} />
               </div>
             </div>
-            <div className="input-group">
+            <div className={styles['ADM-CLUB-input-group']}>
               <label>Nom du Club</label>
               <p>{selectedClub.nom}</p>
             </div>
-            <div className="input-group">
+            <div className={styles['ADM-CLUB-input-group']}>
               <label>Description</label>
               <p>{selectedClub.description_club || 'Aucune description'}</p>
             </div>
-            <div className="input-group">
+            <div className={styles['ADM-CLUB-input-group']}>
               <label>Gérant</label>
               <p>{selectedClub.gerant_nom || 'Non défini'} {selectedClub.gerant_prenom || ''}</p>
             </div>
-            <div className="button-group">
-              <button type="button" className="close-button" onClick={() => setShowViewModal(false)}>
+            <div className={styles['ADM-CLUB-button-group']}>
+              <button type="button" className={styles['ADM-CLUB-close-button']} onClick={() => setShowViewModal(false)}>
                 <FaTimes /> Fermer
               </button>
             </div>
@@ -802,13 +801,13 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
       )}
 
       {confirmModal.isOpen && (
-        <div className="modal-overlay active">
-          <div className="confirm-modal">
+        <div className={`${styles['ADM-CLUB-modal-overlay']} ${styles['active']}`}>
+          <div className={styles['ADM-CLUB-confirm-modal']}>
             <h3>Confirmation</h3>
             <p>{confirmModal.message}</p>
-            <div className="button-group">
+            <div className={styles['ADM-CLUB-button-group']}>
               <button
-                className="confirm-button"
+                className={styles['ADM-CLUB-confirm-button']}
                 onClick={() => {
                   confirmModal.onConfirm();
                   setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} });
@@ -817,7 +816,7 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
                 Confirmer
               </button>
               <button
-                className="cancel-button"
+                className={styles['ADM-CLUB-cancel-button']}
                 onClick={() => setConfirmModal({ isOpen: false, message: '', onConfirm: () => {} })}
               >
                 Annuler
@@ -826,7 +825,6 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
           </div>
         </div>
       )}
-    </div>
     </div>
   );
 };

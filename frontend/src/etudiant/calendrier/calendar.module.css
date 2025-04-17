@@ -1,0 +1,790 @@
+
+  /* Calendar container */
+.CLD-calendar-container {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    min-height: calc(100vh - 4rem);
+    position: relative;
+  }
+  
+  /* "Back to home" button with #3972a8 background */
+  .CLD-home-link {
+    position: absolute;
+    top: 1.5rem;
+    left: 1rem;
+    background: #3972a8; /* Fixed background #3972a8 */
+    color: #ffffff; /* White text */
+    text-decoration: none;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    width: 100%;
+    max-width: 200px;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+    margin: 0;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Transition for animation */
+  }
+  
+  /* Hover animation: slight zoom and shadow */
+  .CLD-home-link:hover {
+    background: #3972a8; /* Keep same background */
+    color: #ffffff; /* Keep text color */
+    transform: scale(1.05); /* Slight zoom (5%) */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Subtle shadow */
+  }
+  
+  /* Ensure icon stays white */
+  .CLD-home-link .CLD-icon {
+    color: #ffffff; /* Icon color fixed to white */
+  }
+  
+  /* Prevent icon color change on hover */
+  .CLD-home-link:hover .CLD-icon {
+    color: #ffffff; /* Keep icon color */
+  }
+  
+  /* Title frame */
+  .CLD-title-container {
+    width: calc(100% - 4rem);
+    margin: 3rem auto 2rem auto;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15), 0 0 20px rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    z-index: 2;
+    text-align: center;
+  }
+  
+  .CLD-main-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--secondary);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 1px 1px 2px rgba(14, 25, 95, 0.1);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .CLD-subtitle {
+    font-size: 0.95rem;
+    font-weight: 300;
+    color: var(--accent);
+    margin-top: 0.5rem;
+    font-style: italic;
+  }
+  
+  .CLD-title-container:hover .CLD-main-title::after {
+    width: 120px;
+    background: linear-gradient(90deg, var(--accent), var(--primary), var(--accent));
+    box-shadow: 0 0 10px rgba(84, 131, 179, 0.5);
+  }
+  
+  /* Style for icons in main title */
+  .CLD-main-title .CLD-icon {
+    color: var(--primary);
+  }
+  
+  /* Calendar structure */
+  .CLD-calendar-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .CLD-main-content {
+    display: flex;
+    gap: 2rem;
+  }
+  
+  .CLD-daily-view-container {
+    flex: 3;
+  }
+  
+  .CLD-sidebar {
+    flex: 1;
+  }
+  
+  /* Date title with white text and navigation buttons */
+  .CLD-daily-view-header {
+    background: linear-gradient(90deg, var(--secondary) 0%, var(--accent) 100%);
+    padding: 1rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--border-radius-lg) var(--border-radius-lg) var(--border-radius-lg) var(--border-radius-lg);
+    box-shadow: var(--shadow-medium);
+    margin-bottom: 0;
+    width: 70%;
+    display: flex; /* Use flex to align elements */
+    align-items: center; /* Center vertically */
+    justify-content: space-between; /* Space elements (buttons and title) */
+  }
+  
+  .CLD-daily-view-header::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  
+  /* Container for title and day name */
+  .CLD-date-title-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center the date */
+    flex: 1; /* Take central space */
+    position: relative; /* For day name positioning */
+  }
+  
+  .CLD-daily-view-header h2 {
+    color: var(--white) !important;
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center title */
+    gap: 0.5rem;
+  }
+  
+  /* Style for day name */
+  .CLD-day-name {
+    color: var(--white);
+    font-size: 1rem;
+    font-weight: 300; /* Thin but not too light */
+    margin: 0.2rem 0 0 0; /* Slight top spacing */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    text-transform: capitalize; /* Capitalize first letter */
+    position: relative;
+    left: 30px; /* Offset right to align under year */
+  }
+  
+  .CLD-daily-view-header .CLD-icon {
+    color: var(--white);
+  }
+  
+  /* Navigation buttons for date */
+  .CLD-daily-view-header .CLD-nav-btn {
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--white);
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition-standard);
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    margin: 0 10px; /* Spacing from title */
+  }
+  
+  .CLD-daily-view-header .CLD-nav-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+  }
+  
+  /* Style for button icons */
+  .CLD-daily-view-header .CLD-nav-btn .CLD-icon {
+    font-size: 1rem;
+  }
+  
+  .CLD-daily-view {
+    background: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: var(--border-radius-lg) var(--border-radius-lg) var(--border-radius-lg) var(--border-radius-lg);
+    box-shadow: var(--shadow-strong);
+  }
+  
+  .CLD-day-grid {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    grid-template-rows: repeat(6, minmax(90px, 1fr));
+    height: 100%;
+    gap: 1px;
+    background-color: var(--light-accent);
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+  }
+  
+  .CLD-time-row {
+    display: contents;
+  }
+  
+  .CLD-time-slot-label {
+    padding: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--secondary) 0%, var(--accent) 100%);
+    color: var(--white);
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-right: 2px solid var(--white);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    gap: 0.5rem;
+  }
+  
+  .CLD-time-slot-cell {
+    background: var(--white);
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: var(--transition-standard);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .CLD-time-slot-cell:hover {
+    background: rgba(125, 160, 202, 0.1);
+  }
+  
+  .CLD-time-slot-cell::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(193, 232, 255, 0.2) 0%, transparent 100%);
+    pointer-events: none;
+  }
+  
+  .CLD-event-block {
+    padding: 0.75rem;
+    border-radius: var(--border-radius-sm);
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: var(--transition-standard);
+    position: relative;
+    overflow: hidden;
+    border-left: 4px solid transparent;
+  }
+  
+  .CLD-event-block:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .CLD-event-block.CLD-event-personal {
+    background-color: var(--accent);
+    color: var(--white);
+    border-left-color: var(--primary);
+  }
+  
+  .CLD-event-block.CLD-event-personal::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 15px;
+    height: 15px;
+    background: var(--primary);
+    clip-path: polygon(100% 0, 0 0, 100% 100%);
+  }
+  
+  .CLD-event-block.CLD-event-supp {
+    background: linear-gradient(135deg, var(--supp-color) 0%, var(--supp-color-dark) 100%);
+    color: var(--white);
+    border-left-color: var(--supp-color-dark);
+  }
+  
+  .CLD-event-block.CLD-event-club {
+    background: linear-gradient(135deg, var(--beige) 0%, #fffff0 100%);
+    color: var(--text);
+    border-left-color: #d4c89c;
+  }
+  
+  .CLD-event-block.CLD-event-admin {
+    background: linear-gradient(135deg, var(--admin-color) 0%, var(--admin-color-dark) 100%) !important;
+    color: var(--white) !important;
+    border-left-color: var(--admin-color-dark) !important;
+  }
+  
+  .CLD-event-block span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+  
+  .CLD-event-types {
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-medium);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(125, 160, 202, 0.3);
+    transition: var(--transition-standard);
+    margin-top: 1.5rem;
+  }
+  
+  .CLD-event-types:hover {
+    box-shadow: var(--shadow-strong);
+    transform: translateY(-3px);
+  }
+  
+  .CLD-event-types div {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    color: var(--text);
+    font-weight: 500;
+    padding: 0.5rem;
+    border-radius: var(--border-radius-sm);
+    transition: var(--transition-standard);
+  }
+  
+  .CLD-event-types div:hover {
+    background: rgba(193, 232, 255, 0.3);
+    transform: translateX(5px);
+  }
+  
+  .CLD-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+  }
+  
+  .CLD-dot::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.7);
+  }
+  
+  .CLD-dot-personal {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--primary) 100%);
+  }
+  
+  .CLD-dot-supp {
+    background: linear-gradient(135deg, var(--supp-color) 0%, var(--supp-color-dark) 100%);
+  }
+  
+  .CLD-dot-club {
+    background: linear-gradient(135deg, var(--beige) 0%, #d4c89c 100%);
+  }
+  
+  .CLD-dot-admin {
+    background: linear-gradient(135deg, var(--admin-color) 0%, var(--admin-color-dark) 100%);
+  }
+  
+  .CLD-small-calendar {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: var(--border-radius-lg);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-medium);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(125, 160, 202, 0.3);
+    transition: var(--transition-standard);
+  }
+  
+  .CLD-small-calendar:hover {
+    box-shadow: var(--shadow-strong);
+    transform: translateY(-3px);
+  }
+  
+  .CLD-small-calendar .CLD-calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+    padding: 1rem;
+    border-radius: var(--border-radius-md);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .CLD-small-calendar .CLD-calendar-header::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  
+  .CLD-small-calendar .CLD-calendar-header h3 {
+    color: var(--white);
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .CLD-small-calendar .CLD-calendar-header .CLD-nav-btn {
+    background: rgba(255, 255, 250, 0.2);
+    color: var(--white);
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition-standard);
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  .CLD-small-calendar .CLD-calendar-header .CLD-nav-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+  }
+  
+  .CLD-days-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    color: var(--secondary);
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(125, 160, 202, 0.3);
+  }
+  
+  .CLD-days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+  }
+  
+  .CLD-day {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: var(--transition-standard);
+    color: var(--text);
+    font-weight: 500;
+    position: relative;
+  }
+  
+  .CLD-day:hover {
+    background: var(--light-accent);
+    color: var(--white);
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .CLD-day.CLD-today {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--secondary) 100%);
+    color: var(--white);
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  .CLD-day.CLD-has-event::after {
+    content: "";
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--supp-color);
+    box-shadow: 0 0 4px rgba(0, 163, 180, 0.5);
+  }
+  
+  .CLD-day.CLD-today.CLD-has-event::after {
+    background-color: var(--white);
+  }
+  
+  .CLD-empty-day {
+    opacity: 0.4;
+    cursor: default;
+  }
+  
+  .CLD-empty-day:hover {
+    transform: none;
+    background: transparent;
+    box-shadow: none;
+  }
+  
+  .CLD-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(2, 16, 36, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+  }
+  
+  .CLD-modal-content {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: var(--border-radius-lg);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    box-shadow: var(--shadow-strong);
+    width: 450px;
+    max-width: 90%;
+    position: relative;
+    animation: CLD-modalFadeIn 0.3s ease-out;
+  }
+  
+  @keyframes CLD-modalFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .CLD-modal-content h2 {
+    color: var(--primary);
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--light-accent);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .CLD-modal-content p {
+    color: var(--text);
+    line-height: 1.6;
+  }
+  
+  .CLD-modal-content .CLD-input-field,
+  .CLD-modal-content .CLD-textarea-field {
+    padding: 0.75rem;
+    border: 1px solid var(--light-accent);
+    border-radius: var(--border-radius-sm);
+    font-family: inherit;
+    font-size: 1rem;
+    width: 100%;
+    background: rgba(193, 232, 255, 0.1);
+    color: var(--text);
+    transition: var(--transition-standard);
+  }
+  
+  .CLD-modal-content .CLD-input-field:focus,
+  .CLD-modal-content .CLD-textarea-field:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(84, 131, 179, 0.2);
+  }
+  
+  .CLD-modal-content .CLD-textarea-field {
+    min-height: 120px;
+    resize: vertical;
+  }
+  
+  .CLD-input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .CLD-input-group .CLD-icon {
+    position: absolute;
+    left: 10px;
+    color: var(--accent);
+  }
+  
+  .CLD-input-group .CLD-input-field,
+  .CLD-input-group .CLD-textarea-field {
+    padding-left: 35px;
+    width: 100%;
+  }
+  
+  .CLD-modal-content .CLD-action-btn {
+    background: linear-gradient(90deg, var(--accent) 0%, var(--secondary) 100%);
+    color: var(--white);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    transition: var(--transition-standard);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .CLD-modal-content .CLD-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .CLD-modal-content .CLD-action-btn:active {
+    transform: translateY(1px);
+  }
+  
+  .CLD-modal-content .CLD-action-btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: 0.5s;
+  }
+  
+  .CLD-modal-content .CLD-action-btn:hover::before {
+    left: 100%;
+  }
+  
+  .CLD-modal-content .CLD-action-btn + .CLD-action-btn {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    box-shadow: none;
+  }
+  
+  .CLD-modal-content .CLD-action-btn + .CLD-action-btn:hover {
+    background: rgba(84, 131, 179, 0.1);
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 992px) {
+    .CLD-main-content {
+      gap: 1.5rem;
+    }
+  
+    .CLD-day-grid {
+      grid-template-rows: repeat(6, minmax(70px, 1fr));
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .CLD-calendar-container {
+      padding: 1rem;
+    }
+  
+    .CLD-title-container {
+      width: calc(100% - 2rem);
+      padding: 15px;
+    }
+  
+    .CLD-main-title {
+      font-size: 1.5rem;
+    }
+  
+    .CLD-subtitle {
+      font-size: 0.85rem;
+    }
+  
+    .CLD-main-content {
+      flex-direction: column;
+    }
+  
+    .CLD-event-types {
+      margin-top: 0;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .CLD-day-grid {
+      grid-template-columns: 60px 1fr;
+    }
+  
+    .CLD-time-slot-label {
+      font-size: 0.8rem;
+      padding: 0.5rem;
+    }
+  
+    .CLD-home-link {
+      top: 0.5rem;
+      left: 0.5rem;
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      max-width: 180px;
+    }
+  
+    .CLD-daily-view-header h2 {
+      font-size: 1.2rem; /* Smaller title for small screens */
+    }
+  
+    .CLD-day-name {
+      font-size: 0.85rem; /* Smaller day name */
+      left: 20px; /* Adjust offset for small screens */
+    }
+  
+    .CLD-daily-view-header .CLD-nav-btn {
+      width: 25px; /* Smaller buttons */
+      height: 25px;
+      margin: 0 5px; /* Less spacing */
+    }
+  }
+  
+  .CLD-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .CLD-icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }

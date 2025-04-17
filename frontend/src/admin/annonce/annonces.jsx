@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { FaHome, FaPlus, FaEdit, FaTrash, FaTimes, FaUser, FaPaperPlane, FaBullhorn, FaSearch } from 'react-icons/fa';
-import styles from "./annonce.module.css"; // Import du nouveau CSS Module
+import styles from "./annonce.module.css";
 
 const handleImageUpload = (e, setFormData) => {
   const file = e.target.files[0];
@@ -255,10 +255,34 @@ function GestionAnnonces() {
     setSelectedAnnonce(selectedAnnonce === id ? null : id);
   };
 
+  // New function to reset form and state
+  const resetForm = () => {
+    setFormData({
+      title: '',
+      content: '',
+      image_url: '',
+      image: null,
+      admin_matricule: '',
+      target_type: '',
+      target_filter: { tous: true, faculte: '', departement: '', specialite: '' }
+    });
+    setEditingAnnonce(null);
+    setDepartements([]);
+    setSpecialites([]);
+  };
+
+  // Modified handler for toggling the form
+  const handleToggleForm = () => {
+    if (showForm) {
+      resetForm();
+    }
+    setShowForm(!showForm);
+  };
+
   if (error) {
     return (
-      <div id="annonces" className={styles.annonces}>
-        <div className={styles.container}>
+      <div id="annonces" className={styles['ADM-ANC-container']}>
+        <div className={styles['ADM-ANC-container']}>
           <h1 style={{ color: 'red', textAlign: 'center' }}>{error}</h1>
           <button onClick={() => { setError(null); fetchAnnonces(); fetchFacultes(); }}>
             Réessayer
@@ -269,50 +293,50 @@ function GestionAnnonces() {
   }
 
   return (
-      <div className={styles.container}>
-        <div className={styles.backgroundShapes}>
-          <div className={styles.shape1}></div>
-          <div className={styles.shape2}></div>
+      <div className={styles['ADM-ANC-container']}>
+        <div className={styles['ADM-ANC-backgroundShapes']}>
+          <div className={styles['ADM-ANC-shape1']}></div>
+          <div className={styles['ADM-ANC-shape2']}></div>
         </div>
 
-        <aside className={styles.sidebar}>
-          <div className={styles.logo}>
+        <aside className={styles['ADM-ANC-sidebar']}>
+          <div className={styles['ADM-ANC-logo']}>
             <h2>Gestion Annonces</h2>
           </div>
-          <button className={styles.sidebarButton} onClick={() => navigate('/admin')}>
+          <button className={styles['ADM-ANC-sidebarButton']} onClick={() => navigate('/admin')}>
             <FaHome /> Retour à l'accueil
           </button>
-          <button className={styles.sidebarButton} onClick={() => setShowForm(!showForm)}>
+          <button className={styles['ADM-ANC-sidebarButton']} onClick={handleToggleForm}>
             <FaPlus /> {showForm ? 'Masquer le formulaire' : 'Ajouter une annonce'}
           </button>
         </aside>
 
-        <main className={styles.mainContent}>
-          <header className={styles.header}>
+        <main className={styles['ADM-ANC-mainContent']}>
+          <header className={styles['ADM-ANC-header']}>
             <h1><FaUser /> Bienvenue sur votre espace annonces</h1>
             <p>Ayez une excellente expérience de gestion</p>
           </header>
 
           {showForm && (
-            <form onSubmit={handleSubmit} ref={formRef} className={styles.form}>
-              <div className={styles.inputGroup}>
-                <span className={styles.inputIcon}><FaEdit /></span>
+            <form onSubmit={handleSubmit} ref={formRef} className={styles['ADM-ANC-form']}>
+              <div className={styles['ADM-ANC-inputGroup']}>
+                <span className={styles['ADM-ANC-inputIcon']}><FaEdit /></span>
                 <input type="text" name="title" placeholder="Titre de l'annonce" value={formData.title} onChange={handleChange} required />
               </div>
-              <div className={styles.inputGroup}>
+              <div className={styles['ADM-ANC-inputGroup']}>
                 <textarea name="content" placeholder="Contenu" value={formData.content} onChange={handleChange} required />
               </div>
-              <div className={styles.inputGroup}>
+              <div className={styles['ADM-ANC-inputGroup']}>
                 <input type="text" name="image_url" placeholder="URL de l'image (optionnel)" value={formData.image_url} onChange={handleChange} />
               </div>
-              <div className={styles.inputGroup}>
+              <div className={styles['ADM-ANC-inputGroup']}>
                 <input type="file" name="image" onChange={(e) => handleImageUpload(e, setFormData)} accept="image/*" />
               </div>
-              <div className={styles.inputGroup}>
-                <span className={styles.inputIcon}><FaEdit /></span>
+              <div className={styles['ADM-ANC-inputGroup']}>
+                <span className={styles['ADM-ANC-inputIcon']}><FaEdit /></span>
                 <input type="number" name="admin_matricule" placeholder="Matricule de l'admin" value={formData.admin_matricule} onChange={handleChange} required />
               </div>
-              <div className={styles.inputGroup}>
+              <div className={styles['ADM-ANC-inputGroup']}>
                 <select name="target_type" value={formData.target_type} onChange={handleTargetTypeChange} required>
                   <option value="">Sélectionner votre destinataire...</option>
                   <option value="Etudiants">Étudiants</option>
@@ -321,16 +345,16 @@ function GestionAnnonces() {
               </div>
               {formData.target_type && (
                 <>
-                  <div className={styles.inputGroup}>
+                  <div className={styles['ADM-ANC-inputGroup']}>
                     <label>
                       <input type="checkbox" checked={formData.target_filter.tous} onChange={handleTousChange} />
                       Tous les {formData.target_type.toLowerCase()}
                     </label>
                   </div>
                   {!formData.target_filter.tous && (
-                    <div className={styles.filterSection}>
-                      <div className={styles.filterOptions}>
-                        <div className={styles.filterGroup}>
+                    <div className={styles['ADM-ANC-filterSection']}>
+                      <div className={styles['ADM-ANC-filterOptions']}>
+                        <div className={styles['ADM-ANC-filterGroup']}>
                           <label>Faculté</label>
                           <select name="faculte" value={formData.target_filter.faculte} onChange={handleChange}>
                             <option value="">Toutes</option>
@@ -339,7 +363,7 @@ function GestionAnnonces() {
                             ))}
                           </select>
                         </div>
-                        <div className={styles.filterGroup}>
+                        <div className={styles['ADM-ANC-filterGroup']}>
                           <label>Département</label>
                           <select name="departement" value={formData.target_filter.departement} onChange={handleChange} disabled={!formData.target_filter.faculte}>
                             <option value="">Tous</option>
@@ -348,7 +372,7 @@ function GestionAnnonces() {
                             ))}
                           </select>
                         </div>
-                        <div className={styles.filterGroup}>
+                        <div className={styles['ADM-ANC-filterGroup']}>
                           <label>Spécialité</label>
                           <select name="specialite" value={formData.target_filter.specialite} onChange={handleChange} disabled={!formData.target_filter.departement}>
                             <option value="">Toutes</option>
@@ -362,21 +386,21 @@ function GestionAnnonces() {
                   )}
                 </>
               )}
-              <div className={styles.buttonGroup}>
+              <div className={styles['ADM-ANC-buttonGroup']}>
                 <button type="submit">
                   <FaPaperPlane /> {editingAnnonce ? 'Modifier' : 'Publier'}
                 </button>
-                <button type="button" className={styles.closeButton} onClick={() => setShowForm(false)}>
+                <button type="button" className={styles['ADM-ANC-closeButton']} onClick={() => { resetForm(); setShowForm(false); }}>
                   <FaTimes /> Annuler
                 </button>
               </div>
             </form>
           )}
 
-          <section className={styles.eventList}>
+          <section className={styles['ADM-ANC-eventList']}>
             <h3><FaPaperPlane /> Liste des Annonces</h3>
-            <div className={styles.searchBar}>
-              <span className={styles.searchIcon}><FaSearch /></span>
+            <div className={styles['ADM-ANC-searchBar']}>
+              <span className={styles['ADM-ANC-searchIcon']}><FaSearch /></span>
               <input
                 type="text"
                 placeholder="Rechercher une annonce..."
@@ -385,22 +409,22 @@ function GestionAnnonces() {
               />
             </div>
 
-            <div className={styles.etudiantsSection}>
+            <div className={styles['ADM-ANC-etudiantsSection']}>
               <h4>Annonces pour les Étudiants</h4>
               {filteredEtudiants.length === 0 ? (
-                <p className={styles.noResults}>Aucune annonce pour les étudiants.</p>
+                <p className={styles['ADM-ANC-noResults']}>Aucune annonce pour les étudiants.</p>
               ) : (
                 <ul>
                   {filteredEtudiants.map((annonce) => (
-                    <li key={annonce.id} className={styles.eventItem} onClick={() => toggleFullscreen(annonce.id)}>
-                      <div className={styles.eventInfo}>
+                    <li key={annonce.id} className={styles['ADM-ANC-eventItem']} onClick={() => toggleFullscreen(annonce.id)}>
+                      <div className={styles['ADM-ANC-eventInfo']}>
                         <h4>
-                          <FaBullhorn className={styles.annonceIcon} />
+                          <FaBullhorn className={styles['ADM-ANC-annonceIcon']} />
                           {annonce.title}
                         </h4>
                         <p>{annonce.content.substring(0, 50)}...</p>
                       </div>
-                      <div className={styles.eventStats}>
+                      <div className={styles['ADM-ANC-eventStats']}>
                         <p>{annonce.target_type}</p>
                       </div>
                     </li>
@@ -409,22 +433,22 @@ function GestionAnnonces() {
               )}
             </div>
 
-            <div className={styles.enseignantsSection}>
+            <div className={styles['ADM-ANC-enseignantsSection']}>
               <h4>Annonces pour les Enseignants</h4>
               {filteredEnseignants.length === 0 ? (
-                <p className={styles.noResults}>Aucune annonce pour les enseignants.</p>
+                <p className={styles['ADM-ANC-noResults']}>Aucune annonce pour les enseignants.</p>
               ) : (
                 <ul>
                   {filteredEnseignants.map((annonce) => (
-                    <li key={annonce.id} className={styles.eventItem} onClick={() => toggleFullscreen(annonce.id)}>
-                      <div className={styles.eventInfo}>
+                    <li key={annonce.id} className={styles['ADM-ANC-eventItem']} onClick={() => toggleFullscreen(annonce.id)}>
+                      <div className={styles['ADM-ANC-eventInfo']}>
                         <h4>
-                          <FaBullhorn className={styles.annonceIcon} />
+                          <FaBullhorn className={styles['ADM-ANC-annonceIcon']} />
                           {annonce.title}
                         </h4>
                         <p>{annonce.content.substring(0, 50)}...</p>
                       </div>
-                      <div className={styles.eventStats}>
+                      <div className={styles['ADM-ANC-eventStats']}>
                         <p>{annonce.target_type}</p>
                       </div>
                     </li>
@@ -435,31 +459,31 @@ function GestionAnnonces() {
           </section>
         </main>
 
-        <div className={`${styles.modalOverlay} ${selectedAnnonce ? styles.active : ''}`}>
+        <div className={`${styles['ADM-ANC-modalOverlay']} ${selectedAnnonce ? styles['ADM-ANC-active'] : ''}`}>
           {selectedAnnonce && (
-            <div className={styles.modalContent}>
+            <div className={styles['ADM-ANC-modalContent']}>
               <h3>{annonces.find(a => a.id === selectedAnnonce)?.title}</h3>
               {annonces.find(a => a.id === selectedAnnonce)?.image_url && (
                 <img
                   src={annonces.find(a => a.id === selectedAnnonce).image_url}
                   alt={annonces.find(a => a.id === selectedAnnonce).title}
-                  className={styles.eventImage}
+                  className={styles['ADM-ANC-eventImage']}
                   onError={(e) => { e.target.src = ''; }}
                 />
               )}
-              <div className={styles.description}>
+              <div className={styles['ADM-ANC-description']}>
                 <p>{annonces.find(a => a.id === selectedAnnonce)?.content}</p>
               </div>
               <p>Destinataire : {annonces.find(a => a.id === selectedAnnonce)?.target_type}</p>
               <p>Publié par : Matricule {annonces.find(a => a.id === selectedAnnonce)?.admin_matricule}</p>
-              <div className={styles.buttonGroup}>
-                <button className={styles.editButton} onClick={() => handleEdit(annonces.find(a => a.id === selectedAnnonce))}>
+              <div className={styles['ADM-ANC-buttonGroup']}>
+                <button className={styles['ADM-ANC-editButton']} onClick={() => handleEdit(annonces.find(a => a.id === selectedAnnonce))}>
                   <FaEdit /> Modifier
                 </button>
-                <button className={styles.deleteButton} onClick={() => handleDelete(selectedAnnonce)}>
+                <button className={styles['ADM-ANC-deleteButton']} onClick={() => handleDelete(selectedAnnonce)}>
                   <FaTrash /> Supprimer
                 </button>
-                <button className={styles.closeButton} onClick={() => setSelectedAnnonce(null)}>
+                <button className={styles['ADM-ANC-closeButton']} onClick={() => setSelectedAnnonce(null)}>
                   <FaTimes /> Fermer
                 </button>
               </div>

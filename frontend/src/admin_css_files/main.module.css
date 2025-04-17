@@ -1,16 +1,16 @@
-.mainContainer {
-  background: linear-gradient(180deg, #5483b3, #c1e8ff); /* Remplace var(--accent) et var(--background) par des valeurs fixes */
+.MAIN-mainContainer {
+  background: linear-gradient(180deg, #5483b3, #c1e8ff);
   transition: opacity 1s ease-in-out;
   height: 100vh;
 }
 
-.mainContainerLoaded {
+.MAIN-mainContainerLoaded {
   opacity: 1;
 }
 
-.sidebar {
+.MAIN-sidebar {
   width: 70px;
-  background: linear-gradient(180deg, #021024, #052659); /* Remplace var(--primary) et var(--secondary) */
+  background: linear-gradient(180deg, #021024, #052659);
   padding: 20px 0;
   display: flex;
   flex-direction: column;
@@ -24,7 +24,7 @@
   height: 70vh;
 }
 
-.sidebarMenu {
+.MAIN-sidebarMenu {
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -33,7 +33,7 @@
   height: 100%;
 }
 
-.sidebarItem {
+.MAIN-sidebarItem {
   background: none;
   border: none;
   padding: 12px;
@@ -44,7 +44,7 @@
   position: relative;
 }
 
-.sidebarItem::before {
+.MAIN-sidebarItem::before {
   content: '';
   position: absolute;
   top: 50%;
@@ -58,71 +58,71 @@
   transition: all 0.3s ease;
 }
 
-.sidebarItem:hover::before {
+.MAIN-sidebarItem:hover::before {
   opacity: 1;
 }
 
-.sidebarItem:hover {
+.MAIN-sidebarItem:hover {
   transform: scale(1.1);
 }
 
-.sidebarIcon {
+.MAIN-sidebarIcon {
   font-size: 1.2rem;
-  color: #ffffff; /* Remplace var(--white) */
+  color: #ffffff;
   z-index: 1;
 }
 
-.mainContent {
+.MAIN-mainContent {
   flex: 1;
   padding: 30px;
   margin-left: 70px;
   position: relative;
 }
 
-.welcomeMessage {
+.MAIN-welcomeMessage {
   margin-bottom: 20px;
   transform: translateX(-50px);
   transition: all 1s ease-in-out;
 }
 
-.welcomeMessageSlideIn {
+.MAIN-welcomeMessageSlideIn {
   opacity: 1;
   transform: translateX(0);
 }
 
-.welcomeMessage h1 {
+.MAIN-welcomeMessage h1 {
   font-size: 2rem;
   font-weight: 800;
-  color: #c1e8ff; /* Remplace var(--background) */
+  color: #c1e8ff;
   margin-bottom: 5px;
-  background: linear-gradient(90deg, #ffffff, #5483b3); /* Remplace var(--white) et var(--accent) */
+  background: linear-gradient(90deg, #ffffff, #5483b3);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.welcomeMessage p {
+.MAIN-welcomeMessage p {
   font-size: 1rem;
-  color: #c1e8ff; /* Remplace var(--background) */
+  color: #c1e8ff;
   font-weight: 400;
 }
 
-.mainLayout {
+.MAIN-mainLayout {
   display: flex;
   gap: 20px;
 }
 
-.cardsSection {
+.MAIN-cardsSection {
   flex: 3;
 }
 
-.cardsGrid {
+.MAIN-cardsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 15px;
 }
 
-.card {
-  background: linear-gradient(145deg, #ffffff, #c1e8ff); /* Remplace var(--card-bg) et var(--background) */
+.MAIN-card {
+  background: linear-gradient(145deg, #ffffff, #c1e8ff);
   padding: 20px;
   border-radius: 15px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
@@ -132,12 +132,12 @@
   border: 2px solid transparent;
 }
 
-.card:hover {
+.MAIN-card:hover {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  border-color: #5483b3; /* Remplace var(--accent) */
+  border-color: #5483b3;
 }
 
-.card::before {
+.MAIN-card::before {
   content: '';
   position: absolute;
   top: 0;
@@ -149,61 +149,61 @@
   transition: opacity 0.3s ease;
 }
 
-.card:hover::before {
+.MAIN-card:hover::before {
   opacity: 1;
 }
 
-.cardIcon {
+.MAIN-cardIcon {
   position: absolute;
   top: -25px;
   left: 20px;
   width: 50px;
   height: 50px;
-  background: #021024; /* Remplace var(--primary) */
+  background: #021024;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
-  color: #ffffff; /* Remplace var(--white) */
+  color: #ffffff;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
-.cardContent {
+.MAIN-cardContent {
   margin-top: 35px;
 }
 
-.cardTitle {
+.MAIN-cardTitle {
   font-size: 1.2rem;
-  color: #021024; /* Remplace var(--primary) */
+  color: #021024;
   margin-bottom: 5px;
   font-weight: 900;
 }
 
-.cardDescription {
-  color: #052659; /* Remplace var(--secondary) */
+.MAIN-cardDescription {
+  color: #052659;
   font-size: 0.90rem;
   line-height: 1.5;
   font-weight: 600;
 }
 
-.cardArrow {
+.MAIN-cardArrow {
   position: absolute;
   right: 15px;
   top: 50%;
   transform: translateY(-50%);
-  color: #5483b3; /* Remplace var(--accent) */
+  color: #5483b3;
   font-size: 1.2rem;
   opacity: 0;
   transition: all 0.3s ease;
 }
 
-.card:hover .cardArrow {
+.MAIN-card:hover .MAIN-cardArrow {
   opacity: 1;
   right: 10px;
 }
 
-.rightColumn {
+.MAIN-rightColumn {
   flex: 1;
   max-width: 300px;
   display: flex;
@@ -211,170 +211,170 @@
   gap: 20px;
 }
 
-.calendarSection {
-  background: linear-gradient(145deg, #7da0ca, #c1e8ff); /* Remplace var(--light-accent) et var(--background) */
+.MAIN-calendarSection {
+  background: linear-gradient(145deg, #7da0ca, #c1e8ff);
   padding: 15px;
   border-radius: 15px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
 }
 
-.calendarSection h3 {
+.MAIN-calendarSection h3 {
   font-size: 1.2rem;
-  color: #021024; /* Remplace var(--primary) */
+  color: #021024;
   margin-bottom: 10px;
 }
 
-.calendarGrid {
+.MAIN-calendarGrid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 5px;
   text-align: center;
 }
 
-.calendarDayHeader {
+.MAIN-calendarDayHeader {
   font-size: 0.75rem;
-  color: #021024; /* Remplace var(--text) */
+  color: #021024;
   font-weight: 600;
   padding: 5px;
   background: rgba(255, 255, 255, 0.2);
   border-radius: 5px;
 }
 
-.calendarDay {
+.MAIN-calendarDay {
   padding: 5px;
   font-size: 0.9rem;
-  color: #021024; /* Remplace var(--text) */
+  color: #021024;
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 5px;
   transition: background 0.3s ease;
 }
 
-.calendarDay:hover {
-  background: #5483b3; /* Remplace var(--accent) */
-  color: #ffffff; /* Remplace var(--white) */
+.MAIN-calendarDay:hover {
+  background: #5483b3;
+  color: #ffffff;
 }
 
-.currentDay {
-  background: #5483b3; /* Remplace var(--accent) */
-  color: #ffffff; /* Remplace var(--white) */
-  border: 2px solid #021024; /* Remplace var(--primary) */
+.MAIN-currentDay {
+  background: #5483b3;
+  color: #ffffff;
+  border: 2px solid #021024;
 }
 
 /* Notes Section */
-.notesSection {
-  background: linear-gradient(145deg, #7da0ca, #c1e8ff); /* Remplace var(--light-accent) et var(--background) */
+.MAIN-notesSection {
+  background: linear-gradient(145deg, #7da0ca, #c1e8ff);
   padding: 15px;
   border-radius: 15px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
 }
 
-.notesSection h3 {
+.MAIN-notesSection h3 {
   font-size: 1.2rem;
-  color: #021024; /* Remplace var(--primary) */
+  color: #021024;
   margin-bottom: 10px;
 }
 
-.notesList {
+.MAIN-notesList {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.addButton {
-  background: linear-gradient(135deg, #021024, #052659); /* Remplace var(--primary) et var(--secondary) */
+.MAIN-addButton {
+  background: linear-gradient(135deg, #021024, #052659);
   border: none;
   padding: 8px 15px;
   border-radius: 15px;
-  color: #ffffff; /* Remplace var(--white) */
+  color: #ffffff;
   cursor: pointer;
   margin-bottom: 15px;
   align-self: flex-start;
   transition: all 0.3s ease;
 }
 
-.addButton:hover {
+.MAIN-addButton:hover {
   background: linear-gradient(135deg, #052659, #021024);
   transform: scale(1.05);
 }
 
-.noteItem {
-  background: #fff9c4; /* Light yellow for sticky note effect */
+.MAIN-noteItem {
+  background: #fff9c4;
   padding: 15px;
   border-radius: 8px;
   box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
-  border: 1px solid #ffeb3b; /* Slightly darker yellow border */
+  border: 1px solid #ffeb3b;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
   position: relative;
-  min-height: 120px; /* Ensure enough space for content */
-  max-height: 150px; /* Limit height to avoid overflow */
-  overflow: hidden; /* Hide overflow content */
+  min-height: 120px;
+  max-height: 150px;
+  overflow: hidden;
 }
 
-.noteItem:hover {
-  transform: scale(1.02) !important; /* Slight scale on hover, override rotation */
+.MAIN-noteItem:hover {
+  transform: scale(1.02) !important;
   box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.3);
 }
 
-.rotatePositive {
-  transform: rotate(2deg); /* Slight tilt to the right */
+.MAIN-rotatePositive {
+  transform: rotate(2deg);
 }
 
-.rotateNegative {
-  transform: rotate(-2deg); /* Slight tilt to the left */
+.MAIN-rotateNegative {
+  transform: rotate(-2deg);
 }
 
-.noteContent {
-  font-family: 'Shadows Into Light', cursive; /* Handwritten font */
-  color: #333; /* Darker text for readability */
+.MAIN-noteContent {
+  font-family: 'Shadows Into Light', cursive;
+  color: #333;
   display: flex;
   flex-direction: column;
   gap: 5px;
 }
 
-.noteTitle {
+.MAIN-noteTitle {
   font-size: 1.1rem;
   font-weight: 700;
   margin: 0;
   line-height: 1.2;
 }
 
-.noteSnippet {
+.MAIN-noteSnippet {
   font-size: 0.95rem;
   margin: 0;
   line-height: 1.3;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
-  -webkit-line-clamp: 2; /* Limit to 2 lines */
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 }
 
-.noteDate {
+.MAIN-noteDate {
   font-size: 0.8rem;
-  color: #666; /* Slightly lighter for the date */
-  margin-top: auto; /* Push to the bottom */
+  color: #666;
+  margin-top: auto;
 }
 
-.seeMoreButton {
-  background: linear-gradient(135deg, #021024, #052659); /* Remplace var(--primary) et var(--secondary) */
+.MAIN-seeMoreButton {
+  background: linear-gradient(135deg, #021024, #052659);
   border: none;
   padding: 8px 15px;
   border-radius: 15px;
-  color: #ffffff; /* Remplace var(--white) */
+  color: #ffffff;
   cursor: pointer;
   margin-top: 10px;
   align-self: center;
   transition: all 0.3s ease;
 }
 
-.seeMoreButton:hover {
+.MAIN-seeMoreButton:hover {
   background: linear-gradient(135deg, #052659, #021024);
   transform: scale(1.05);
 }
 
 /* Modal Overlay */
-.modalOverlay {
+.MAIN-modalOverlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -388,29 +388,29 @@
   z-index: 1000;
 }
 
-.modalOverlayActive {
+.MAIN-modalOverlayActive {
   display: flex;
-  animation: slideInFromTop 0.4s ease-out forwards;
+  animation: MAIN-slideInFromTop 0.4s ease-out forwards;
 }
 
 /* Fallback for centering if flex fails */
-.modalOverlay[data-modal] {
+.MAIN-modalOverlay[data-modal] {
   display: none;
 }
 
-.modalOverlayActive[data-modal] {
+.MAIN-modalOverlayActive[data-modal] {
   display: block;
 }
 
-.modalOverlayActive[data-modal] .modalContent {
+.MAIN-modalOverlayActive[data-modal] .MAIN-modalContent {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%); /* Remove rotation for modals */
+  transform: translate(-50%, -50%);
 }
 
 /* Modal Content Base Styles */
-.modalContent {
+.MAIN-modalContent {
   width: 100%;
   max-width: 500px;
   max-height: 80vh;
@@ -425,18 +425,18 @@
 }
 
 /* Sticky Note Modal */
-.stickyNote {
-  background: #fff9c4; /* Light yellow for sticky note effect */
-  border: 1px solid #ffeb3b; /* Slightly darker yellow border */
+.MAIN-stickyNote {
+  background: #fff9c4;
+  border: 1px solid #ffeb3b;
   border-radius: 8px;
   box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
   padding: 20px;
   max-width: 600px;
-  font-family: 'Shadows Into Light', cursive; /* Handwritten font */
+  font-family: 'Shadows Into Light', cursive;
   color: #333;
 }
 
-.stickyNote h3 {
+.MAIN-stickyNote h3 {
   font-size: 1.6rem;
   font-weight: 700;
   color: #333;
@@ -444,36 +444,36 @@
   text-align: center;
 }
 
-.modalBody {
-  font-family: 'Shadows Into Light', cursive; /* Handwritten font for modal content */
+.MAIN-modalBody {
+  font-family: 'Shadows Into Light', cursive;
   color: #333;
 }
 
-.noteContentText {
+.MAIN-noteContentText {
   font-size: 1.1rem;
   line-height: 1.4;
   margin-bottom: 15px;
 }
 
 /* Add Note Modal */
-.addNoteModal {
-  max-width: 600px; /* Match sticky note modal width */
+.MAIN-addNoteModal {
+  max-width: 600px;
 }
 
-/* Large Modal (remove previous styles) */
-.largeModal {
-  max-width: 600px; /* Match sticky note modal width */
+/* Large Modal */
+.MAIN-largeModal {
+  max-width: 600px;
 }
 
 /* Buttons */
-.buttonGroup {
+.MAIN-buttonGroup {
   display: flex;
   gap: 15px;
   margin-top: 25px;
   justify-content: center;
 }
 
-.buttonGroup button {
+.MAIN-buttonGroup button {
   background: linear-gradient(135deg, #5483b3 0%, #052659 100%);
   color: #ffffff;
   padding: 12px 25px;
@@ -491,12 +491,12 @@
   overflow: hidden;
 }
 
-.buttonGroup button:hover {
+.MAIN-buttonGroup button:hover {
   transform: translateY(-3px);
   box-shadow: 0 12px 25px rgba(5, 38, 89, 0.15), 0 0 15px rgba(125, 160, 202, 0.4);
 }
 
-.closeButtonTopRight {
+.MAIN-closeButtonTopRight {
   position: absolute;
   top: 10px;
   right: 10px;
@@ -514,24 +514,24 @@
   padding: 5px;
 }
 
-.closeButtonTopRight:hover {
+.MAIN-closeButtonTopRight:hover {
   color: #ff4444;
 }
 
 /* Input and Textarea */
-.titleInput {
+.MAIN-titleInput {
   width: 100%;
   padding: 10px;
   margin-bottom: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  font-family: 'Shadows Into Light', cursive; /* Handwritten font */
+  font-family: 'Shadows Into Light', cursive;
   font-size: 1.2rem;
   font-weight: 600;
   color: #333;
 }
 
-.linedText {
+.MAIN-linedText {
   width: 100%;
   background: repeating-linear-gradient(
     to bottom,
@@ -544,14 +544,14 @@
   border: 1px solid #ccc;
   border-radius: 5px;
   padding: 10px;
-  font-family: 'Shadows Into Light', cursive; /* Handwritten font */
+  font-family: 'Shadows Into Light', cursive;
   font-size: 1rem;
   resize: vertical;
   color: #333;
 }
 
 /* Animations */
-@keyframes slideInFromTop {
+@keyframes MAIN-slideInFromTop {
   from {
     opacity: 0;
     transform: translateY(-50px);
@@ -563,13 +563,13 @@
 }
 
 /* Styles pour la modale de notification */
-.notificationModal {
+.MAIN-notificationModal {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(2, 16, 36, 0.5); /* Remplace var(--primary) avec opacité */
+  background: rgba(2, 16, 36, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -578,38 +578,46 @@
   transition: opacity 0.3s ease-in-out;
 }
 
-.notificationModalActive {
+.MAIN-notificationModalActive {
   opacity: 1;
 }
 
-.notificationModalContent {
-  background: linear-gradient(145deg, #ffffff, #c1e8ff); /* Remplace var(--card-bg) et var(--background) */
+.MAIN-notificationModalContent {
+  background: linear-gradient(145deg, #ffffff, #c1e8ff);
   padding: 20px;
   border-radius: 15px;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
   position: relative;
   min-width: 300px;
   max-width: 500px;
-  border: 2px solid #5483b3; /* Remplace var(--accent) */
+  max-height: 80vh;
+  overflow-y: auto;
+  border: 2px solid #5483b3;
   transform: scale(0.9);
   transition: transform 0.3s ease-in-out;
 }
 
-.notificationModalContentActive {
+.MAIN-notificationModalContentActive {
   transform: scale(1);
 }
 
-.closeModalBtn {
+.MAIN-notificationListWrapper {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.MAIN-closeModalBtn {
   position: absolute;
   top: 10px;
   right: 10px;
-  background: #021024; /* Remplace var(--primary) */
+  background: #021024;
   border: none;
   width: 25px;
   height: 25px;
   border-radius: 50%;
   font-size: 1rem;
-  color: #ffffff; /* Remplace var(--white) */
+  color: #ffffff;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -617,18 +625,18 @@
   transition: background 0.3s ease, transform 0.3s ease;
 }
 
-.closeModalBtn:hover {
-  background: #052659; /* Remplace var(--secondary) */
+.MAIN-closeModalBtn:hover {
+  background: #052659;
   transform: scale(1.1);
 }
 
-.editContainer {
+.MAIN-editContainer {
   width: 100%;
   display: flex;
   gap: 10px;
 }
 
-.editInput {
+.MAIN-editInput {
   flex: 1;
   padding: 8px;
   border: 1px solid #5483b3;
@@ -636,7 +644,7 @@
   font-size: 1rem;
 }
 
-.editContainer button {
+.MAIN-editContainer button {
   background: linear-gradient(135deg, #021024, #052659);
   color: #ffffff;
   border: none;

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaHome, FaSearch, FaPaperPlane, FaTimes, FaUser, FaPaperclip } from "react-icons/fa";
-import "../admin_css_files/messages.css";
+import { FaHome, FaSearch, FaPaperPlane, FaTimes, FaUser, FaPaperclip, FaFacebookMessenger } from "react-icons/fa";
+import styles from "../admin_css_files/messages.module.css";
 
 const Messages = () => {
   const navigate = useNavigate();
@@ -218,22 +218,22 @@ const Messages = () => {
   const contacts = uniqueContacts();
 
   return (
-    <div id="messages">
-      <div className="messages-page">
-        <div className="messages-container">
-          <aside className="sidebar">
-            <div className="logo">
-              <h2>Messagerie`  Messagerie</h2>
+    <div >
+      <div className={styles['MSG-messages-page']}>
+        <div className={styles['MSG-messages-container']}>
+          <aside className={styles['MSG-sidebar']}>
+            <div className={styles['MSG-logo']}>
+              <h2><FaFacebookMessenger/>  Messagerie</h2>
             </div>
-            <button className="sidebar-button" onClick={handleNavigateHome}>
+            <button className={styles['MSG-sidebar-button']} onClick={handleNavigateHome}>
               <FaHome /> Retour à l'accueil
             </button>
-            <button className="sidebar-button" onClick={() => setIsModalOpen(true)}>
+            <button className={styles['MSG-sidebar-button']} onClick={() => setIsModalOpen(true)}>
               <FaSearch /> Rechercher
             </button>
           </aside>
 
-          <section className="contacts-list">
+          <section className={styles['MSG-contacts-list']}>
             <h3>
               <FaUser /> Derniers Contacts
             </h3>
@@ -241,13 +241,13 @@ const Messages = () => {
               contacts.map((msg) => (
                 <div
                   key={msg.ID_message}
-                  className="contact-item"
+                  className={styles['MSG-contact-item']}
                   onClick={() => handleMessageClick(msg)}
                 >
-                  <div className="contact-info">
-                    <h4 className={hasUnreadMessages(msg.expediteur) ? "unread" : ""}>
+                  <div className={styles['MSG-contact-info']}>
+                    <h4 className={hasUnreadMessages(msg.expediteur) ? styles['MSG-unread'] : ""}>
                       {msg.nom} {msg.prenom}
-                      {hasUnreadMessages(msg.expediteur) && <span className="unread-dot"></span>}
+                      {hasUnreadMessages(msg.expediteur) && <span className={styles['MSG-unread-dot']}></span>}
                     </h4>
                     <p>{msg.contenu.substring(0, 30)}...</p>
                   </div>
@@ -255,42 +255,42 @@ const Messages = () => {
                 </div>
               ))
             ) : (
-              <p className="no-contacts">Aucun message reçu.</p>
+              <p className={styles['MSG-no-contacts']}>Aucun message reçu.</p>
             )}
           </section>
 
-          <main className="main-content">
-            <header className="header">
+          <main className={styles['MSG-main-content']}>
+            <header className={styles['MSG-header']}>
               <h1>
                 <FaPaperPlane /> Messagerie {user?.role === "admin" ? "Admin" : user?.role === "enseignant" ? "Enseignant" : "Étudiant"}
               </h1>
               <p>Gérez vos conversations ici</p>
             </header>
 
-            {error && <p className="messages-error">{error}</p>}
+            {error && <p className={styles['MSG-messages-error']}>{error}</p>}
 
             {recipient && (
-              <div className="chat-section">
-                <div className="recipient-info">
+              <div className={styles['MSG-chat-section']}>
+                <div className={styles['MSG-recipient-info']}>
                   <h3>
                     Discussion avec {recipient.nom} {recipient.prenom}
                   </h3>
-                  <button className="messages-btn close" onClick={handleCloseChat}>
+                  <button className={`${styles['MSG-messages-btn']} ${styles['MSG-close']}`} onClick={handleCloseChat}>
                     <FaTimes /> Fermer
                   </button>
                 </div>
-                <div className="messages-list" ref={messagesListRef}>
+                <div className={styles['MSG-messages-list']} ref={messagesListRef}>
                   {messages.length > 0 ? (
                     messages.map((msg) => (
                       <div
                         key={msg.ID_message}
-                        className={`message-item ${
-                          msg.expediteur === user.Matricule ? "sent" : "received"
+                        className={`${styles['MSG-message-item']} ${
+                          msg.expediteur === user.Matricule ? styles['MSG-sent'] : styles['MSG-received']
                         }`}
                       >
                         <p>{msg.contenu}</p>
                         {msg.filePath && (
-                          <div className="file-attachment">
+                          <div className={styles['MSG-file-attachment']}>
                             <span>Fichier : {msg.fileName || "Fichier sans nom"}</span>
                             <a
                               href={`http://localhost:8082/uploads/${msg.filePath}`}
@@ -305,14 +305,14 @@ const Messages = () => {
                       </div>
                     ))
                   ) : (
-                    <p className="no-messages">Aucun message pour l'instant.</p>
+                    <p className={styles['MSG-no-messages']}>Aucun message pour l'instant.</p>
                   )}
                 </div>
-                <div className="message-input">
+                <div className={styles['MSG-message-input']}>
                   {selectedFile && (
-                    <div className="selected-file">
+                    <div className={styles['MSG-selected-file']}>
                       <span>{selectedFile.name}</span>
-                      <button className="remove-file-btn" onClick={handleRemoveFile}>
+                      <button className={styles['MSG-remove-file-btn']} onClick={handleRemoveFile}>
                         <FaTimes />
                       </button>
                     </div>
@@ -322,7 +322,7 @@ const Messages = () => {
                     onChange={(e) => setNewMessage(e.target.value)}
                     placeholder="Tapez votre message..."
                   />
-                  <label className="file-upload-btn">
+                  <label className={styles['MSG-file-upload-btn']}>
                     <FaPaperclip />
                     <input
                       type="file"
@@ -330,7 +330,7 @@ const Messages = () => {
                       style={{ display: "none" }}
                     />
                   </label>
-                  <button className="messages-btn send" onClick={handleSendMessage}>
+                  <button className={`${styles['MSG-messages-btn']} ${styles['MSG-send']}`} onClick={handleSendMessage}>
                     <FaPaperPlane /> Envoyer
                   </button>
                 </div>
@@ -341,16 +341,16 @@ const Messages = () => {
       </div>
 
       {isModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">
+        <div className={styles['MSG-modal-overlay']}>
+          <div className={styles['MSG-modal-content']}>
+            <div className={styles['MSG-modal-header']}>
               <h2>Rechercher un utilisateur</h2>
-              <button className="modal-close-btn" onClick={() => setIsModalOpen(false)}>
+              <button className={styles['MSG-modal-close-btn']} onClick={() => setIsModalOpen(false)}>
                 <FaTimes />
               </button>
             </div>
-            <div className="modal-body">
-              <div className="form-group">
+            <div className={styles['MSG-modal-body']}>
+              <div className={styles['MSG-form-group']}>
                 <label>Rechercher par email</label>
                 <input
                   type="email"
@@ -359,16 +359,16 @@ const Messages = () => {
                   placeholder="Entrez l'email"
                 />
               </div>
-              <button className="modal-search-btn" onClick={handleSearchRecipient}>
+              <button className={styles['MSG-modal-search-btn']} onClick={handleSearchRecipient}>
                 <FaSearch /> Rechercher
               </button>
               {searchResults && (
-                <div className="search-result">
+                <div className={styles['MSG-search-result']}>
                   <div
-                    className="contact-item"
+                    className={styles['MSG-contact-item']}
                     onClick={() => handleSelectRecipient(searchResults)}
                   >
-                    <div className="contact-info">
+                    <div className={styles['MSG-contact-info']}>
                       <h4>
                         {searchResults.nom} {searchResults.prenom}
                       </h4>
@@ -377,7 +377,7 @@ const Messages = () => {
                   </div>
                 </div>
               )}
-              {error && <p className="messages-error">{error}</p>}
+              {error && <p className={styles['MSG-messages-error']}>{error}</p>}
             </div>
           </div>
         </div>

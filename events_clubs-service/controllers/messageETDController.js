@@ -1,15 +1,13 @@
-// club-evenement-service/backend/Controllers/messageController.js
 const pool = require('../config/db');
+const { createNotification } = require('./notificationETDController');
+const path = require('path');
+const fs = require('fs');
 
-// Récupérer les messages pour un club (messagerie de groupe)
 const getMessagesForClub = async (req, res) => {
   const { clubId, userMatricule } = req.params;
 
-  console.log('Requête reçue pour clubId:', clubId, 'userMatricule:', userMatricule);
-
   try {
     const [club] = await pool.query('SELECT * FROM Club WHERE ID_club = ?', [clubId]);
-    console.log('Résultat club:', club);
     if (club.length === 0) {
       return res.status(404).json({ error: 'Club non trouvé' });
     }
@@ -19,30 +17,50 @@ const getMessagesForClub = async (req, res) => {
       'SELECT matricule_etudiant FROM MembreClub WHERE ID_club = ?',
       [clubId]
     );
-    console.log('Membres trouvés:', membres);
     const membreMatricules = membres.map(m => m.matricule_etudiant);
 
     const isGerant = String(userMatricule) === String(gerantMatricule);
     const isMembre = membreMatricules.includes(Number(userMatricule));
-    console.log('isGerant:', isGerant, 'isMembre:', isMembre);
 
     if (!isGerant && !isMembre) {
       return res.status(403).json({ error: 'Vous n’êtes pas autorisé à accéder à cette messagerie' });
     }
 
-    const [messages] = await pool.query(
-      `
-      SELECT m.*, 
+    const sentMessagesQuery = `
+      SELECT MIN(m.ID_message) AS ID_message, m.contenu, m.expediteur, NULL AS destinataire,
+             m.date_envoi, m.filePath, m.fileName,
              sender.nom AS expediteur_nom, sender.prenom AS expediteur_prenom
-      FROM Message m
+      FROM MessageClub m
       JOIN User sender ON m.expediteur = sender.Matricule
-      WHERE (m.expediteur = ? OR m.destinataire = ?)
+      WHERE m.expediteur = ?
       AND m.contenu LIKE ?
-      ORDER BY m.date_envoi ASC
-      `,
-      [userMatricule, userMatricule, `[CLUB_${clubId}]%`]
-    );
-    console.log('Messages trouvés:', messages);
+      GROUP BY m.contenu, m.expediteur, m.date_envoi, m.filePath, m.fileName,
+               sender.nom, sender.prenom
+    `;
+
+    const receivedMessagesQuery = `
+      SELECT m.ID_message, m.contenu, m.expediteur, m.destinataire, 
+             m.date_envoi, m.filePath, m.fileName,
+             sender.nom AS expediteur_nom, sender.prenom AS expediteur_prenom
+      FROM MessageClub m
+      JOIN User sender ON m.expediteur = sender.Matricule
+      WHERE m.destinataire = ?
+      AND m.contenu LIKE ?
+    `;
+
+    const combinedQuery = `
+      (${sentMessagesQuery})
+      UNION
+      (${receivedMessagesQuery})
+      ORDER BY date_envoi ASC
+    `;
+
+    const [messages] = await pool.query(combinedQuery, [
+      userMatricule,
+      `[CLUB_${clubId}]%`,
+      userMatricule,
+      `[CLUB_${clubId}]%`,
+    ]);
 
     const cleanedMessages = messages.map(msg => ({
       ...msg,
@@ -56,21 +74,21 @@ const getMessagesForClub = async (req, res) => {
   }
 };
 
-// Envoyer un message dans la messagerie de groupe
 const sendMessage = async (req, res) => {
   const { clubId, expediteur, contenu } = req.body;
-
-  if (!contenu || !expediteur || !clubId) {
-    return res.status(400).json({ error: 'Contenu, expéditeur et clubId sont requis' });
-  }
+  const file = req.file;
 
   try {
-    // Vérifier que l'expéditeur est le gérant ou un membre du club
-    const [club] = await pool.query('SELECT gerant_matricule FROM Club WHERE ID_club = ?', [clubId]);
+    if (!contenu || !expediteur || !clubId) {
+      return res.status(400).json({ error: 'Contenu, expéditeur et clubId sont requis' });
+    }
+
+    const [club] = await pool.query('SELECT * FROM Club WHERE ID_club = ?', [clubId]);
     if (club.length === 0) {
       return res.status(404).json({ error: 'Club non trouvé' });
     }
     const gerantMatricule = club[0].gerant_matricule;
+    const clubName = club[0].nom;
 
     const [membres] = await pool.query(
       'SELECT matricule_etudiant FROM MembreClub WHERE ID_club = ?',
@@ -85,37 +103,50 @@ const sendMessage = async (req, res) => {
       return res.status(403).json({ error: 'Vous n’êtes pas autorisé à envoyer un message dans ce club' });
     }
 
-    // Ajouter un préfixe au contenu pour identifier le club
     const prefixedContenu = `[CLUB_${clubId}] ${contenu}`;
-
-    // Liste des destinataires : tous les membres du club + le gérant (sauf l'expéditeur)
     const destinataires = [...membreMatricules, gerantMatricule].filter(
       matricule => matricule !== Number(expediteur)
     );
 
-    // Insérer un message pour chaque destinataire
+    let filePath = null;
+    let fileName = null;
+    if (file) {
+      filePath = `/uploads/messages/${file.filename}`;
+      fileName = file.originalname;
+    }
+
     const insertedMessages = [];
     for (const destinataire of destinataires) {
       const [result] = await pool.query(
-        'INSERT INTO Message (contenu, expediteur, destinataire) VALUES (?, ?, ?)',
-        [prefixedContenu, expediteur, destinataire]
+        'INSERT INTO MessageClub (contenu, expediteur, destinataire, filePath, fileName) VALUES (?, ?, ?, ?, ?)',
+        [prefixedContenu, expediteur, destinataire, filePath, fileName]
       );
 
-      // Récupérer le message inséré avec les informations de l'expéditeur
       const [newMessage] = await pool.query(
         `
         SELECT m.*, 
                sender.nom AS expediteur_nom, sender.prenom AS expediteur_prenom
-        FROM Message m
+        FROM MessageClub m
         JOIN User sender ON m.expediteur = sender.Matricule
         WHERE m.ID_message = ?
         `,
         [result.insertId]
       );
 
-      // Supprimer le préfixe avant de renvoyer le message
       newMessage[0].contenu = newMessage[0].contenu.replace(`[CLUB_${clubId}] `, '');
       insertedMessages.push(newMessage[0]);
+
+      const notificationContent = `Vous avez de nouveaux messages du club ${clubName}`;
+      const [existingNotification] = await pool.query(
+        'SELECT * FROM Notification WHERE destinataire = ? AND contenu = ? AND expediteur = ? AND date_envoi > DATE_SUB(NOW(), INTERVAL 1 MINUTE)',
+        [destinataire, notificationContent, expediteur]
+      );
+
+      if (existingNotification.length === 0) {
+        await createNotification(destinataire, notificationContent, expediteur);
+      } else {
+        console.log('Notification déjà existante pour:', { destinataire, contenu: notificationContent, expediteur });
+      }
     }
 
     res.status(201).json(insertedMessages);

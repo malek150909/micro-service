@@ -1,6 +1,6 @@
-// club-evenement-service/frontend/src/components/DemandeCreationClub.jsx
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
+import styles from './club.module.css';
 
 const DemandeCreationClub = ({ setError }) => {
   const [formData, setFormData] = useState({
@@ -8,11 +8,10 @@ const DemandeCreationClub = ({ setError }) => {
     description_club: '',
   });
   const [success, setSuccess] = useState(null);
-  
-
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8084';
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const matricule = storedUser?.Matricule;
+
+  const API_URL = 'http://localhost:8084';
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -67,18 +66,18 @@ const DemandeCreationClub = ({ setError }) => {
 
   return (
     <>
-    <div id="clubs">
-      <div className="header">
+      <div className={styles['CLUB-ETD-header']}>
         <h1>Demande de Création de Club</h1>
         <p>Envoyez une demande pour créer un nouveau club</p>
-        {success && <p className="success-message">{success}</p>}
+        {success && <p className={styles['CLUB-ETD-success-message']}>{success}</p>}
       </div>
 
-      <div className="content-grid">
-        <form onSubmit={handleSubmit}>
-          <div className="input-group">
+      <div className={styles['CLUB-ETD-content-grid']}>
+        <form className={styles['CLUB-ETD-form']} onSubmit={handleSubmit}>
+          <div className={styles['CLUB-ETD-input-group']}>
             <label>Nom du Club</label>
             <input
+              className={styles['CLUB-ETD-input']}
               type="text"
               name="nom_club"
               value={formData.nom_club}
@@ -86,22 +85,22 @@ const DemandeCreationClub = ({ setError }) => {
               required
             />
           </div>
-          <div className="input-group">
+          <div className={styles['CLUB-ETD-input-group']}>
             <label>Description</label>
             <textarea
+              className={styles['CLUB-ETD-textarea']}
               name="description_club"
               value={formData.description_club}
               onChange={handleInputChange}
               rows="4"
             />
           </div>
-          <div className="button-group">
-            <button type="submit">
+          <div className={styles['CLUB-ETD-button-group']}>
+            <button className={styles['CLUB-ETD-button']} type="submit">
               <FaPlus /> Envoyer la Demande
             </button>
           </div>
         </form>
-      </div>
       </div>
     </>
   );

@@ -1,12 +1,9 @@
-// club-evenement-service/backend/routes/messageRoutes.js
 const express = require('express');
 const router = express.Router();
-const {getMessagesForClub , sendMessage} = require('../controllers/messageETDController')
+const messageController = require('../controllers/messageETDController');
+const upload = require('../config/multer');
 
-// Récupérer les messages d’un club (messagerie de groupe)
-router.get('/club/:clubId/user/:userMatricule', getMessagesForClub);
-
-// Envoyer un message dans la messagerie de groupe
-router.post('/club/:clubId', sendMessage);
+router.get('/club/:clubId/user/:userMatricule', messageController.getMessagesForClub);
+router.post('/club/:clubId', upload.single('file'), messageController.sendMessage);
 
 module.exports = router;

@@ -1,198 +1,232 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import TeacherSection from './TeacherSection'; // Adjust the import path as needed
+import TeacherSection from './TeacherSection';
+import styles from './prof.module.css';
 
 const TeacherList = () => {
-    const [teachers, setTeachers] = useState([]);
-    const [selectedTeacher, setSelectedTeacher] = useState(null);
-    const [facultes, setFacultes] = useState([]);
-    const [departements, setDepartements] = useState([]);
-    const [specialites, setSpecialites] = useState([]);
-    const [filters, setFilters] = useState({ idFaculte: '', idDepartement: '', idSpecialite: '' });
-    const [showTeachers, setShowTeachers] = useState(false); // Controls whether to display the teacher list
+  const [teachers, setTeachers] = useState([]);
+  const [selectedTeacher, setSelectedTeacher] = useState(null);
+  const [facultes, setFacultes] = useState([]);
+  const [departements, setDepartements] = useState([]);
+  const [specialites, setSpecialites] = useState([]);
+  const [filters, setFilters] = useState({ idFaculte: '', idDepartement: '', idSpecialite: '' });
+  const [newTeacher, setNewTeacher] = useState({
+    nom: '',
+    prenom: '',
+    email: '',
+    idFaculte: '',
+    idDepartement: '',
+    modules: [],
+  });
+  const [showTeachers, setShowTeachers] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
 
-    // Fetch all facultes on mount
-    useEffect(() => {
-        axios.get('http://localhost:8081/api/facultes')
-            .then(res => {
-                setFacultes(res.data);
-            })
-            .catch(err => {
-                console.error('Error fetching facultes:', err);
-            });
-    }, []);
+  useEffect(() => {
+    axios.get('http://localhost:8081/api/facultes')
+      .then(res => setFacultes(res.data))
+      .catch(err => console.error('Error fetching facultes:', err));
+  }, []);
 
-    // Fetch departments when faculty is selected
-    useEffect(() => {
-        if (filters.idFaculte) {
-            axios.get(`http://localhost:8081/api/departements/${filters.idFaculte}`)
-                .then(res => {
-                    setDepartements(res.data);
-                    setFilters(prev => ({ ...prev, idDepartement: '', idSpecialite: '' })); // Reset dependent filters
-                })
-                .catch(err => {
-                    console.error('Error fetching departements:', err);
-                });
-        } else {
-            setDepartements([]);
-            setSpecialites([]);
-            setFilters(prev => ({ ...prev, idDepartement: '', idSpecialite: '' }));
-        }
-    }, [filters.idFaculte]);
+  useEffect(() => {
+    if (filters.idFaculte) {
+      axios.get(`http://localhost:8081/api/departements/${filters.idFaculte}`)
+        .then(res => {
+          setDepartements(res.data);
+          setFilters((prev) => ({ ...prev, idDepartement: '', idSpecialite: '' }));
+        })
+        .catch(err => console.error('Error fetching departements:', err));
+    } else {
+      setDepartements([]);
+      setSpecialites([]);
+    }
+  }, [filters.idFaculte]);
 
-    // Fetch specialites when department is selected
-    useEffect(() => {
-        if (filters.idDepartement) {
-            axios.get(`http://localhost:8081/api/specialites/${filters.idDepartement}`)
-                .then(res => {
-                    setSpecialites(res.data);
-                    setFilters(prev => ({ ...prev, idSpecialite: '' })); // Reset dependent filter
-                })
-                .catch(err => {
-                    console.error('Error fetching specialites:', err);
-                });
-        } else {
-            setSpecialites([]);
-            setFilters(prev => ({ ...prev, idSpecialite: '' }));
-        }
-    }, [filters.idDepartement]);
+  useEffect(() => {
+    if (filters.idDepartement) {
+      axios.get(`http://localhost:8081/api/specialites/${filters.idDepartement}`)
+        .then(res => {
+          setSpecialites(res.data);
+          setFilters((prev) => ({ ...prev, idSpecialite: '' }));
+        })
+        .catch(err => console.error('Error fetching specialites:', err));
+    } else {
+      setSpecialites([]);
+    }
+  }, [filters.idDepartement]);
 
-    // Fetch teachers when filters are applied
-    const handleFilterSubmit = () => {
-        if (filters.idSpecialite) {
-            axios.get('http://localhost:8081/api/enseignants/filtered', {
-                params: {
-                    idFaculte: filters.idFaculte,
-                    idDepartement: filters.idDepartement,
-                    idSpecialite: filters.idSpecialite
-                }
-            })
-                .then(res => {
-                    setTeachers(res.data);
-                    setShowTeachers(true); // Show the teacher list after filtering
-                })
-                .catch(err => {
-                    console.error('Error fetching teachers:', err);
-                    setTeachers([]); // Clear teachers on error
-                });
-        } else {
-            setTeachers([]); // Clear teachers if no specialty selected
-            setShowTeachers(false);
-        }
-    };
+  const handleFilterSubmit = () => {
+    if (filters.idSpecialite) {
+      axios.get('http://localhost:8081/api/enseignants/filtered', { params: filters })
+        .then(res => {
+          setTeachers(res.data);
+          setShowTeachers(true);
+        })
+        .catch(err => {
+          console.error('Error fetching teachers:', err);
+          setTeachers([]);
+        });
+    } else {
+      setTeachers([]);
+      setShowTeachers(false);
+    }
+  };
 
-    // Handle teacher selection to view details
-    const handleTeacherClick = (teacher) => {
-        setSelectedTeacher(teacher);
-    };
+  const handleTeacherClick = (teacher) => setSelectedTeacher(teacher);
 
-    // Handle return from TeacherSection
-    const handleBack = (resetList) => {
-        setSelectedTeacher(null);
-        if (resetList) {
-            setTeachers([]); // Clear the teacher list
-            setShowTeachers(false); // Hide the teacher list
-        }
-    };
+  const handleBack = (resetList) => {
+    setSelectedTeacher(null);
+    if (resetList) {
+      setTeachers([]);
+      setShowTeachers(false);
+    }
+  };
 
-    return (
-        <div id="profs">
-        <div style={{ padding: '20px' }}>
-            <h2>Liste des enseignants</h2>
-            {selectedTeacher ? (
-                <TeacherSection teacher={selectedTeacher} onBack={handleBack} />
-            ) : (
-                <div>
-                    <h3>Filtres</h3>
-                    <div style={{ marginBottom: '20px' }}>
-                        <select
-                            name="idFaculte"
-                            value={filters.idFaculte}
-                            onChange={(e) => setFilters({ ...filters, idFaculte: e.target.value })}
-                            style={{ margin: '5px', padding: '5px', width: '200px', borderRadius: '4px', border: '1px solid #ccc' }}
-                        >
-                            <option value="">Sélectionner une faculté</option>
-                            {facultes.map(f => (
-                                <option key={f.ID_faculte} value={f.ID_faculte}>
-                                    {f.nom_faculte}
-                                </option>
-                            ))}
-                        </select>
-                        <select
-                            name="idDepartement"
-                            value={filters.idDepartement}
-                            onChange={(e) => setFilters({ ...filters, idDepartement: e.target.value })}
-                            style={{ margin: '5px', padding: '5px', width: '200px', borderRadius: '4px', border: '1px solid #ccc' }}
-                            disabled={!filters.idFaculte}
-                        >
-                            <option value="">Sélectionner un département</option>
-                            {departements.map(d => (
-                                <option key={d.ID_departement} value={d.ID_departement}>
-                                    {d.Nom_departement}
-                                </option>
-                            ))}
-                        </select>
-                        <select
-                            name="idSpecialite"
-                            value={filters.idSpecialite}
-                            onChange={(e) => setFilters({ ...filters, idSpecialite: e.target.value })}
-                            style={{ margin: '5px', padding: '5px', width: '200px', borderRadius: '4px', border: '1px solid #ccc' }}
-                            disabled={!filters.idDepartement}
-                        >
-                            <option value="">Sélectionner une spécialité</option>
-                            {specialites.map(s => (
-                                <option key={s.ID_specialite} value={s.ID_specialite}>
-                                    {s.nom_specialite}
-                                </option>
-                            ))}
-                        </select>
-                        <button
-                            onClick={handleFilterSubmit}
-                            style={{
-                                padding: '5px 10px',
-                                backgroundColor: '#2196f3',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '4px',
-                                cursor: 'pointer',
-                                margin: '5px'
-                            }}
-                        >
-                            Filtrer
-                        </button>
-                    </div>
-                    {showTeachers && (
-                        <div>
-                            <h3>Enseignants</h3>
-                            {teachers.length > 0 ? (
-                                <ul style={{ listStyle: 'none', padding: 0 }}>
-                                    {teachers.map(teacher => (
-                                        <li
-                                            key={teacher.Matricule}
-                                            onClick={() => handleTeacherClick(teacher)}
-                                            style={{
-                                                padding: '10px',
-                                                borderBottom: '1px solid #ddd',
-                                                cursor: 'pointer',
-                                                backgroundColor: '#f9f9f9',
-                                                margin: '5px 0',
-                                                borderRadius: '4px'
-                                            }}
-                                        >
-                                            {teacher.nom} {teacher.prenom}
-                                        </li>
-                                    ))}
-                                </ul>
-                            ) : (
-                                <p>Aucun enseignant trouvé.</p>
-                            )}
-                        </div>
-                    )}
-                </div>
-            )}
-        </div>
-        </div>
-    );
+  const handleAddTeacher = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post('http://localhost:8081/api/enseignants', {
+        ...newTeacher,
+        modules: newTeacher.modules.map(m => parseInt(m)),
+      });
+      setNewTeacher({ nom: '', prenom: '', email: '', idFaculte: '', idDepartement: '', modules: [] });
+      setShowAddForm(false);
+      handleFilterSubmit();
+    } catch (err) {
+      console.error('Error adding teacher:', err);
+    }
+  };
+
+  return (
+    <div className={styles.ProfContainer}>
+      <h1 className={styles.ProfTitleH1}>Gestion des Enseignants</h1>
+      <button className={styles.ProfButton} onClick={() => setShowAddForm(true)}>Ajouter un nouvel enseignant</button>
+      {selectedTeacher ? (
+        <TeacherSection teacher={selectedTeacher} onBack={handleBack} />
+      ) : (
+        <>
+          {showAddForm && (
+            <form onSubmit={handleAddTeacher} className={styles.ProfSectionCard}>
+              <input
+                type="text"
+                placeholder="Nom"
+                value={newTeacher.nom}
+                onChange={(e) => setNewTeacher({ ...newTeacher, nom: e.target.value })}
+                required
+                className={styles.ProfInput}
+              />
+              <input
+                type="text"
+                placeholder="Prénom"
+                value={newTeacher.prenom}
+                onChange={(e) => setNewTeacher({ ...newTeacher, prenom: e.target.value })}
+                required
+                className={styles.ProfInput}
+              />
+              <input
+                type="email"
+                placeholder="Email"
+                value={newTeacher.email}
+                onChange={(e) => setNewTeacher({ ...newTeacher, email: e.target.value })}
+                required
+                className={styles.ProfInput}
+              />
+              <select
+                value={newTeacher.idFaculte}
+                onChange={(e) => setNewTeacher({ ...newTeacher, idFaculte: e.target.value })}
+                required
+                className={styles.ProfSelect}
+              >
+                <option value="">Sélectionner une faculté</option>
+                {facultes.map((f) => (
+                  <option key={f.ID_faculte} value={f.ID_faculte}>{f.nom_faculte}</option>
+                ))}
+              </select>
+              <select
+                value={newTeacher.idDepartement}
+                onChange={(e) => setNewTeacher({ ...newTeacher, idDepartement: e.target.value })}
+                disabled={!newTeacher.idFaculte}
+                required
+                className={styles.ProfSelect}
+              >
+                <option value="">Sélectionner un département</option>
+                {departements.map((d) => (
+                  <option key={d.ID_departement} value={d.ID_departement}>{d.Nom_departement}</option>
+                ))}
+              </select>
+              <select
+                multiple
+                value={newTeacher.modules}
+                onChange={(e) => setNewTeacher({ ...newTeacher, modules: Array.from(e.target.selectedOptions, option => option.value) })}
+                disabled={!newTeacher.idDepartement}
+                className={styles.ProfSelect}
+              >
+                {specialites.map((s) => (
+                  <option key={s.ID_specialite} value={s.ID_specialite}>{s.nom_specialite}</option>
+                ))}
+              </select>
+              <button type="submit" className={styles.ProfButton}>Ajouter</button>
+              <button type="button" className={styles.ProfBackButton} onClick={() => setShowAddForm(false)}>Annuler</button>
+            </form>
+          )}
+          <div className={styles.ProfFilters}>
+            <select
+              name="idFaculte"
+              value={filters.idFaculte}
+              onChange={(e) => setFilters({ ...filters, idFaculte: e.target.value })}
+              className={styles.ProfSelect}
+            >
+              <option value="">Sélectionner une faculté</option>
+              {facultes.map((f) => (
+                <option key={f.ID_faculte} value={f.ID_faculte}>{f.nom_faculte}</option>
+              ))}
+            </select>
+            <select
+              name="idDepartement"
+              value={filters.idDepartement}
+              onChange={(e) => setFilters({ ...filters, idDepartement: e.target.value })}
+              disabled={!filters.idFaculte}
+              className={styles.ProfSelect}
+            >
+              <option value="">Sélectionner un département</option>
+              {departements.map((d) => (
+                <option key={d.ID_departement} value={d.ID_departement}>{d.Nom_departement}</option>
+              ))}
+            </select>
+            <select
+              name="idSpecialite"
+              value={filters.idSpecialite}
+              onChange={(e) => setFilters({ ...filters, idSpecialite: e.target.value })}
+              disabled={!filters.idDepartement}
+              className={styles.ProfSelect}
+            >
+              <option value="">Sélectionner une spécialité</option>
+              {specialites.map((s) => (
+                <option key={s.ID_specialite} value={s.ID_specialite}>{s.nom_specialite}</option>
+              ))}
+            </select>
+            <button onClick={handleFilterSubmit} className={styles.ProfButton}>Filtrer</button>
+          </div>
+          {showTeachers && (
+            <div className={styles.ProfTeachersList}>
+              {teachers.length > 0 ? (
+                teachers.map((teacher) => (
+                  <div
+                    key={teacher.Matricule}
+                    className={styles.ProfTeacherCard}
+                    onClick={() => handleTeacherClick(teacher)}
+                  >
+                    {teacher.nom} {teacher.prenom}
+                  </div>
+                ))
+              ) : (
+                <p className={styles.ProfNoTeachers}>Aucun enseignant trouvé.</p>
+              )}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
 };
 
 export default TeacherList;

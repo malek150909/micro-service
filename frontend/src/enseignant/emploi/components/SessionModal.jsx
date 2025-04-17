@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const SessionModal = ({ session, onClose }) => {
+const SessionModal = ({ session, onClose, styles }) => { // Add styles prop
   const [formData, setFormData] = useState({
     ...session,
     ID_salle: session.ID_salle || '',
@@ -147,58 +147,58 @@ const SessionModal = ({ session, onClose }) => {
   };
 
   if (loading) {
-    return <div className="modal-content">Chargement...</div>;
+    return <div className={styles['ENS-EDT-modal-content']}>Chargement...</div>;
   }
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
+    <div className={styles['ENS-EDT-modal-overlay']}>
+      <div className={styles['ENS-EDT-modal-content']}>
         {formData.ID_seance && !isEditing ? (
-          <div className="session-details">
-            <h3 className="timetable-title">Détails de la séance</h3>
-            <div className="details-card">
-              <div className="detail-item">
-                <span className="detail-label">Type :</span>
-                <span className="detail-value">{formData.type_seance === 'Cour' ? 'Cours' : formData.type_seance}</span>
+          <div className={styles['ENS-EDT-session-details']}>
+            <h3 className={styles['ENS-EDT-timetable-title']}>Détails de la séance</h3>
+            <div className={styles['ENS-EDT-details-card']}>
+              <div className={styles['ENS-EDT-detail-item']}>
+                <span className={styles['ENS-EDT-detail-label']}>Type :</span>
+                <span className={styles['ENS-EDT-detail-value']}>{formData.type_seance === 'Cour' ? 'Cours' : formData.type_seance}</span>
               </div>
-              <div className="detail-item">
-                <span className="detail-label">Module :</span>
-                <span className="detail-value">{formData.nom_module}</span>
+              <div className={styles['ENS-EDT-detail-item']}>
+                <span className={styles['ENS-EDT-detail-label']}>Module :</span>
+                <span className={styles['ENS-EDT-detail-value']}>{formData.nom_module}</span>
               </div>
-              <div className="detail-item">
-                <span className="detail-label">Salle :</span>
-                <span className="detail-value">{formData.nom_salle}</span>
+              <div className={styles['ENS-EDT-detail-item']}>
+                <span className={styles['ENS-EDT-detail-label']}>Salle :</span>
+                <span className={styles['ENS-EDT-detail-value']}>{formData.nom_salle}</span>
               </div>
               {(formData.type_seance === 'TP' || formData.type_seance === 'TD') && (
-                <div className="detail-item">
-                  <span className="detail-label">Groupe :</span>
-                  <span className="detail-value">{formData.num_groupe}</span>
+                <div className={styles['ENS-EDT-detail-item']}>
+                  <span className={styles['ENS-EDT-detail-label']}>Groupe :</span>
+                  <span className={styles['ENS-EDT-detail-value']}>{formData.num_groupe}</span>
                 </div>
               )}
-              <div className="detail-item">
-                <span className="detail-label">Jour :</span>
-                <span className="detail-value">{formData.jour}</span>
+              <div className={styles['ENS-EDT-detail-item']}>
+                <span className={styles['ENS-EDT-detail-label']}>Jour :</span>
+                <span className={styles['ENS-EDT-detail-value']}>{formData.jour}</span>
               </div>
-              <div className="detail-item">
-                <span className="detail-label">Horaire :</span>
-                <span className="detail-value">{formData.time_slot}</span>
+              <div className={styles['ENS-EDT-detail-item']}>
+                <span className={styles['ENS-EDT-detail-label']}>Horaire :</span>
+                <span className={styles['ENS-EDT-detail-value']}>{formData.time_slot}</span>
               </div>
-              <div className="detail-item">
-                <span className="detail-label">Section :</span>
-                <span className="detail-value">{`(${formData.niveau} ${formData.nom_specialite} ${formData.nom_section})`}</span>
+              <div className={styles['ENS-EDT-detail-item']}>
+                <span className={styles['ENS-EDT-detail-label']}>Section :</span>
+                <span className={styles['ENS-EDT-detail-value']}>{`(${formData.niveau} ${formData.nom_specialite} ${formData.nom_section})`}</span>
               </div>
             </div>
-            <div className="detail-actions">
-              <button className="timetable-btn edit" onClick={() => setIsEditing(true)}>Modifier</button>
-              <button className="timetable-btn delete" onClick={handleDelete}>Supprimer</button>
-              <button className="timetable-btn close-modal" onClick={onClose}>Fermer</button>
+            <div className={styles['ENS-EDT-detail-actions']}>
+              <button className={`${styles['ENS-EDT-timetable-btn']} ${styles['ENS-EDT-edit']}`} onClick={() => setIsEditing(true)}>Modifier</button>
+              <button className={`${styles['ENS-EDT-timetable-btn']} ${styles['ENS-EDT-delete']}`} onClick={handleDelete}>Supprimer</button>
+              <button className={`${styles['ENS-EDT-timetable-btn']} ${styles['ENS-EDT-close-modal']}`} onClick={onClose}>Fermer</button>
             </div>
           </div>
         ) : (
-          <form className="session-form" onSubmit={formData.ID_seance ? handleUpdate : handleAdd}>
-            <h3 className="timetable-title">{formData.ID_seance ? 'Modifier la séance' : 'Ajouter une séance'}</h3>
-            <div className="form-grid">
-              <div className="form-group">
+          <form className={styles['ENS-EDT-session-form']} onSubmit={formData.ID_seance ? handleUpdate : handleAdd}>
+            <h3 className={styles['ENS-EDT-timetable-title']}>{formData.ID_seance ? 'Modifier la séance' : 'Ajouter une séance'}</h3>
+            <div className={styles['ENS-EDT-form-grid']}>
+              <div className={styles['ENS-EDT-form-group']}>
                 <label>Jour</label>
                 <select name="jour" value={formData.jour || ''} onChange={handleChange}>
                   <option value="">Sélectionner</option>
@@ -207,7 +207,7 @@ const SessionModal = ({ session, onClose }) => {
                   ))}
                 </select>
               </div>
-              <div className="form-group">
+              <div className={styles['ENS-EDT-form-group']}>
                 <label>Horaire</label>
                 <select name="time_slot" value={formData.time_slot || ''} onChange={handleChange}>
                   <option value="">Sélectionner</option>
@@ -216,7 +216,7 @@ const SessionModal = ({ session, onClose }) => {
                   ))}
                 </select>
               </div>
-              <div className="form-group">
+              <div className={styles['ENS-EDT-form-group']}>
                 <label>Type</label>
                 <select name="type_seance" value={formData.type_seance || ''} onChange={handleChange}>
                   <option value="">Sélectionner</option>
@@ -225,7 +225,7 @@ const SessionModal = ({ session, onClose }) => {
                   <option value="TP">TP</option>
                 </select>
               </div>
-              <div className="form-group">
+              <div className={styles['ENS-EDT-form-group']}>
                 <label>Spécialité</label>
                 <select name="ID_specialite" value={formData.ID_specialite || ''} onChange={handleChange}>
                   <option value="">Sélectionner</option>
@@ -234,7 +234,7 @@ const SessionModal = ({ session, onClose }) => {
                   ))}
                 </select>
               </div>
-              <div className="form-group">
+              <div className={styles['ENS-EDT-form-group']}>
                 <label>Section</label>
                 <select name="ID_section" value={formData.ID_section || ''} onChange={handleChange}>
                   <option value="">Sélectionner</option>
@@ -243,7 +243,7 @@ const SessionModal = ({ session, onClose }) => {
                   ))}
                 </select>
               </div>
-              <div className="form-group">
+              <div className={styles['ENS-EDT-form-group']}>
                 <label>Module</label>
                 <select name="ID_module" value={formData.ID_module || ''} onChange={handleChange}>
                   <option value="">Sélectionner</option>
@@ -252,7 +252,7 @@ const SessionModal = ({ session, onClose }) => {
                   ))}
                 </select>
               </div>
-              <div className="form-group">
+              <div className={styles['ENS-EDT-form-group']}>
                 <label>Salle</label>
                 <select name="ID_salle" value={formData.ID_salle || ''} onChange={handleChange}>
                   <option value="">Sélectionner</option>
@@ -261,7 +261,7 @@ const SessionModal = ({ session, onClose }) => {
                   ))}
                 </select>
               </div>
-              <div className="form-group">
+              <div className={styles['ENS-EDT-form-group']}>
                 <label>Groupe</label>
                 <select name="ID_groupe" value={formData.ID_groupe || ''} onChange={handleChange}>
                   <option value="">Sélectionner</option>
@@ -271,12 +271,12 @@ const SessionModal = ({ session, onClose }) => {
                 </select>
               </div>
             </div>
-            {error && <p className="timetable-error modal-error">{error}</p>}
-            <div className="form-actions">
-              <button type="submit" className="timetable-btn save">
+            {error && <p className={`${styles['ENS-EDT-timetable-error']} ${styles['ENS-EDT-modal-error']}`}>{error}</p>}
+            <div className={styles['ENS-EDT-form-actions']}>
+              <button type="submit" className={`${styles['ENS-EDT-timetable-btn']} ${styles['ENS-EDT-save']}`}>
                 {formData.ID_seance ? 'Enregistrer' : 'Ajouter'}
               </button>
-              <button type="button" className="timetable-btn cancel" onClick={onClose}>Annuler</button>
+              <button type="button" className={`${styles['ENS-EDT-timetable-btn']} ${styles['ENS-EDT-cancel']}`} onClick={onClose}>Annuler</button>
             </div>
           </form>
         )}

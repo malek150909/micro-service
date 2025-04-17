@@ -34,9 +34,9 @@ const upload = multer({
 });
 
 // Créer un événement dans la table ClubEvenement
-const createEvenement = async (nom_evenement, description_evenement, date_evenement, lieu, capacite, image_url, gerant_matricule, clubId) => {
+const createEvenement = async (nom_evenement, description_evenement, date_evenement, lieu, capacite, image_url, gerant_matricule, clubId, time_slots) => {
   try {
-    console.log('Appel de createEvenement avec:', { nom_evenement, description_evenement, date_evenement, lieu, capacite, image_url, gerant_matricule, clubId });
+    console.log('Appel de createEvenement avec:', { nom_evenement, description_evenement, date_evenement, lieu, capacite, image_url, gerant_matricule, clubId, time_slots });
 
     // Vérifier si la date de l'événement est dans le futur
     const currentDate = new Date();
@@ -56,10 +56,10 @@ const createEvenement = async (nom_evenement, description_evenement, date_evenem
     const nomClub = club[0].nom;
     console.log('Nom du club récupéré:', nomClub);
 
-    // Insérer l’événement dans la table ClubEvenement
+    // Insérer l’événement dans la table ClubEvenement avec time_slot
     const [result] = await pool.query(
-      'INSERT INTO ClubEvenement (nom_evenement, description_evenement, date_evenement, lieu, capacite, image_url, organisateur_admin, ID_club) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-      [nom_evenement, description_evenement || null, date_evenement, lieu, capacite, image_url || null, gerant_matricule, clubId]
+      'INSERT INTO ClubEvenement (nom_evenement, description_evenement, date_evenement, lieu, capacite, image_url, organisateur_admin, ID_club, time_slots) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [nom_evenement, description_evenement || null, date_evenement, lieu, capacite, image_url || null, gerant_matricule, clubId, time_slots || null]
     );
     const evenementId = result.insertId;
     console.log('Événement créé avec ID:', evenementId);
@@ -126,220 +126,103 @@ const getEvenementsByGerant = async (req, res) => {
 };
 
 const updateEvenement = async (req, res) => {
-    const { evenementId } = req.params;
-    const {
-      nom_evenement,
-      description_evenement,
-      date_evenement,
-      lieu,
-      capacite,
-      gerant_matricule,
-      image_url,
-    } = req.body;
-    const file = req.file;
-  
-    const evenementIdInt = parseInt(evenementId);
-    const gerantMatriculeInt = parseInt(gerant_matricule);
-  
-    console.log('Requête de mise à jour reçue:', { evenementId: evenementIdInt, gerant_matricule: gerantMatriculeInt });
-  
-    // Validation
-    if (isNaN(evenementIdInt) || isNaN(gerantMatriculeInt)) {
-      return res.status(400).json({ error: 'ID de l’événement ou matricule du gérant invalide' });
-    }
-  
-    try {
-      // Récupérer l'événement existant
-      const [evenement] = await pool.query(
-        'SELECT ce.*, c.nom AS nom_club FROM ClubEvenement ce JOIN Club c ON ce.ID_club = c.ID_club WHERE ce.ID_club_evenement = ? AND ce.organisateur_admin = ?',
-        [evenementIdInt, gerantMatriculeInt]
-      );
-      console.log('Résultat de la requête pour l’événement:', evenement);
-  
-      if (evenement.length === 0) {
-        return res.status(404).json({ error: 'Événement non trouvé ou vous n’êtes pas autorisé à le modifier' });
-      }
-  
-      const nomClub = evenement[0].nom_club;
-      const clubId = evenement[0].ID_club;
-      const ancienNomEvenement = evenement[0].nom_evenement;
-  
-      // Gérer l'image
-      let newImageUrl = image_url;
-      if (file) {
-        if (evenement[0].image_url) {
-          const oldImagePath = path.join(__dirname, '..', evenement[0].image_url);
-          if (fs.existsSync(oldImagePath)) {
-            fs.unlinkSync(oldImagePath);
-            console.log('Ancienne image supprimée:', oldImagePath);
-          }
-        }
-        newImageUrl = `/uploads/${file.filename}`;
-      }
-  
-      // Mettre à jour l'événement dans la table ClubEvenement
-      await pool.query(
-        'UPDATE ClubEvenement SET nom_evenement = ?, description_evenement = ?, date_evenement = ?, lieu = ?, capacite = ?, image_url = ? WHERE ID_club_evenement = ?',
-        [
-          nom_evenement,
-          description_evenement,
-          date_evenement,
-          lieu,
-          parseInt(capacite),
-          newImageUrl,
-          evenementIdInt,
-        ]
-      );
-      console.log('Événement mis à jour avec ID:', evenementIdInt);
-  
-      // Mettre à jour la publication associée
-      const [publication] = await pool.query(
-        'SELECT ID_publication FROM Publication WHERE ID_club = ? AND contenu LIKE ?',
-        [clubId, `%**Événement du club "${nomClub}": ${ancienNomEvenement}**%`]
-      );
-  
-      if (publication.length > 0) {
-        const publicationId = publication[0].ID_publication;
-  
-        // Construire le nouveau contenu de la publication
-        const newContenu = `
-          **Événement du club "${nomClub}": ${nom_evenement}**
-          - **Date** : ${new Date(date_evenement).toLocaleDateString('fr-FR')} ${new Date(date_evenement).toLocaleTimeString('fr-FR')}
-          - **Lieu** : ${lieu}
-          - **Capacité** : ${capacite} participants
-          - **Description** : ${description_evenement || 'Aucune description'}
-        `;
-  
-        // Mettre à jour la publication
-        await pool.query(
-          'UPDATE Publication SET contenu = ? WHERE ID_publication = ?',
-          [newContenu, publicationId]
-        );
-        console.log('Publication mise à jour avec ID:', publicationId);
-  
-        // Si une nouvelle image est téléchargée, mettre à jour les images de la publication
-        if (file) {
-          // Supprimer les anciennes images
-          const [images] = await pool.query(
-            'SELECT image_url FROM PublicationImages WHERE ID_publication = ?',
-            [publicationId]
-          );
-          for (const image of images) {
-            const imagePath = path.join(__dirname, '..', image.image_url);
-            try {
-              if (fs.existsSync(imagePath)) {
-                fs.unlinkSync(imagePath);
-                console.log('Ancienne image de la publication supprimée:', imagePath);
-              }
-            } catch (unlinkError) {
-              console.error('Erreur lors de la suppression de l’ancienne image de la publication:', unlinkError);
-            }
-          }
-          await pool.query('DELETE FROM PublicationImages WHERE ID_publication = ?', [publicationId]);
-  
-          // Ajouter la nouvelle image
-          await pool.query(
-            'INSERT INTO PublicationImages (ID_publication, image_url) VALUES (?, ?)',
-            [publicationId, newImageUrl]
-          );
-          console.log('Nouvelle image ajoutée à la publication:', newImageUrl);
-        }
-      } else {
-        console.warn('Aucune publication associée trouvée pour l’événement:', evenementIdInt);
-      }
-  
-      // Mettre à jour les notifications
-      const message = `L’événement du club "${nomClub}": "${nom_evenement}" a été mis à jour !`;
-      const [existingNotifications] = await pool.query(
-        'SELECT * FROM Notification WHERE contenu LIKE ? OR contenu LIKE ?',
-        [
-          `%du club "${nomClub}": "${ancienNomEvenement}" est là !%`,
-          `%du club "${nomClub}": "${ancienNomEvenement}" a été mis à jour !%`
-        ]
-      );
-  
-      const notificationPromises = existingNotifications.map(notification => {
-        return pool.query(
-          'UPDATE Notification SET contenu = ?, date_envoi = NOW() WHERE ID_notification = ?',
-          [message, notification.ID_notification]
-        );
-      });
-  
-      await Promise.all(notificationPromises);
-      console.log('Notifications mises à jour:', existingNotifications.length);
-  
-      // Retourner l'événement mis à jour pour le frontend
-      const [updatedEvenement] = await pool.query(
-        'SELECT ce.*, c.nom AS nom_club FROM ClubEvenement ce JOIN Club c ON ce.ID_club = c.ID_club WHERE ce.ID_club_evenement = ?',
-        [evenementIdInt]
-      );
-  
-      res.json({ message: 'Événement et publication associée mis à jour avec succès', updatedEvenement: updatedEvenement[0] });
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour de l’événement:', error);
-      res.status(500).json({ error: 'Erreur lors de la mise à jour de l’événement' });
-    }
-  };
+  const { evenementId } = req.params;
+  const {
+    nom_evenement,
+    description_evenement,
+    date_evenement,
+    lieu,
+    capacite,
+    gerant_matricule,
+    image_url,
+    time_slots
+  } = req.body;
+  const file = req.file;
 
-const deleteEvenement = async (req, res) => {
-    const { evenementId } = req.params;
-    const { gerant_matricule } = req.body;
-  
-    const evenementIdInt = parseInt(evenementId);
-    const gerantMatriculeInt = parseInt(gerant_matricule);
-  
-    console.log('Requête de suppression reçue:', { evenementId: evenementIdInt, gerant_matricule: gerantMatriculeInt });
-  
-    // Validation
-    if (isNaN(evenementIdInt) || isNaN(gerantMatriculeInt)) {
-      return res.status(400).json({ error: 'ID de l’événement ou matricule du gérant invalide' });
+  const evenementIdInt = parseInt(evenementId);
+  const gerantMatriculeInt = parseInt(gerant_matricule);
+
+  console.log('Requête de mise à jour reçue:', { evenementId: evenementIdInt, gerant_matricule: gerantMatriculeInt, time_slots });
+
+  // Validation
+  if (isNaN(evenementIdInt) || isNaN(gerantMatriculeInt)) {
+    return res.status(400).json({ error: 'ID de l’événement ou matricule du gérant invalide' });
+  }
+
+  try {
+    // Récupérer l'événement existant
+    const [evenement] = await pool.query(
+      'SELECT ce.*, c.nom AS nom_club FROM ClubEvenement ce JOIN Club c ON ce.ID_club = c.ID_club WHERE ce.ID_club_evenement = ? AND ce.organisateur_admin = ?',
+      [evenementIdInt, gerantMatriculeInt]
+    );
+    console.log('Résultat de la requête pour l’événement:', evenement);
+
+    if (evenement.length === 0) {
+      return res.status(404).json({ error: 'Événement non trouvé ou vous n’êtes pas autorisé à le modifier' });
     }
-  
-    try {
-      // Récupérer l'événement
-      const [evenement] = await pool.query(
-        'SELECT ce.*, c.nom AS nom_club FROM ClubEvenement ce JOIN Club c ON ce.ID_club = c.ID_club WHERE ce.ID_club_evenement = ? AND ce.organisateur_admin = ?',
-        [evenementIdInt, gerantMatriculeInt]
-      );
-      console.log('Résultat de la requête pour l’événement:', evenement);
-  
-      if (evenement.length === 0) {
-        return res.status(404).json({ error: 'Événement non trouvé ou vous n’êtes pas autorisé à le supprimer' });
+
+    const nomClub = evenement[0].nom_club;
+    const clubId = evenement[0].ID_club;
+    const ancienNomEvenement = evenement[0].nom_evenement;
+
+    // Gérer l'image
+    let newImageUrl = image_url;
+    if (file) {
+      if (evenement[0].image_url) {
+        const oldImagePath = path.join(__dirname, '..', evenement[0].image_url);
+        if (fs.existsSync(oldImagePath)) {
+          fs.unlinkSync(oldImagePath);
+          console.log('Ancienne image supprimée:', oldImagePath);
+        }
       }
-  
-      const nomClub = evenement[0].nom_club;
-      const clubId = evenement[0].ID_club;
-      const nomEvenement = evenement[0].nom_evenement;
-  
-      // Supprimer les notifications associées
-      const [existingNotifications] = await pool.query(
-        'SELECT * FROM Notification WHERE contenu LIKE ? OR contenu LIKE ?',
-        [
-          `%du club "${nomClub}": "${nomEvenement}" est là !%`,
-          `%du club "${nomClub}": "${nomEvenement}" a été mis à jour !%`
-        ]
+      newImageUrl = `/uploads/${file.filename}`;
+    }
+
+    // Mettre à jour l'événement dans la table ClubEvenement avec time_slot
+    await pool.query(
+      'UPDATE ClubEvenement SET nom_evenement = ?, description_evenement = ?, date_evenement = ?, lieu = ?, capacite = ?, image_url = ?, time_slots = ? WHERE ID_club_evenement = ?',
+      [
+        nom_evenement,
+        description_evenement,
+        date_evenement,
+        lieu,
+        parseInt(capacite),
+        newImageUrl,
+        time_slots,
+        evenementIdInt,
+      ]
+    );
+    console.log('Événement mis à jour avec ID:', evenementIdInt);
+
+    // Mettre à jour la publication associée
+    const [publication] = await pool.query(
+      'SELECT ID_publication FROM Publication WHERE ID_club = ? AND contenu LIKE ?',
+      [clubId, `%**Événement du club "${nomClub}": ${ancienNomEvenement}**%`]
+    );
+
+    if (publication.length > 0) {
+      const publicationId = publication[0].ID_publication;
+
+      // Construire le nouveau contenu de la publication avec time_slot
+      const newContenu = `
+        **Événement du club "${nomClub}": ${nom_evenement}**
+        - **Date** : ${new Date(date_evenement).toLocaleDateString('fr-FR')} ${new Date(date_evenement).toLocaleTimeString('fr-FR')}
+        - **Heure** : ${time_slots}
+        - **Lieu** : ${lieu}
+        - **Capacité** : ${capacite} participants
+        - **Description** : ${description_evenement || 'Aucune description'}
+      `;
+
+      // Mettre à jour la publication
+      await pool.query(
+        'UPDATE Publication SET contenu = ? WHERE ID_publication = ?',
+        [newContenu, publicationId]
       );
-      console.log('Notifications existantes avant suppression:', existingNotifications);
-  
-      const [deleteNotificationResult] = await pool.query(
-        'DELETE FROM Notification WHERE contenu LIKE ? OR contenu LIKE ?',
-        [
-          `%du club "${nomClub}": "${nomEvenement}" est là !%`,
-          `%du club "${nomClub}": "${nomEvenement}" a été mis à jour !%`
-        ]
-      );
-      console.log('Nombre de notifications supprimées:', deleteNotificationResult.affectedRows);
-  
-      // Supprimer la publication associée
-      const [publication] = await pool.query(
-        'SELECT ID_publication FROM Publication WHERE ID_club = ? AND contenu LIKE ?',
-        [clubId, `%**Événement du club "${nomClub}": ${nomEvenement}**%`]
-      );
-  
-      if (publication.length > 0) {
-        const publicationId = publication[0].ID_publication;
-  
-        // Supprimer les images associées à la publication
+      console.log('Publication mise à jour avec ID:', publicationId);
+
+      // Si une nouvelle image est téléchargée, mettre à jour les images de la publication
+      if (file) {
+        // Supprimer les anciennes images
         const [images] = await pool.query(
           'SELECT image_url FROM PublicationImages WHERE ID_publication = ?',
           [publicationId]
@@ -349,49 +232,169 @@ const deleteEvenement = async (req, res) => {
           try {
             if (fs.existsSync(imagePath)) {
               fs.unlinkSync(imagePath);
-              console.log('Image supprimée:', imagePath);
+              console.log('Ancienne image de la publication supprimée:', imagePath);
             }
           } catch (unlinkError) {
-            console.error('Erreur lors de la suppression de l’image:', unlinkError);
+            console.error('Erreur lors de la suppression de l’ancienne image de la publication:', unlinkError);
           }
         }
-  
-        // Supprimer les données associées à la publication
         await pool.query('DELETE FROM PublicationImages WHERE ID_publication = ?', [publicationId]);
-        await pool.query('DELETE FROM Commentaire WHERE ID_publication = ?', [publicationId]);
-        await pool.query('DELETE FROM Reaction WHERE ID_publication = ?', [publicationId]);
-        await pool.query('DELETE FROM Publication WHERE ID_publication = ?', [publicationId]);
-        console.log('Publication associée supprimée avec ID:', publicationId);
-      } else {
-        console.warn('Aucune publication associée trouvée pour l’événement:', evenementIdInt);
+
+        // Ajouter la nouvelle image
+        await pool.query(
+          'INSERT INTO PublicationImages (ID_publication, image_url) VALUES (?, ?)',
+          [publicationId, newImageUrl]
+        );
+        console.log('Nouvelle image ajoutée à la publication:', newImageUrl);
       }
-  
-      // Supprimer l'image de l'événement
-      if (evenement[0].image_url) {
-        const eventImagePath = path.join(__dirname, '..', evenement[0].image_url);
+    } else {
+      console.warn('Aucune publication associée trouvée pour l’événement:', evenementIdInt);
+    }
+
+    // Mettre à jour les notifications
+    const message = `L’événement du club "${nomClub}": "${nom_evenement}" a été mis à jour !`;
+    const [existingNotifications] = await pool.query(
+      'SELECT * FROM Notification WHERE contenu LIKE ? OR contenu LIKE ?',
+      [
+        `%du club "${nomClub}": "${ancienNomEvenement}" est là !%`,
+        `%du club "${nomClub}": "${ancienNomEvenement}" a été mis à jour !%`
+      ]
+    );
+
+    const notificationPromises = existingNotifications.map(notification => {
+      return pool.query(
+        'UPDATE Notification SET contenu = ?, date_envoi = NOW() WHERE ID_notification = ?',
+        [message, notification.ID_notification]
+      );
+    });
+
+    await Promise.all(notificationPromises);
+    console.log('Notifications mises à jour:', existingNotifications.length);
+
+    // Retourner l'événement mis à jour pour le frontend
+    const [updatedEvenement] = await pool.query(
+      'SELECT ce.*, c.nom AS nom_club FROM ClubEvenement ce JOIN Club c ON ce.ID_club = c.ID_club WHERE ce.ID_club_evenement = ?',
+      [evenementIdInt]
+    );
+
+    res.json({ message: 'Événement et publication associée mis à jour avec succès', updatedEvenement: updatedEvenement[0] });
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour de l’événement:', error);
+    res.status(500).json({ error: 'Erreur lors de la mise à jour de l’événement' });
+  }
+};
+
+const deleteEvenement = async (req, res) => {
+  const { evenementId } = req.params;
+  const { gerant_matricule } = req.body;
+
+  const evenementIdInt = parseInt(evenementId);
+  const gerantMatriculeInt = parseInt(gerant_matricule);
+
+  console.log('Requête de suppression reçue:', { evenementId: evenementIdInt, gerant_matricule: gerantMatriculeInt });
+
+  // Validation
+  if (isNaN(evenementIdInt) || isNaN(gerantMatriculeInt)) {
+    return res.status(400).json({ error: 'ID de l’événement ou matricule du gérant invalide' });
+  }
+
+  try {
+    // Récupérer l'événement
+    const [evenement] = await pool.query(
+      'SELECT ce.*, c.nom AS nom_club FROM ClubEvenement ce JOIN Club c ON ce.ID_club = c.ID_club WHERE ce.ID_club_evenement = ? AND ce.organisateur_admin = ?',
+      [evenementIdInt, gerantMatriculeInt]
+    );
+    console.log('Résultat de la requête pour l’événement:', evenement);
+
+    if (evenement.length === 0) {
+      return res.status(404).json({ error: 'Événement non trouvé ou vous n’êtes pas autorisé à le supprimer' });
+    }
+
+    const nomClub = evenement[0].nom_club;
+    const clubId = evenement[0].ID_club;
+    const nomEvenement = evenement[0].nom_evenement;
+
+    // Supprimer les notifications associées
+    const [existingNotifications] = await pool.query(
+      'SELECT * FROM Notification WHERE contenu LIKE ? OR contenu LIKE ?',
+      [
+        `%du club "${nomClub}": "${nomEvenement}" est là !%`,
+        `%du club "${nomClub}": "${nomEvenement}" a été mis à jour !%`
+      ]
+    );
+    console.log('Notifications existantes avant suppression:', existingNotifications);
+
+    const [deleteNotificationResult] = await pool.query(
+      'DELETE FROM Notification WHERE contenu LIKE ? OR contenu LIKE ?',
+      [
+        `%du club "${nomClub}": "${nomEvenement}" est là !%`,
+        `%du club "${nomClub}": "${nomEvenement}" a été mis à jour !%`
+      ]
+    );
+    console.log('Nombre de notifications supprimées:', deleteNotificationResult.affectedRows);
+
+    // Supprimer la publication associée
+    const [publication] = await pool.query(
+      'SELECT ID_publication FROM Publication WHERE ID_club = ? AND contenu LIKE ?',
+      [clubId, `%**Événement du club "${nomClub}": ${nomEvenement}**%`]
+    );
+
+    if (publication.length > 0) {
+      const publicationId = publication[0].ID_publication;
+
+      // Supprimer les images associées à la publication
+      const [images] = await pool.query(
+        'SELECT image_url FROM PublicationImages WHERE ID_publication = ?',
+        [publicationId]
+      );
+      for (const image of images) {
+        const imagePath = path.join(__dirname, '..', image.image_url);
         try {
-          if (fs.existsSync(eventImagePath)) {
-            fs.unlinkSync(eventImagePath);
-            console.log('Image de l’événement supprimée:', eventImagePath);
+          if (fs.existsSync(imagePath)) {
+            fs.unlinkSync(imagePath);
+            console.log('Image supprimée:', imagePath);
           }
         } catch (unlinkError) {
-          console.error('Erreur lors de la suppression de l’image de l’événement:', unlinkError);
+          console.error('Erreur lors de la suppression de l’image:', unlinkError);
         }
       }
-  
-      // Supprimer l'événement
-      const [deleteEventResult] = await pool.query('DELETE FROM ClubEvenement WHERE ID_club_evenement = ?', [evenementIdInt]);
-      if (deleteEventResult.affectedRows === 0) {
-        return res.status(404).json({ error: 'Événement non trouvé lors de la suppression' });
-      }
-      console.log('Événement supprimé avec ID:', evenementIdInt);
-  
-      res.json({ message: 'Événement et publication associée supprimés avec succès', deletedEvenementId: evenementIdInt });
-    } catch (error) {
-      console.error('Erreur lors de la suppression de l’événement:', error);
-      res.status(500).json({ error: 'Erreur lors de la suppression de l’événement' });
+
+      // Supprimer les données associées à la publication
+      await pool.query('DELETE FROM PublicationImages WHERE ID_publication = ?', [publicationId]);
+      await pool.query('DELETE FROM Commentaire WHERE ID_publication = ?', [publicationId]);
+      await pool.query('DELETE FROM Reaction WHERE ID_publication = ?', [publicationId]);
+      await pool.query('DELETE FROM Publication WHERE ID_publication = ?', [publicationId]);
+      console.log('Publication associée supprimée avec ID:', publicationId);
+    } else {
+      console.warn('Aucune publication associée trouvée pour l’événement:', evenementIdInt);
     }
-  };
+
+    // Supprimer l'image de l'événement
+    if (evenement[0].image_url) {
+      const eventImagePath = path.join(__dirname, '..', evenement[0].image_url);
+      try {
+        if (fs.existsSync(eventImagePath)) {
+          fs.unlinkSync(eventImagePath);
+          console.log('Image de l’événement supprimée:', eventImagePath);
+        }
+      } catch (unlinkError) {
+        console.error('Erreur lors de la suppression de l’image de l’événement:', unlinkError);
+      }
+    }
+
+    // Supprimer l'événement
+    const [deleteEventResult] = await pool.query('DELETE FROM ClubEvenement WHERE ID_club_evenement = ?', [evenementIdInt]);
+    if (deleteEventResult.affectedRows === 0) {
+      return res.status(404).json({ error: 'Événement non trouvé lors de la suppression' });
+    }
+    console.log('Événement supprimé avec ID:', evenementIdInt);
+
+    res.json({ message: 'Événement et publication associée supprimés avec succès', deletedEvenementId: evenementIdInt });
+  } catch (error) {
+    console.error('Erreur lors de la suppression de l’événement:', error);
+    res.status(500).json({ error: 'Erreur lors de la suppression de l’événement' });
+  }
+};
 
 module.exports = {
   createEvenement,

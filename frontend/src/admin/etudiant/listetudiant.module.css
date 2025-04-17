@@ -1,0 +1,736 @@
+/* Formes abstraites en arrière-plan */
+.ADM-ETD-background-shapes {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ADM-ETD-shape {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.3;
+  animation: ADM-ETD-pulseShape 10s infinite ease-in-out;
+}
+
+.ADM-ETD-shape1 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, #ffffff 0%, #c1e8ff 100%);
+  top: 10%;
+  left: 10%;
+  filter: blur(50px);
+  animation-delay: 0s;
+}
+
+.ADM-ETD-shape2 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, #ffffff 0%, #7da0ca 100%);
+  bottom: 10%;
+  right: 10%;
+  filter: blur(40px);
+  animation-delay: 3s;
+}
+
+/* Sidebar */
+.ADM-ETD-sidebar {
+  background: linear-gradient(135deg, rgba(91, 135, 179, 0.95) 0%, rgba(17, 69, 148, 0.95) 100%);
+  border-radius: 0;
+  padding: 25px;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  position: fixed;
+  top: 0;
+  left: 30px;
+  width: 200px; /* Increased from 150px to 200px */
+  height: 100vh;
+  box-shadow: 0 15px 40px rgba(37, 100, 194, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  animation: slideIn 0.5s ease-out;
+  overflow-y: auto;
+  padding-bottom: 40px;
+}
+
+.ADM-ETD-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.ADM-ETD-logo h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.ADM-ETD-sidebar-button {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.9rem; /* Reduced from 1rem to 0.9rem for better fit */
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 10px 15px; /* Adjusted padding from 12px 20px to 10px 15px */
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+  white-space: normal; /* Allow text to wrap */
+  word-wrap: break-word; /* Ensure long words break to the next line */
+  line-height: 1.2; /* Improve readability with better line spacing */
+}
+
+.ADM-ETD-sidebar-icon {
+  font-size: 1.5rem;
+}
+
+.ADM-ETD-sidebar-button:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(125, 160, 202, 0.5));
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+.ADM-ETD-sidebar-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: all 0.5s ease;
+}
+
+.ADM-ETD-sidebar-button:hover::before {
+  left: 100%;
+}
+
+/* Contenu principal */
+.ADM-ETD-main-content {
+  margin-left: 250px;
+  margin-right: 30px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  min-height: 100vh;
+  z-index: 1;
+}
+
+/* Main Header */
+.ADM-ETD-main-header {
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15), 0 0 20px rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  z-index: 2;
+}
+
+.ADM-ETD-main-header h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #052659;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 3px rgba(5, 38, 89, 0.1);
+}
+
+.ADM-ETD-main-header p {
+  font-size: 1rem;
+  color: #5483b3;
+  margin: 8px 0 0;
+}
+
+/* Conteneur principal */
+.ADM-ETD-container {
+  max-width: 1400px;
+  margin: 30px auto;
+  padding: 0;
+  position: relative;
+  display: block;
+}
+
+/* Filtres */
+.ADM-ETD-filter-panel {
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15), 0 0 20px rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(152, 166, 205, 0.5);
+  backdrop-filter: blur(10px);
+  margin-bottom: 20px;
+}
+
+.ADM-ETD-filter-select {
+  padding: 15px;
+  border: 1px solid rgba(84, 131, 179, 0.2);
+  border-radius: 12px;
+  font-size: 0.95rem;
+  background: #f0f7ff;
+  color: #052659;
+  width: 100%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.ADM-ETD-filter-select:focus {
+  border-color: #5483b3;
+  box-shadow: 0 0 15px rgba(84, 131, 179, 0.2);
+  outline: none;
+}
+
+/* Formulaire */
+.ADM-ETD-form, .ADM-ETD-add-student-form, .ADM-ETD-add-section-form {
+  background: rgba(255, 255, 255, 0.85);
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.ADM-ETD-input-group {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ADM-ETD-input, .ADM-ETD-select {
+  padding: 15px;
+  border: 1px solid rgba(84, 131, 179, 0.2);
+  border-radius: 12px;
+  font-size: 0.95rem;
+  background: #f0f7ff;
+  color: #052659;
+  width: 100%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.ADM-ETD-input:focus, .ADM-ETD-select:focus {
+  border-color: #5483b3;
+  box-shadow: 0 0 15px rgba(84, 131, 179, 0.2);
+  outline: none;
+}
+
+.ADM-ETD-input::placeholder {
+  color: #7da0ca;
+}
+
+/* Tableaux */
+.ADM-ETD-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15), 0 0 20px rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(152, 166, 205, 0.5);
+  backdrop-filter: blur(10px);
+}
+
+.ADM-ETD-th, .ADM-ETD-td {
+  padding: 15px 20px;
+  text-align: left;
+  border-bottom: 1px solid rgba(84, 131, 179, 0.2);
+}
+
+.ADM-ETD-th {
+  background: linear-gradient(135deg, #5483b3 0%, #052659 100%);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.ADM-ETD-tr:hover {
+  background: rgba(72, 108, 202, 0.1);
+}
+
+/* Liste des sections */
+.ADM-ETD-sections-list {
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15), 0 0 20px rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(152, 166, 205, 0.5);
+  backdrop-filter: blur(10px);
+}
+
+.ADM-ETD-section-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(84, 131, 179, 0.2);
+  backdrop-filter: blur(5px);
+  margin-bottom: 15px;
+}
+
+.ADM-ETD-section-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+  background: rgb(72, 108, 202);
+  border-color: rgba(84, 131, 179, 0.4);
+}
+
+.ADM-ETD-section-item span {
+  color: #0a1e3d;
+}
+
+.ADM-ETD-section-item:hover span {
+  color: #ffffff;
+}
+
+/* Message "Aucune section" */
+.ADM-ETD-no-sections {
+  text-align: center;
+  color: #184976;
+  font-size: 1.2rem;
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Upload Section */
+.ADM-ETD-upload-section {
+  margin: 15px 0;
+  padding: 20px;
+  background: #f0f7ff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(5, 38, 89, 0.05);
+  border: 1px solid rgba(84, 131, 179, 0.1);
+}
+
+.ADM-ETD-upload-section .ADM-ETD-input[type="file"] {
+  padding: 15px;
+  border: 1px solid rgba(84, 131, 179, 0.2);
+  border-radius: 12px;
+  font-size: 0.95rem;
+  background: #f0f7ff;
+  color: #052659;
+  width: 100%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+/* Import Details */
+.ADM-ETD-import-details {
+  background: #f0f7ff;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 15px rgba(5, 38, 89, 0.05);
+  border: 1px solid rgba(84, 131, 179, 0.1);
+}
+
+/* Boutons */
+.ADM-ETD-button, .ADM-ETD-edit-btn, .ADM-ETD-delete-btn, .ADM-ETD-delete-section-btn, .ADM-ETD-back-btn, .ADM-ETD-filter-btn {
+  background: linear-gradient(135deg, #5483b3 0%, #052659 100%);
+  color: #ffffff;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 8px 20px rgba(5, 38, 89, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.ADM-ETD-button:hover, .ADM-ETD-edit-btn:hover, .ADM-ETD-delete-btn:hover, .ADM-ETD-delete-section-btn:hover, .ADM-ETD-back-btn:hover, .ADM-ETD-filter-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(5, 38, 89, 0.15), 0 0 15px rgba(125, 160, 202, 0.4);
+}
+
+.ADM-ETD-button::before, .ADM-ETD-edit-btn::before, .ADM-ETD-delete-btn::before, .ADM-ETD-delete-section-btn::before, .ADM-ETD-back-btn::before, .ADM-ETD-filter-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: all 0.5s ease;
+}
+
+.ADM-ETD-button:hover::before, .ADM-ETD-edit-btn:hover::before, .ADM-ETD-delete-btn:hover::before, .ADM-ETD-delete-section-btn:hover::before, .ADM-ETD-back-btn:hover::before, .ADM-ETD-filter-btn:hover::before {
+  left: 100%;
+}
+
+.ADM-ETD-edit-btn {
+  background: linear-gradient(135deg, #7da0ca 0%, #5483b3 100%);
+}
+
+.ADM-ETD-edit-btn:hover {
+  background: linear-gradient(135deg, #5483b3 0%, #7da0ca 100%);
+}
+
+.ADM-ETD-delete-btn, .ADM-ETD-delete-section-btn {
+  background: linear-gradient(135deg, #052659 0%, #021024 100%);
+}
+
+.ADM-ETD-delete-btn:hover, .ADM-ETD-delete-section-btn:hover {
+  background: linear-gradient(135deg, #021024 0%, #052659 100%);
+}
+
+.ADM-ETD-back-btn {
+  background: linear-gradient(135deg, #5483b3 0%, #7da0ca 100%);
+}
+
+.ADM-ETD-back-btn:hover {
+  background: linear-gradient(135deg, #7da0ca 0%, #5483b3 100%);
+}
+
+.ADM-ETD-filter-btn {
+  background: linear-gradient(135deg, #5483b3 0%, #052659 100%);
+}
+
+/* Styles pour les toasts personnalisés */
+.ADM-ETD-custom-toast {
+  font-family: 'Poppins', sans-serif;
+}
+
+.ADM-ETD-custom-toast-success {
+  background: #50C878 !important;
+  color: #fff !important;
+}
+
+.ADM-ETD-custom-toast-error {
+  background: #FF6B6B !important;
+  color: #fff !important;
+}
+
+.ADM-ETD-custom-toast-warning {
+  background: #FFD93D !important;
+  color: #fff !important;
+}
+
+.ADM-ETD-Toastify__toast-icon {
+  margin-right: 10px !important;
+  font-size: 20px !important;
+}
+
+.ADM-ETD-swal-confirm-btn {
+  background: linear-gradient(135deg, #5483b3 0%, #052659 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  padding: 10px 20px !important;
+  border-radius: 12px !important;
+  font-size: 16px !important;
+}
+
+.ADM-ETD-swal-cancel-btn {
+  background: linear-gradient(135deg, #052659 0%, #021024 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  padding: 10px 20px !important;
+  border-radius: 12px !important;
+  font-size: 16px !important;
+}
+
+/* Animations */
+@keyframes ADM-ETD-pulseShape {
+  0% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.05) translateY(-15px); }
+  100% { transform: scale(1) translateY(0); }
+}
+
+@keyframes ADM-ETD-slideIn {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes ADM-ETD-slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .ADM-ETD-sidebar {
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    margin-bottom: 40px;
+  }
+
+  .ADM-ETD-main-content {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .ADM-ETD-filter-select {
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+
+  .ADM-ETD-sections-list,
+  .ADM-ETD-student-section {
+    padding: 15px;
+  }
+
+  .ADM-ETD-section-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .ADM-ETD-section-item .ADM-ETD-button {
+    width: 100%;
+  }
+
+  .ADM-ETD-add-student-form .ADM-ETD-input,
+  .ADM-ETD-add-student-form .ADM-ETD-select {
+    width: 100%;
+  }
+}
+
+/* Amélioration du style de FilterPanel */
+.ADM-ETD-filter-panel {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 12px 35px rgba(5, 38, 89, 0.2), 0 0 25px rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(152, 166, 205, 0.6);
+  backdrop-filter: blur(12px);
+  margin-bottom: 25px;
+  transition: transform 0.3s ease;
+}
+
+.ADM-ETD-filter-panel:hover {
+  transform: translateY(-5px);
+}
+
+.ADM-ETD-filter-panel h3 {
+  font-size: 1.5rem;
+  color: #052659;
+  margin-bottom: 20px;
+  text-shadow: 0 1px 3px rgba(5, 38, 89, 0.1);
+}
+
+.ADM-ETD-filter-select {
+  padding: 15px;
+  border: 1px solid rgba(84, 131, 179, 0.3);
+  border-radius: 12px;
+  font-size: 0.95rem;
+  background: #f5faff;
+  color: #052659;
+  width: 100%;
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+}
+
+.ADM-ETD-filter-select:hover {
+  background: #e6f0ff;
+  border-color: #5483b3;
+}
+
+/* Amélioration du style de AddSectionForm */
+.ADM-ETD-add-section-form {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(84, 131, 179, 0.3);
+  backdrop-filter: blur(8px);
+  transition: transform 0.3s ease;
+}
+
+.ADM-ETD-add-section-form:hover {
+  transform: translateY(-3px);
+}
+
+.ADM-ETD-add-section-form h4 {
+  font-size: 1.4rem;
+  color: #052659;
+  margin-bottom: 20px;
+  text-shadow: 0 1px 3px rgba(5, 38, 89, 0.1);
+}
+
+.ADM-ETD-add-section-form .ADM-ETD-input,
+.ADM-ETD-add-section-form .ADM-ETD-select {
+  padding: 15px;
+  border: 1px solid rgba(84, 131, 179, 0.3);
+  border-radius: 12px;
+  font-size: 0.95rem;
+  background: #f5faff;
+  color: #052659;
+  width: 100%;
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+}
+
+.ADM-ETD-add-section-form .ADM-ETD-input:hover,
+.ADM-ETD-add-section-form .ADM-ETD-select:hover {
+  background: #e6f0ff;
+  border-color: #5483b3;
+}
+
+/* Ajout de la gestion du défilement horizontal pour .student-section */
+.ADM-ETD-student-section {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 12px 35px rgba(5, 38, 89, 0.2), 0 0 25px rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(152, 166, 205, 0.6);
+  backdrop-filter: blur(12px);
+  transition: transform 0.3s ease;
+  overflow-x: auto;
+}
+
+/* Ajustement de la largeur minimale du tableau */
+.ADM-ETD-student-section .ADM-ETD-table {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 15px;
+  box-shadow: 0 12px 30px rgba(5, 38, 89, 0.18), 0 0 20px rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(152, 166, 205, 0.6);
+  width: 100%;
+  min-width: 900px;
+}
+
+/* Ajustement des colonnes pour réduire leur largeur */
+.ADM-ETD-student-section .ADM-ETD-th,
+.ADM-ETD-student-section .ADM-ETD-td {
+  padding: 15px 10px;
+  text-align: left;
+  border-bottom: 1px solid rgba(84, 131, 179, 0.2);
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+/* Ajustement des colonnes spécifiques pour réduire leur largeur */
+.ADM-ETD-student-section .ADM-ETD-th:nth-child(1),
+.ADM-ETD-student-section .ADM-ETD-td:nth-child(1) {
+  width: 80px;
+}
+
+.ADM-ETD-student-section .ADM-ETD-th:nth-child(2),
+.ADM-ETD-student-section .ADM-ETD-td:nth-child(2) {
+  width: 100px;
+}
+
+.ADM-ETD-student-section .ADM-ETD-th:nth-child(3),
+.ADM-ETD-student-section .ADM-ETD-td:nth-child(3) {
+  width: 100px;
+}
+
+.ADM-ETD-student-section .ADM-ETD-th:nth-child(4),
+.ADM-ETD-student-section .ADM-ETD-td:nth-child(4) {
+  width: 150px;
+}
+
+.ADM-ETD-student-section .ADM-ETD-th:nth-child(5),
+.ADM-ETD-student-section .ADM-ETD-td:nth-child(5) {
+  width: 60px;
+}
+
+.ADM-ETD-student-section .ADM-ETD-th:nth-child(6),
+.ADM-ETD-student-section .ADM-ETD-td:nth-child(6) {
+  width: 100px;
+}
+
+.ADM-ETD-student-section .ADM-ETD-th:nth-child(7),
+.ADM-ETD-student-section .ADM-ETD-td:nth-child(7) {
+  width: 100px;
+}
+
+.ADM-ETD-student-section .ADM-ETD-th:nth-child(8),
+.ADM-ETD-student-section .ADM-ETD-td:nth-child(8) {
+  width: 60px;
+}
+
+.ADM-ETD-student-section .ADM-ETD-th:nth-child(9),
+.ADM-ETD-student-section .ADM-ETD-td:nth-child(9) {
+  width: 120px;
+}
+
+/* Ajustement des inputs dans le tableau pour éviter qu'ils ne débordent */
+.ADM-ETD-student-section .ADM-ETD-td .ADM-ETD-input,
+.ADM-ETD-student-section .ADM-ETD-td .ADM-ETD-select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 5px;
+  font-size: 0.85rem;
+}
+
+/* Style général pour les titres avec icônes et trait animé */
+ .ADM-ETD-filter-panel h3, .ADM-ETD-student-section h2, .ADM-ETD-student-section h4 {
+  position: relative;
+  display: inline-block;
+  padding-bottom: 10px;
+  color: #052659;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+/* Ajout d'un trait en dessous des titres */
+ .ADM-ETD-filter-panel h3::after, .ADM-ETD-student-section h2::after, .ADM-ETD-student-section h4::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 3px;
+  background: linear-gradient(90deg, #5483b3, #052659);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+/* Animation du trait au survol */
+ .ADM-ETD-filter-panel h3:hover::after, .ADM-ETD-student-section h2:hover::after, .ADM-ETD-student-section h4:hover::after {
+  width: 100%;
+}
+
+/* Changement de couleur du titre au survol */
+ .ADM-ETD-filter-panel h3:hover, .ADM-ETD-student-section h2:hover, .ADM-ETD-student-section h4:hover {
+  color: #5483b3;
+}

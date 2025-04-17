@@ -5,7 +5,8 @@ import { toast } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSignOutAlt, faPen, faHome, faClipboardList, faSave, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { jwtDecode } from 'jwt-decode';
-import "../global.css";
+import styles from "../moyennes.module.css";
+import { FaHome } from 'react-icons/fa';
 
 const StudentGrades = () => {
   const navigate = useNavigate();
@@ -44,13 +45,15 @@ const StudentGrades = () => {
       }
       const decoded = jwtDecode(token);
       const matricule = decoded.matricule;
-      console.log('matricule =' , matricule) ;
+      console.log('matricule =', matricule);
       const res = await api.get(`/user/${matricule}`);
       const user = res.data;
       setStudentName(`${user.nom} ${user.prenom}`);
     } catch (err) {
       console.error('Error fetching student name:', err.response?.data || err.message);
-      setStudentName('Unknown Student');
+     
+
+ setStudentName('Unknown Student');
       setError('Failed to load student details.');
     }
   };
@@ -77,7 +80,7 @@ const StudentGrades = () => {
       const token = localStorage.getItem('token');
       if (!token) throw new Error('No token found');
       const decoded = jwtDecode(token);
-      const res = await api.get('/student-grades', { 
+      const res = await api.get('/student-grades', {
         params: { niveau: filters.niveau, semestre: filters.semestre },
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -148,129 +151,127 @@ const StudentGrades = () => {
 
   return (
     <>
-    <div id="notes">
-      <div className="background-shapes">
-        <div className="shape shape1"></div>
-        <div className="shape shape2"></div>
-      </div>
-      <div className="sidebar">
-        <div className="logo">
-          <h2>Notes</h2>
+        <div className={styles['ETD-MOY-background-shapes']}>
+          <div className={`${styles['ETD-MOY-shape']} ${styles['ETD-MOY-shape1']}`}></div>
+          <div className={`${styles['ETD-MOY-shape']} ${styles['ETD-MOY-shape2']}`}></div>
         </div>
-        <button className="sidebar-button" onClick={() => navigate('/etudiant')}>
-          <FontAwesomeIcon icon={faHome} /> Retour
-        </button>
-      </div>
-      <div className="container">
-        <div className="main-content">
-          <div className="welcome-panel">
-            <h1>BIENVENUE SUR VOTRE ESPACE NOTES, {studentName}</h1>
-            <p>Consultez vos notes archivées</p>
+        <div className={styles['ETD-MOY-sidebar']}>
+          <div className={styles['ETD-MOY-logo']}>
+            <h2>Mes Moyennes</h2>
           </div>
-          <div className="section-card">
-            <h1>Mes Notes Archivées</h1>
-            <div className="filters">
-              <select
-                name="niveau"
-                value={filters.niveau}
-                onChange={handleFilterChange}
-              >
-                <option value="">Sélectionner une année</option>
-                {availableLevels.map((level) => (
-                  <option key={level} value={level}>
-                    {level}
-                  </option>
-                ))}
-              </select>
-              <select
-                name="semestre"
-                value={filters.semestre}
-                onChange={handleFilterChange}
-              >
-                <option value="">Sélectionner un semestre</option>
-                <option value="S1">S1</option>
-                <option value="S2">S2</option>
-              </select>
+          <button className={styles['ETD-MOY-sidebar-button']} onClick={() => navigate('/etudiant')}>
+            <FaHome /> Retour à l'accueil
+          </button>
+        </div>
+        <div className={styles['ETD-MOY-container']}>
+          <div className={styles['ETD-MOY-main-content']}>
+            <div className={styles['ETD-MOY-welcome-panel']}>
+              <h1>BIENVENUE SUR VOTRE ESPACE NOTES, {studentName}</h1>
+              <p>Consultez vos notes archivées</p>
             </div>
-            {error && <p className="error-message">{error}</p>}
-            {filters.niveau && filters.semestre ? (
-              grades.length > 0 ? (
-                <table className="grades-table">
-                  <thead>
-                    <tr>
-                      <th>Module</th>
-                      <th>Note</th>
-                      <th>Remarque</th>
-                      <th>Niveau</th>
-                      <th>Semestre</th>
-                      <th>Réclamation</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {grades.map((grade) => (
-                      <tr key={`${grade.ID_module}-${grade.Semestre}`}>
-                        <td>{grade.nom_module}</td>
-                        <td>{grade.Moyenne !== null ? grade.Moyenne : 'Non soumise'}</td>
-                        <td>{grade.remarque || '-'}</td>
-                        <td>{grade.niveau}</td>
-                        <td>{grade.Semestre}</td>
-                        <td>
-                          {grade.reclamation ? (
-                            <div>
-                              <p><strong>Votre réclamation:</strong> {grade.reclamation}</p>
-                              {grade.prof_response ? (
-                                <p><strong>Réponse du professeur:</strong> {grade.prof_response}</p>
-                              ) : (
-                                <p>En attente de réponse</p>
-                              )}
-                            </div>
-                          ) : (
-                            <button
-                              onClick={() => openReclamationModal(grade.ID_module)}
-                              className="reclamation-button"
-                              title="Ajouter une réclamation"
-                            >
-                              <FontAwesomeIcon icon={faPen} /> Ajouter Réclamation
-                            </button>
-                          )}
-                        </td>
+            <div className={styles['ETD-MOY-section-card']}>
+              <h1>Mes Notes Archivées</h1>
+              <div className={styles['ETD-MOY-filters']}>
+                <select
+                  name="niveau"
+                  value={filters.niveau}
+                  onChange={handleFilterChange}
+                >
+                  <option value="">Sélectionner une année</option>
+                  {availableLevels.map((level) => (
+                    <option key={level} value={level}>
+                      {level}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  name="semestre"
+                  value={filters.semestre}
+                  onChange={handleFilterChange}
+                >
+                  <option value="">Sélectionner un semestre</option>
+                  <option value="S1">S1</option>
+                  <option value="S2">S2</option>
+                </select>
+              </div>
+              {error && <p className={styles['ETD-MOY-error-message']}>{error}</p>}
+              {filters.niveau && filters.semestre ? (
+                grades.length > 0 ? (
+                  <table className={styles['ETD-MOY-grades-table']}>
+                    <thead>
+                      <tr>
+                        <th>Module</th>
+                        <th>Note</th>
+                        <th>Remarque</th>
+                        <th>Niveau</th>
+                        <th>Semestre</th>
+                        <th>Réclamation</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {grades.map((grade) => (
+                        <tr key={`${grade.ID_module}-${grade.Semestre}`}>
+                          <td>{grade.nom_module}</td>
+                          <td>{grade.Moyenne !== null ? grade.Moyenne : 'Non soumise'}</td>
+                          <td>{grade.remarque || '-'}</td>
+                          <td>{grade.niveau}</td>
+                          <td>{grade.Semestre}</td>
+                          <td>
+                            {grade.reclamation ? (
+                              <div>
+                                <p><strong>Votre réclamation:</strong> {grade.reclamation}</p>
+                                {grade.prof_response ? (
+                                  <p><strong>Réponse du professeur:</strong> {grade.prof_response}</p>
+                                ) : (
+                                  <p>En attente de réponse</p>
+                                )}
+                              </div>
+                            ) : (
+                              <button
+                                onClick={() => openReclamationModal(grade.ID_module)}
+                                className={styles['ETD-MOY-reclamation-button']}
+                                title="Ajouter une réclamation"
+                              >
+                                <FontAwesomeIcon icon={faPen} /> Ajouter Réclamation
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <p className={styles['ETD-MOY-no-results']}>Aucune note disponible pour {filters.niveau} {filters.semestre}.</p>
+                )
               ) : (
-                <p className="no-results">Aucune note disponible pour {filters.niveau} {filters.semestre}.</p>
-              )
-            ) : (
-              <p className="no-results">Veuillez sélectionner une année et un semestre pour voir vos notes.</p>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {isModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h2>Ajouter une réclamation</h2>
-            <textarea
-              value={reclamationInputs[selectedModuleId] || ''}
-              onChange={(e) => handleReclamationChange(selectedModuleId, e.target.value)}
-              placeholder="Écrire votre réclamation..."
-              rows="4"
-              style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
-            />
-            <div className="modal-actions">
-              <button onClick={submitReclamation} className="modal-submit-button">
-                <FontAwesomeIcon icon={faSave} /> Soumettre
-              </button>
-              <button onClick={closeReclamationModal} className="modal-cancel-button">
-                <FontAwesomeIcon icon={faTimes} /> Annuler
-              </button>
+                <p className={styles['ETD-MOY-no-results']}>Veuillez sélectionner une année et un semestre pour voir vos notes.</p>
+              )}
             </div>
           </div>
         </div>
-      )}
-      </div>
+
+        {isModalOpen && (
+          <div className={styles['ETD-MOY-modal-overlay']}>
+            <div className={styles['ETD-MOY-modal-content']}>
+              <h2>Ajouter une réclamation</h2>
+              <textarea
+                value={reclamationInputs[selectedModuleId] || ''}
+                onChange={(e) => handleReclamationChange(selectedModuleId, e.target.value)}
+                placeholder="Écrire votre réclamation..."
+                rows="4"
+                style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
+              />
+              <div className={styles['ETD-MOY-modal-actions']}>
+                <button onClick={submitReclamation} className={styles['ETD-MOY-modal-submit-button']}>
+                  <FontAwesomeIcon icon={faSave} /> Soumettre
+                </button>
+                <button onClick={closeReclamationModal} className={styles['ETD-MOY-modal-cancel-button']}>
+                  <FontAwesomeIcon icon={faTimes} /> Annuler
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
     </>
   );
 };

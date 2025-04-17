@@ -33,8 +33,8 @@ const getAdminAnnonces = async (req, res) => {
             let image_url = annonce.image_url || '';
             if (image_url && !image_url.startsWith('http')) {
                 image_url = annonce.event_id
-                    ? `http://localhost:5000${image_url}`
-                    : `http://localhost:5001${image_url}`;
+                    ? `http://localhost:8084${image_url}`
+                    : `http://localhost:8082${image_url}`;
                 console.log(`Annonce ID ${annonce.id} - event_id: ${annonce.event_id}, URL ajustée: ${image_url}`);
             } else {
                 console.log(`Annonce ID ${annonce.id} - URL inchangée: ${image_url}`);
@@ -118,10 +118,10 @@ const getTeacherSections = async (req, res) => {
                      WHERE g.ID_section = ?`,
                     [section.ID_section]
                 );
-                // Formater nom_groupe pour qu'il soit plus descriptif (par exemple, "Groupe 1")
+                // Formater nom_groupe pour qu'il soit plus descriptif
                 const formattedGroupes = groupes.map(groupe => ({
                     ...groupe,
-                    nom_groupe: `Groupe ${groupe.nom_groupe}` // Ajouter "Groupe" devant le numéro
+                    nom_groupe: `Groupe ${groupe.nom_groupe}`
                 }));
                 return {
                     ...section,
@@ -145,8 +145,8 @@ const createAnnonce = async (req, res) => {
         return res.status(400).json({ error: 'Tous les champs sont requis' });
     }
 
-    const sections = target_filter.sections; // Sections ciblées
-    const groupes = target_filter.groupes || {}; // Groupes ciblés par section
+    const sections = target_filter.sections;
+    const groupes = target_filter.groupes || {};
 
     try {
         console.log('target_filter avant enregistrement:', target_filter);
@@ -170,7 +170,6 @@ const createAnnonce = async (req, res) => {
             console.log('Sections pour la requête SQL:', sectionIds);
 
             if (sendToAllStudents) {
-                // Si "Tous les groupes" est sélectionné, récupérer tous les étudiants de la section
                 [etudiants] = await pool.query(
                     `SELECT DISTINCT e.Matricule
                      FROM Etudiant e
@@ -179,12 +178,10 @@ const createAnnonce = async (req, res) => {
                     [sectionIds]
                 );
             } else {
-                // Si un groupe spécifique est sélectionné, filtrer les étudiants par groupe
                 let allEtudiants = [];
                 for (const sectionId of sectionIds) {
                     const sectionGroupes = groupes[sectionId] || [];
                     if (sectionGroupes.length === 0 || sectionGroupes[0] === "") {
-                        // Si aucun groupe spécifique, récupérer tous les étudiants de la section
                         const [sectionEtudiants] = await pool.query(
                             `SELECT DISTINCT e.Matricule
                              FROM Etudiant e
@@ -194,7 +191,6 @@ const createAnnonce = async (req, res) => {
                         );
                         allEtudiants.push(...sectionEtudiants);
                     } else {
-                        // Filtrer les étudiants par groupe
                         const groupeIds = sectionGroupes.map(id => parseInt(id));
                         console.log(`Groupes pour la section ${sectionId}:`, groupeIds);
                         const [groupeEtudiants] = await pool.query(
@@ -207,14 +203,12 @@ const createAnnonce = async (req, res) => {
                         allEtudiants.push(...groupeEtudiants);
                     }
                 }
-                // Éliminer les doublons d'étudiants
                 etudiants = [...new Map(allEtudiants.map(e => [e.Matricule, e])).values()];
             }
         }
 
         console.log('Étudiants trouvés pour les sections ciblées:', etudiants);
 
-        // Si aucun étudiant n'est trouvé, renvoyer une erreur sans créer l'annonce
         if (etudiants.length === 0) {
             console.log('Aucun étudiant trouvé pour les sections ciblées:', sections);
             if (!sendToAllStudents) {
@@ -223,7 +217,6 @@ const createAnnonce = async (req, res) => {
             return res.status(400).json({ error: 'Aucun étudiant trouvé pour les sections et groupes sélectionnés' });
         }
 
-        // Créer l'annonce
         const [result] = await pool.query(
             `INSERT INTO annonce (title, content, enseignant_matricule, target_type, target_filter)
              VALUES (?, ?, ?, 'Etudiants', ?)`,
@@ -233,7 +226,6 @@ const createAnnonce = async (req, res) => {
         const annonceId = result.insertId;
         console.log(`Annonce créée avec l'ID: ${annonceId}`);
 
-        // Créer une notification pour chaque étudiant avec le nouveau format
         console.log(`Envoi des notifications pour l'annonce ID ${annonceId} à ${etudiants.length} étudiants:`, etudiants);
         for (const etudiant of etudiants) {
             await pool.query(
@@ -266,7 +258,6 @@ const updateAnnonce = async (req, res) => {
     try {
         console.log('target_filter avant mise à jour:', target_filter);
 
-        // Vérifier si l'annonce existe et appartient à l'enseignant
         const [annonces] = await pool.query(
             `SELECT * FROM annonce WHERE id = ? AND enseignant_matricule = ?`,
             [id, matricule]
@@ -276,7 +267,6 @@ const updateAnnonce = async (req, res) => {
             return res.status(404).json({ error: 'Annonce non trouvée ou non autorisée' });
         }
 
-        // Vérifier si des groupes spécifiques sont sélectionnés
         let sendToAllStudents = true;
         for (const sectionId of sections) {
             const sectionGroupes = groupes[sectionId] || [];
@@ -288,7 +278,6 @@ const updateAnnonce = async (req, res) => {
         }
         console.log('sendToAllStudents:', sendToAllStudents);
 
-        // Récupérer les étudiants associés aux sections ciblées
         let etudiants = [];
         if (sections.length > 0) {
             const sectionIds = sections.map(id => parseInt(id, 10));
@@ -342,7 +331,6 @@ const updateAnnonce = async (req, res) => {
             return res.status(400).json({ error: 'Aucun étudiant trouvé pour les sections et groupes sélectionnés' });
         }
 
-        // Mettre à jour l'annonce
         await pool.query(
             `UPDATE annonce
              SET title = ?, content = ?, target_filter = ?
@@ -352,14 +340,12 @@ const updateAnnonce = async (req, res) => {
 
         console.log(`Annonce ID ${id} mise à jour`);
 
-        // Supprimer les anciennes notifications avec le nouveau format
         await pool.query(
             `DELETE FROM Notification
              WHERE contenu LIKE ? AND expediteur = ?`,
             [`Nouvelle annonce : ${annonces[0].title}`, matricule]
         );
 
-        // Créer de nouvelles notifications avec le nouveau format
         console.log(`Envoi des notifications pour l'annonce ID ${id} à ${etudiants.length} étudiants:`, etudiants);
         for (const etudiant of etudiants) {
             await pool.query(
@@ -386,7 +372,6 @@ const deleteAnnonce = async (req, res) => {
     }
 
     try {
-        // Récupérer les informations de l'annonce pour supprimer les notifications associées
         const [annonces] = await pool.query(
             `SELECT title, content, target_filter
              FROM annonce
@@ -401,7 +386,6 @@ const deleteAnnonce = async (req, res) => {
         const { title, content, target_filter } = annonces[0];
         let sections = [];
 
-        // Vérifier si target_filter est un objet ou une chaîne JSON
         if (target_filter) {
             if (typeof target_filter === 'string' && target_filter.trim() !== '') {
                 try {
@@ -422,7 +406,6 @@ const deleteAnnonce = async (req, res) => {
             sections = [];
         }
 
-        // Récupérer les étudiants associés aux sections ciblées (sans filtrage par groupe)
         let etudiants = [];
         if (sections.length > 0) {
             [etudiants] = await pool.query(
@@ -435,7 +418,6 @@ const deleteAnnonce = async (req, res) => {
 
         const etudiantMatricules = etudiants.map(e => e.Matricule);
 
-        // Supprimer les notifications associées à cette annonce pour ces étudiants avec le nouveau format
         if (etudiantMatricules.length > 0) {
             await pool.query(
                 `DELETE FROM Notification
@@ -444,14 +426,12 @@ const deleteAnnonce = async (req, res) => {
             );
         }
 
-        // Supprimer les commentaires associés à l'annonce
         await pool.query(
             `DELETE FROM Commentaire_Annonce
              WHERE ID_annonce = ?`,
             [id]
         );
 
-        // Supprimer l'annonce
         const [result] = await pool.query(
             `DELETE FROM annonce
              WHERE id = ? AND enseignant_matricule = ?`,
@@ -494,7 +474,7 @@ const getCommentsForAnnonce = async (req, res) => {
     }
 };
 
-// Répondre à un commentaire (pour les enseignants)
+// Répondre à un commentaire
 const replyToComment = async (req, res) => {
     const { commentaireId, enseignantMatricule, reponse } = req.body;
 
@@ -503,7 +483,6 @@ const replyToComment = async (req, res) => {
     }
 
     try {
-        // Vérifier si le commentaire existe et est lié à une annonce de l'enseignant
         const [commentaire] = await pool.query(
             `
             SELECT ca.*, a.enseignant_matricule
@@ -522,7 +501,6 @@ const replyToComment = async (req, res) => {
             return res.status(403).json({ error: 'Vous n\'êtes pas autorisé à répondre à ce commentaire.' });
         }
 
-        // Mettre à jour le commentaire avec la réponse
         await pool.query(
             `
             UPDATE Commentaire_Annonce
@@ -539,6 +517,111 @@ const replyToComment = async (req, res) => {
     }
 };
 
+// Ajouter un événement administratif au calendrier de l'enseignant
+const addAdminEventToCalendar = async (req, res) => {
+    const { annonceId, matricule, time_slot, event_date } = req.body;
+
+    if (!annonceId || !matricule || !time_slot || !event_date) {
+        return res.status(400).json({ error: 'Veuillez fournir toutes les informations nécessaires.' });
+    }
+
+    try {
+        // Vérifier si l'annonce existe et est administrative
+        const [annonce] = await pool.query(
+            `
+            SELECT title, content
+            FROM annonce
+            WHERE id = ? AND admin_matricule IS NOT NULL
+            `,
+            [annonceId]
+        );
+
+        if (annonce.length === 0) {
+            return res.status(404).json({ error: 'Annonce administrative non trouvée.' });
+        }
+
+        // Vérifier si l'enseignant existe
+        const [enseignant] = await pool.query(
+            `
+            SELECT Matricule
+            FROM Enseignant
+            WHERE Matricule = ?
+            `,
+            [matricule]
+        );
+
+        if (enseignant.length === 0) {
+            return res.status(404).json({ error: 'Enseignant non trouvé.' });
+        }
+
+        // Vérifier si le time_slot est valide
+        const validTimeSlots = [
+            '08:00 - 09:30',
+            '09:40 - 11:10',
+            '11:20 - 12:50',
+            '13:00 - 14:30',
+            '14:40 - 16:10',
+            '16:20 - 17:50'
+        ];
+
+        if (!validTimeSlots.includes(time_slot)) {
+            return res.status(400).json({ error: 'Créneau horaire invalide.' });
+        }
+
+        // Formatter le titre et le contenu
+        const title = 'Événements administratifs';
+        const content = `L'événement administratif ${annonce[0].title} aura lieu ce jour-là`;
+
+        // Insérer l'événement dans CalendarEvent
+        await pool.query(
+            `
+            INSERT INTO CalendarEvent (matricule, title, content, event_date, time_slot)
+            VALUES (?, ?, ?, ?, ?)
+            `,
+            [matricule, title, content, event_date, time_slot]
+        );
+
+        res.status(201).json({ message: 'Événement ajouté au calendrier avec succès.' });
+    } catch (error) {
+        console.error('Erreur lors de l\'ajout au calendrier:', error);
+        res.status(500).json({ error: 'Une erreur est survenue lors de l\'ajout de l\'événement au calendrier.' });
+    }
+};
+
+// Vérifier si un événement est déjà dans le calendrier
+const checkCalendarEvent = async (req, res) => {
+    const { annonceId, matricule } = req.params;
+
+    try {
+        const [events] = await pool.query(
+            `
+            SELECT ID_event
+            FROM CalendarEvent
+            WHERE matricule = ? AND content LIKE ?
+            `,
+            [matricule, `%L'événement administratif ${await getAnnonceTitle(annonceId)}%`]
+        );
+
+        res.json({ isAdded: events.length > 0 });
+    } catch (error) {
+        console.error('Erreur lors de la vérification de l\'événement:', error);
+        res.status(500).json({ error: 'Une erreur est survenue lors de la vérification de l\'événement.' });
+    }
+};
+
+// Fonction utilitaire pour récupérer le titre de l'annonce
+const getAnnonceTitle = async (annonceId) => {
+    const [annonce] = await pool.query(
+        `
+        SELECT title
+        FROM annonce
+        WHERE id = ?
+        `,
+        [annonceId]
+    );
+    return annonce.length > 0 ? annonce[0].title : '';
+};
+
 module.exports = {
     getAdminAnnonces,
     getTeacherAnnonces,
@@ -547,5 +630,7 @@ module.exports = {
     updateAnnonce,
     deleteAnnonce,
     getCommentsForAnnonce,
-    replyToComment
+    replyToComment,
+    addAdminEventToCalendar,
+    checkCalendarEvent
 };

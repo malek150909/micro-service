@@ -4,6 +4,7 @@ import XLSX from 'xlsx';
 import PDFDocument from 'pdfkit';
 import multer from 'multer';
 import jwt from 'jsonwebtoken';
+import ExcelJS from 'exceljs'; 
 
 const router = express.Router();
 
@@ -11,13 +12,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 const JWT_SECRET = process.env.JWT_SECRET ; // Replace with a secure key in production (e.g., from .env)
-let ExcelJS;
-try {
-  ExcelJS = require('exceljs');
-} catch (err) {
-  console.error('Failed to load ExcelJS:', err.message);
-  ExcelJS = null;
-}
+
 // Middleware to authenticate token
 const authenticate = (req, res, next) => {
   const token = req.headers['authorization']?.split(' ')[1];

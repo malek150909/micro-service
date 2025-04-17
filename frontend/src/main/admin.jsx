@@ -47,16 +47,61 @@ const Admin = () => {
     };
 
     const items = [
-        { title: "Événements", description: "Consulter et créer les événements", route: "/gestionEvenements", icon: <FaCalendar /> },
-        { title: "Exams Planning", description: "Consulter et créer les plannings", route: "/consult", icon: <FaBook /> },
-        { title: "Modules", description: "Consulter les modules", route: "/modules", icon: <FaBook /> },
-        { title: "Annonces", description: "Consulter et créer les annonces", route: "/annonces", icon: <FaBullhorn /> },
-        { title: "Étudiants", description: "Consulter la liste des étudiants", route: "/etudiants", icon: <FaUsers /> },
-        { title: "Profs", description: "Listes des enseignants", route: "/enseignants", icon: <FaUsers /> },
-        { title: "Emploi du temps", description: "Consulter et créer des emplois", route: "/emploidutemps", icon: <FaCalendar /> },
-        { title: "Documents", description: "Consulter et créer des documents", route: "/docsAdmin", icon: <FaClipboardList /> },
-        { title: "Clubs", description: "Consulter les Clubs", route: "/clubsADM", icon: <FaUsers /> }
-    ];
+        { 
+          title: "Événements", 
+          description: "Gérez et créez des événements institutionnels.", 
+          route: "/gestionEvenements", 
+          icon: <FaCalendar /> 
+        },
+        { 
+          title: "Exams Planning", 
+          description: "Planifiez et consultez les calendriers d'examens.", 
+          route: "/consult", 
+          icon: <FaBook /> 
+        },
+        { 
+          title: "Modules", 
+          description: "Accédez et gérez les modules pédagogiques.", 
+          route: "/modules", 
+          icon: <FaBook /> 
+        },
+        { 
+          title: "Annonces", 
+          description: "Créez et consultez les annonces officielles.", 
+          route: "/annonces", 
+          icon: <FaBullhorn /> 
+        },
+        { 
+          title: "Étudiants", 
+          description: "Consultez et gérez la liste des étudiants.", 
+          route: "/etudiants", 
+          icon: <FaUsers /> 
+        },
+        { 
+          title: "Profs", 
+          description: "Consultez et gérez la liste des enseignants.", 
+          route: "/enseignants", 
+          icon: <FaUsers /> 
+        },
+        { 
+          title: "Emploi du temps", 
+          description: "Créez et visualisez les emplois du temps.", 
+          route: "/emploidutemps", 
+          icon: <FaCalendar /> 
+        },
+        { 
+          title: "Documents", 
+          description: "Gérez et consultez les documents administratifs.", 
+          route: "/docsAdmin", 
+          icon: <FaClipboardList /> 
+        },
+        { 
+          title: "Clubs", 
+          description: "Supervisez et consultez les clubs étudiants.", 
+          route: "/clubsADM", 
+          icon: <FaUsers /> 
+        }
+      ];
 
     const calendarDays = Array.from({ length: 30 }, (_, i) => i + 1); // Jours d'avril
     const currentDay = 5; // 5 avril 2025
@@ -69,30 +114,30 @@ const Admin = () => {
     };
 
     return (
-        <div className={styles.mainContainer}>
+        <div className={`${styles['MAIN-mainContainer']} ${isLoaded ? styles['MAIN-mainContainerLoaded'] : ''}`}>
             {/* Sidebar */}
-            <div className={styles.sidebar}>
-                <div className={styles.sidebarMenu}>
-                    <button onClick={handleEditProfile} className={styles.sidebarItem}>
-                        <FaUser className={styles.sidebarIcon} />
+            <div className={styles['MAIN-sidebar']}>
+                <div className={styles['MAIN-sidebarMenu']}>
+                    <button onClick={handleEditProfile} className={styles['MAIN-sidebarItem']}>
+                        <FaUser className={styles['MAIN-sidebarIcon']} />
                     </button>
-                    <button onClick={handleMessages} className={styles.sidebarItem}>
-                        <FaEnvelope className={styles.sidebarIcon} />
+                    <button onClick={handleMessages} className={styles['MAIN-sidebarItem']}>
+                        <FaEnvelope className={styles['MAIN-sidebarIcon']} />
                     </button>
-                    <button onClick={handleNotificationClick} className={styles.sidebarItem}>
-                        <FaBell className={styles.sidebarIcon} />
+                    <button onClick={handleNotificationClick} className={styles['MAIN-sidebarItem']}>
+                        <FaBell className={styles['MAIN-sidebarIcon']} />
                     </button>
-                    <button onClick={handleLogout} className={styles.sidebarItem}>
-                        <FaSignOutAlt className={styles.sidebarIcon} />
+                    <button onClick={handleLogout} className={styles['MAIN-sidebarItem']}>
+                        <FaSignOutAlt className={styles['MAIN-sidebarIcon']} />
                     </button>
                 </div>
             </div>
 
             {/* Main Content */}
-            <div className={styles.mainContent}>
+            <div className={styles['MAIN-mainContent']}>
                 {/* Welcome Message */}
                 {showWelcome && user && (
-                    <div className={`${styles.welcomeMessage} ${isLoaded ? styles.welcomeMessageSlideIn : ''}`}>
+                    <div className={`${styles['MAIN-welcomeMessage']} ${isLoaded ? styles['MAIN-welcomeMessageSlideIn'] : ''}`}>
                         <h1>Bienvenue, {user.nom} {user.prenom} !</h1>
                         <p>Que souhaitez-vous faire aujourd'hui ?</p>
                     </div>
@@ -100,10 +145,10 @@ const Admin = () => {
 
                 {/* Notification Modal */}
                 {showNotificationModal && (
-                    <div className={`${styles.notificationModal} ${showNotificationModal ? styles.notificationModalActive : ''}`}>
-                        <div className={`${styles.notificationModalContent} ${showNotificationModal ? styles.notificationModalContentActive : ''}`}>
+                    <div className={`${styles['MAIN-notificationModal']} ${showNotificationModal ? styles['MAIN-notificationModalActive'] : ''}`}>
+                        <div className={`${styles['MAIN-notificationModalContent']} ${showNotificationModal ? styles['MAIN-notificationModalContentActive'] : ''}`}>
                             <button
-                                className={styles.closeModalBtn}
+                                className={styles['MAIN-closeModalBtn']}
                                 onClick={() => setShowNotificationModal(false)}
                             >
                                 X
@@ -114,38 +159,38 @@ const Admin = () => {
                 )}
 
                 {/* Main Layout */}
-                <div className={styles.mainLayout}>
+                <div className={styles['MAIN-mainLayout']}>
                     {/* Cards Section */}
-                    <div className={styles.cardsSection}>
-                        <div className={styles.cardsGrid}>
+                    <div className={styles['MAIN-cardsSection']}>
+                        <div className={styles['MAIN-cardsGrid']}>
                             {items.map((item, index) => (
-                                <div key={index} onClick={() => navigate(item.route)} className={styles.card}>
-                                    <div className={styles.cardIcon}>{item.icon}</div>
-                                    <div className={styles.cardContent}>
-                                        <h3 className={styles.cardTitle}>{item.title}</h3>
-                                        <p className={styles.cardDescription}>{item.description}</p>
+                                <div key={index} onClick={() => navigate(item.route)} className={styles['MAIN-card']}>
+                                    <div className={styles['MAIN-cardIcon']}>{item.icon}</div>
+                                    <div className={styles['MAIN-cardContent']}>
+                                        <h3 className={styles['MAIN-cardTitle']}>{item.title}</h3>
+                                        <p className={styles['MAIN-cardDescription']}>{item.description}</p>
                                     </div>
-                                    <FaChevronRight className={styles.cardArrow} />
+                                    <FaChevronRight className={styles['MAIN-cardArrow']} />
                                 </div>
                             ))}
                         </div>
                     </div>
 
                     {/* Right Column: Calendar and To-Do List */}
-                    <div className={styles.rightColumn}>
+                    <div className={styles['MAIN-rightColumn']}>
                         {/* Calendar */}
-                        <div className={styles.calendarSection}>
+                        <div className={styles['MAIN-calendarSection']}>
                             <h3>Avril 2025</h3>
-                            <div className={styles.calendarGrid}>
+                            <div className={styles['MAIN-calendarGrid']}>
                                 {["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map((day, index) => (
-                                    <div key={index} className={styles.calendarDayHeader}>
+                                    <div key={index} className={styles['MAIN-calendarDayHeader']}>
                                         {day}
                                     </div>
                                 ))}
                                 {calendarDays.map((day, index) => (
                                     <div
                                         key={index}
-                                        className={`${styles.calendarDay} ${day === currentDay ? styles.currentDay : ''}`}
+                                        className={`${styles['MAIN-calendarDay']} ${day === currentDay ? styles['MAIN-currentDay'] : ''}`}
                                     >
                                         {day}
                                     </div>
@@ -154,10 +199,10 @@ const Admin = () => {
                         </div>
 
                         {/* To-Do List */}
-                        <div className={styles.todoSection}>
+                        <div className={styles['MAIN-todoSection']}>
                             <h3>Tâches d'aujourd'hui</h3>
-                            <div className={styles.todoList}>
-                                <div className={styles.todoInput}>
+                            <div className={styles['MAIN-todoList']}>
+                                <div className={styles['MAIN-todoInput']}>
                                     <input
                                         type="text"
                                         value={newTask}
@@ -169,12 +214,12 @@ const Admin = () => {
                                     </button>
                                 </div>
                                 {todoList.map((item, index) => (
-                                    <div key={index} className={styles.todoItem}>
-                                        <div className={styles.todoDetails}>
+                                    <div key={index} className={styles['MAIN-todoItem']}>
+                                        <div className={styles['MAIN-todoDetails']}>
                                             <p>{item.task}</p>
-                                            <div className={styles.todoProgress}>
+                                            <div className={styles['MAIN-todoProgress']}>
                                                 <div
-                                                    className={styles.progressBar}
+                                                    className={styles['MAIN-progressBar']}
                                                     style={{ width: `${item.progress}%` }}
                                                 ></div>
                                             </div>

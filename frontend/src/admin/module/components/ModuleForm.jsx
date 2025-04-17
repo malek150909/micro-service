@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
-import "../module.css";
+import styles from "../module.module.css";
 
 const ModuleForm = ({ onAdd, disabled, niveau }) => {
   let semesterOptions = [];
@@ -50,8 +50,7 @@ const ModuleForm = ({ onAdd, disabled, niveau }) => {
   };
 
   return (
-    <div id="modules">
-    <div className="form-container">
+    <div className={styles['ADM-MDL-form-container']}>
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -67,6 +66,7 @@ const ModuleForm = ({ onAdd, disabled, niveau }) => {
             onChange={handleChange}
             required
             disabled={disabled}
+            className={styles['ADM-MDL-input']}
           />
           <input
             type="text"
@@ -75,6 +75,7 @@ const ModuleForm = ({ onAdd, disabled, niveau }) => {
             value={moduleData.description_module}
             onChange={handleChange}
             disabled={disabled}
+            className={styles['ADM-MDL-input']}
           />
           <input
             type="number"
@@ -84,6 +85,7 @@ const ModuleForm = ({ onAdd, disabled, niveau }) => {
             onChange={handleChange}
             required
             disabled={disabled}
+            className={styles['ADM-MDL-input']}
           />
           <input
             type="number"
@@ -93,6 +95,7 @@ const ModuleForm = ({ onAdd, disabled, niveau }) => {
             onChange={handleChange}
             required
             disabled={disabled}
+            className={styles['ADM-MDL-input']}
           />
           <select
             name="semestre"
@@ -100,6 +103,7 @@ const ModuleForm = ({ onAdd, disabled, niveau }) => {
             onChange={handleChange}
             required
             disabled={disabled}
+            className={styles['ADM-MDL-select']}
           >
             <option value="">Sélectionner un Semestre</option>
             {semesterOptions.map((semestre) => (
@@ -114,6 +118,7 @@ const ModuleForm = ({ onAdd, disabled, niveau }) => {
             onChange={handleChange}
             required
             disabled={disabled}
+            className={styles['ADM-MDL-select']}
           >
             <option value="">Sélectionner les Séances</option>
             <option value="Cour">Cour</option>
@@ -122,10 +127,11 @@ const ModuleForm = ({ onAdd, disabled, niveau }) => {
             <option value="Cour/TD/TP">Cour/TD/TP</option>
             <option value="En ligne">En ligne</option>
           </select>
-          <button type="submit" disabled={disabled}>Ajouter Module</button>
+          <button type="submit" disabled={disabled} className={styles['ADM-MDL-button']}>
+            Ajouter Module
+          </button>
         </form>
       </motion.div>
-    </div>
     </div>
   );
 };

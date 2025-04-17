@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { FaEdit, FaTrash, FaTimes, FaCalendar, FaMapMarkerAlt, FaUsers, FaSearch, FaList, FaPlus, FaHome, FaUser, FaChartBar } from 'react-icons/fa';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
-import './evenement.css';
+import styles from './evenement.module.css';
 
 // Enregistrer les composants nécessaires pour Chart.js
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -44,6 +44,10 @@ function GestionEvenements() {
     fetchFacultes();
   }, []);
 
+  useEffect(() => {
+    console.log('showFormModal changed:', showFormModal);
+  }, [showFormModal]);
+
   const fetchEvenements = async () => {
     try {
       const response = await axios.get('http://localhost:8084/evenement/evenements');
@@ -55,7 +59,7 @@ function GestionEvenements() {
 
   const fetchFacultes = async () => {
     try {
-      const response = await axios.get('http://localhost:8084/evenement/facultes');
+      const response = await axios.get('http://localhost:8082/annonces/facultes');
       setFacultes(response.data);
     } catch (error) {
       console.error('Erreur lors de la récupération des facultés :', error);
@@ -70,7 +74,7 @@ function GestionEvenements() {
       return;
     }
     try {
-      const response = await axios.get(`http://localhost:8084/evenement/departements?faculteId=${faculteId}`);
+      const response = await axios.get(`http://localhost:8082/annonces/departements?faculteId=${faculteId}`);
       setDepartements(response.data);
       setSpecialites([]);
     } catch (error) {
@@ -86,7 +90,7 @@ function GestionEvenements() {
       return;
     }
     try {
-      const response = await axios.get(`http://localhost:8084/evenement/specialites?departementId=${departementId}`);
+      const response = await axios.get(`http://localhost:8082/annonces/specialites?departementId=${departementId}`);
       setSpecialites(response.data);
     } catch (error) {
       console.error('Erreur lors de la récupération des spécialités :', error);
@@ -224,7 +228,8 @@ function GestionEvenements() {
       });
       await fetchEvenements();
     } catch (error) {
-      console.error('Erreur lors de l\'ajout/modification :', error.response?.data || error.message);
+      console.error('Erreur complète :', error);
+      console.error('Détails de la réponse :', error.response);
       if (error.response) {
         if (error.response.status === 400) {
           const errorMessage = error.response.data.message;
@@ -233,6 +238,8 @@ function GestionEvenements() {
           } else {
             setErrors({ general: errorMessage });
           }
+        } else if (error.response.status === 404) {
+          setErrors({ general: 'Endpoint non trouvé. Vérifiez que l\'URL http://localhost:8084/evenement/evenements est correcte et que le serveur est en marche.' });
         } else {
           setErrors({ general: `Erreur serveur (${error.response.status}) : ${error.response.data.message || 'Veuillez réessayer plus tard.'}` });
         }
@@ -311,7 +318,7 @@ function GestionEvenements() {
       {
         label: 'Nombre d\'événements',
         data: Object.values(eventStats),
-        backgroundColor: 'rgba(129, 152, 200, 0.8)', // Corail pour les barres
+        backgroundColor: 'rgba(129, 152, 200, 0.8)',
         borderWidth: 0,
         borderRadius: 8,
       },
@@ -356,254 +363,404 @@ function GestionEvenements() {
     },
   };
 
-  // Gestion de l'animation de la modale
-  useEffect(() => {
-    const modalOverlay = document.querySelector('.modal-overlay');
-    if (showFormModal || selectedEvent) {
-      if (modalOverlay) {
-        modalOverlay.classList.add('active');
-      }
-    } else {
-      if (modalOverlay) {
-        modalOverlay.classList.remove('active');
-      }
-    }
-  }, [showFormModal, selectedEvent]);
-
   const handleOpenModal = () => {
     console.log('Bouton "Ajouter un événement" cliqué');
     setShowFormModal(true);
+    console.log('setShowFormModal appelé avec true');
   };
 
   return (
     <div id="evenements">
-    <div className="container">
-      {/* Formes abstraites en arrière-plan */}
-      <div className="background-shapes">
-        <div className="shape shape1"></div>
-        <div className="shape shape2"></div>
-      </div>
-
-      {/* Barre latérale */}
-      <div className="sidebar">
-        <div className="logo">
-          <h2>Événements</h2>
-        </div>
-        <button onClick={() => navigate('/admin')} className="sidebar-button">
-          <FaHome /> Retour à l'accueil
-        </button>
-        <button onClick={handleOpenModal} className="sidebar-button">
-          <FaPlus /> Ajouter un événement
-        </button>
-      </div>
-
-      {/* Placeholder pour occuper l'espace de la barre latérale dans la grille */}
-      <div className="sidebar-placeholder"></div>
-
-      {/* Contenu principal */}
-      <div className="main-content">
-        <div className="header">
-          <h1><FaUser /> Bienvenue sur votre espace evenement</h1>
-          <p>Ayez une excellente experience de gestionnement</p>
+      <div className={styles['ADM-EVN-container']}>
+        {/* Formes abstraites en arrière-plan */}
+        <div className={styles['ADM-EVN-background-shapes']}>
+          <div className={`${styles['ADM-EVN-shape']} ${styles['ADM-EVN-shape1']}`}></div>
+          <div className={`${styles['ADM-EVN-shape']} ${styles['ADM-EVN-shape2']}`}></div>
         </div>
 
-        <div className="content-grid">
-          {/* Section des statistiques */}
-          <div className="chart-container">
-            <h3 className="chart-title"><FaChartBar /> Statistiques des Événements</h3>
-            <div className="chart-wrapper">
-              <Bar data={chartData} options={chartOptions} />
+        {/* Barre latérale */}
+        <div className={styles['ADM-EVN-sidebar']}>
+          <div className={styles['ADM-EVN-logo']}>
+            <h2 className={styles['ADM-EVN-logo-h2']}>Événements</h2>
+          </div>
+          <button onClick={() => navigate('/admin')} className={styles['ADM-EVN-sidebar-button']}>
+            <FaHome /> Retour à l'accueil
+          </button>
+          <button onClick={handleOpenModal} className={styles['ADM-EVN-sidebar-button']}>
+            <FaPlus /> Ajouter un événement
+          </button>
+        </div>
+
+        {/* Placeholder pour occuper l'espace de la barre latérale */}
+        <div className={styles['ADM-EVN-sidebar-placeholder']}></div>
+
+        {/* Contenu principal */}
+        <div className={styles['ADM-EVN-main-content']}>
+          <div className={styles['ADM-EVN-header']}>
+            <h1 className={styles['ADM-EVN-header-h1']}>
+              <FaUser /> Bienvenue sur votre espace événement
+            </h1>
+            <p className={styles['ADM-EVN-header-p']}>
+              Ayez une excellente expérience de gestion
+            </p>
+          </div>
+
+          <div className={styles['ADM-EVN-content-grid']}>
+            {/* Section des statistiques */}
+            <div className={styles['ADM-EVN-chart-container']}>
+              <h3 className={styles['ADM-EVN-chart-title']}>
+                <FaChartBar /> Statistiques des Événements
+              </h3>
+              <div className={styles['ADM-EVN-chart-wrapper']}>
+                <Bar data={chartData} options={chartOptions} />
+              </div>
+            </div>
+
+            {/* Liste des événements */}
+            <div className={styles['ADM-EVN-event-list']}>
+              <h3 className={styles['ADM-EVN-event-list-h3']}>
+                <FaList /> Liste des Événements
+              </h3>
+              <div className={styles['ADM-EVN-search-container']}>
+                <input
+                  type="text"
+                  placeholder="Rechercher un événement..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className={styles['ADM-EVN-search-bar']}
+                />
+                <FaSearch className={styles['ADM-EVN-search-icon']} />
+              </div>
+              <ul className={styles['ADM-EVN-event-list-ul']}>
+                {filteredEvenements.length > 0 ? (
+                  filteredEvenements.map((evenement) => (
+                    <li
+                      key={evenement.ID_evenement}
+                      className={styles['ADM-EVN-event-item']}
+                      onClick={() => toggleDetails(evenement.ID_evenement)}
+                    >
+                      <div className={styles['ADM-EVN-event-info']}>
+                        <h4 className={styles['ADM-EVN-event-info-h4']}>
+                          {evenement.nom_evenement}
+                        </h4>
+                        <p className={styles['ADM-EVN-event-info-p']}>
+                          {evenement.date_evenement}
+                        </p>
+                      </div>
+                      <div className={styles['ADM-EVN-event-stats']}>
+                        <p className={styles['ADM-EVN-event-stats-p']}>
+                          {evenement.capacite} participants
+                        </p>
+                      </div>
+                    </li>
+                  ))
+                ) : (
+                  <p className={styles['ADM-EVN-no-results']}>
+                    Aucun événement trouvé.
+                  </p>
+                )}
+              </ul>
             </div>
           </div>
 
-          {/* Liste des événements */}
-          <div className="event-list">
-            <h3><FaList /> Liste des Événements</h3>
-            <div className="search-container">
-              <input
-                type="text"
-                placeholder="Rechercher un événement..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="search-bar"
-              />
-              <FaSearch className="search-icon" />
-            </div>
-            <ul>
-              {filteredEvenements.length > 0 ? (
-                filteredEvenements.map((evenement) => (
-                  <li
-                    key={evenement.ID_evenement}
-                    className="event-item"
-                    onClick={() => toggleDetails(evenement.ID_evenement)}
-                  >
-                    <div className="event-info">
-                      <h4>{evenement.nom_evenement}</h4>
-                      <p>{evenement.date_evenement}</p>
-                    </div>
-                    <div className="event-stats">
-                      <p>{evenement.capacite} participants</p>
-                    </div>
-                  </li>
-                ))
-              ) : (
-                <p className="no-results">Aucun événement trouvé.</p>
-              )}
-            </ul>
-          </div>
-        </div>
-
-        {/* Modale pour le formulaire d'ajout/modification */}
-        {showFormModal && (
-          <div className="modal-overlay">
-            <div className="modal-content">
-              <h3>{editingEvent ? 'Modifier un Événement' : 'Ajouter un Événement'}</h3>
-              <form onSubmit={handleSubmit} ref={formRef}>
-                <div className="input-group">
-                  <input type="text" name="nom_evenement" placeholder="Nom de l'événement" value={formData.nom_evenement} onChange={handleChange} required />
-                  {errors.nom_evenement && <span className="error-message">{errors.nom_evenement}</span>}
-                </div>
-                <div className="input-group">
-                  <textarea name="description_evenement" placeholder="Description" value={formData.description_evenement} onChange={handleChange} required />
-                  {errors.description_evenement && <span className="error-message">{errors.description_evenement}</span>}
-                </div>
-                <div className="input-group">
-                  <FaCalendar className="input-icon" />
-                  <input
-                    type="date"
-                    name="date_evenement"
-                    value={formData.date_evenement}
-                    onChange={handleChange}
-                    required
-                  />
-                  {errors.date_evenement && <span className="error-message">{errors.date_evenement}</span>}
-                </div>
-                <div className="input-group">
-                  <FaMapMarkerAlt className="input-icon" />
-                  <input type="text" name="lieu" placeholder="Lieu" value={formData.lieu} onChange={handleChange} required />
-                  {errors.lieu && <span className="error-message">{errors.lieu}</span>}
-                </div>
-                <div className="input-group">
-                  <FaUsers className="input-icon" />
-                  <input type="number" name="capacite" placeholder="Capacité" value={formData.capacite} onChange={handleChange} required />
-                  {errors.capacite && <span className="error-message">{errors.capacite}</span>}
-                </div>
-                <div className="input-group">
-                  <input type="number" name="organisateur_admin" placeholder="Matricule de l'organisateur" value={formData.organisateur_admin} onChange={handleChange} required />
-                  {errors.organisateur_admin && <span className="error-message">{errors.organisateur_admin}</span>}
-                </div>
-                <div className="input-group">
-                  <input type="text" name="image_url" placeholder="URL de l'image" value={formData.image_url} onChange={handleChange} />
-                </div>
-                <div className="input-group">
-                  <input type="file" name="image" onChange={(e) => handleImageUpload(e, setFormData)} accept="image/*" />
-                </div>
-                <div className="input-group">
-                  <select name="target_type" value={formData.target_type} onChange={handleTargetTypeChange}>
-                    <option value="">Sélectionner votre destinataire...</option>
-                    <option value="Etudiants">Étudiants</option>
-                    <option value="Enseignants">Enseignants</option>
-                  </select>
-                </div>
-                {formData.target_type && (
-                  <>
-                    <div className="input-group">
-                      <label>
-                        <input type="checkbox" checked={formData.target_filter.tous} onChange={(e) => handleTousChange(e)} />
-                        Tous les {formData.target_type.toLowerCase()}
-                      </label>
-                    </div>
-                    {!formData.target_filter.tous && (
-                      <div className="filter-section">
-                        <div className="filter-options">
-                          <div className="filter-group">
-                            <label>Faculté</label>
-                            <select name="faculte" value={formData.target_filter.faculte} onChange={handleChange}>
-                              <option value="">Toutes</option>
-                              {facultes.map(f => (
-                                <option key={f.ID_faculte} value={f.ID_faculte}>{f.nom_faculte}</option>
-                              ))}
-                            </select>
-                          </div>
-                          <div className="filter-group">
-                            <label>Département</label>
-                            <select name="departement" value={formData.target_filter.departement} onChange={handleChange} disabled={!formData.target_filter.faculte}>
-                              <option value="">Tous</option>
-                              {departements.map(d => (
-                                <option key={d.ID_departement} value={d.ID_departement}>{d.Nom_departement}</option>
-                              ))}
-                            </select>
-                          </div>
-                          <div className="filter-group">
-                            <label>Spécialité</label>
-                            <select name="specialite" value={formData.target_filter.specialite} onChange={handleChange} disabled={!formData.target_filter.departement}>
-                              <option value="">Toutes</option>
-                              {specialites.map(s => (
-                                <option key={s.ID_specialite} value={s.ID_specialite}>{s.nom_specialite}</option>
-                              ))}
-                            </select>
+          {/* Modale pour le formulaire d'ajout/modification */}
+          {showFormModal && (
+            <div className={`${styles['ADM-EVN-modal-overlay']} ${styles['ADM-EVN-active']}`}>
+              <div className={styles['ADM-EVN-modal-content']}>
+                <h3 className={styles['ADM-EVN-modal-content-h3']}>
+                  {editingEvent ? 'Modifier un Événement' : 'Ajouter un Événement'}
+                </h3>
+                <form onSubmit={handleSubmit} ref={formRef} className={styles['ADM-EVN-form']}>
+                  <div className={styles['ADM-EVN-input-group']}>
+                    <input
+                      type="text"
+                      name="nom_evenement"
+                      placeholder="Nom de l'événement"
+                      value={formData.nom_evenement}
+                      onChange={handleChange}
+                      required
+                      className={styles['ADM-EVN-input']}
+                    />
+                    {errors.nom_evenement && (
+                      <span className={styles['ADM-EVN-error-message']}>
+                        {errors.nom_evenement}
+                      </span>
+                    )}
+                  </div>
+                  <div className={styles['ADM-EVN-input-group']}>
+                    <textarea
+                      name="description_evenement"
+                      placeholder="Description"
+                      value={formData.description_evenement}
+                      onChange={handleChange}
+                      required
+                      className={styles['ADM-EVN-textarea']}
+                    />
+                    {errors.description_evenement && (
+                      <span className={styles['ADM-EVN-error-message']}>
+                        {errors.description_evenement}
+                      </span>
+                    )}
+                  </div>
+                  <div className={styles['ADM-EVN-input-group']}>
+                    <FaCalendar className={styles['ADM-EVN-input-icon']} />
+                    <input
+                      type="date"
+                      name="date_evenement"
+                      value={formData.date_evenement}
+                      onChange={handleChange}
+                      required
+                      className={styles['ADM-EVN-input']}
+                    />
+                    {errors.date_evenement && (
+                      <span className={styles['ADM-EVN-error-message']}>
+                        {errors.date_evenement}
+                      </span>
+                    )}
+                  </div>
+                  <div className={styles['ADM-EVN-input-group']}>
+                    <FaMapMarkerAlt className={styles['ADM-EVN-input-icon']} />
+                    <input
+                      type="text"
+                      name="lieu"
+                      placeholder="Lieu"
+                      value={formData.lieu}
+                      onChange={handleChange}
+                      required
+                      className={styles['ADM-EVN-input']}
+                    />
+                    {errors.lieu && (
+                      <span className={styles['ADM-EVN-error-message']}>
+                        {errors.lieu}
+                      </span>
+                    )}
+                  </div>
+                  <div className={styles['ADM-EVN-input-group']}>
+                    <FaUsers className={styles['ADM-EVN-input-icon']} />
+                    <input
+                      type="number"
+                      name="capacite"
+                      placeholder="Capacité"
+                      value={formData.capacite}
+                      onChange={handleChange}
+                      required
+                      className={styles['ADM-EVN-input']}
+                    />
+                    {errors.capacite && (
+                      <span className={styles['ADM-EVN-error-message']}>
+                        {errors.capacite}
+                      </span>
+                    )}
+                  </div>
+                  <div className={styles['ADM-EVN-input-group']}>
+                    <input
+                      type="number"
+                      name="organisateur_admin"
+                      placeholder="Matricule de l'organisateur"
+                      value={formData.organisateur_admin}
+                      onChange={handleChange}
+                      required
+                      className={styles['ADM-EVN-input']}
+                    />
+                    {errors.organisateur_admin && (
+                      <span className={styles['ADM-EVN-error-message']}>
+                        {errors.organisateur_admin}
+                      </span>
+                    )}
+                  </div>
+                  <div className={styles['ADM-EVN-input-group']}>
+                    <input
+                      type="text"
+                      name="image_url"
+                      placeholder="URL de l'image"
+                      value={formData.image_url}
+                      onChange={handleChange}
+                      className={styles['ADM-EVN-input']}
+                    />
+                  </div>
+                  <div className={styles['ADM-EVN-input-group']}>
+                    <input
+                      type="file"
+                      name="image"
+                      onChange={(e) => handleImageUpload(e, setFormData)}
+                      accept="image/*"
+                    />
+                  </div>
+                  <div className={styles['ADM-EVN-input-group']}>
+                    <select
+                      name="target_type"
+                      value={formData.target_type}
+                      onChange={handleTargetTypeChange}
+                      className={styles['ADM-EVN-select']}
+                    >
+                      <option value="">Sélectionner votre destinataire...</option>
+                      <option value="Etudiants">Étudiants</option>
+                      <option value="Enseignants">Enseignants</option>
+                    </select>
+                  </div>
+                  {formData.target_type && (
+                    <>
+                      <div className={styles['ADM-EVN-input-group']}>
+                        <label className={styles['ADM-EVN-input-group-label']}>
+                          <input
+                            type="checkbox"
+                            checked={formData.target_filter.tous}
+                            onChange={(e) => handleTousChange(e)}
+                          />
+                          Tous les {formData.target_type.toLowerCase()}
+                        </label>
+                      </div>
+                      {!formData.target_filter.tous && (
+                        <div className={styles['ADM-EVN-filter-section']}>
+                          <div className={styles['ADM-EVN-filter-options']}>
+                            <div className={styles['ADM-EVN-filter-group']}>
+                              <label className={styles['ADM-EVN-filter-group-label']}>
+                                Faculté
+                              </label>
+                              <select
+                                name="faculte"
+                                value={formData.target_filter.faculte}
+                                onChange={handleChange}
+                                className={styles['ADM-EVN-select']}
+                              >
+                                <option value="">Toutes</option>
+                                {facultes.map(f => (
+                                  <option key={f.ID_faculte} value={f.ID_faculte}>
+                                    {f.nom_faculte}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                            <div className={styles['ADM-EVN-filter-group']}>
+                              <label className={styles['ADM-EVN-filter-group-label']}>
+                                Département
+                              </label>
+                              <select
+                                name="departement"
+                                value={formData.target_filter.departement}
+                                onChange={handleChange}
+                                disabled={!formData.target_filter.faculte}
+                                className={styles['ADM-EVN-select']}
+                              >
+                                <option value="">Tous</option>
+                                {departements.map(d => (
+                                  <option key={d.ID_departement} value={d.ID_departement}>
+                                    {d.Nom_departement}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                            <div className={styles['ADM-EVN-filter-group']}>
+                              <label className={styles['ADM-EVN-filter-group-label']}>
+                                Spécialité
+                              </label>
+                              <select
+                                name="specialite"
+                                value={formData.target_filter.specialite}
+                                onChange={handleChange}
+                                disabled={!formData.target_filter.departement}
+                                className={styles['ADM-EVN-select']}
+                              >
+                                <option value="">Toutes</option>
+                                {specialites.map(s => (
+                                  <option key={s.ID_specialite} value={s.ID_specialite}>
+                                    {s.nom_specialite}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )}
-                  </>
-                )}
-                {errors.general && (
-                  <div className="error-message">{errors.general}</div>
-                )}
-                <div className="button-group">
-                  <button type="submit">{editingEvent ? 'Modifier' : 'Ajouter'}</button>
-                  <button type="button" className="close-button" onClick={() => setShowFormModal(false)}>
-                    <FaTimes /> Annuler
-                  </button>
-                </div>
-              </form>
+                      )}
+                    </>
+                  )}
+                  {errors.general && (
+                    <div className={styles['ADM-EVN-error-message']}>
+                      {errors.general}
+                    </div>
+                  )}
+                  <div className={styles['ADM-EVN-button-group']}>
+                    <button type="submit" className={styles['ADM-EVN-button']}>
+                      {editingEvent ? 'Modifier' : 'Ajouter'}
+                    </button>
+                    <button
+                      type="button"
+                      className={`${styles['ADM-EVN-button']} ${styles['ADM-EVN-close-button']}`}
+                      onClick={() => setShowFormModal(false)}
+                    >
+                      <FaTimes /> Annuler
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Modale pour les détails de l'événement */}
-        {selectedEvent && (
-          <div className="modal-overlay">
-            <div className="modal-content">
-              {(() => {
-                const evenement = evenements.find(e => e.ID_evenement === selectedEvent);
-                if (!evenement) return <p>Événement non trouvé.</p>;
-                return (
-                  <>
-                    {evenement.image_url && (
-                      <img
-                        src={evenement.image_url}
-                        alt={evenement.nom_evenement}
-                        className="event-image"
-                      />
-                    )}
-                    <h3>{evenement.nom_evenement}</h3>
-                    <div className="description">
-                      <p>{evenement.description_evenement}</p>
-                    </div>
-                    <p><FaCalendar /> Date: {evenement.date_evenement}</p>
-                    <p><FaMapMarkerAlt /> Lieu: {evenement.lieu}</p>
-                    <p><FaUsers /> Capacité: {evenement.capacite}</p>
-                    <div className="button-group">
-                      <button className="close-button" onClick={() => setSelectedEvent(null)}>
-                        <FaTimes /> Fermer
-                      </button>
-                      <button className="edit-button" onClick={() => handleEdit(evenement)}>
-                        <FaEdit /> Modifier
-                      </button>
-                      <button className="delete-button" onClick={() => handleDelete(evenement.ID_evenement)}>
-                        <FaTrash /> Supprimer
-                      </button>
-                    </div>
-                  </>
-                );
-              })()}
+          {/* Modale pour les détails de l'événement */}
+          {selectedEvent && (
+            <div className={`${styles['ADM-EVN-modal-overlay']} ${styles['ADM-EVN-active']}`}>
+              <div className={styles['ADM-EVN-modal-content']}>
+                {(() => {
+                  const evenement = evenements.find(e => e.ID_evenement === selectedEvent);
+                  if (!evenement) return (
+                    <p className={styles['ADM-EVN-modal-content-p']}>
+                      Événement non trouvé.
+                    </p>
+                  );
+                  return (
+                    <>
+                      {evenement.image_url && (
+                        <img
+                          src={evenement.image_url}
+                          alt={evenement.nom_evenement}
+                          className={styles['ADM-EVN-event-image']}
+                        />
+                      )}
+                      <h3 className={styles['ADM-EVN-modal-content-h3']}>
+                        {evenement.nom_evenement}
+                      </h3>
+                      <div className={styles['ADM-EVN-description']}>
+                        <p className={styles['ADM-EVN-description-p']}>
+                          {evenement.description_evenement}
+                        </p>
+                      </div>
+                      <p className={styles['ADM-EVN-modal-content-p']}>
+                        <FaCalendar /> Date: {evenement.date_evenement}
+                      </p>
+                      <p className={styles['ADM-EVN-modal-content-p']}>
+                        <FaMapMarkerAlt /> Lieu: {evenement.lieu}
+                      </p>
+                      <p className={styles['ADM-EVN-modal-content-p']}>
+                        <FaUsers /> Capacité: {evenement.capacite}
+                      </p>
+                      <div className={styles['ADM-EVN-button-group']}>
+                        <button
+                          className={`${styles['ADM-EVN-button']} ${styles['ADM-EVN-close-button']}`}
+                          onClick={() => setSelectedEvent(null)}
+                        >
+                          <FaTimes /> Fermer
+                        </button>
+                        <button
+                          className={`${styles['ADM-EVN-button']} ${styles['ADM-EVN-edit-button']}`}
+                          onClick={() => handleEdit(evenement)}
+                        >
+                          <FaEdit /> Modifier
+                        </button>
+                        <button
+                          className={`${styles['ADM-EVN-button']} ${styles['ADM-EVN-delete-button']}`}
+                          onClick={() => handleDelete(evenement.ID_evenement)}
+                        >
+                          <FaTrash /> Supprimer
+                        </button>
+                      </div>
+                    </>
+                  );
+                })()}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
-    </div>
     </div>
   );
 }

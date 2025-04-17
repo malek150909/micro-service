@@ -35,10 +35,10 @@ const upload = multer({
 
 // Créer une publication avec plusieurs images ou un événement
 const createPublication = async (req, res) => {
-  const { clubId, contenu, matricule, type, nom_evenement, description_evenement, date_evenement, lieu, capacite } = req.body;
+  const { clubId, contenu, matricule, type, nom_evenement, description_evenement, date_evenement, lieu, capacite, time_slots } = req.body;
   const files = req.files;
 
-  console.log('Requête reçue pour createPublication:', { clubId, contenu, matricule, type });
+  console.log('Requête reçue pour createPublication:', { clubId, contenu, matricule, type, time_slots });
   console.log('Fichiers reçus:', files ? files.map(f => f.originalname) : 'Aucun fichier');
 
   if (!clubId || !contenu || !matricule) {
@@ -69,7 +69,7 @@ const createPublication = async (req, res) => {
         console.log('Fichier existe:', fs.existsSync(path.join(__dirname, '..', image_url)));
       }
 
-      console.log('Appel de createEvenement avec:', { nom_evenement, description_evenement, date_evenement, lieu, capacite, image_url, matricule, clubId });
+      console.log('Appel de createEvenement avec:', { nom_evenement, description_evenement, date_evenement, lieu, capacite, image_url, matricule, clubId, time_slots });
       const result = await createEvenement(
         nom_evenement,
         description_evenement,
@@ -78,19 +78,21 @@ const createPublication = async (req, res) => {
         parseInt(capacite),
         image_url,
         matricule,
-        clubId
+        clubId,
+        time_slots
       );
 
       evenementId = result.evenementId;
       notificationIds = result.notificationIds;
       const nomClub = result.nomClub;
 
-      // Construire le contenu de la publication avec toutes les informations de l'événement, sauf l'URL de l'image
+      // Construire le contenu de la publication avec toutes les informations de l'événement, y compris time_slot
       publicationContenu = `
         ${contenu}
 
         **Événement du club "${nomClub}": ${nom_evenement}**
         - **Date** : ${new Date(date_evenement).toLocaleString()}
+        - **Heure** : ${time_slots}
         - **Lieu** : ${lieu}
         - **Capacité** : ${capacite} participants
         ${description_evenement ? `- **Description** : ${description_evenement}` : ''}

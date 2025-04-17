@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { FaUsers, FaBook, FaFileAlt, FaFileUpload, FaInfoCircle } from 'react-icons/fa';
-import "../ressources.css";
+import styles from '../ressources.module.css';
 
 const ResourceUploadForm = ({
   matricule,
@@ -29,38 +29,38 @@ const ResourceUploadForm = ({
 
   // Effects
   useEffect(() => {
-        const fetchSections = async () => {
-            try {
-                const token = localStorage.getItem('token');
-                if (!token) {
-                    setLocalMessage('Erreur : Vous devez être connecté.');
-                    return;
-                }
+    const fetchSections = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          setLocalMessage('Erreur : Vous devez être connecté.');
+          return;
+        }
 
-                const response = await fetch('http://localhost:8082/ressources/sections', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'matricule': matricule
-                    },
-                });
+        const response = await fetch('http://localhost:8082/ressources/sections', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'matricule': matricule
+          },
+        });
 
-                console.log('Response status:', response.status);
-                const result = await response.json(); // Lecture unique du corps
-                console.log('Response:', result);
+        console.log('Response status:', response.status);
+        const result = await response.json();
+        console.log('Response:', result);
 
-                if (!response.ok) {
-                    throw new Error(result.error || 'Failed to fetch sections');
-                }
+        if (!response.ok) {
+          throw new Error(result.error || 'Failed to fetch sections');
+        }
 
-                setSections(result);
-            } catch (error) {
-                console.error('Error fetching sections:', error);
-                setLocalMessage('Erreur lors du chargement des sections.');
-                setTimeout(() => setLocalMessage(''), 3000);
-            }
-        };
-        fetchSections();
-    }, [matricule]);
+        setSections(result);
+      } catch (error) {
+        console.error('Error fetching sections:', error);
+        setLocalMessage('Erreur lors du chargement des sections.');
+        setTimeout(() => setLocalMessage(''), 3000);
+      }
+    };
+    fetchSections();
+  }, [matricule]);
 
   // Scroll to the message when it changes (only for errors)
   useEffect(() => {
@@ -181,11 +181,10 @@ const ResourceUploadForm = ({
   const displayMessage = localMessage || message;
 
   return (
-    <div id="ressources">
-      <form onSubmit={handleSubmit} className="form-group">
-        <div className="input-group">
+      <form onSubmit={handleSubmit} className={styles['ENS-RES-form-group']}>
+        <div className={styles['ENS-RES-input-group']}>
           <label htmlFor="section">
-            <FaUsers className="input-icon" />
+            <FaUsers className={styles['ENS-RES-input-icon']} />
             Sélectionner une Section
           </label>
           <select
@@ -204,9 +203,9 @@ const ResourceUploadForm = ({
           </select>
         </div>
 
-        <div className="input-group">
+        <div className={styles['ENS-RES-input-group']}>
           <label htmlFor="module">
-            <FaBook className="input-icon" />
+            <FaBook className={styles['ENS-RES-input-icon']} />
             Sélectionner un Module
           </label>
           <select
@@ -226,9 +225,9 @@ const ResourceUploadForm = ({
           </select>
         </div>
 
-        <div className="input-group">
+        <div className={styles['ENS-RES-input-group']}>
           <label htmlFor="nom_ressource">
-            <FaFileAlt className="input-icon" />
+            <FaFileAlt className={styles['ENS-RES-input-icon']} />
             Nom de la Ressource
           </label>
           <input
@@ -242,9 +241,9 @@ const ResourceUploadForm = ({
           />
         </div>
 
-        <div className="input-group">
+        <div className={styles['ENS-RES-input-group']}>
           <label htmlFor="type_ressource">
-            <FaBook className="input-icon" />
+            <FaBook className={styles['ENS-RES-input-icon']} />
             Type de Ressource
           </label>
           <select
@@ -260,9 +259,9 @@ const ResourceUploadForm = ({
           </select>
         </div>
 
-        <div className="input-group">
+        <div className={styles['ENS-RES-input-group']}>
           <label htmlFor="description">
-            <FaInfoCircle className="input-icon" />
+            <FaInfoCircle className={styles['ENS-RES-input-icon']} />
             Description (Optionnel)
           </label>
           <textarea
@@ -275,12 +274,12 @@ const ResourceUploadForm = ({
           />
         </div>
 
-        <div className="input-group">
+        <div className={styles['ENS-RES-input-group']}>
           <label htmlFor="file">
-            <FaFileUpload className="input-icon" />
+            <FaFileUpload className={styles['ENS-RES-input-icon']} />
             Télécharger PDF
           </label>
-          <div className="custom-file-input">
+          <div className={styles['ENS-RES-custom-file-input']}>
             <input
               type="file"
               id="file"
@@ -289,29 +288,28 @@ const ResourceUploadForm = ({
               onChange={handleInputChange}
               required
             />
-            <label htmlFor="file" className="custom-file-label">
-              <FaFileUpload className="icon" />
+            <label htmlFor="file" className={styles['ENS-RES-custom-file-label']}>
+              <FaFileUpload className={styles['ENS-RES-icon']} />
               Choisir
             </label>
-            <span className="file-name">{fileName}</span>
+            <span className={styles['ENS-RES-file-name']}>{fileName}</span>
           </div>
         </div>
 
         <button type="submit">
-          <FaFileUpload className="icon" />
+          <FaFileUpload className={styles['ENS-RES-icon']} />
           Ajouter Ressource
         </button>
 
         {displayMessage && (
           <div
             ref={messageRef}
-            className={`message ${displayMessage.includes('Erreur') ? 'error' : ''}`}
+            className={`${styles['ENS-RES-message']} ${displayMessage.includes('Erreur') ? styles['ENS-RES-error'] : ''}`}
           >
             {displayMessage}
           </div>
         )}
       </form>
-    </div>
   );
 };
 

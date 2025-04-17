@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import axios from 'axios';
 import { FaBook, FaFilter, FaPlus, FaHome } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import "../module.css";
+import styles from "../module.module.css";
 
 const API_URL = 'http://localhost:8083/modules';
 
@@ -89,52 +89,48 @@ const Home = () => {
 
   const CustomAlert = ({ message, onClose }) => {
     return (
-      <div id="modules">
       <motion.div
-        className="modal-overlay"
+        className={styles['ADM-MDL-modal-overlay']}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
       >
         <motion.div
-          className="custom-alert"
+          className={styles['ADM-MDL-custom-alert']}
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.8, opacity: 0 }}
           transition={{ duration: 0.3 }}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="alert-content">
-            <FiAlertCircle className="alert-icon" />
-            <p className="alert-message">{message}</p>
+          <div className={styles['ADM-MDL-alert-content']}>
+            <FiAlertCircle className={styles['ADM-MDL-alert-icon']} />
+            <p className={styles['ADM-MDL-alert-message']}>{message}</p>
           </div>
           <button
             onClick={onClose}
-            className="alert-close-button"
+            className={styles['ADM-MDL-button']}
           >
             Fermer
           </button>
         </motion.div>
       </motion.div>
-      </div>
     );
   };
 
   return (
-    <div id="modules">
-    <div className="container">
-      <div className="sidebar">
-        <div className="logo">
-          <FaBook />
+    <div className={styles['ADM-MDL-container']}>
+      <div className={styles['ADM-MDL-sidebar']}>
+        <div className={styles['ADM-MDL-logo']}>
           <h2>Gestion des Modules</h2>
         </div>
-        <button className="sidebar-button" onClick={() => navigate('/admin')}>
+        <button className={styles['ADM-MDL-sidebar-button']} onClick={() => navigate('/admin')}>
           <FaHome /> Retour à l'accueil
         </button>
       </div>
 
-      <div className="main-content">
+      <div className={styles['ADM-MDL-main-content']}>
         {error && <p style={{ color: 'red' }}>{error}</p>}
         <FilterForm onFilter={handleFilter} />
         {modules.length > 0 ? (
@@ -145,13 +141,12 @@ const Home = () => {
             niveau={filters.niveau}
           />
         ) : (
-          <p className="no-results">
+          <p className={styles['ADM-MDL-no-results']}>
             {filters.section && isFilterApplied ? 'Aucun module trouvé.' : 'Veuillez sélectionner une section pour filtrer ou ajouter un nouveau module.'}
           </p>
         )}
-        {/* Affichage conditionnel du formulaire d'ajout de module */}
         {filters.section && (
-          <div className="form-section">
+          <div className={styles['ADM-MDL-form-section']}>
             <ModuleForm
               onAdd={handleAddModule}
               disabled={!filters.section || !filters.specialite}
@@ -161,7 +156,6 @@ const Home = () => {
         )}
         {alertMessage && <CustomAlert message={alertMessage} onClose={handleCloseAlert} />}
       </div>
-    </div>
     </div>
   );
 };

@@ -335,21 +335,19 @@ CREATE TABLE annonce (
   CONSTRAINT annonce_ibfk_4 FOREIGN KEY (enseignant_matricule) REFERENCES enseignant (Matricule) ON DELETE CASCADE
 );
 
-CREATE TABLE clubevenement (
-  ID_club_evenement int NOT NULL AUTO_INCREMENT,
-  nom_evenement varchar(255) NOT NULL,
-  description_evenement text,
-  date_evenement datetime NOT NULL,
-  lieu varchar(255) NOT NULL,
-  capacite int NOT NULL,
-  image_url varchar(255) DEFAULT NULL,
-  organisateur_admin bigint DEFAULT NULL,
-  ID_club int NOT NULL,
-  PRIMARY KEY (ID_club_evenement),
-  KEY organisateur_admin (organisateur_admin),
-  KEY ID_club (ID_club),
-  CONSTRAINT clubevenement_ibfk_1 FOREIGN KEY (organisateur_admin) REFERENCES user (Matricule) ON DELETE CASCADE,
-  CONSTRAINT clubevenement_ibfk_2 FOREIGN KEY (ID_club) REFERENCES club (ID_club) ON DELETE CASCADE
+CREATE TABLE ClubEvenement (
+    ID_club_evenement INT PRIMARY KEY AUTO_INCREMENT,
+    nom_evenement VARCHAR(255) NOT NULL,
+    description_evenement TEXT,
+    date_evenement DATETIME NOT NULL,
+    lieu VARCHAR(255) NOT NULL,
+    capacite INT NOT NULL,
+    image_url VARCHAR(255),
+    organisateur_admin BIGINT,
+    ID_club INT NOT NULL,
+    time_slots TEXT,
+    FOREIGN KEY (organisateur_admin) REFERENCES User(Matricule) ON DELETE CASCADE,
+    FOREIGN KEY (ID_club) REFERENCES Club(ID_club) ON DELETE CASCADE
 );
 
 CREATE TABLE DemandeCreationClub (
@@ -515,4 +513,68 @@ CREATE TABLE Notification_seen (
      PRIMARY KEY (ID_notification, matricule),
      FOREIGN KEY (ID_notification) REFERENCES Notification(ID_notification) ON DELETE CASCADE,
      FOREIGN KEY (matricule) REFERENCES User(Matricule) ON DELETE CASCADE
+);
+
+ CREATE TABLE Seance_Supp (
+        ID_seance_supp INT PRIMARY KEY AUTO_INCREMENT,
+        Matricule BIGINT NOT NULL,
+        ID_section INT NOT NULL,
+        ID_salle INT NULL, -- Made nullable for online sessions
+        ID_module INT NOT NULL,
+        type_seance ENUM('cours', 'TD', 'TP') NOT NULL,
+        date_seance DATE NOT NULL,
+        time_slot ENUM('08:00 - 09:30', '09:40 - 11:10', '11:20 - 12:50',
+                      '13:00 - 14:30', '14:40 - 16:10', '16:20 - 17:50') NOT NULL,
+        mode ENUM('presentiel', 'en ligne') NOT NULL DEFAULT 'presentiel', -- New: Mode of the session
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (Matricule) REFERENCES Enseignant(Matricule) ON DELETE CASCADE,
+        FOREIGN KEY (ID_section) REFERENCES Section(ID_section) ON DELETE CASCADE,
+        FOREIGN KEY (ID_salle) REFERENCES Salle(ID_salle) ON DELETE SET NULL,
+        FOREIGN KEY (ID_module) REFERENCES Module(ID_module) ON DELETE CASCADE,
+        UNIQUE (ID_salle, date_seance, time_slot),
+        UNIQUE (Matricule, date_seance, time_slot)
+);
+
+CREATE TABLE Seance_Supp_Groupe (
+    ID_seance_supp INT NOT NULL,
+    ID_groupe INT NOT NULL,
+    PRIMARY KEY (ID_seance_supp, ID_groupe),
+    FOREIGN KEY (ID_seance_supp) REFERENCES Seance_Supp(ID_seance_supp) ON DELETE CASCADE,
+    FOREIGN KEY (ID_groupe) REFERENCES Groupe(ID_groupe) ON DELETE CASCADE
+);
+
+CREATE TABLE MessageClub (
+    ID_message INT PRIMARY KEY AUTO_INCREMENT,
+    date_envoi TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    contenu TEXT NOT NULL,
+    expediteur BIGINT,
+    destinataire BIGINT,
+    isRead TINYINT(1) DEFAULT 0,
+    filePath VARCHAR(255) DEFAULT NULL,
+    fileName VARCHAR(255) DEFAULT NULL,
+    FOREIGN KEY (expediteur) REFERENCES User(Matricule) ON DELETE CASCADE,
+    FOREIGN KEY (destinataire) REFERENCES User(Matricule) ON DELETE CASCADE
+);
+
+CREATE TABLE CalendarEvent (
+         ID_event INT PRIMARY KEY AUTO_INCREMENT,
+         matricule BIGINT NOT NULL,
+         title VARCHAR(255) NOT NULL,
+         content TEXT NOT NULL,
+         event_date DATE NOT NULL,
+         time_slot ENUM('08:00 - 09:30', '09:40 - 11:10', '11:20 - 12:50',
+                       '13:00 - 14:30', '14:40 - 16:10', '16:20 - 17:50') NOT NULL,
+         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (matricule) REFERENCES User(Matricule) ON DELETE CASCADE
+);
+
+CREATE TABLE notes (
+    ID_note INT PRIMARY KEY AUTO_INCREMENT,
+    Matricule BIGINT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (Matricule) REFERENCES Etudiant(Matricule) ON DELETE CASCADE
 );

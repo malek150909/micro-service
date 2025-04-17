@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FaBook, FaBookOpen, FaChalkboardTeacher, FaPen, FaLaptopCode, FaFolderOpen, FaHome, FaTimes, FaCalendarAlt, FaUser, FaSearch } from 'react-icons/fa';
-import "./ETDressource.css"; // Importer le fichier CSS pour le style
+import styles from './ETDressources.module.css'; // Import CSS module
 
 function StudentDashboard() {
   const [modules, setModules] = useState([]);
@@ -12,31 +12,43 @@ function StudentDashboard() {
   const [semesterSelected, setSemesterSelected] = useState(false);
   const [resourceType, setResourceType] = useState('');
   const [isMounted, setIsMounted] = useState(false);
-  const [sectionId, setSectionId] = useState(null); // État pour sectionId
-  const [niveau, setNiveau] = useState(null); // État pour niveau
+  const [sectionId, setSectionId] = useState(null);
+  const [niveau, setNiveau] = useState(null);
+  const [isFetching, setIsFetching] = useState(false);
   const navigate = useNavigate();
   const moduleListRef = useRef(null);
 
-  const matricule = localStorage.getItem('matricule');
+  const userData = JSON.parse(localStorage.getItem('user') || '{}');
+  const matricule = userData?.Matricule;
 
   useEffect(() => {
     if (!matricule) {
+      console.log('Matricule absent, redirection vers /');
       navigate('/');
-    } else {
-      // Récupérer sectionId et niveau depuis le backend
-      const fetchStudentData = async () => {
-        try {
-          const response = await axios.post('http://localhost:8083/ETDressources/login', { matricule });
-          setSectionId(response.data.sectionId);
-          setNiveau(response.data.niveau);
-          setIsMounted(true);
-        } catch (err) {
-          console.error('Error fetching student data:', err.response || err);
-          navigate('/');
-        }
-      };
-      fetchStudentData();
+      return;
     }
+
+    const fetchStudentData = async () => {
+      try {
+        console.log('Appel API /ETDressources/login avec matricule:', matricule);
+        const response = await axios.post('http://localhost:8083/ETDressources/login', { matricule });
+        console.log('Réponse API /ETDressources/login:', response.data);
+        const { sectionId, niveau } = response.data;
+        if (!sectionId || !niveau) {
+          console.error('sectionId ou niveau manquant dans la réponse:', response.data);
+          navigate('/');
+          return;
+        }
+        setSectionId(sectionId);
+        setNiveau(niveau);
+        setIsMounted(true);
+      } catch (err) {
+        console.error('Erreur lors de la récupération des données étudiant:', err.response?.data || err.message);
+        navigate('/');
+      }
+    };
+
+    fetchStudentData();
   }, [matricule, navigate]);
 
   useEffect(() => {
@@ -50,35 +62,58 @@ function StudentDashboard() {
   }, []);
 
   const fetchModules = async (semester) => {
+    if (!sectionId) {
+      console.log('sectionId non disponible, fetchModules annulé');
+      return;
+    }
+
+    if (isFetching) {
+      console.log('Requête déjà en cours, fetchModules annulé');
+      return;
+    }
+
+    setIsFetching(true);
     try {
+      console.log('Appel API /ETDressources/modules avec:', { sectionId, semester });
       const response = await axios.get('http://localhost:8083/ETDressources/modules', {
         params: { sectionId, semester },
       });
+      console.log('Réponse API /ETDressources/modules:', response.data);
       const modulesData = Array.isArray(response.data) ? response.data : [];
       setModules(modulesData);
       setSemesterSelected(true);
+      console.log('Après setModules, modules:', modulesData);
+      console.log('Après setSemesterSelected, semesterSelected:', true);
     } catch (err) {
-      console.error('Error fetching modules:', err.response || err);
+      console.error('Erreur lors de la récupération des modules:', err.response?.data || err.message);
       setModules([]);
+      setSemesterSelected(true);
+      console.log('Après erreur, modules:', []);
+      console.log('Après erreur, semesterSelected:', true);
+    } finally {
+      setIsFetching(false);
     }
   };
 
   const fetchResources = async (moduleId, type) => {
     try {
+      console.log('Appel API /ETDressources/resources avec:', { moduleId, sectionId, type });
       const response = await axios.get('http://localhost:8083/ETDressources/resources', {
         params: { moduleId, sectionId, type },
       });
+      console.log('Réponse API /ETDressources/resources:', response.data);
       const resourcesData = Array.isArray(response.data) ? response.data : [];
       setResources(resourcesData);
       setResourceType(type);
       setShowResourceModal(true);
     } catch (err) {
-      console.error('Error fetching resources:', err.response || err);
+      console.error('Erreur lors de la récupération des ressources:', err.response?.data || err.message);
       setResources([]);
     }
   };
 
   const handleSemesterClick = (semester) => {
+    console.log('Clic sur semestre:', semester);
     fetchModules(semester);
   };
 
@@ -92,10 +127,10 @@ function StudentDashboard() {
 
   const getResourceIcon = (type) => {
     switch (type) {
-      case 'Cours': return <FaChalkboardTeacher className="resource-icon" />;
-      case 'TD': return <FaPen className="resource-icon" />;
-      case 'TP': return <FaLaptopCode className="resource-icon" />;
-      default: return <FaChalkboardTeacher className="resource-icon" />;
+      case 'Cours': return <FaChalkboardTeacher className={styles['ETD-resource-icon']} />;
+      case 'TD': return <FaPen className={styles['ETD-resource-icon']} />;
+      case 'TP': return <FaLaptopCode className={styles['ETD-resource-icon']} />;
+      default: return <FaChalkboardTeacher className={styles['ETD-resource-icon']} />;
     }
   };
 
@@ -104,195 +139,189 @@ function StudentDashboard() {
     case 'L1':
       semesterButtons = (
         <>
-            <div id="ETDressources">
-            <button className="sidebar-button" onClick={() => handleSemesterClick('1')}>
-                <FaCalendarAlt className="sidebar-icon" /> Semestre 1
-            </button>
-            <button className="sidebar-button" onClick={() => handleSemesterClick('2')}>
-                <FaCalendarAlt className="sidebar-icon" /> Semestre 2
-            </button>
-            </div>
+          <button className={styles['ETD-sidebar-button']} onClick={() => handleSemesterClick('1')} disabled={isFetching}>
+            <FaCalendarAlt className={styles['ETD-sidebar-icon']} /> Semestre 1
+          </button>
+          <button className={styles['ETD-sidebar-button']} onClick={() => handleSemesterClick('2')} disabled={isFetching}>
+            <FaCalendarAlt className={styles['ETD-sidebar-icon']} /> Semestre 2
+          </button>
         </>
       );
       break;
     case 'L2':
       semesterButtons = (
         <>
-            <div id="ETDressources">
-            <button className="sidebar-button" onClick={() => handleSemesterClick('3')}>
-                <FaCalendarAlt className="sidebar-icon" /> Semestre 3
-            </button>
-            <button className="sidebar-button" onClick={() => handleSemesterClick('4')}>
-                <FaCalendarAlt className="sidebar-icon" /> Semestre 4
-            </button>
-            </div>
+          <button className={styles['ETD-sidebar-button']} onClick={() => handleSemesterClick('3')} disabled={isFetching}>
+            <FaCalendarAlt className={styles['ETD-sidebar-icon']} /> Semestre 3
+          </button>
+          <button className={styles['ETD-sidebar-button']} onClick={() => handleSemesterClick('4')} disabled={isFetching}>
+            <FaCalendarAlt className={styles['ETD-sidebar-icon']} /> Semestre 4
+          </button>
         </>
       );
       break;
     case 'L3':
       semesterButtons = (
         <>
-            <div id="ETDressources">
-            <button className="sidebar-button" onClick={() => handleSemesterClick('5')}>
-                <FaCalendarAlt className="sidebar-icon" /> Semestre 5
-            </button>
-            <button className="sidebar-button" onClick={() => handleSemesterClick('6')}>
-                <FaCalendarAlt className="sidebar-icon" /> Semestre 6
-            </button>
-            </div>
+          <button className={styles['ETD-sidebar-button']} onClick={() => handleSemesterClick('5')} disabled={isFetching}>
+            <FaCalendarAlt className={styles['ETD-sidebar-icon']} /> Semestre 5
+          </button>
+          <button className={styles['ETD-sidebar-button']} onClick={() => handleSemesterClick('6')} disabled={isFetching}>
+            <FaCalendarAlt className={styles['ETD-sidebar-icon']} /> Semestre 6
+          </button>
         </>
       );
       break;
     default:
       semesterButtons = (
         <>
-            <div id="ETDressources">
-            <button className="sidebar-button" onClick={() => handleSemesterClick('1')}>
-                <FaCalendarAlt className="sidebar-icon" /> Semestre 1
-            </button>
-            <button className="sidebar-button" onClick={() => handleSemesterClick('2')}>
-                <FaCalendarAlt className="sidebar-icon" /> Semestre 2
-            </button>
-            </div>
+          <button className={styles['ETD-sidebar-button']} onClick={() => handleSemesterClick('1')} disabled={isFetching}>
+            <FaCalendarAlt className={styles['ETD-sidebar-icon']} /> Semestre 1
+          </button>
+          <button className={styles['ETD-sidebar-button']} onClick={() => handleSemesterClick('2')} disabled={isFetching}>
+            <FaCalendarAlt className={styles['ETD-sidebar-icon']} /> Semestre 2
+          </button>
         </>
       );
       break;
   }
 
   return (
-    <div id="ETDressources">
-    <div className="container">
-      <div className="background-shapes">
-        <div className="shape shape1"></div>
-        <div className="shape shape2"></div>
-      </div>
-      <div className="sidebar">
-        <div className="logo">
-          <FaUser className="sidebar-icon" />
-          <h2>Étudiant</h2>
+      <div className={styles['ETD-container']}>
+        <div className={styles['ETD-background-shapes']}>
+          <div className={styles['ETD-shape'] + ' ' + styles['ETD-shape1']}></div>
+          <div className={styles['ETD-shape'] + ' ' + styles['ETD-shape2']}></div>
         </div>
-        <button className="sidebar-button" onClick={() => navigate('/etudiant')}>
-          <FaHome className="sidebar-icon" /> Retour à l'accueil
-        </button>
-        {semesterButtons}
-      </div>
-      <div className="main-content">
-        <div className={`header ${isMounted ? 'animate-in' : ''}`}>
-          <h1>
-            <FaFolderOpen style={{ marginRight: '10px' }} /> Ressources Étudiant
-          </h1>
-          <p>Consultez les ressources de vos modules</p>
+        <div className={styles['ETD-sidebar']}>
+          <div className={styles['ETD-logo']}>
+            <FaUser className={styles['ETD-sidebar-icon']} />
+            <h2>Ressources</h2>
+          </div>
+          <button className={styles['ETD-sidebar-button']} onClick={() => navigate('/etudiant')}>
+            <FaHome className={styles['ETD-sidebar-icon']} /> Retour à l'accueil
+          </button>
+          {semesterButtons}
         </div>
-        <div className={`document-list ${isMounted ? 'animate-in' : ''}`} ref={moduleListRef}>
-          <h3>
-            <FaBook style={{ marginRight: '10px' }} /> Modules
-          </h3>
-          {!semesterSelected ? (
-            <div className="no-results">
-              Veuillez sélectionner un semestre pour consulter vos ressources
-            </div>
-          ) : !Array.isArray(modules) || modules.length === 0 ? (
-            <div className="no-results">
-              Aucun module trouvé pour ce semestre.
-            </div>
-          ) : (
-            <ul>
-              {modules.map((module) => (
-                <li
-                  key={module.ID_module}
-                  className={`document-item ${selectedModule?.ID_module === module.ID_module ? 'expanded' : ''}`}
-                  onClick={() => handleModuleClick(module)}
-                >
-                  <div className="document-info">
-                    <FaBookOpen className="module-icon" />
-                    <h3>{module.nom_module}</h3>
-                  </div>
-                  <div className="type-options">
-                    <button
-                      className="type-option"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleTypeClick(module.ID_module, 'Cours');
-                      }}
-                    >
-                      Cours
-                    </button>
-                    <button
-                      className="type-option"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleTypeClick(module.ID_module, 'TD');
-                      }}
-                    >
-                      TD
-                    </button>
-                    <button
-                      className="type-option"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleTypeClick(module.ID_module, 'TP');
-                      }}
-                    >
-                      TP
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </div>
-      <div className={`modal-overlay ${showResourceModal ? 'active' : ''}`}>
-        <div className={`modal-content ${showResourceModal ? 'active' : ''}`}>
-          <h3>
-            {getResourceIcon(resourceType)} {resourceType}
-          </h3>
-          <ul className="resource-list">
-            {!Array.isArray(resources) || resources.length === 0 ? (
-              <li className="no-results">
-                Aucune ressource trouvée pour ce type.
-              </li>
+        <div className={styles['ETD-main-content']}>
+          <div className={`${styles['ETD-header']} ${isMounted ? 'animate-in' : ''}`}>
+            <h1>
+              <FaFolderOpen style={{ marginRight: '10px' }} /> Ressources Étudiant
+            </h1>
+            <p>Consultez les ressources de vos modules</p>
+          </div>
+          <div className={`${styles['ETD-document-list']} ${isMounted ? 'animate-in' : ''}`} ref={moduleListRef}>
+            <h3>
+              <FaBook style={{ marginRight: '10px' }} /> Modules
+            </h3>
+            {!sectionId ? (
+              <div className={styles['ETD-no-results']}>
+                Chargement des données de l'étudiant...
+              </div>
+            ) : !semesterSelected ? (
+              <div className={styles['ETD-no-results']}>
+                Veuillez sélectionner un semestre pour consulter vos ressources
+              </div>
+            ) : !Array.isArray(modules) || modules.length === 0 ? (
+              <div className={styles['ETD-no-results']}>
+                Aucun module trouvé pour ce semestre.
+              </div>
             ) : (
-              resources.map((resource, index) => (
-                <li key={index} className="resource-item">
-                  <div className="resource-info">
-                    <div className="resource-header">
-                      {getResourceIcon(resourceType)}
-                      <h3>{resource.nom_ressource}</h3>
+              <ul>
+                {modules.map((module) => (
+                  <li
+                    key={module.ID_module}
+                    className={`${styles['ETD-document-item']} ${selectedModule?.ID_module === module.ID_module ? styles['ETD-expanded'] : ''}`}
+                    onClick={() => handleModuleClick(module)}
+                  >
+                    <div className={styles['ETD-document-info']}>
+                      <FaBookOpen className={styles['ETD-module-icon']} />
+                      <h3>{module.nom_module}</h3>
                     </div>
-                    <p className="resource-description">{resource.description}</p>
-                    <div className="resource-footer">
-                      <span className="resource-date">
-                        <FaCalendarAlt className="date-icon" />
-                        {resource.date_upload}
-                      </span>
-                      <a
-                        href={`http://localhost:8082${resource.fichier_url}`}
-                        download
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="download-button"
+                    <div className={styles['ETD-type-options']}>
+                      <button
+                        className={styles['ETD-type-option']}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleTypeClick(module.ID_module, 'Cours');
+                        }}
                       >
-                        <FaSearch style={{ marginRight: '8px' }} /> Consulter
-                      </a>
+                        Cours
+                      </button>
+                      <button
+                        className={styles['ETD-type-option']}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleTypeClick(module.ID_module, 'TD');
+                        }}
+                      >
+                        TD
+                      </button>
+                      <button
+                        className={styles['ETD-type-option']}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleTypeClick(module.ID_module, 'TP');
+                        }}
+                      >
+                        TP
+                      </button>
                     </div>
-                  </div>
-                </li>
-              ))
+                  </li>
+                ))}
+              </ul>
             )}
-          </ul>
-          <div className="button-group">
-            <button
-              className="close-button"
-              onClick={() => setShowResourceModal(false)}
-            >
-              <FaTimes style={{ marginRight: '8px' }} /> Fermer
-            </button>
+          </div>
+        </div>
+        <div className={`${styles['ETD-modal-overlay']} ${showResourceModal ? styles['ETD-active'] : ''}`}>
+          <div className={`${styles['ETD-modal-content']} ${showResourceModal ? styles['ETD-active'] : ''}`}>
+            <h3>
+              {getResourceIcon(resourceType)} {resourceType}
+            </h3>
+            <ul className={styles['ETD-resource-list']}>
+              {!Array.isArray(resources) || resources.length === 0 ? (
+                <li className={styles['ETD-no-results']}>
+                  Aucune ressource trouvée pour ce type.
+                </li>
+              ) : (
+                resources.map((resource, index) => (
+                  <li key={index} className={styles['ETD-resource-item']}>
+                    <div className={styles['ETD-resource-info']}>
+                      <div className={styles['ETD-resource-header']}>
+                        {getResourceIcon(resourceType)}
+                        <h3>{resource.nom_ressource}</h3>
+                      </div>
+                      <p className={styles['ETD-resource-description']}>{resource.description}</p>
+                      <div className={styles['ETD-resource-footer']}>
+                        <span className={styles['ETD-resource-date']}>
+                          <FaCalendarAlt className={styles['ETD-date-icon']} />
+                          {resource.date_upload}
+                        </span>
+                        <a
+                          href={`http://localhost:8082${resource.fichier_url}`}
+                          download
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={styles['ETD-download-button']}
+                        >
+                          <FaSearch style={{ marginRight: '8px' }} /> Consulter
+                        </a>
+                      </div>
+                    </div>
+                  </li>
+                ))
+              )}
+            </ul>
+            <div className={styles['ETD-button-group']}>
+              <button
+                className={styles['ETD-close-button']}
+                onClick={() => setShowResourceModal(false)}
+              >
+                <FaTimes style={{ marginRight: '8px' }} /> Fermer
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    </div>
   );
 }
 

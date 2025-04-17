@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaHeart, FaComment, FaComments, FaChevronLeft, FaChevronRight, FaTimesCircle } from 'react-icons/fa';
+import styles from './club.module.css';
 
 const MesClubsMembre = ({ clubsMembre, setClubsMembre, setError }) => {
   const [selectedClub, setSelectedClub] = useState(null);
@@ -8,17 +9,19 @@ const MesClubsMembre = ({ clubsMembre, setClubsMembre, setError }) => {
   const [showMessagerie, setShowMessagerie] = useState(false);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
+  const [messageFile, setMessageFile] = useState(null);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [isSendingMessage, setIsSendingMessage] = useState(false);
+  const [isFetchingMessages, setIsFetchingMessages] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState({});
   const [alert, setAlert] = useState(null);
+  const [showComments, setShowComments] = useState({});
   const messagesEndRef = useRef(null);
-
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8084';
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const matricule = storedUser?.Matricule;
 
-  // Fonction pour faire défiler automatiquement vers le bas de la messagerie
+  const API_URL = 'http://localhost:8084';
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -27,7 +30,6 @@ const MesClubsMembre = ({ clubsMembre, setClubsMembre, setError }) => {
     scrollToBottom();
   }, [messages]);
 
-  // Initialisation des indices pour le carrousel d'images des publications
   useEffect(() => {
     const initialIndexes = {};
     publications.forEach(pub => {
@@ -38,7 +40,6 @@ const MesClubsMembre = ({ clubsMembre, setClubsMembre, setError }) => {
     setCurrentImageIndex(initialIndexes);
   }, [publications]);
 
-  // Afficher une alerte d'erreur
   const showErrorAlert = (message) => {
     setAlert({
       type: 'error',
@@ -47,7 +48,52 @@ const MesClubsMembre = ({ clubsMembre, setClubsMembre, setError }) => {
     });
   };
 
-  // Sélectionner un club et charger ses publications
+  const fetchMessages = async () => {
+    if (!selectedClub || !selectedClub.ID_club || isFetchingMessages) {
+      return;
+    }
+
+    try {
+      setIsFetchingMessages(true);
+      setIsLoadingMessages(true);
+      const response = await fetch(`${API_URL}/messagesCLUB/club/${selectedClub.ID_club}/user/${matricule}`);
+      if (!response.ok) {
+        const contentType = response.headers.get('content-type');
+        let errorData = {};
+        if (contentType && contentType.includes('application/json')) {
+          errorData = await response.json();
+        } else {
+          const text = await response.text();
+          console.error('Réponse non-JSON reçue:', text);
+          throw new Error('Réponse inattendue du serveur (non-JSON)');
+        }
+        throw new Error(errorData.error || 'Erreur lors de la récupération des messages');
+      }
+      const messagesData = await response.json();
+      console.log('Messages reçus de l\'API:', messagesData);
+      setMessages(messagesData || []);
+    } catch (err) {
+      showErrorAlert(err.message);
+      setMessages([]);
+    } finally {
+      setIsLoadingMessages(false);
+      setIsFetchingMessages(false);
+    }
+  };
+
+  useEffect(() => {
+    let interval;
+    if (showMessagerie && selectedClub) {
+      fetchMessages();
+      interval = setInterval(() => {
+        fetchMessages();
+      }, 10000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [showMessagerie, selectedClub, matricule]);
+
   const handleSelectClub = async (club) => {
     setSelectedClub(club);
     setShowMessagerie(false);
@@ -64,12 +110,15 @@ const MesClubsMembre = ({ clubsMembre, setClubsMembre, setError }) => {
       const response = await fetch(`${API_URL}/publicationsCLUB/club/${club.ID_club}`);
       if (!response.ok) {
         const contentType = response.headers.get('content-type');
+        let errorData = {};
         if (contentType && contentType.includes('application/json')) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Erreur lors de la récupération des publications');
+          errorData = await response.json();
         } else {
+          const text = await response.text();
+          console.error('Réponse non-JSON reçue:', text);
           throw new Error('Réponse inattendue du serveur (non-JSON)');
         }
+        throw new Error(errorData.error || 'Erreur lors de la récupération des publications');
       }
       const data = await response.json();
       setPublications(data || []);
@@ -79,73 +128,52 @@ const MesClubsMembre = ({ clubsMembre, setClubsMembre, setError }) => {
     }
   };
 
-  // Afficher la messagerie du club sélectionné
   const handleShowMessagerie = async () => {
     setShowMessagerie(true);
     setAlert(null);
-
-    if (!selectedClub || !selectedClub.ID_club) {
-      showErrorAlert('Aucun club sélectionné pour la messagerie.');
-      return;
-    }
-
-    try {
-      setIsLoadingMessages(true);
-      const response = await fetch(`${API_URL}/messagesCLUB/club/${selectedClub.ID_club}/user/${matricule}`);
-      if (!response.ok) {
-        const contentType = response.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Erreur lors de la récupération des messages');
-        } else {
-          throw new Error('Réponse inattendue du serveur (non-JSON)');
-        }
-      }
-      const messagesData = await response.json();
-      setMessages(messagesData || []);
-    } catch (err) {
-      showErrorAlert(err.message);
-      setMessages([]);
-    } finally {
-      setIsLoadingMessages(false);
-    }
+    await fetchMessages();
   };
 
-  // Envoyer un message dans la messagerie
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (!newMessage.trim()) {
-      showErrorAlert('Le message ne peut pas être vide');
+    if (!newMessage.trim() && !messageFile) {
+      showErrorAlert('Le message ou le fichier ne peut pas être vide');
       return;
     }
 
     try {
       setIsSendingMessage(true);
+      const formData = new FormData();
+      formData.append('clubId', selectedClub.ID_club);
+      formData.append('expediteur', matricule);
+      formData.append('contenu', newMessage.trim() || 'Fichier joint');
+      if (messageFile) {
+        formData.append('file', messageFile);
+      }
+
       const response = await fetch(`${API_URL}/messagesCLUB/club/${selectedClub.ID_club}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          clubId: selectedClub.ID_club,
-          expediteur: matricule,
-          contenu: newMessage.trim(),
-        }),
+        body: formData,
       });
 
       if (!response.ok) {
         const contentType = response.headers.get('content-type');
+        let errorData = {};
         if (contentType && contentType.includes('application/json')) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Erreur lors de l’envoi du message');
+          errorData = await response.json();
         } else {
+          const text = await response.text();
+          console.error('Réponse non-JSON reçue:', text);
           throw new Error('Réponse inattendue du serveur (non-JSON)');
         }
+        throw new Error(errorData.error || 'Erreur lors de l’envoi du message');
       }
 
-      const newMessages = await response.json();
-      setMessages([...messages, ...newMessages]);
       setNewMessage('');
+      setMessageFile(null);
+      setTimeout(async () => {
+        await fetchMessages();
+      }, 500);
     } catch (err) {
       showErrorAlert(err.message);
     } finally {
@@ -153,7 +181,6 @@ const MesClubsMembre = ({ clubsMembre, setClubsMembre, setError }) => {
     }
   };
 
-  // Gérer le "J'aime" sur une publication
   const handleLikePublication = async (publicationId) => {
     try {
       const response = await fetch(`${API_URL}/publicationsCLUB/${publicationId}/like`, {
@@ -166,14 +193,15 @@ const MesClubsMembre = ({ clubsMembre, setClubsMembre, setError }) => {
 
       if (!response.ok) {
         const contentType = response.headers.get('content-type');
+        let errorData = {};
         if (contentType && contentType.includes('application/json')) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Erreur lors du like');
+          errorData = await response.json();
         } else {
           const text = await response.text();
           console.error('Réponse non-JSON reçue:', text);
           throw new Error('Réponse inattendue du serveur (non-JSON)');
         }
+        throw new Error(errorData.error || 'Erreur lors du like');
       }
 
       const updatedPublication = await response.json();
@@ -193,7 +221,6 @@ const MesClubsMembre = ({ clubsMembre, setClubsMembre, setError }) => {
     }
   };
 
-  // Ajouter un commentaire à une publication
   const handleAddComment = async (publicationId) => {
     const contenu = newComment[publicationId] ? newComment[publicationId].trim() : '';
     if (!contenu) {
@@ -212,25 +239,29 @@ const MesClubsMembre = ({ clubsMembre, setClubsMembre, setError }) => {
 
       if (!response.ok) {
         const contentType = response.headers.get('content-type');
+        let errorData = {};
         if (contentType && contentType.includes('application/json')) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Erreur lors de l’ajout du commentaire');
+          errorData = await response.json();
         } else {
           const text = await response.text();
           console.error('Réponse non-JSON reçue:', text);
           throw new Error('Réponse inattendue du serveur (non-JSON)');
         }
+        throw new Error(errorData.error || 'Erreur lors de l’ajout du commentaire');
       }
 
       const updatedPublications = await fetch(`${API_URL}/publicationsCLUB/club/${selectedClub.ID_club}`);
       if (!updatedPublications.ok) {
         const contentType = updatedPublications.headers.get('content-type');
+        let errorData = {};
         if (contentType && contentType.includes('application/json')) {
-          const errorData = await updatedPublications.json();
-          throw new Error(errorData.error || 'Erreur lors de la récupération des publications mises à jour');
+          errorData = await updatedPublications.json();
         } else {
+          const text = await updatedPublications.text();
+          console.error('Réponse non-JSON reçue:', text);
           throw new Error('Réponse inattendue du serveur (non-JSON)');
         }
+        throw new Error(errorData.error || 'Erreur lors de la récupération des publications mises à jour');
       }
       const data = await updatedPublications.json();
       setPublications(data || []);
@@ -240,7 +271,6 @@ const MesClubsMembre = ({ clubsMembre, setClubsMembre, setError }) => {
     }
   };
 
-  // Navigation dans le carrousel d'images
   const handlePrevImage = (id, length) => {
     setCurrentImageIndex(prev => ({
       ...prev,
@@ -255,213 +285,206 @@ const MesClubsMembre = ({ clubsMembre, setClubsMembre, setError }) => {
     }));
   };
 
-  // Rafraîchissement automatique des messages toutes les 10 secondes
-  useEffect(() => {
-    let interval;
-    if (showMessagerie && selectedClub) {
-      interval = setInterval(async () => {
-        try {
-          const response = await fetch(`${API_URL}/messagesCLUB/club/${selectedClub.ID_club}/user/${matricule}`);
-          if (!response.ok) {
-            const contentType = response.headers.get('content-type');
-            if (contentType && contentType.includes('application/json')) {
-              const errorData = await response.json();
-              throw new Error(errorData.error || 'Erreur lors de la récupération des messages');
-            } else {
-              throw new Error('Réponse inattendue du serveur (non-JSON)');
-            }
-          }
-          const messagesData = await response.json();
-          setMessages(messagesData || []);
-        } catch (err) {
-          console.error('Erreur lors du rafraîchissement des messages:', err.message);
-        }
-      }, 10000);
-    }
-    return () => clearInterval(interval);
-  }, [showMessagerie, selectedClub, matricule]);
-
   return (
     <>
-    <div id="clubs">
-      <div className="header">
+      <div className={styles['CLUB-ETD-header']}>
         <h1>Mes Clubs (Membre)</h1>
         <p>Consultez les clubs dont vous êtes membre</p>
       </div>
 
-      <div className="content-grid">
-        <div className="event-list">
+      <div className={styles['CLUB-ETD-content-grid']}>
+        <div className={styles['CLUB-ETD-event-list']}>
           {clubsMembre.length === 0 ? (
-            <p className="no-data">Vous n’êtes membre d’aucun club. Rejoignez un club pour voir ses publications.</p>
+            <p className={styles['CLUB-ETD-no-data']}>Vous n’êtes membre d’aucun club. Rejoignez un club pour voir ses publications.</p>
           ) : (
             <>
               <h3>Choisissez un club :</h3>
-              <ul id="clubs-list">
+              <ul id="clubs-list" className={styles['CLUB-ETD-clubs-list']}>
                 {clubsMembre.map(club => (
-                  <li key={club.ID_club} className="club-item">
-                    <div className="club-preview" onClick={() => handleSelectClub(club)}>
-                      <div className="club-image-container">
+                  <li key={club.ID_club} className={styles['CLUB-ETD-club-item']}>
+                    <div className={styles['CLUB-ETD-club-preview']} onClick={() => handleSelectClub(club)}>
+                      <div className={styles['CLUB-ETD-club-image-container']}>
                         {club.image_url ? (
                           <img
                             src={`${API_URL}${club.image_url}`}
                             alt={club.nom}
-                            className="club-image"
+                            className={styles['CLUB-ETD-club-image']}
                             onError={(e) => {
                               console.error('Erreur chargement image club:', `${API_URL}${club.image_url}`);
                               e.target.src = 'https://via.placeholder.com/60x60?text=Club';
                             }}
                           />
                         ) : (
-                          <div className="club-placeholder">Club</div>
+                          <div className={styles['CLUB-ETD-club-placeholder']}>Club</div>
                         )}
                       </div>
-                      <h4 className="club-name">{club.nom}</h4>
+                      <h4 className={styles['CLUB-ETD-club-name']}>{club.nom}</h4>
                     </div>
                   </li>
                 ))}
               </ul>
 
               {selectedClub && (
-                <div className="club-details">
+                <div className={styles['CLUB-ETD-club-details']}>
                   <h3>{selectedClub.nom}</h3>
-                  <div className="club-details-header">
-                    <div className="club-image-container">
+                  <div className={styles['CLUB-ETD-club-details-header']}>
+                    <div className={styles['CLUB-ETD-club-image-container']}>
                       {selectedClub.image_url ? (
                         <img
                           src={`${API_URL}${selectedClub.image_url}`}
                           alt={selectedClub.nom}
-                          className="club-image"
+                          className={styles['CLUB-ETD-club-image']}
                           onError={(e) => {
                             e.target.src = 'https://via.placeholder.com/60x60?text=Club';
                           }}
                         />
                       ) : (
-                        <div className="club-placeholder">Club</div>
+                        <div className={styles['CLUB-ETD-club-placeholder']}>Club</div>
                       )}
                     </div>
-                    <div className="club-info">
+                    <div className={styles['CLUB-ETD-club-info']}>
                       <h4>{selectedClub.nom}</h4>
                       <p>{selectedClub.description_club || 'Aucune description'}</p>
                     </div>
                   </div>
-                  <div className="button-group">
-                    <button onClick={() => setShowMessagerie(false)}>
+                  <div className={styles['CLUB-ETD-button-group']}>
+                    <button className={styles['CLUB-ETD-button']} onClick={() => setShowMessagerie(false)}>
                       <FaHeart /> Voir les Publications
                     </button>
-                    <button onClick={handleShowMessagerie}>
+                    <button className={styles['CLUB-ETD-button']} onClick={handleShowMessagerie}>
                       <FaComments /> Messagerie
                     </button>
                   </div>
 
                   {showMessagerie ? (
-                    <div className="messagerie-section">
-                      <h4 className="section-title">Messagerie de groupe - {selectedClub.nom}</h4>
-                      <div className="messagerie-container">
+                    <div className={styles['CLUB-ETD-messagerie-section']}>
+                      <h4 className={styles['CLUB-ETD-section-title']}>Messagerie de groupe - {selectedClub.nom}</h4>
+                      <div className={styles['CLUB-ETD-messagerie-container']} style={{ maxHeight: '400px', overflowY: 'auto' }}>
                         {isLoadingMessages ? (
                           <p style={{ textAlign: 'center', color: '#5483b3' }}>Chargement des messages...</p>
                         ) : messages.length === 0 ? (
-                          <p className="no-data">Aucun message dans ce club.</p>
+                          <p className={styles['CLUB-ETD-no-data']}>Aucun message dans ce club.</p>
                         ) : (
                           messages.map(msg => (
                             <div
                               key={msg.ID_message}
-                              className={`message ${msg.expediteur === matricule ? 'sent' : 'received'}`}
+                              className={`${styles['CLUB-ETD-message']} ${String(msg.expediteur) === String(matricule) ? styles['CLUB-ETD-sent'] : styles['CLUB-ETD-received']}`}
                             >
-                              <div className="message-header">
-                                <div className="message-sender">
-                                  {msg.expediteur === matricule ? 'Vous' : `${msg.expediteur_nom} ${msg.expediteur_prenom}`}
+                              <div className={styles['CLUB-ETD-message-header']}>
+                                <div className={styles['CLUB-ETD-message-sender']}>
+                                  {String(msg.expediteur) === String(matricule) ? 'Vous' : `${msg.expediteur_nom} ${msg.expediteur_prenom}`}
                                 </div>
-                                <div className="message-timestamp">
+                                <div className={styles['CLUB-ETD-message-timestamp']}>
                                   {new Date(msg.date_envoi).toLocaleString()}
                                 </div>
                               </div>
-                              <div className="message-content">
+                              <div className={styles['CLUB-ETD-message-content']}>
                                 {msg.contenu}
+                                {msg.filePath && (
+                                  <div>
+                                    <a
+                                      href={`${API_URL}${msg.filePath}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      download={msg.fileName}
+                                    >
+                                      {msg.fileName} (Télécharger)
+                                    </a>
+                                  </div>
+                                )}
                               </div>
                             </div>
                           ))
                         )}
                         <div ref={messagesEndRef} />
                       </div>
-                      <form onSubmit={handleSendMessage} className="message-form">
+                      <form onSubmit={handleSendMessage} className={styles['CLUB-ETD-message-form']}>
                         <textarea
+                          className={styles['CLUB-ETD-textarea']}
                           value={newMessage}
                           onChange={(e) => setNewMessage(e.target.value)}
                           placeholder="Écrire un message..."
-                          disabled={isSendingMessage}
                         />
-                        <button type="submit" disabled={isSendingMessage}>
+                        <div className={styles['CLUB-ETD-file-input-container']}>
+                          <input
+                            type="file"
+                            id="messageFile"
+                            accept="image/jpeg,image/png,application/pdf,text/plain"
+                            onChange={(e) => setMessageFile(e.target.files[0])}
+                          />
+                          <label htmlFor="messageFile">Joindre un fichier</label>
+                        </div>
+                        {messageFile && <p className={styles['CLUB-ETD-file-selected']}>Fichier sélectionné : {messageFile.name}</p>}
+                        <button className={styles['CLUB-ETD-button']} type="submit" disabled={isSendingMessage}>
                           {isSendingMessage ? 'Envoi...' : 'Envoyer'}
                         </button>
                       </form>
                     </div>
                   ) : (
-                    <div className="publications-section">
-                      <h4 className="section-title">Publications de {selectedClub.nom}</h4>
+                    <div className={styles['CLUB-ETD-publications-section']}>
+                      <h4 className={styles['CLUB-ETD-section-title']}>Publications de {selectedClub.nom}</h4>
                       {publications.length === 0 ? (
-                        <p className="no-data">Aucune publication pour ce club.</p>
+                        <p className={styles['CLUB-ETD-no-data']}>Aucune publication pour ce club.</p>
                       ) : (
-                        <ul className="social-posts">
+                        <ul className={styles['CLUB-ETD-social-posts']}>
                           {publications.map(pub => (
-                            <li key={pub.ID_publication} className="social-post-card">
-                              <div className="post-header">
-                                <div className="post-club-info">
-                                  <div className="club-image-container">
+                            <li key={pub.ID_publication} className={styles['CLUB-ETD-social-post-card']}>
+                              <div className={styles['CLUB-ETD-post-header']}>
+                                <div className={styles['CLUB-ETD-post-club-info']}>
+                                  <div className={styles['CLUB-ETD-club-image-container']}>
                                     {selectedClub.image_url ? (
                                       <img
                                         src={`${API_URL}${selectedClub.image_url}`}
                                         alt={selectedClub.nom}
-                                        className="club-image"
+                                        className={styles['CLUB-ETD-club-image']}
                                         onError={(e) => {
                                           e.target.src = 'https://via.placeholder.com/40x40?text=Club';
                                         }}
                                       />
                                     ) : (
-                                      <div className="club-placeholder">Club</div>
+                                      <div className={styles['CLUB-ETD-club-placeholder']}>Club</div>
                                     )}
                                   </div>
                                   <div>
                                     <h5>{selectedClub.nom}</h5>
-                                    <p className="post-date">
-                                      {pub.date_publication
-                                        ? new Date(pub.date_publication).toLocaleDateString()
-                                        : 'Date inconnue'}
+                                    <p className={styles['CLUB-ETD-post-date']}>
+                                      {new Date(pub.date_publication).toLocaleDateString()}
                                     </p>
                                   </div>
                                 </div>
                               </div>
                               {pub.images && Array.isArray(pub.images) && pub.images.length > 0 ? (
-                                <div className="post-image-carousel">
+                                <div className={styles['CLUB-ETD-post-image-carousel']}>
                                   <button
-                                    className="carousel-button prev"
+                                    className={`${styles['CLUB-ETD-carousel-button']} ${styles['CLUB-ETD-prev']}`}
                                     onClick={() => handlePrevImage(pub.ID_publication, pub.images.length)}
                                     disabled={pub.images.length <= 1}
                                   >
                                     <FaChevronLeft />
                                   </button>
-                                  <div className="carousel-image-container">
+                                  <div className={styles['CLUB-ETD-carousel-image-container']}>
                                     <img
-                                      src={`${API_URL}${pub.images[currentImageIndex[`pub-${pub.ID_publication}`] || 0]?.image_url}`}
+                                      src={`${API_URL}${pub.images[currentImageIndex[`pub-${pub.ID_publication}`] || 0].image_url}`}
                                       alt={`Publication ${currentImageIndex[`pub-${pub.ID_publication}`] + 1}`}
-                                      className="carousel-image"
+                                      className={styles['CLUB-ETD-carousel-image']}
                                       onError={(e) => {
                                         e.target.src = 'https://via.placeholder.com/400x300?text=Image+Indisponible';
                                       }}
                                     />
                                   </div>
                                   <button
-                                    className="carousel-button next"
+                                    className={`${styles['CLUB-ETD-carousel-button']} ${styles['CLUB-ETD-next']}`}
                                     onClick={() => handleNextImage(pub.ID_publication, pub.images.length)}
                                     disabled={pub.images.length <= 1}
                                   >
                                     <FaChevronRight />
                                   </button>
                                   {pub.images.length > 1 && (
-                                    <div className="carousel-indicators">
+                                    <div className={styles['CLUB-ETD-carousel-indicators']}>
                                       {pub.images.map((_, index) => (
                                         <span
                                           key={index}
-                                          className={`indicator ${index === (currentImageIndex[`pub-${pub.ID_publication}`] || 0) ? 'active' : ''}`}
+                                          className={`${styles['CLUB-ETD-indicator']} ${index === (currentImageIndex[`pub-${pub.ID_publication}`] || 0) ? styles['CLUB-ETD-active'] : ''}`}
                                           onClick={() => setCurrentImageIndex(prev => ({ ...prev, [`pub-${pub.ID_publication}`]: index }))}
                                         />
                                       ))}
@@ -469,53 +492,64 @@ const MesClubsMembre = ({ clubsMembre, setClubsMembre, setError }) => {
                                   )}
                                 </div>
                               ) : null}
-                              <div className="post-content">
-                                <p>{pub.contenu || 'Aucun contenu'}</p>
+                              <div className={styles['CLUB-ETD-post-content']}>
+                                <p>{pub.contenu}</p>
                               </div>
-                              <div className="post-actions">
+                              <div className={styles['CLUB-ETD-post-actions']}>
                                 <button
-                                  className={`like-button ${pub.liked_by && Array.isArray(pub.liked_by) && pub.liked_by.includes(matricule) ? 'liked' : ''}`}
                                   onClick={() => handleLikePublication(pub.ID_publication)}
+                                  className={`${styles['CLUB-ETD-like-button']} ${pub.liked_by && pub.liked_by.includes(Number(matricule)) ? styles['CLUB-ETD-liked'] : ''}`}
                                 >
                                   <FaHeart /> {pub.likes || 0} J’aime
                                 </button>
                                 <span>{pub.commentaires_count || 0} Commentaire(s)</span>
                               </div>
-                              <div className="post-comments">
-                                <h5>Commentaires :</h5>
-                                {pub.commentaires && Array.isArray(pub.commentaires) && pub.commentaires.length > 0 ? (
-                                  <ul>
-                                    {pub.commentaires.map(comment => (
-                                      <li key={comment.ID_commentaire}>
-                                        <strong>{comment.nom || 'Utilisateur'} {comment.prenom || ''} :</strong> {comment.contenu || 'Aucun contenu'}
-                                      </li>
-                                    ))}
-                                  </ul>
-                                ) : (
-                                  <p>Aucun commentaire.</p>
-                                )}
-                                <form
-                                  onSubmit={(e) => {
-                                    e.preventDefault();
-                                    handleAddComment(pub.ID_publication);
-                                  }}
-                                  className="comment-form"
-                                >
-                                  <textarea
-                                    value={newComment[pub.ID_publication] || ''}
-                                    onChange={(e) =>
-                                      setNewComment(prev => ({
+                              <div className={styles['CLUB-ETD-post-comments']}>
+                                <h5>
+                                  Commentaires :
+                                  <button
+                                    className={styles['CLUB-ETD-toggle-comments-btn']}
+                                    onClick={() =>
+                                      setShowComments(prev => ({
                                         ...prev,
-                                        [pub.ID_publication]: e.target.value,
+                                        [pub.ID_publication]: !prev[pub.ID_publication],
                                       }))
                                     }
-                                    placeholder="Ajouter un commentaire..."
-                                    rows="2"
-                                  />
-                                  <button type="submit">
-                                    <FaComment /> Commenter
+                                  >
+                                    {showComments[pub.ID_publication] ? 'Masquer' : 'Afficher'}
                                   </button>
-                                </form>
+                                </h5>
+                                {showComments[pub.ID_publication] && (
+                                  <>
+                                    {pub.commentaires && pub.commentaires.length > 0 ? (
+                                      <ul className={styles['CLUB-ETD-comments-list']}>
+                                        {pub.commentaires.map(comment => (
+                                          <li key={comment.ID_commentaire}>
+                                            <strong>{comment.nom} {comment.prenom} :</strong> {comment.contenu}
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    ) : (
+                                      <p>Aucun commentaire.</p>
+                                    )}
+                                    <div className={styles['CLUB-ETD-add-comment']}>
+                                      <textarea
+                                        className={styles['CLUB-ETD-textarea']}
+                                        value={newComment[pub.ID_publication] || ''}
+                                        onChange={(e) =>
+                                          setNewComment(prev => ({
+                                            ...prev,
+                                            [pub.ID_publication]: e.target.value,
+                                          }))
+                                        }
+                                        placeholder="Ajouter un commentaire..."
+                                      />
+                                      <button className={styles['CLUB-ETD-button']} onClick={() => handleAddComment(pub.ID_publication)}>
+                                        <FaComment /> Commenter
+                                      </button>
+                                    </div>
+                                  </>
+                                )}
                               </div>
                             </li>
                           ))}
@@ -531,21 +565,20 @@ const MesClubsMembre = ({ clubsMembre, setClubsMembre, setError }) => {
       </div>
 
       {alert && (
-        <div className={`custom-alert ${alert.type}`}>
-          <div className="alert-content">
-            <div className="alert-icon">
+        <div className={`${styles['CLUB-ETD-custom-alert']} ${styles[`CLUB-ETD-${alert.type}`]}`}>
+          <div className={styles['CLUB-ETD-alert-content']}>
+            <div className={styles['CLUB-ETD-alert-icon']}>
               <FaTimesCircle />
             </div>
             <p>{alert.message}</p>
-            <div className="alert-buttons">
-              <button className="close-button" onClick={alert.onClose}>
-                Fermer
+            <div className={styles['CLUB-ETD-alert-buttons']}>
+              <button className={styles['CLUB-ETD-close-button']} onClick={alert.onClose}>
+                <FaTimesCircle /> Fermer
               </button>
             </div>
           </div>
         </div>
       )}
-      </div>
     </>
   );
 };

@@ -30,22 +30,24 @@
 /* Sidebar */
 #edit-profil .sidebar {
     background: linear-gradient(135deg, rgba(91, 135, 179, 0.95) 0%, rgba(17, 69, 148, 0.95) 100%);
-    border-radius: 0;
-    padding: 25px;
-    color: #ffffff;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    position: fixed;
-    top: 0;
-    left: 30px;
-    width: 180px;
-    height: 100vh;
-    box-shadow: 0 15px 40px rgba(37, 100, 194, 0.35);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
-    z-index: 1000;
-    animation: slideIn 0.5s ease-out;
+  border-radius: 0;
+  padding: 25px;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  position: fixed;
+  top: 0;
+  left: 30px;
+  width: 200px; /* Increased from 150px to 200px */
+  height: 100vh;
+  box-shadow: 0 15px 40px rgba(37, 100, 194, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  animation: slideIn 0.5s ease-out;
+  overflow-y: auto;
+  padding-bottom: 40px;
 }
 
 #edit-profil .logo {
@@ -66,22 +68,26 @@
 
 #edit-profil .sidebar-button {
     background: rgba(255, 255, 255, 0.1);
-    color: #ffffff;
-    text-decoration: none;
-    font-size: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 12px;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    width: 100%;
-    box-sizing: border-box;
-    position: relative;
-    overflow: hidden;
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.9rem; /* Reduced from 1rem to 0.9rem for better fit */
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 10px 15px; /* Adjusted padding from 12px 20px to 10px 15px */
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+  white-space: normal; /* Allow text to wrap */
+  word-wrap: break-word; /* Ensure long words break to the next line */
+  line-height: 1.2; /* Improve readability with better line spacing */
 }
 
 #edit-profil .sidebar-button:hover {

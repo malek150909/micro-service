@@ -7,7 +7,7 @@ const getAllAnnonces = async (req, res) => {
       let image_url = annonce.image_url || '';
       if (image_url && !image_url.startsWith('http')) {
         image_url = annonce.event_id
-          ? `http://localhost:9000${image_url}`
+          ? `http://localhost:8084${image_url}`
           : `http://localhost:8082${image_url}`;
         console.log(`Annonce ID ${annonce.id} - event_id: ${annonce.event_id}, URL ajustée: ${image_url}`);
       } else {
@@ -73,7 +73,7 @@ const createAnnonce = async (req, res) => {
       id: result.insertId,
       title,
       content,
-      image_url: image_url ? `http://localhost:5001${image_url}` : '',
+      image_url: image_url ? `http://localhost:8082${image_url}` : '',
       admin_matricule,
       target_type,
       target_filter: targetFilterParsed,

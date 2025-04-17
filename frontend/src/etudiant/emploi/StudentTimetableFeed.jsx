@@ -216,7 +216,7 @@ const StudentTimetableFeed = () => {
       <div className="sidebar">
       <div className="logo"><h2>Emplois du temps</h2></div>
         <button className="sidebar-button" onClick={() => navigate('/etudiant')}>
-          <FaHome /> Retour
+          <FaHome /> Retour à l'accueil
         </button>
         <button className="sidebar-button export-pdf" onClick={exportToPDF}>
           <FaFilePdf /> Exporter en PDF

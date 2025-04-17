@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FaArrowLeft, FaPlus, FaEdit, FaTrash, FaExclamationTriangle, FaBook, FaPen, FaFileUpload, FaDownload, FaHome, FaUser } from 'react-icons/fa';
 import { MdDescription } from 'react-icons/md';
-import "./doc.css";
+import styles from './doc.module.css';
 
 function AdminDashboard() {
     const navigate = useNavigate();
-    const [user, setUser] = useState(null); // État local pour stocker l'utilisateur
+    const [user, setUser] = useState(null);
     const [documents, setDocuments] = useState([]);
     const [faculties, setFaculties] = useState([]);
     const [formData, setFormData] = useState({
@@ -35,10 +35,10 @@ function AdminDashboard() {
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
         if (!storedUser) {
-            navigate('/'); // Redirection si aucun utilisateur n'est trouvé
+            navigate('/');
         } else {
-            setUser(storedUser); // Stocker l'utilisateur dans l'état
-            fetchFaculties(storedUser); // Charger les facultés avec l'utilisateur
+            setUser(storedUser);
+            fetchFaculties(storedUser);
         }
     }, [navigate]);
 
@@ -212,7 +212,7 @@ function AdminDashboard() {
             setError('');
             console.log('Deleting document with ID:', documentToDelete.ID_document);
             const response = await axios.delete(`http://localhost:8083/documents/${documentToDelete.ID_document}`, {
-                headers: { matricule: user.Matricule } // Correction ici
+                headers: { matricule: user.Matricule }
             });
             console.log('Delete response:', response.data);
             fetchDocuments();
@@ -258,39 +258,38 @@ function AdminDashboard() {
     };
 
     const handleLogout = () => {
-        navigate('/admin'); // Redirection vers la page racine
+        navigate('/admin');
     };
 
     return (
-        <div id="docs">
-        <div className="container">
-            <div className="background-shapes">
-                <div className="shape shape1"></div>
-                <div className="shape shape2"></div>
+        <div className={styles['ADM-DOC-container']}>
+            <div className={styles['ADM-DOC-background-shapes']}>
+                <div className={styles['ADM-DOC-shape ADM-DOC-shape1']}></div>
+                <div className={styles['ADM-DOC-shape ADM-DOC-shape2']}></div>
             </div>
 
-            <div className="sidebar">
-                <div className="logo">
-                    <h2><FaUser /> Admin</h2>
+            <div className={styles['ADM-DOC-sidebar']}>
+                <div className={styles['ADM-DOC-logo']}>
+                    <h2>Documents Administratifs</h2>
                 </div>
-                <button className="sidebar-button" onClick={handleLogout}>
+                <button className={styles['ADM-DOC-sidebar-button']} onClick={handleLogout}>
                     <FaHome /> Retour à l’accueil
                 </button>
             </div>
 
-            <div className="main-content">
-                <div className="header">
+            <div className={styles['ADM-DOC-main-content']}>
+                <div className={styles['ADM-DOC-header']}>
                     <h1>Gestion des documents administratifs</h1>
                     <p>Gérer les documents des facultés</p>
                 </div>
 
-                <div className="content-grid">
-                    <div className="chart-container">
-                        <div className="chart-title">
+                <div className={styles['ADM-DOC-content-grid']}>
+                    <div className={styles['ADM-DOC-chart-container']}>
+                        <div className={styles['ADM-DOC-chart-title']}>
                             <FaPlus /> Ajouter un Nouveau Document
                         </div>
                         <form ref={formRef} onSubmit={handleSubmit}>
-                            <div className="input-group">
+                            <div className={styles['ADM-DOC-input-group']}>
                                 <label>Faculté</label>
                                 {loadingFaculties ? (
                                     <p>Chargement des facultés...</p>
@@ -311,9 +310,9 @@ function AdminDashboard() {
                                     </select>
                                 )}
                             </div>
-                            <div className="input-group">
+                            <div className={styles['ADM-DOC-input-group']}>
                                 <label>
-                                    <FaPen className="input-icon" /> Titre
+                                    <FaPen className={styles['ADM-DOC-input-icon']} /> Titre
                                 </label>
                                 <input
                                     type="text"
@@ -321,23 +320,25 @@ function AdminDashboard() {
                                     value={formData.titre}
                                     onChange={(e) => setFormData({...formData, titre: e.target.value})}
                                     required
+                                    className={styles['ADM-DOC-input']}
                                 />
                             </div>
-                            <div className="input-group">
+                            <div className={styles['ADM-DOC-input-group']}>
                                 <label>
-                                    <MdDescription className="input-icon" /> Description
+                                    <MdDescription className={styles['ADM-DOC-input-icon']} /> Description
                                 </label>
                                 <textarea
                                     placeholder="Description"
                                     value={formData.description}
                                     onChange={(e) => setFormData({...formData, description: e.target.value})}
+                                    className={styles['ADM-DOC-textarea']}
                                 />
                             </div>
-                            <div className="input-group">
+                            <div className={styles['ADM-DOC-input-group']}>
                                 <label>
-                                    <FaFileUpload className="input-icon" /> Télécharger PDF
+                                    <FaFileUpload className={styles['ADM-DOC-input-icon']} /> Télécharger PDF
                                 </label>
-                                <div className="custom-file-input">
+                                <div className={styles['ADM-DOC-custom-file-input']}>
                                     <input
                                         type="file"
                                         accept="application/pdf"
@@ -345,33 +346,33 @@ function AdminDashboard() {
                                         onChange={handleFileChange}
                                         required
                                     />
-                                    <label htmlFor="file-upload" className="custom-file-label">
+                                    <label htmlFor="file-upload" className={styles['ADM-DOC-custom-file-label']}>
                                         Choisir
                                     </label>
-                                    <span className="file-name">{selectedFileName}</span>
+                                    <span className={styles['ADM-DOC-file-name']}>{selectedFileName}</span>
                                 </div>
                             </div>
-                            <button type="submit">
+                            <button type="submit" className={styles['ADM-DOC-button']}>
                                 <FaPlus /> Ajouter Document
                             </button>
                         </form>
                     </div>
 
-                    <div className="document-list">
+                    <div className={styles['ADM-DOC-document-list']}>
                         <h3>
                             <FaBook /> Documents
                         </h3>
                         {!selectedFaculte ? (
-                            <div className="no-results">Sélectionnez une faculté pour afficher les documents.</div>
+                            <div className={styles['ADM-DOC-no-results']}>Sélectionnez une faculté pour afficher les documents.</div>
                         ) : documents === null || documents === undefined ? (
-                            <div className="no-results">Erreur lors du chargement des documents.</div>
+                            <div className={styles['ADM-DOC-no-results']}>Erreur lors du chargement des documents.</div>
                         ) : documents.length === 0 ? (
-                            <div className="no-results">Aucun document trouvé pour cette faculté.</div>
+                            <div className={styles['ADM-DOC-no-results']}>Aucun document trouvé pour cette faculté.</div>
                         ) : (
                             <ul>
                                 {documents.map(doc => (
-                                    <li key={doc.ID_document} className="document-item">
-                                        <div className="document-info">
+                                    <li key={doc.ID_document} className={styles['ADM-DOC-document-item']}>
+                                        <div className={styles['ADM-DOC-document-info']}>
                                             <h3>
                                                 <FaBook /> {doc.titre}
                                             </h3>
@@ -381,11 +382,11 @@ function AdminDashboard() {
                                                 <FaDownload /> Télécharger
                                             </a>
                                         </div>
-                                        <div className="document-actions">
-                                            <button className="edit-button" onClick={() => handleEdit(doc)}>
+                                        <div className={styles['ADM-DOC-document-actions']}>
+                                            <button className={styles['ADM-DOC-edit-button']} onClick={() => handleEdit(doc)}>
                                                 <FaEdit /> Modifier
                                             </button>
-                                            <button className="delete-button" onClick={() => handleDeleteClick(doc)}>
+                                            <button className={styles['ADM-DOC-delete-button']} onClick={() => handleDeleteClick(doc)}>
                                                 <FaTrash /> Supprimer
                                             </button>
                                         </div>
@@ -398,15 +399,15 @@ function AdminDashboard() {
             </div>
 
             {(editModalOpen || editModalClosing) && (
-                <div className={`modal-overlay ${editModalActive && !editModalClosing ? 'active' : ''}`}>
-                    <div className="modal-content">
+                <div className={`${styles['ADM-DOC-modal-overlay']} ${editModalActive && !editModalClosing ? styles['ADM-DOC-active'] : ''}`}>
+                    <div className={styles['ADM-DOC-modal-content']}>
                         <h3>
                             <FaEdit /> Modifier Document
                         </h3>
                         <form onSubmit={handleUpdate}>
-                            <div className="input-group">
+                            <div className={styles['ADM-DOC-input-group']}>
                                 <label>
-                                    <FaPen className="input-icon" /> Titre
+                                    <FaPen className={styles['ADM-DOC-input-icon']} /> Titre
                                 </label>
                                 <input
                                     type="text"
@@ -414,40 +415,42 @@ function AdminDashboard() {
                                     value={formData.titre}
                                     onChange={(e) => setFormData({...formData, titre: e.target.value})}
                                     required
+                                    className={styles['ADM-DOC-input']}
                                 />
                             </div>
-                            <div className="input-group">
+                            <div className={styles['ADM-DOC-input-group']}>
                                 <label>
-                                    <MdDescription className="input-icon" /> Description
+                                    <MdDescription className={styles['ADM-DOC-input-icon']} /> Description
                                 </label>
                                 <textarea
                                     placeholder="Description"
                                     value={formData.description}
                                     onChange={(e) => setFormData({...formData, description: e.target.value})}
+                                    className={styles['ADM-DOC-textarea']}
                                 />
                             </div>
-                            <div className="input-group">
+                            <div className={styles['ADM-DOC-input-group']}>
                                 <label>
-                                    <FaFileUpload className="input-icon" /> Télécharger un Nouveau PDF (facultatif)
+                                    <FaFileUpload className={styles['ADM-DOC-input-icon']} /> Télécharger un Nouveau PDF (facultatif)
                                 </label>
-                                <div className="custom-file-input">
+                                <div className={styles['ADM-DOC-custom-file-input']}>
                                     <input
                                         type="file"
                                         accept="application/pdf"
                                         id="file-upload-edit"
                                         onChange={handleFileChange}
                                     />
-                                    <label htmlFor="file-upload-edit" className="custom-file-label">
+                                    <label htmlFor="file-upload-edit" className={styles['ADM-DOC-custom-file-label']}>
                                         Choisir
                                     </label>
-                                    <span className="file-name">{selectedFileName}</span>
+                                    <span className={styles['ADM-DOC-file-name']}>{selectedFileName}</span>
                                 </div>
                             </div>
-                            <div className="button-group">
-                                <button type="submit">
+                            <div className={styles['ADM-DOC-button-group']}>
+                                <button type="submit" className={styles['ADM-DOC-button']}>
                                     <FaEdit /> Mettre à Jour Document
                                 </button>
-                                <button type="button" className="close-button" onClick={closeEditModal}>
+                                <button type="button" className={styles['ADM-DOC-close-button']} onClick={closeEditModal}>
                                     Annuler
                                 </button>
                             </div>
@@ -457,17 +460,17 @@ function AdminDashboard() {
             )}
 
             {(deleteModalOpen || deleteModalClosing) && (
-                <div className={`modal-overlay ${deleteModalActive && !deleteModalClosing ? 'active' : ''}`}>
-                    <div className="modal-content delete-modal">
+                <div className={`${styles['ADM-DOC-modal-overlay']} ${deleteModalActive && !deleteModalClosing ? styles['ADM-DOC-active'] : ''}`}>
+                    <div className={`${styles['ADM-DOC-modal-content']} ${styles['ADM-DOC-delete-modal']}`}>
                         <h3>
                             <FaExclamationTriangle /> Confirmer la Suppression
                         </h3>
                         <p>Êtes-vous sûr de vouloir supprimer le document "{documentToDelete?.titre}" ? Cette action est irréversible.</p>
-                        <div className="button-group">
-                            <button className="delete-button" onClick={confirmDelete}>
+                        <div className={styles['ADM-DOC-button-group']}>
+                            <button className={styles['ADM-DOC-delete-button']} onClick={confirmDelete}>
                                 <FaTrash /> Confirmer
                             </button>
-                            <button className="close-button" onClick={closeDeleteModal}>
+                            <button className={styles['ADM-DOC-close-button']} onClick={closeDeleteModal}>
                                 Annuler
                             </button>
                         </div>
@@ -476,19 +479,18 @@ function AdminDashboard() {
             )}
 
             {(error || errorModalClosing) && (
-                <div className={`modal-overlay ${errorModalActive && !errorModalClosing ? 'active' : ''}`}>
-                    <div className="modal-content error-modal">
+                <div className={`${styles['ADM-DOC-modal-overlay']} ${errorModalActive && !errorModalClosing ? styles['ADM-DOC-active'] : ''}`}>
+                    <div className={`${styles['ADM-DOC-modal-content']} ${styles['ADM-DOC-error-modal']}`}>
                         <h3>
                             <FaExclamationTriangle /> Erreur
                         </h3>
                         <p>{error}</p>
-                        <button className="close-button" onClick={closeErrorModal}>
+                        <button className={styles['ADM-DOC-close-button']} onClick={closeErrorModal}>
                             Fermer
                         </button>
                     </div>
                 </div>
             )}
-        </div>
         </div>
     );
 }

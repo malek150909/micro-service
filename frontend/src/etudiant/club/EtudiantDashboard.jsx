@@ -1,12 +1,11 @@
-// club-evenement-service/frontend/src/components/EtudiantDashboard.jsx
-import { useState, useEffect } from 'react';
-import { FaUsers, FaList, FaEnvelope, FaSignOutAlt } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { FaUsers, FaList, FaEnvelope, FaHome } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import GererMesClubs from './GererMesClubs';
 import ListeClubsDisponibles from './ListeClubsDisponibles';
 import MesClubsMembre from './MesClubsMembre';
 import DemandeCreationClub from './DemandeCreationClub';
-import './club.css';
+import styles from './club.module.css';
 
 const EtudiantDashboard = () => {
   const navigate = useNavigate();
@@ -16,10 +15,10 @@ const EtudiantDashboard = () => {
   const [clubsDisponibles, setClubsDisponibles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8084';
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const matricule = storedUser?.Matricule;
+
+  const API_URL = 'http://localhost:8084';
 
   useEffect(() => {
     const fetchClubs = async () => {
@@ -42,58 +41,57 @@ const EtudiantDashboard = () => {
 
     fetchClubs();
   }, [matricule]);
-  
+
+  const handleBack = () => {
+    navigate('/etudiant');
+  };
+
   if (loading) {
-    return (
-        <div id="clubs">
-        <div className="container">Chargement...</div>
-        </div>
-    );
+    return <div className={styles['CLUB-ETD-container']}>Chargement...</div>;
   }
 
   return (
-    <div id="clubs">
-    <div className="container">
-      <div className="background-shapes">
-        <div className="shape shape1"></div>
-        <div className="shape shape2"></div>
+    <div className={styles['CLUB-ETD-container']}>
+      <div className={styles['CLUB-ETD-background-shapes']}>
+        <div className={styles['CLUB-ETD-shape1']}></div>
+        <div className={styles['CLUB-ETD-shape2']}></div>
       </div>
 
-      <aside className="sidebar">
-        <div className="logo">
+      <aside className={styles['CLUB-ETD-sidebar']}>
+        <div className={styles['CLUB-ETD-logo']}>
           <h2>Club et Événement</h2>
         </div>
+        <button className={styles['CLUB-ETD-sidebar-button']} onClick={handleBack}>
+          <FaHome /> retour a l'accueil
+        </button>
         <button
-          className={`sidebar-button ${activeTab === 'gerer' ? 'active' : ''}`}
+          className={`${styles['CLUB-ETD-sidebar-button']} ${activeTab === 'gerer' ? styles['CLUB-ETD-active'] : ''}`}
           onClick={() => setActiveTab('gerer')}
         >
           <FaUsers /> Gérer mes Clubs
         </button>
         <button
-          className={`sidebar-button ${activeTab === 'disponibles' ? 'active' : ''}`}
+          className={`${styles['CLUB-ETD-sidebar-button']} ${activeTab === 'disponibles' ? styles['CLUB-ETD-active'] : ''}`}
           onClick={() => setActiveTab('disponibles')}
         >
           <FaList /> Consulter les Clubs
         </button>
         <button
-          className={`sidebar-button ${activeTab === 'membre' ? 'active' : ''}`}
+          className={`${styles['CLUB-ETD-sidebar-button']} ${activeTab === 'membre' ? styles['CLUB-ETD-active'] : ''}`}
           onClick={() => setActiveTab('membre')}
         >
           <FaUsers /> Mes Clubs (Membre)
         </button>
         <button
-          className={`sidebar-button ${activeTab === 'demande' ? 'active' : ''}`}
+          className={`${styles['CLUB-ETD-sidebar-button']} ${activeTab === 'demande' ? styles['CLUB-ETD-active'] : ''}`}
           onClick={() => setActiveTab('demande')}
         >
           <FaEnvelope /> Demande de Création
         </button>
-        <button className="sidebar-button" onClick={()=> navigate('/etudiant')}>
-          <FaSignOutAlt /> Retour
-        </button>
       </aside>
 
-      <main className="main-content">
-        <section className="tab-content">
+      <main className={styles['CLUB-ETD-main-content']}>
+        <section className={styles['CLUB-ETD-tab-content']}>
           {activeTab === 'gerer' && (
             <GererMesClubs
               matricule={matricule}
@@ -124,10 +122,9 @@ const EtudiantDashboard = () => {
               setError={setError}
             />
           )}
-          {error && <p className="error-message">{error}</p>}
+          {error && <p className={styles['CLUB-ETD-error-message']}>{error}</p>}
         </section>
       </main>
-    </div>
     </div>
   );
 };

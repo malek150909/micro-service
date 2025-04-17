@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import ModuleModal from './ModuleModal';
-import "../module.css";
+import styles from "../module.module.css";
 
 const ModuleList = ({ modules, onDelete, onUpdate, niveau }) => {
   let semestreGroup1, semestreGroup2, label1, label2;
@@ -43,24 +43,23 @@ const ModuleList = ({ modules, onDelete, onUpdate, niveau }) => {
   };
 
   return (
-    <div id="modules">
-    <div className="module-list">
-      <div className="semestre-columns">
-        <div className="semestre-column">
+    <div className={styles['ADM-MDL-module-list']}>
+      <div className={styles['ADM-MDL-semestre-columns']}>
+        <div className={styles['ADM-MDL-semestre-column']}>
           <h3>{label1}</h3>
           {semestreGroup1.length > 0 ? (
             semestreGroup1.map((module) => (
               <motion.div
                 key={module.ID_module}
-                className="module-item"
+                className={styles['ADM-MDL-module-item']}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5 }}
               >
-                <span className="module-name" onClick={() => handleModuleClick(module)}>
+                <span className={styles['ADM-MDL-module-name']} onClick={() => handleModuleClick(module)}>
                   {module.nom_module} ({module.seances})
                 </span>
-                <button onClick={() => onDelete(module.ID_module)} className="delete-button">
+                <button onClick={() => onDelete(module.ID_module)} className={styles['ADM-MDL-delete-button']}>
                   Supprimer
                 </button>
               </motion.div>
@@ -69,21 +68,21 @@ const ModuleList = ({ modules, onDelete, onUpdate, niveau }) => {
             <p>Aucun module pour {label1}</p>
           )}
         </div>
-        <div className="semestre-column">
+        <div className={styles['ADM-MDL-semestre-column']}>
           <h3>{label2}</h3>
           {semestreGroup2.length > 0 ? (
             semestreGroup2.map((module) => (
               <motion.div
                 key={module.ID_module}
-                className="module-item"
+                className={styles['ADM-MDL-module-item']}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5 }}
               >
-                <span className="module-name" onClick={() => handleModuleClick(module)}>
+                <span className={styles['ADM-MDL-module-name']} onClick={() => handleModuleClick(module)}>
                   {module.nom_module} ({module.seances})
                 </span>
-                <button onClick={() => onDelete(module.ID_module)} className="delete-button">
+                <button onClick={() => onDelete(module.ID_module)} className={styles['ADM-MDL-delete-button']}>
                   Supprimer
                 </button>
               </motion.div>
@@ -100,7 +99,6 @@ const ModuleList = ({ modules, onDelete, onUpdate, niveau }) => {
           onSave={handleSave}
         />
       )}
-    </div>
     </div>
   );
 };

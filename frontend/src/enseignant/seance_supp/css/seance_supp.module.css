@@ -1,0 +1,1027 @@
+/* Container */
+.ENS-SUPP-container {
+  width: 100vw;
+  max-width: none;
+  margin: 0;
+  padding: 30px;
+  display: flex;
+  min-height: calc(100vh - 60px);
+  position: relative;
+}
+
+/* Background Shapes */
+.ENS-SUPP-background-shapes {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.ENS-SUPP-shape {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.2;
+  animation: ENS-SUPP-float 12s infinite ease-in-out;
+}
+
+.ENS-SUPP-shape1 {
+  width: 900px;
+  height: 600px;
+  background: radial-gradient(circle, #ffffff 20%, #c1e8ff 80%);
+  top: -200px;
+  left: -150px;
+  filter: blur(60px);
+}
+
+.ENS-SUPP-shape2 {
+  width: 800px;
+  height: 500px;
+  background: radial-gradient(circle, #ffffff 20%, #7da0ca 80%);
+  bottom: -150px;
+  right: -100px;
+  filter: blur(50px);
+  animation-delay: 4s;
+}
+
+@keyframes ENS-SUPP-float {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-20px) scale(1.03); }
+}
+
+/* Animation Keyframes */
+@keyframes ENS-SUPP-slideIn {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes ENS-SUPP-fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes ENS-SUPP-fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes ENS-SUPP-fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ENS-SUPP-modalPopIn {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes ENS-SUPP-modalPopOut {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+}
+
+/* Sidebar */
+.ENS-SUPP-sidebar {
+  background: linear-gradient(135deg, rgba(91, 135, 179, 0.95) 0%, rgba(17, 69, 148, 0.95) 100%);
+  border-radius: 0;
+  padding: 25px;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  position: fixed;
+  top: 0;
+  left: 30px;
+  width: 200px; /* Increased from 150px to 200px */
+  height: 100vh;
+  box-shadow: 0 15px 40px rgba(37, 100, 194, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  animation: ENS-SUPP-slideIn 0.5s ease-out;
+  overflow-y: auto;
+  padding-bottom: 40px;
+}
+
+.ENS-SUPP-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.ENS-SUPP-logo h2 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin: 0;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.ENS-SUPP-sidebar-button {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.9rem; /* Reduced from 1rem to 0.9rem for better fit */
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 10px 15px; /* Adjusted padding from 12px 20px to 10px 15px */
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+  white-space: normal; /* Allow text to wrap */
+  word-wrap: break-word; /* Ensure long words break to the next line */
+  line-height: 1.2; /* Improve readability with better line spacing */
+}
+
+.ENS-SUPP-sidebar-button:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(125, 160, 202, 0.5));
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+.ENS-SUPP-sidebar-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: all 0.5s ease;
+}
+
+.ENS-SUPP-sidebar-button:hover::before {
+  left: 100%;
+}
+
+.ENS-SUPP-sidebar-icon {
+  font-size: 1.5rem;
+  color: #ffffff;
+}
+
+/* Main Content */
+.ENS-SUPP-main-content {
+  margin-left: 280px;
+  padding: 0 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  width: calc(100vw - 280px);
+}
+
+.ENS-SUPP-main-content-container.ENS-SUPP-blur-background {
+  filter: blur(5px);
+  border-radius: 20px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Header */
+.ENS-SUPP-header {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 20px 30px;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(5, 38, 89, 0.1);
+  backdrop-filter: blur(6px);
+  animation: ENS-SUPP-fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  opacity: 0;
+  animation-delay: 0.3s;
+}
+
+.ENS-SUPP-header h1 {
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: #052659;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ENS-SUPP-header p {
+  font-size: 1.1rem;
+  color: #5483b3;
+  margin-top: 8px;
+}
+
+/* Document List */
+.ENS-SUPP-document-list {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(5, 38, 89, 0.1);
+  backdrop-filter: blur(6px);
+  flex-grow: 1;
+  animation: ENS-SUPP-fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  opacity: 0;
+  animation-delay: 0.5s;
+}
+
+.ENS-SUPP-document-list h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #052659;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Form Elements */
+.ENS-SUPP-document-list select,
+.ENS-SUPP-document-list input[type="date"],
+.ENS-SUPP-document-list input[type="text"] {
+  width: 100%;
+  padding: 15px 20px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  border: none;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 4px 15px rgba(5, 38, 89, 0.05);
+  font-size: 1rem;
+  color: #173d78;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.ENS-SUPP-document-list select:hover,
+.ENS-SUPP-document-list input[type="date"]:hover,
+.ENS-SUPP-document-list input[type="text"]:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(5, 38, 89, 0.15);
+}
+
+.ENS-SUPP-document-list select:focus,
+.ENS-SUPP-document-list input[type="date"]:focus,
+.ENS-SUPP-document-list input[type="text"]:focus {
+  outline: none;
+  box-shadow: 0 6px 20px rgba(5, 38, 89, 0.2);
+}
+
+/* Timetable List */
+.ENS-SUPP-document-list ul {
+  list-style: none;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.ENS-SUPP-document-list ul::-webkit-scrollbar {
+  width: 8px;
+}
+
+.ENS-SUPP-document-list ul::-webkit-scrollbar-track {
+  background: rgba(240, 247, 255, 0.8);
+  border-radius: 4px;
+}
+
+.ENS-SUPP-document-list ul::-webkit-scrollbar-thumb {
+  background: #7da0ca;
+  border-radius: 4px;
+}
+
+/* Resource Item (for Timetable) */
+.ENS-SUPP-resource-item {
+  background: rgba(240, 247, 255, 0.9);
+  padding: 15px 20px;
+  margin-bottom: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(5, 38, 89, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.ENS-SUPP-resource-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(5, 38, 89, 0.15);
+}
+
+.ENS-SUPP-resource-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ENS-SUPP-resource-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ENS-SUPP-resource-info h3 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #173d78;
+  margin: 0;
+  line-height: 1;
+}
+
+.ENS-SUPP-resource-description {
+  font-size: 0.95rem;
+  color: #5483b3;
+}
+
+/* Buttons */
+.ENS-SUPP-type-option {
+  background: #5483b3;
+  color: #ffffff;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.ENS-SUPP-type-option:hover {
+  background: #7da0ca;
+  transform: translateY(-2px);
+}
+
+.ENS-SUPP-close-button {
+  background: linear-gradient(135deg, #5483b3, #7da0ca);
+  color: #ffffff;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.ENS-SUPP-close-button:hover {
+  background: linear-gradient(135deg, #7da0ca, #5483b3);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  transform: translateY(-3px);
+}
+
+.ENS-SUPP-close-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: all 0.5s ease;
+}
+
+.ENS-SUPP-close-button:hover::before {
+  left: 100%;
+}
+
+/* Error Message */
+.ENS-SUPP-no-results {
+  text-align: center;
+  padding: 30px;
+  font-size: 1.1rem;
+  color: #5483b3;
+  font-style: italic;
+}
+
+/* Modal pour les erreurs */
+.ENS-SUPP-error-modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  animation: ENS-SUPP-fadeIn 0.3s ease-in-out forwards;
+}
+
+.ENS-SUPP-error-modal.ENS-SUPP-fade-out {
+  animation: ENS-SUPP-fadeOut 0.3s ease-in-out forwards;
+}
+
+.ENS-SUPP-error-modal-content {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(5, 38, 89, 0.2);
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  transform: scale(0.8);
+  animation: ENS-SUPP-scaleIn 0.3s ease-in-out forwards;
+}
+
+/* Message de succès */
+.ENS-SUPP-success-message {
+  text-align: center;
+  padding: 10px;
+  font-size: 1rem;
+  color: #2e7d32;
+  font-style: italic;
+  margin-top: 10px;
+  opacity: 0;
+  animation: ENS-SUPP-fadeIn 0.5s ease-in-out forwards;
+}
+
+/* Enhanced Timetable Design */
+.ENS-SUPP-timetable-container {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  max-width: 1200px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 247, 255, 0.9));
+  padding: 40px;
+  border-radius: 25px;
+  box-shadow: 0 15px 40px rgba(5, 38, 89, 0.2);
+  border: 1px solid rgba(152, 166, 205, 0.6);
+  backdrop-filter: blur(15px);
+  width: calc(100% - 60px);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.3s ease;
+}
+
+/* Titre */
+.ENS-SUPP-timetable-title {
+  font-size: 2.2rem;
+  color: #052659;
+  margin-bottom: 30px;
+  font-weight: 700;
+  text-shadow: 0 2px 5px rgba(5, 38, 89, 0.2);
+}
+
+/* Boutons d'exportation */
+.ENS-SUPP-export-buttons {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+/* Tableau */
+.ENS-SUPP-timetable-table {
+  width: 95%;
+  max-width: 1100px;
+  margin: 20px auto;
+  border-collapse: collapse;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(5, 38, 89, 0.2);
+  border: 1px solid rgba(152, 166, 205, 0.6);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.ENS-SUPP-timetable-table:hover {
+  transform: scale(1.01);
+  box-shadow: 0 10px 25px rgba(5, 38, 89, 0.2);
+}
+
+/* Toggle Section */
+.ENS-SUPP-toggle-section {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+/* Button to toggle table visibility */
+.ENS-SUPP-toggle-table-btn {
+  background: linear-gradient(135deg, #5483b3, #7da0ca);
+  color: #ffffff;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+  width: fit-content;
+}
+
+.ENS-SUPP-toggle-table-btn:hover {
+  background: linear-gradient(135deg, #7da0ca, #5483b3);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+.ENS-SUPP-toggle-table-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: all 0.5s ease;
+}
+
+.ENS-SUPP-toggle-table-btn:hover::before {
+  left: 100%;
+}
+
+.ENS-SUPP-toggle-table-btn:active {
+  transform: translateY(0);
+}
+
+/* En-têtes du tableau */
+.ENS-SUPP-timetable-table th {
+  background: #052659;
+  color: #ffffff;
+  font-weight: 700;
+  padding: 15px 20px;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  text-align: center;
+  border-right: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.ENS-SUPP-timetable-table th:last-child {
+  border-right: none;
+}
+
+/* Cellules du tableau */
+.ENS-SUPP-timetable-table td {
+  padding: 15px 20px;
+  border: 1px solid rgba(84, 131, 179, 0.2);
+  font-size: 1rem;
+  color: #052659;
+  background: #f9f9f9;
+  transition: background 0.3s ease, transform 0.2s ease;
+  text-align: center;
+  position: relative;
+}
+
+/* Première colonne (jours) */
+.ENS-SUPP-timetable-table td:first-child {
+  background: linear-gradient(135deg, #e6f0fa 0%, #d0e1f9 100%);
+  font-weight: 600;
+  color: #184976;
+}
+
+/* Cellules occupées */
+.ENS-SUPP-timetable-table td.ENS-SUPP-session-occupied {
+  background: #f9f9f9;
+  color: #184976;
+  font-weight: 600;
+}
+
+/* Effet de survol sur les cellules */
+.ENS-SUPP-timetable-table td:hover {
+  background: rgba(72, 108, 202, 0.15);
+  transform: scale(1.02);
+}
+
+/* Session Details */
+.ENS-SUPP-session-details {
+  font-size: 0.8rem;
+  line-height: 1.2;
+  background: rgba(84, 131, 179, 0.1);
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  display: inline-block;
+  text-align: center;
+  margin: 5px auto;
+}
+
+/* Session Type (e.g., COURS, TD, TP) */
+.ENS-SUPP-session-type {
+  color: #052659;
+  font-weight: 600;
+}
+
+/* Supplementary sessions container */
+.ENS-SUPP-supplementary-sessions {
+  margin-top: 25px;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+/* Date block for each date */
+.ENS-SUPP-supplementary-date-block {
+  flex: 1 1 calc(50% - 20px);
+  max-width: calc(50% - 20px);
+  background: rgba(255, 255, 255, 0.95);
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 6px 20px rgba(5, 38, 89, 0.15);
+  border: 1px solid rgba(84, 131, 179, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.ENS-SUPP-supplementary-date-block:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(5, 38, 89, 0.2);
+}
+
+.ENS-SUPP-supplementary-date-block h4 {
+  font-size: 1.4em;
+  color: #052659;
+  margin-bottom: 15px;
+  text-transform: capitalize;
+}
+
+/* List of sessions under each date */
+.ENS-SUPP-sessions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Make the section scrollable */
+.ENS-SUPP-scrollable-section {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid rgba(84, 131, 179, 0.2);
+  border-radius: 12px;
+  padding: 10px;
+}
+
+/* Individual session card */
+.ENS-SUPP-session-card {
+  padding: 20px;
+  border: 1px solid rgba(84, 131, 179, 0.2);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.ENS-SUPP-session-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Highlight supplementary sessions */
+.ENS-SUPP-supplementary-session {
+  background: rgba(255, 223, 186, 0.5);
+  border: 1px solid #ff9800;
+}
+
+/* Highlight past sessions */
+.ENS-SUPP-passed-session {
+  background: rgba(200, 200, 200, 0.5);
+  border: 1px solid #999;
+}
+
+/* Session Actions */
+.ENS-SUPP-session-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+/* Modern Buttons */
+.ENS-SUPP-modern-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.ENS-SUPP-modern-btn:hover {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+.ENS-SUPP-modern-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: all 0.5s ease;
+}
+
+.ENS-SUPP-modern-btn:hover::before {
+  left: 100%;
+}
+
+.ENS-SUPP-edit-btn {
+  background: linear-gradient(135deg, #5483b3, #7da0ca);
+}
+
+.ENS-SUPP-edit-btn:hover {
+  background: linear-gradient(135deg, #7da0ca, #5483b3);
+}
+
+.ENS-SUPP-delete-btn {
+  background: linear-gradient(135deg, #052659, #184976);
+}
+
+.ENS-SUPP-delete-btn:hover {
+  background: linear-gradient(135deg, #184976, #052659);
+}
+
+/* No session message */
+.ENS-SUPP-no-session {
+  padding: 15px;
+  color: #184976;
+  text-align: center;
+}
+
+/* Fade-in animation */
+.ENS-SUPP-fade-in {
+  animation: ENS-SUPP-fadeIn 0.5s ease-in;
+}
+
+/* Modal Overlay */
+.ENS-SUPP-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  animation: ENS-SUPP-fadeIn 0.4s ease-out forwards;
+}
+
+.ENS-SUPP-modal-overlay.ENS-SUPP-closing {
+  animation: ENS-SUPP-fadeOut 0.4s ease-out forwards;
+}
+
+/* Modal Content */
+.ENS-SUPP-modal-content {
+  background: #fff;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 600px;
+  min-height: 200px;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.9);
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  animation: ENS-SUPP-modalPopIn 0.4s ease-out forwards;
+}
+
+.ENS-SUPP-modal-content.ENS-SUPP-closing {
+  animation: ENS-SUPP-modalPopOut 0.4s ease-out forwards;
+}
+
+.ENS-SUPP-modal-content h4 {
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+  color: #052659;
+}
+
+/* Modal Form */
+.ENS-SUPP-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Form Row for Two-Column Layout */
+.ENS-SUPP-form-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.ENS-SUPP-form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.ENS-SUPP-form-group label {
+  font-weight: bold;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.ENS-SUPP-form-group input,
+.ENS-SUPP-form-group select {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  width: 100%;
+}
+
+/* Modal Actions */
+.ENS-SUPP-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.ENS-SUPP-save-btn {
+  background: linear-gradient(135deg, #5483b3, #7da0ca);
+}
+
+.ENS-SUPP-save-btn:hover {
+  background: linear-gradient(135deg, #7da0ca, #5483b3);
+}
+
+.ENS-SUPP-cancel-btn {
+  background: linear-gradient(135deg, #d32f2f, #f44336);
+}
+
+.ENS-SUPP-cancel-btn:hover {
+  background: linear-gradient(135deg, #f44336, #d32f2f);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .ENS-SUPP-modal-content {
+    max-width: 90%;
+  }
+  .ENS-SUPP-form-row {
+    flex-direction: column;
+    gap: 15px;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+  .ENS-SUPP-sidebar {
+    position: static;
+    width: 100%;
+    height: auto;
+    left: 0;
+    border-radius: 0 0 15px 15px;
+    padding: 25px;
+  }
+
+  .ENS-SUPP-main-content {
+    margin-left: 0;
+    padding: 15px;
+    width: 100%;
+  }
+
+  .ENS-SUPP-timetable-container {
+    width: 90%;
+    margin: 0 auto;
+  }
+
+  .ENS-SUPP-timetable-table {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .ENS-SUPP-timetable-table th,
+  .ENS-SUPP-timetable-table td {
+    padding: 6px 4px;
+    font-size: 0.8rem;
+  }
+
+  .ENS-SUPP-toggle-section {
+    width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .ENS-SUPP-container {
+    padding: 15px;
+  }
+
+  .ENS-SUPP-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .ENS-SUPP-document-list h3 {
+    font-size: 1.3rem;
+  }
+
+  .ENS-SUPP-document-list select,
+  .ENS-SUPP-document-list input[type="date"],
+  .ENS-SUPP-document-list input[type="text"] {
+    font-size: 0.9rem;
+    padding: 12px 15px;
+  }
+}
+
+.ENS-SUPP-error-message {
+  text-align: center;
+  padding: 10px;
+  font-size: 1rem;
+  color: #d32f2f;
+  font-style: italic;
+  margin-bottom: 20px;
+}
+
+.ENS-SUPP-error-message.ENS-SUPP-fade-in {
+  animation: ENS-SUPP-fadeIn 0.5s ease-in-out forwards;
+}
+
+.ENS-SUPP-error-message.ENS-SUPP-fade-out {
+  animation: ENS-SUPP-fadeOut 0.5s ease-in-out forwards;
+}
+
+.ENS-SUPP-add-session-container {
+  position: relative;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(5, 38, 89, 0.1);
+  backdrop-filter: blur(6px);
+  margin-top: 20px;
+  overflow: hidden;
+}
+
+select[multiple] {
+  height: 100px;
+  padding: 5px;
+}
+
+/* Timetable Wrapper */
+.ENS-SUPP-timetable-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Add Session Wrapper */
+.ENS-SUPP-add-session-wrapper {
+  margin-top: 20px;
+}
+
+.ENS-SUPP-spinner {
+  animation: ENS-SUPP-spin 1s linear infinite;
+}
+
+@keyframes ENS-SUPP-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Ensure proper alignment for scaleIn animation */
+@keyframes ENS-SUPP-scaleIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

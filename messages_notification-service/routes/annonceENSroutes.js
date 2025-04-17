@@ -13,4 +13,8 @@ router.delete('/:id', annonceController.deleteAnnonce);
 router.get('/comments/:annonceId', annonceController.getCommentsForAnnonce);
 router.post('/comment/reply', annonceController.replyToComment);
 
+// Routes pour le calendrier
+router.post('/calendar/add', annonceController.addAdminEventToCalendar);
+router.get('/calendar/check/:annonceId/:matricule', annonceController.checkCalendarEvent);
+
 module.exports = router;

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ResourceUploadForm from '../components/ResourceUploadForm';
 import { FaHome, FaBook, FaDownload, FaTrash, FaEdit, FaInfoCircle, FaUser, FaFileAlt, FaFileUpload, FaUsers, FaCalendarAlt, FaTimes, FaPlus } from 'react-icons/fa';
-import "../ressources.css";
+import styles from '../ressources.module.css';
 
 function Home() {
     const [matricule, setMatricule] = useState(localStorage.getItem('matricule') || '');
@@ -111,27 +111,25 @@ function Home() {
     };
 
     return (
-        <div id="ressources">
-            <div className="container">
-                <div className="sidebar">
-                    <div className="logo">
-                        <FaUser className="icon" />
-                        <h2>Professeur</h2>
+            <div className={styles['ENS-RES-container']}>
+                <div className={styles['ENS-RES-sidebar']}>
+                    <div className={styles['ENS-RES-logo']}>
+                        <h2>Ressources</h2>
                     </div>
-                    <button className="sidebar-button" onClick={handleReturn}>
-                        <FaHome className="icon" />
+                    <button className={styles['ENS-RES-sidebar-button']} onClick={handleReturn}>
+                        <FaHome className={styles['ENS-RES-icon']} />
                         Retour à l'accueil
                     </button>
                 </div>
-                <div className="main-content">
-                    <div className="header">
+                <div className={styles['ENS-RES-main-content']}>
+                    <div className={styles['ENS-RES-header']}>
                         <h1>Gestion des Ressources Pédagogiques</h1>
                         <p>Gérer les ressources des sections et modules</p>
                     </div>
-                    <div className="content-grid">
-                        <div className="form-container">
-                            <h2 className="form-title">
-                                <FaPlus className="icon" />
+                    <div className={styles['ENS-RES-content-grid']}>
+                        <div className={styles['ENS-RES-form-container']}>
+                            <h2 className={styles['ENS-RES-form-title']}>
+                                <FaPlus className={styles['ENS-RES-icon']} />
                                 Ajouter une Ressource
                             </h2>
                             <ResourceUploadForm
@@ -146,37 +144,37 @@ function Home() {
                                 setMessage={setMessage}
                             />
                         </div>
-                        <div className="resources-list">
+                        <div className={styles['ENS-RES-resources-list']}>
                             <h3>
-                                <FaBook className="icon" />
+                                <FaBook className={styles['ENS-RES-icon']} />
                                 Ressources
                             </h3>
                             {!selectedSection || !selectedModule ? (
-                                <div className="no-results">
+                                <div className={styles['ENS-RES-no-results']}>
                                     Sélectionnez une section et un module pour afficher les ressources.
                                 </div>
                             ) : resources.length === 0 ? (
-                                <div className="no-results">
+                                <div className={styles['ENS-RES-no-results']}>
                                     Aucune ressource disponible pour cette section et ce module.
                                 </div>
                             ) : (
-                                <div className="resource-grid">
+                                <div className={styles['ENS-RES-resource-grid']}>
                                     {['Cours', 'TD', 'TP'].map((type) => {
                                         if (groupedResources[type].length === 0) {
                                             return null;
                                         }
                                         return (
-                                            <div key={type} className="resource-section">
+                                            <div key={type} className={styles['ENS-RES-resource-section']}>
                                                 <h3>{type}</h3>
                                                 <ul>
                                                     {groupedResources[type].map(resource => (
                                                         <li
                                                             key={resource.ID_ressource}
-                                                            className="resource-item"
+                                                            className={styles['ENS-RES-resource-item']}
                                                             onClick={() => setSelectedResource(resource)}
                                                             style={{ cursor: 'pointer' }}
                                                         >
-                                                            <div className="resource-info">
+                                                            <div className={styles['ENS-RES-resource-info']}>
                                                                 <h3>{resource.nom_ressource}</h3>
                                                                 {resource.description && (
                                                                     <p>{resource.description}</p>
@@ -185,15 +183,15 @@ function Home() {
                                                                     Date de soumission: {new Date(resource.date_upload).toLocaleDateString()}
                                                                 </p>
                                                             </div>
-                                                            <div className="resource-actions">
+                                                            <div className={styles['ENS-RES-resource-actions']}>
                                                                 <a
                                                                     href={`http://localhost:8082${resource.fichier_url}`}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
-                                                                    className="download-link"
+                                                                    className={styles['ENS-RES-download-link']}
                                                                     onClick={handleDownloadClick}
                                                                 >
-                                                                    <FaDownload className="icon" />
+                                                                    <FaDownload className={styles['ENS-RES-icon']} />
                                                                     Télécharger
                                                                 </a>
                                                                 <button
@@ -201,9 +199,9 @@ function Home() {
                                                                         e.stopPropagation();
                                                                         handleDeleteResource(resource.ID_ressource);
                                                                     }}
-                                                                    className="delete-button"
+                                                                    className={styles['ENS-RES-delete-button']}
                                                                 >
-                                                                    <FaTrash className="icon" />
+                                                                    <FaTrash className={styles['ENS-RES-icon']} />
                                                                     Supprimer
                                                                 </button>
                                                             </div>
@@ -228,7 +226,6 @@ function Home() {
                     />
                 )}
             </div>
-        </div>
     );
 }
 
@@ -293,82 +290,81 @@ const ResourceModal = ({ resource, onClose, onUpdate, matricule }) => {
     };
 
     return (
-        <div id="ressoures">
-            <div className="modal-overlay">
-                <div className="modal-content">
+            <div className={styles['ENS-RES-modal-overlay']}>
+                <div className={styles['ENS-RES-modal-content']}>
                     <h3>
-                        <FaInfoCircle className="icon" />
+                        <FaInfoCircle className={styles['ENS-RES-icon']} />
                         Détails de la Ressource
                     </h3>
                     {!isEditing ? (
-                        <div className="modal-view">
-                            <div className="modal-field">
+                        <div className={styles['ENS-RES-modal-view']}>
+                            <div className={styles['ENS-RES-modal-field']}>
                                 <label>
-                                    <FaFileAlt className="input-icon" />
+                                    <FaFileAlt className={styles['ENS-RES-input-icon']} />
                                     Nom de la Ressource
                                 </label>
                                 <input type="text" value={formData.nom_ressource} disabled />
                             </div>
-                            <div className="modal-field">
+                            <div className={styles['ENS-RES-modal-field']}>
                                 <label>
-                                    <FaBook className="input-icon" />
+                                    <FaBook className={styles['ENS-RES-input-icon']} />
                                     Type de Ressource
                                 </label>
                                 <input type="text" value={formData.type_ressource} disabled />
                             </div>
-                            <div className="modal-field">
+                            <div className={styles['ENS-RES-modal-field']}>
                                 <label>
-                                    <FaInfoCircle className="input-icon" />
+                                    <FaInfoCircle className={styles['ENS-RES-input-icon']} />
                                     Description
                                 </label>
                                 <textarea value={formData.description} disabled rows="2" />
                             </div>
-                            <div className="modal-field">
+                            <div className={styles['ENS-RES-modal-field']}>
                                 <label>
-                                    <FaFileUpload className="input-icon" />
+                                    <FaFileUpload className={styles['ENS-RES-input-icon']} />
                                     Fichier Actuel
                                 </label>
                                 <a href={`http://localhost:8082${resource.fichier_url}`} target="_blank" rel="noopener noreferrer">
                                     {resource.fichier_url.split('/').pop()}
                                 </a>
                             </div>
-                            <div className="modal-field">
+                            <div className={styles['ENS-RES-modal-field']}>
                                 <label>
-                                    <FaBook className="input-icon" />
+                                    <FaBook className={styles['ENS-RES-input-icon']} />
                                     Module
                                 </label>
                                 <input type="text" value={resource.nom_module} disabled />
                             </div>
-                            <div className="modal-field">
+                            <div className={styles['ENS-RES-modal-field']}>
                                 <label>
-                                    <FaUsers className="input-icon" />
+                                    <FaUsers className={styles['ENS-RES-input-icon']} />
                                     Section
                                 </label>
                                 <input type="text" value={`${resource.nom_section} - ${resource.niveau} - ${resource.nom_specialite}`} disabled />
                             </div>
-                            <div className="modal-field">
+                            <div className={styles['ENS-RES-modal-field']}>
                                 <label>
-                                    <FaCalendarAlt className="input-icon" />
+                                    <FaCalendarAlt className={styles['ENS-RES-input-icon']} />
                                     Date de Soumission
                                 </label>
                                 <input type="text" value={new Date(resource.date_upload).toLocaleString()} disabled />
                             </div>
-                            <div className="modal-actions">
+                            <div className={styles['ENS-RES-modal-actions']}>
                                 <button onClick={() => setIsEditing(true)}>
-                                    <FaEdit className="icon" />
+                                    <FaEdit className={styles['ENS-RES-icon']} />
                                     Modifier
                                 </button>
                                 <button onClick={onClose}>
-                                    <FaTimes className="icon" />
+                                    <FaTimes className={styles['ENS-RES-icon']} />
                                     Fermer
                                 </button>
                             </div>
                         </div>
                     ) : (
                         <form onSubmit={handleSubmit}>
-                            <div className="modal-field">
+                            <div className={styles['ENS-RES-modal-field']}>
                                 <label>
-                                    <FaFileAlt className="input-icon" />
+                                    <FaFileAlt className={styles['ENS-RES-input-icon']} />
                                     Nom de la Ressource
                                 </label>
                                 <input
@@ -379,9 +375,9 @@ const ResourceModal = ({ resource, onClose, onUpdate, matricule }) => {
                                     required
                                 />
                             </div>
-                            <div className="modal-field">
+                            <div className={styles['ENS-RES-modal-field']}>
                                 <label>
-                                    <FaBook className="input-icon" />
+                                    <FaBook className={styles['ENS-RES-input-icon']} />
                                     Type de Ressource
                                 </label>
                                 <select name="type_ressource" value={formData.type_ressource} onChange={handleInputChange} required>
@@ -390,25 +386,25 @@ const ResourceModal = ({ resource, onClose, onUpdate, matricule }) => {
                                     <option value="TP">TP</option>
                                 </select>
                             </div>
-                            <div className="modal-field">
+                            <div className={styles['ENS-RES-modal-field']}>
                                 <label>
-                                    <FaInfoCircle className="input-icon" />
+                                    <FaInfoCircle className={styles['ENS-RES-input-icon']} />
                                     Description
                                 </label>
                                 <textarea name="description" value={formData.description} onChange={handleInputChange} rows="2" />
                             </div>
-                            <div className="modal-field">
+                            <div className={styles['ENS-RES-modal-field']}>
                                 <label>
-                                    <FaFileUpload className="input-icon" />
+                                    <FaFileUpload className={styles['ENS-RES-input-icon']} />
                                     Fichier Actuel
                                 </label>
                                 <a href={`http://localhost:8082${resource.fichier_url}`} target="_blank" rel="noopener noreferrer">
                                     {resource.fichier_url.split('/').pop()}
                                 </a>
                             </div>
-                            <div className="modal-field">
+                            <div className={styles['ENS-RES-modal-field']}>
                                 <label>
-                                    <FaFileUpload className="input-icon" />
+                                    <FaFileUpload className={styles['ENS-RES-input-icon']} />
                                     Remplacer le Fichier (Optionnel)
                                 </label>
                                 <input
@@ -418,13 +414,13 @@ const ResourceModal = ({ resource, onClose, onUpdate, matricule }) => {
                                     onChange={handleInputChange}
                                 />
                             </div>
-                            <div className="modal-actions">
+                            <div className={styles['ENS-RES-modal-actions']}>
                                 <button type="submit">
-                                    <FaEdit className="icon" />
+                                    <FaEdit className={styles['ENS-RES-icon']} />
                                     Mettre à Jour
                                 </button>
                                 <button type="button" onClick={() => setIsEditing(false)}>
-                                    <FaTimes className="icon" />
+                                    <FaTimes className={styles['ENS-RES-icon']} />
                                     Annuler
                                 </button>
                             </div>
@@ -432,7 +428,6 @@ const ResourceModal = ({ resource, onClose, onUpdate, matricule }) => {
                     )}
                 </div>
             </div>
-        </div>
     );
 };
 

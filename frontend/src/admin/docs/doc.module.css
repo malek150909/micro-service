@@ -1,0 +1,714 @@
+/* Conteneur principal */
+.ADM-DOC-container {
+    max-width: 1400px;
+    margin: 30px auto;
+    padding: 0;
+    position: relative;
+}
+
+/* Formes abstraites en arrière-plan avec animation subtile */
+.ADM-DOC-background-shapes {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.ADM-DOC-shape {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.15;
+    animation: ADM-DOC-pulseShape 10s infinite ease-in-out;
+}
+
+.ADM-DOC-shape1 {
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, #ffffff 0%, #c1e8ff 100%);
+    top: -250px;
+    left: -100px;
+    filter: blur(50px);
+    animation-delay: 0s;
+}
+
+.ADM-DOC-shape2 {
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, #ffffff 0%, #7da0ca 100%);
+    bottom: -200px;
+    right: -100px;
+    filter: blur(40px);
+    animation-delay: 3s;
+}
+
+@keyframes ADM-DOC-pulseShape {
+    0% { transform: scale(1) translateY(0); }
+    50% { transform: scale(1.05) translateY(-15px); }
+    100% { transform: scale(1) translateY(0); }
+}
+
+/* Sidebar */
+.ADM-DOC-sidebar {
+    background: linear-gradient(135deg, rgba(91, 135, 179, 0.95) 0%, rgba(17, 69, 148, 0.95) 100%);
+  border-radius: 0;
+  padding: 25px;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  position: fixed;
+  top: 0;
+  left: 30px;
+  width: 200px; /* Increased from 150px to 200px */
+  height: 100vh;
+  box-shadow: 0 15px 40px rgba(37, 100, 194, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  animation: ADM-DOC-slideIn 0.5s ease-out;
+  overflow-y: auto;
+  padding-bottom: 40px;
+}
+
+@keyframes ADM-DOC-slideIn {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
+}
+
+.ADM-DOC-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.ADM-DOC-logo h2 {
+    font-size: 1.45rem;
+    font-weight: 600;
+    margin: 0;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Boutons de la barre latérale */
+.ADM-DOC-sidebar-button {
+    background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.9rem; /* Reduced from 1rem to 0.9rem for better fit */
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 10px 15px; /* Adjusted padding from 12px 20px to 10px 15px */
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+  white-space: normal; /* Allow text to wrap */
+  word-wrap: break-word; /* Ensure long words break to the next line */
+  line-height: 1.2; /* Improve readability with better line spacing */
+}
+
+.ADM-DOC-sidebar-button:hover {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(125, 160, 202, 0.5));
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+.ADM-DOC-sidebar-button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: all 0.5s ease;
+}
+
+.ADM-DOC-sidebar-button:hover::before {
+    left: 100%;
+}
+
+/* Contenu principal */
+.ADM-DOC-main-content {
+    margin-left: 310px;
+    margin-right: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* Header */
+.ADM-DOC-header {
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15), 0 0 20px rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+}
+
+.ADM-DOC-header h1 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #052659;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 3px rgba(5, 38, 89, 0.1);
+}
+
+.ADM-DOC-header p {
+    font-size: 1rem;
+    color: #5483b3;
+    margin: 8px 0 0;
+}
+
+/* Grille de contenu */
+.ADM-DOC-content-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 30px;
+}
+
+/* Graphique */
+.ADM-DOC-chart-container {
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15), 0 0 20px rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.ADM-DOC-chart-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #052659;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: 0.5px;
+    position: relative;
+    padding-bottom: 10px;
+    background: linear-gradient(90deg, #0d3155, #7DA0CA);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: all 0.4s ease;
+}
+
+.ADM-DOC-chart-title:hover {
+    transform: scale(1.02);
+}
+
+.ADM-DOC-chart-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 2px;
+    background: linear-gradient(90deg, #06223e, #7DA0CA);
+    transition: width 0.4s ease;
+}
+
+.ADM-DOC-chart-title:hover::after {
+    width: 100%;
+}
+
+/* Liste des documents */
+.ADM-DOC-document-list {
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15), 0 0 20px rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.ADM-DOC-document-list h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #052659;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: 0.5px;
+    position: relative;
+    padding-bottom: 10px;
+    background: linear-gradient(90deg, #0c3156, #7DA0CA);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: all 0.4s ease;
+}
+
+.ADM-DOC-document-list h3:hover {
+    transform: scale(1.02);
+}
+
+.ADM-DOC-document-list h3::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 2px;
+    background: linear-gradient(90deg, #042649, #7DA0CA);
+    transition: width 0.4s ease;
+}
+
+.ADM-DOC-document-list h3:hover::after {
+    width: 100%;
+}
+
+.ADM-DOC-document-list ul {
+    list-style: none;
+    padding: 0;
+    max-height: 470px;
+    overflow-y: auto;
+}
+
+.ADM-DOC-document-list ul::-webkit-scrollbar {
+    width: 6px;
+}
+
+.ADM-DOC-document-list ul::-webkit-scrollbar-track {
+    background: #f0f7ff;
+    border-radius: 10px;
+}
+
+.ADM-DOC-document-list ul::-webkit-scrollbar-thumb {
+    background: #7da0ca;
+    border-radius: 10px;
+}
+
+.ADM-DOC-document-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.7);
+    margin-bottom: 12px;
+    box-shadow: 0 4px 15px rgba(5, 38, 89, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(5px);
+    min-height: 110px;
+}
+
+/* Remove differentiation for AdminDashboard since we're scoping to ADM-DOC */
+.ADM-DOC-student-dashboard .ADM-DOC-document-item {
+    padding: 15px;
+    min-height: auto;
+}
+
+.ADM-DOC-document-info h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #173d78;
+    margin: 0;
+    letter-spacing: 0.3px;
+}
+
+.ADM-DOC-document-info p {
+    font-size: 0.9rem;
+    color: #5483b3;
+    margin: 10px 0 0;
+}
+
+/* Style for the "Télécharger" button */
+.ADM-DOC-document-info a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #335c86;
+    color: #ffffff;
+    padding: 8px 16px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    box-shadow: 0 4px 15px rgba(5, 38, 89, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.ADM-DOC-document-info a:hover {
+    transform: translateY(-2px);
+    background: #5483b3;
+    color: #ffffff;
+}
+
+/* Custom File Input */
+.ADM-DOC-custom-file-input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.ADM-DOC-custom-file-input input[type="file"] {
+    display: none;
+}
+
+.ADM-DOC-custom-file-label {
+    background: #5483b3;
+    color: #ffffff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(5, 38, 89, 0.1);
+    transition: background 0.3s ease;
+}
+
+.ADM-DOC-custom-file-label:hover {
+    background: #7da0ca;
+}
+
+.ADM-DOC-file-name {
+    font-size: 0.85rem;
+    color: #5483b3;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Modale */
+.ADM-DOC-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(5, 38, 89, 0.5);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+}
+
+.ADM-DOC-modal-overlay.ADM-DOC-active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.ADM-DOC-modal-content {
+    width: 100%;
+    max-width: 500px;
+    max-height: 80vh;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 15px 40px rgba(5, 38, 89, 0.2), 0 0 20px rgba(255, 255, 255, 0.3);
+    overflow-y: auto;
+    border: 1px solid rgba(84, 131, 179, 0.2);
+    backdrop-filter: blur(10px);
+    position: relative;
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.3s ease 0.1s, transform 0.3s ease 0.1s;
+}
+
+.ADM-DOC-modal-overlay.ADM-DOC-active .ADM-DOC-modal-content {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.ADM-DOC-modal-content h3 {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #052659;
+    margin-bottom: 20px;
+    text-align: center;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 3px rgba(5, 38, 89, 0.1);
+}
+
+.ADM-DOC-modal-content p {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.95rem;
+    color: #5483b3;
+    margin: 12px 0;
+    line-height: 1.5;
+}
+
+/* Formulaire */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.ADM-DOC-input-group {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ADM-DOC-input-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #5483b3;
+    font-size: 1.1rem;
+    transition: color 0.3s ease;
+}
+
+input:focus + .ADM-DOC-input-icon,
+textarea:focus + .ADM-DOC-input-icon,
+select:focus + .ADM-DOC-input-icon {
+    color: #7da0ca;
+}
+
+.ADM-DOC-input,
+.ADM-DOC-textarea,
+select {
+    padding: 15px;
+    padding-left: 45px;
+    border: 1px solid rgba(84, 131, 179, 0.2);
+    border-radius: 12px;
+    font-size: 0.95rem;
+    background: #f0f7ff;
+    color: #052659;
+    width: 100%;
+    box-shadow: 0 4px 15px rgba(5, 38, 89, 0.05);
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.ADM-DOC-input:focus,
+.ADM-DOC-textarea:focus,
+select:focus {
+    border-color: #5483b3;
+    box-shadow: 0 0 15px rgba(84, 131, 179, 0.2);
+    outline: none;
+}
+
+.ADM-DOC-textarea,
+select {
+    padding-left: 15px;
+}
+
+.ADM-DOC-input::placeholder,
+.ADM-DOC-textarea::placeholder {
+    color: #7da0ca;
+}
+
+.ADM-DOC-input-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    color: #052659;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+/* Boutons */
+.ADM-DOC-button-group {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+    justify-content: center;
+}
+
+.ADM-DOC-button {
+    background: linear-gradient(135deg, #5483b3 0%, #052659 100%);
+    color: #ffffff;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 8px 20px rgba(5, 38, 89, 0.1);
+    transition: all 0.3s ease;
+    letter-spacing: 0.3px;
+    position: relative;
+    overflow: hidden;
+}
+
+.ADM-DOC-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(5, 38, 89, 0.15), 0 0 15px rgba(125, 160, 202, 0.4);
+}
+
+.ADM-DOC-button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: all 0.5s ease;
+}
+
+.ADM-DOC-button:hover::before {
+    left: 100%;
+}
+
+.ADM-DOC-edit-button {
+    background: linear-gradient(135deg, #7da0ca 0%, #5483b3 100%);
+}
+
+.ADM-DOC-delete-button {
+    background: linear-gradient(135deg, #052659 0%, #021024 100%);
+}
+
+.ADM-DOC-close-button {
+    background: linear-gradient(135deg, #5483b3 0%, #7da0ca 100%);
+}
+
+/* Message "Aucun résultat" */
+.ADM-DOC-no-results {
+    text-align: center;
+    color: #5483b3;
+    font-size: 1rem;
+    padding: 25px;
+}
+
+/* Style spécifique pour la modale d'erreur */
+.ADM-DOC-error-modal {
+    max-width: 300px;
+    text-align: center;
+}
+
+.ADM-DOC-error-modal p {
+    color: #052659;
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+}
+
+/* Adjust document-list for student dashboard */
+.ADM-DOC-student-dashboard .ADM-DOC-document-list {
+    width: 100%;
+}
+
+/* Style for icons */
+.ADM-DOC-icon {
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+/* Style spécifique pour la modale de confirmation de suppression */
+.ADM-DOC-delete-modal {
+    max-width: 400px;
+    text-align: center;
+}
+
+.ADM-DOC-delete-modal p {
+    color: #052659;
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+}
+
+/* Adjust icon size and color for specific elements */
+.ADM-DOC-sidebar-button .ADM-DOC-icon,
+.ADM-DOC-chart-title .ADM-DOC-icon,
+.ADM-DOC-document-list h3 .ADM-DOC-icon,
+.ADM-DOC-document-item h3 .ADM-DOC-icon,
+.ADM-DOC-document-info a .ADM-DOC-icon,
+.ADM-DOC-document-actions .ADM-DOC-button .ADM-DOC-icon,
+.ADM-DOC-modal-content h3 .ADM-DOC-icon,
+.ADM-DOC-button .ADM-DOC-icon {
+    font-size: 1rem;
+    color: inherit;
+}
+
+/* Ensure icons in labels align properly */
+.ADM-DOC-input-group label .ADM-DOC-input-icon {
+    position: static;
+    transform: none;
+    margin-right: 8px;
+    font-size: 1.1rem;
+    color: #5483b3;
+}
+
+/* Style for error modal icon */
+.ADM-DOC-error-modal h3 .ADM-DOC-icon {
+    color: #052659;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .ADM-DOC-sidebar {
+        position: relative;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: auto;
+        margin-bottom: 30px;
+    }
+
+    .ADM-DOC-main-content {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .ADM-DOC-content-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 576px) {
+    .ADM-DOC-button-group {
+        flex-direction: column;
+    }
+
+    .ADM-DOC-modal-content {
+        padding: 20px;
+    }
+
+    .ADM-DOC-custom-file-input {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .ADM-DOC-custom-file-label {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .ADM-DOC-file-name {
+        width: 100%;
+        text-align: center;
+    }
+}

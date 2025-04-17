@@ -1,0 +1,712 @@
+/* evenement.module.css */
+
+/* Conteneur principal */
+.ADM-EVN-container {
+    max-width: 1400px;
+    margin: 30px auto;
+    padding: 0;
+    position: relative;
+}
+
+/* Supprimer le placeholder car nous n'utilisons plus la grille */
+.ADM-EVN-sidebar-placeholder {
+    display: none;
+}
+
+/* Formes abstraites en arrière-plan avec animation subtile */
+.ADM-EVN-background-shapes {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.ADM-EVN-shape {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.15;
+    animation: ADM-EVN-pulseShape 10s infinite ease-in-out;
+}
+
+.ADM-EVN-shape1 {
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, #ffffff 0%, #c1e8ff 100%);
+    top: -250px;
+    left: -100px;
+    filter: blur(50px);
+    animation-delay: 0s;
+}
+
+.ADM-EVN-shape2 {
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, #ffffff 0%, #7da0ca 100%);
+    bottom: -200px;
+    right: -100px;
+    filter: blur(40px);
+    animation-delay: 3s;
+}
+
+@keyframes ADM-EVN-pulseShape {
+    0% { transform: scale(1) translateY(0); }
+    50% { transform: scale(1.05) translateY(-15px); }
+    100% { transform: scale(1) translateY(0); }
+}
+
+/* Sidebar */
+.ADM-EVN-sidebar {
+    background: linear-gradient(135deg, rgba(91, 135, 179, 0.95) 0%, rgba(17, 69, 148, 0.95) 100%);
+  border-radius: 0;
+  padding: 25px;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  position: fixed;
+  top: 0;
+  left: 30px;
+  width: 200px; /* Increased from 150px to 200px */
+  height: 100vh;
+  box-shadow: 0 15px 40px rgba(37, 100, 194, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  animation: ADM-EVN-slideIn 0.5s ease-out;
+  overflow-y: auto;
+  padding-bottom: 40px;
+}
+
+@keyframes ADM-EVN-slideIn {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
+}
+
+.ADM-EVN-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.ADM-EVN-logo-h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Boutons de la barre latérale ajustés pour prendre toute la largeur sans centrage */
+.ADM-EVN-sidebar-button {
+    background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.9rem; /* Reduced from 1rem to 0.9rem for better fit */
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 10px 15px; /* Adjusted padding from 12px 20px to 10px 15px */
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+  white-space: normal; /* Allow text to wrap */
+  word-wrap: break-word; /* Ensure long words break to the next line */
+  line-height: 1.2; /* Improve readability with better line spacing */
+}
+
+.ADM-EVN-sidebar-button:hover {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(125, 160, 202, 0.5));
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+.ADM-EVN-sidebar-button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: all 0.5s ease;
+}
+
+.ADM-EVN-sidebar-button:hover::before {
+    left: 100%;
+}
+
+/* Contenu principal */
+.ADM-EVN-main-content {
+    margin-left: 310px;
+    margin-right: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* Header */
+.ADM-EVN-header {
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15), 0 0 20px rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+}
+
+.ADM-EVN-header-h1 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #052659;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 3px rgba(5, 38, 89, 0.1);
+}
+
+.ADM-EVN-header-p {
+    font-size: 1rem;
+    color: #5483b3;
+    margin: 8px 0 0;
+}
+
+/* Grille de contenu */
+.ADM-EVN-content-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+}
+
+/* Graphique */
+.ADM-EVN-chart-container {
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15), 0 0 20px rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.ADM-EVN-chart-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #052659;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: 0.5px;
+    position: relative;
+    padding-bottom: 10px;
+    background: linear-gradient(90deg, #0d3155, #7DA0CA);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: all 0.4s ease;
+}
+
+.ADM-EVN-chart-title:hover {
+    transform: scale(1.02);
+}
+
+.ADM-EVN-chart-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 2px;
+    background: linear-gradient(90deg, #06223e, #7DA0CA);
+    transition: width 0.4s ease;
+}
+
+.ADM-EVN-chart-title:hover::after {
+    width: 100%;
+}
+
+.ADM-EVN-chart-wrapper {
+    max-width: 100%;
+    height: 300px;
+    position: relative;
+}
+
+/* Liste des événements */
+.ADM-EVN-event-list {
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15), 0 0 20px rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.ADM-EVN-event-list-h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #052659;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: 0.5px;
+    position: relative;
+    padding-bottom: 10px;
+    background: linear-gradient(90deg, #0c3156, #7DA0CA);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: all 0.4s ease;
+}
+
+.ADM-EVN-event-list-h3:hover {
+    transform: scale(1.02);
+}
+
+.ADM-EVN-event-list-h3::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 2px;
+    background: linear-gradient(90deg, #042649, #7DA0CA);
+    transition: width 0.4s ease;
+}
+
+.ADM-EVN-event-list-h3:hover::after {
+    width: 100%;
+}
+
+.ADM-EVN-search-container {
+    position: relative;
+    width: 100%;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 12px;
+    padding: 5px 10px;
+    box-shadow: 0 4px 15px rgba(3, 19, 44, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+}
+
+.ADM-EVN-search-container:hover {
+    box-shadow: 0 6px 20px rgba(5, 38, 89, 0.1);
+}
+
+.ADM-EVN-search-bar {
+    width: 100%;
+    padding: 12px 40px 12px 15px;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    background: transparent;
+    color: #052659;
+}
+
+.ADM-EVN-search-bar:focus {
+    outline: none;
+}
+
+.ADM-EVN-search-bar::placeholder {
+    color: #3c70af;
+}
+
+.ADM-EVN-search-icon {
+    position: absolute;
+    right: 15px;
+    color: #0c2a46;
+    font-size: 1.2rem;
+}
+
+.ADM-EVN-event-list-ul {
+    list-style: none;
+    padding: 0;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.ADM-EVN-event-list-ul::-webkit-scrollbar {
+    width: 6px;
+}
+
+.ADM-EVN-event-list-ul::-webkit-scrollbar-track {
+    background: #f0f7ff;
+    border-radius: 10px;
+}
+
+.ADM-EVN-event-list-ul::-webkit-scrollbar-thumb {
+    background: #7da0ca;
+    border-radius: 10px;
+}
+
+.ADM-EVN-event-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.7);
+    margin-bottom: 12px;
+    box-shadow: 0 4px 15px rgba(5, 38, 89, 0.05);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(5px);
+}
+
+.ADM-EVN-event-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(5, 38, 89, 0.15), 0 0 15px rgba(125, 160, 202, 0.3);
+    background: rgba(145, 187, 218, 0.9);
+    border-color: rgba(84, 131, 179, 0.3);
+}
+
+.ADM-EVN-event-item:last-child {
+    margin-bottom: 0;
+}
+
+.ADM-EVN-event-info-h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #173d78;
+    margin: 0;
+    letter-spacing: 0.3px;
+}
+
+.ADM-EVN-event-info-p {
+    font-size: 0.9rem;
+    color: #5483b3;
+    margin: 5px 0 0;
+}
+
+/* Statistiques avec survol en bleu clair au lieu de gris */
+.ADM-EVN-event-stats-p {
+    font-size: 0.9rem;
+    color: #ffffff;
+    margin: 0;
+    font-weight: 500;
+    padding: 5px 10px;
+    background: #5483b3;
+    border-radius: 8px;
+    letter-spacing: 0.3px;
+    transition: all 0.3s ease;
+}
+
+.ADM-EVN-event-stats-p:hover {
+    background: #7da0ca; /* Bleu clair au lieu de gris */
+    box-shadow: 0 0 10px rgba(125, 160, 202, 0.5);
+}
+
+/* Modale */
+.ADM-EVN-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(5, 38, 89, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.ADM-EVN-modal-content {
+   width: 100%;
+    max-width: 500px;
+    max-height: 80vh;
+    background: white; /* Changé pour mieux voir */
+    border-radius: 10px;
+    padding: 20px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+}
+
+.ADM-EVN-modal-content-h3 {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #052659;
+    margin-bottom: 20px;
+    text-align: center;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 3px rgba(5, 38, 89, 0.1);
+}
+
+.ADM-EVN-event-image {
+    max-height: 200px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    width: 100%;
+    object-fit: cover;
+    box-shadow: 0 8px 25px rgba(5, 38, 89, 0.1);
+    border: 1px solid rgba(84, 131, 179, 0.2);
+}
+
+.ADM-EVN-description {
+    background: #f0f7ff;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(84, 131, 179, 0.1);
+}
+
+.ADM-EVN-description-p {
+    font-size: 0.95rem;
+    margin: 0;
+    color: #052659;
+    line-height: 1.6;
+}
+
+.ADM-EVN-modal-content-p {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.95rem;
+    color: #5483b3;
+    margin: 12px 0;
+    line-height: 1.5;
+}
+
+/* Formulaire */
+.ADM-EVN-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.ADM-EVN-input-group {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ADM-EVN-input-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #5483b3;
+    font-size: 1.1rem;
+    transition: color 0.3s ease;
+}
+
+.ADM-EVN-input:focus + .ADM-EVN-input-icon,
+.ADM-EVN-textarea:focus + .ADM-EVN-input-icon,
+.ADM-EVN-select:focus + .ADM-EVN-input-icon {
+    color: #7da0ca;
+}
+
+.ADM-EVN-input,
+.ADM-EVN-textarea,
+.ADM-EVN-select {
+    padding: 15px;
+    padding-left: 45px;
+    border: 1px solid rgba(84, 131, 179, 0.2);
+    border-radius: 12px;
+    font-size: 0.95rem;
+    background: #f0f7ff;
+    color: #052659;
+    width: 100%;
+    box-shadow: 0 4px 15px rgba(5, 38, 89, 0.05);
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.ADM-EVN-input:focus,
+.ADM-EVN-textarea:focus,
+.ADM-EVN-select:focus {
+    border-color: #5483b3;
+    box-shadow: 0 0 15px rgba(84, 131, 179, 0.2);
+    outline: none;
+}
+
+.ADM-EVN-textarea,
+.ADM-EVN-select {
+    padding-left: 15px;
+}
+
+.ADM-EVN-input::placeholder,
+.ADM-EVN-textarea::placeholder {
+    color: #7da0ca;
+}
+
+.ADM-EVN-input-group-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    color: #052659;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+/* Section de filtrage */
+.ADM-EVN-filter-section {
+    margin: 15px 0;
+    padding: 20px;
+    background: #f0f7ff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(5, 38, 89, 0.05);
+    border: 1px solid rgba(84, 131, 179, 0.1);
+    transition: all 0.3s ease;
+}
+
+.ADM-EVN-filter-section:hover {
+    box-shadow: 0 6px 20px rgba(5, 38, 89, 0.1);
+}
+
+.ADM-EVN-filter-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.ADM-EVN-filter-group {
+    flex: 1;
+    min-width: 150px;
+}
+
+.ADM-EVN-filter-group-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    color: #052659;
+    margin-bottom: 8px;
+}
+
+/* Boutons */
+.ADM-EVN-button-group {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+    justify-content: center;
+}
+
+.ADM-EVN-button {
+    background: linear-gradient(135deg, #5483b3 0%, #052659 100%);
+    color: #ffffff;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 8px 20px rgba(5, 38, 89, 0.1);
+    transition: all 0.3s ease;
+    letter-spacing: 0.3px;
+    position: relative;
+    overflow: hidden;
+}
+
+.ADM-EVN-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(5, 38, 89, 0.15), 0 0 15px rgba(125, 160, 202, 0.4);
+}
+
+.ADM-EVN-button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: all 0.5s ease;
+}
+
+.ADM-EVN-button:hover::before {
+    left: 100%;
+}
+
+.ADM-EVN-edit-button {
+    background: linear-gradient(135deg, #7da0ca 0%, #5483b3 100%);
+}
+
+.ADM-EVN-delete-button {
+    background: linear-gradient(135deg, #052659 0%, #021024 100%);
+}
+
+.ADM-EVN-close-button {
+    background: linear-gradient(135deg, #5483b3 0%, #7da0ca 100%);
+}
+
+/* Message "Aucun résultat" */
+.ADM-EVN-no-results {
+    text-align: center;
+    color: #5483b3;
+    font-size: 1rem;
+    padding: 25px;
+}
+
+.ADM-EVN-error-message {
+    color: #ffffff;
+    font-size: 0.85rem;
+    margin-left: 10px;
+    display: inline-block;
+    background: rgba(255, 59, 48, 0.7);
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+/* Animations */
+@keyframes ADM-EVN-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(84, 131, 179, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(84, 131, 179, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(84, 131, 179, 0); }
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .ADM-EVN-sidebar {
+        position: relative;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: auto;
+        margin-bottom: 30px;
+    }
+
+    .ADM-EVN-main-content {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .ADM-EVN-content-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 576px) {
+    .ADM-EVN-button-group {
+        flex-direction: column;
+    }
+
+    .ADM-EVN-modal-content {
+        padding: 20px;
+    }
+}

@@ -1,40 +1,42 @@
-// backend/routes/evenementRoutes.js
 const express = require('express');
 const evenementController = require('../controllers/evenementController');
 const multer = require('multer');
 const path = require('path');
 
-// Initialize the router
 const router = express.Router();
 
-// Configure storage for uploaded files
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/');
-    },
-    filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        const ext = path.extname(file.originalname);
-        cb(null, file.fieldname + '-' + uniqueSuffix + ext); // Ajoute un suffixe unique pour éviter les conflits de noms
-    }
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    const ext = path.extname(file.originalname);
+    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
+  }
 });
 
 const upload = multer({ storage });
 
-// Routes for events
 router.get('/evenements', evenementController.getAllEvenements);
-router.post('/evenements', upload.single('image'), evenementController.createEvenement);// Gestion de l'upload d'image
-router.put('/evenements/:id', upload.single('image'), evenementController.updateEvenement); // Gestion de l'upload d'image
+
+router.post('/evenements', upload.single('image'), (req, res, next) => {
+  console.log('Requête POST /evenements reçue');
+  console.log('Body:', req.body);
+  console.log('File:', req.file);
+  next();
+}, evenementController.createEvenement);
+
+router.put('/evenements/:id', upload.single('image'), evenementController.updateEvenement);
 router.delete('/evenements/:id', evenementController.deleteEvenement);
 
-
-// Route for image upload (optional, if needed separately)
 router.post('/upload', upload.single('image'), (req, res) => {
-    if (!req.file) {
-        return res.status(400).json({ message: 'No file uploaded' });
-    }
-    res.json({ imageUrl: `/uploads/${req.file.filename}` }); // Retourne l'URL de l'image uploadée
+  if (!req.file) {
+    console.error('Aucun fichier reçu dans /upload');
+    return res.status(400).json({ message: 'No file uploaded' });
+  }
+  console.log('Fichier reçu avec succès :', req.file.filename, 'Chemin :', path.join('uploads', req.file.filename));
+  res.json({ imageUrl: `/uploads/${req.file.filename}` });
 });
 
-// Export the router
 module.exports = router;

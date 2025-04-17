@@ -1,8 +1,7 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap');
 
 /* Conteneur principal */
-#logins .l-container {
+.LOG-l-container {
     display: flex;
     height: 100vh;
     width: 100vw;
@@ -11,7 +10,7 @@
 }
 
 /* Section de l'image de fond */
-#logins .background-section {
+.LOG-background-section {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -22,7 +21,7 @@
     z-index: 1;
 }
 
-#logins .background-section .overlay {
+.LOG-background-section .LOG-overlay {
     position: absolute;
     inset: 0;
     background: var(--primary); /* Overlay teal/vert */
@@ -30,7 +29,7 @@
 }
 
 /* Section du formulaire (déplacée à gauche) */
-#logins .form-section {
+.LOG-form-section {
     position: absolute;
     width: 50%;
     height: 100%;
@@ -42,7 +41,7 @@
 }
 
 /* SVG pour la découpe en S */
-#logins .wave-divider {
+.LOG-wave-divider {
     position: absolute;
     height: 100%;
     width: 100%;
@@ -53,7 +52,7 @@
 }
 
 /* Conteneur du formulaire */
-#logins .login-container {
+.LOG-login-container {
     width: 100%;
     max-width: 400px;
     text-align: center; /* Centré pour le logo et le bouton */
@@ -65,7 +64,7 @@
 }
 
 /* Logo */
-#logins .logo {
+.LOG-logo {
     width: 100px;
     height: 100px;
     margin-bottom: 20px;
@@ -76,30 +75,30 @@
 }
 
 /* Titre et sous-titre */
-#logins h2 {
+h2 {
     font-size: 2.2rem;
     font-weight: 700;
     color: var(--text);
     margin-bottom: 5px;
-    font-family: "Poppins", sans-serif;/* Nouvelle police élégante */
+    font-family: "Poppins", sans-serif; /* Nouvelle police élégante */
     letter-spacing: 1px;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
     line-height: 1.2;
 }
 
-#logins p {
+p {
     font-size: 1.2rem;
     color: var(--dark-blue);
     margin-bottom: 30px;
 }
 
 /* Champs de saisie */
-#logins .input-group {
+.LOG-input-group {
     position: relative;
     margin-bottom: 20px;
 }
 
-#logins .input-icon {
+.LOG-input-icon {
     position: absolute;
     top: 50%;
     left: 15px;
@@ -109,7 +108,7 @@
 }
 
 /* Modification des champs pour qu'ils soient des traits simples */
-#logins .login-input {
+.LOG-login-input {
     width: 100%;
     padding: 12px 15px 12px 40px;
     border: none;
@@ -122,12 +121,12 @@
     transition: all 0.3s ease;
 }
 
-#logins .login-input:focus {
+.LOG-login-input:focus {
     border-bottom-color: var(--primary);
 }
 
 /* Bouton "Connexion" */
-#logins .login-btn {
+.LOG-login-btn {
     width: 150px;
     padding: 12px;
     border: none;
@@ -143,30 +142,30 @@
 }
 
 /* Effet au survol du bouton */
-#logins .login-btn:hover {
+.LOG-login-btn:hover {
     background: var(--secondary);
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-    #logins .form-section {
+    .LOG-form-section {
         width: 100%;
         position: relative;
     }
 
-    #logins .wave-divider {
+    .LOG-wave-divider {
         display: none;
     }
 
-    #logins .l-container {
+    .LOG-l-container {
         flex-direction: column;
     }
 
-    #logins .background-section {
+    .LOG-background-section {
         height: 200px;
     }
 
-    #logins .login-container {
+    .LOG-login-container {
         margin-right: 0;
     }
 }

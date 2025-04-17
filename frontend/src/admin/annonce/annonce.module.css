@@ -1,5 +1,5 @@
 /* Conteneur principal */
-.container {
+.ADM-ANC-container {
   max-width: 1400px;
   margin: 30px auto;
   padding: 0;
@@ -8,7 +8,7 @@
 }
 
 /* Formes abstraites en arrière-plan */
-.backgroundShapes {
+.ADM-ANC-backgroundShapes {
   position: fixed;
   top: 0;
   left: 0;
@@ -19,14 +19,14 @@
   pointer-events: none;
 }
 
-.shape {
+.ADM-ANC-shape {
   position: absolute;
   border-radius: 50%;
   opacity: 0.3;
-  animation: pulseShape 10s infinite ease-in-out;
+  animation: ADM-ANC-pulseShape 10s infinite ease-in-out;
 }
 
-.shape1 {
+.ADM-ANC-shape1 {
   width: 500px;
   height: 500px;
   background: radial-gradient(circle, #ffffff 0%, #c1e8ff 100%);
@@ -36,7 +36,7 @@
   animation-delay: 0s;
 }
 
-.shape2 {
+.ADM-ANC-shape2 {
   width: 400px;
   height: 400px;
   background: radial-gradient(circle, #ffffff 0%, #7da0ca 100%);
@@ -47,7 +47,7 @@
 }
 
 /* Sidebar */
-.sidebar {
+.ADM-ANC-sidebar {
   background: linear-gradient(135deg, rgba(91, 135, 179, 0.95) 0%, rgba(17, 69, 148, 0.95) 100%);
   border-radius: 0;
   padding: 25px;
@@ -58,23 +58,25 @@
   position: fixed;
   top: 0;
   left: 30px;
-  width: 180px;
+  width: 200px; /* Increased from 150px to 200px */
   height: 100vh;
   box-shadow: 0 15px 40px rgba(37, 100, 194, 0.35);
   border: 1px solid rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(10px);
   z-index: 1000;
-  animation: slideIn 0.5s ease-out;
+  animation: ADM-ENS-slideIn 0.5s ease-out;
+  overflow-y: auto;
+  padding-bottom: 40px;
 }
 
-.logo {
+.ADM-ANC-logo {
   display: flex;
   align-items: center;
   gap: 10px;
   margin-bottom: 15px;
 }
 
-.logo h2 {
+.ADM-ANC-logo h2 {
   font-size: 1.5rem;
   font-weight: 600;
   margin: 0;
@@ -83,16 +85,16 @@
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.sidebarButton {
+.ADM-ANC-sidebarButton {
   background: rgba(255, 255, 255, 0.1);
   color: #ffffff;
   text-decoration: none;
-  font-size: 1rem;
+  font-size: 0.9rem; /* Reduced from 1rem to 0.9rem for better fit */
   display: flex;
   align-items: center;
   justify-content: flex-start;
   gap: 12px;
-  padding: 12px 20px;
+  padding: 10px 15px; /* Adjusted padding from 12px 20px to 10px 15px */
   border: none;
   border-radius: 12px;
   cursor: pointer;
@@ -102,15 +104,18 @@
   position: relative;
   overflow: hidden;
   margin: 0;
+  white-space: normal; /* Allow text to wrap */
+  word-wrap: break-word; /* Ensure long words break to the next line */
+  line-height: 1.2; /* Improve readability with better line spacing */
 }
 
-.sidebarButton:hover {
+.ADM-ANC-sidebarButton:hover {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(125, 160, 202, 0.5));
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   transform: translateY(-2px);
 }
 
-.sidebarButton::before {
+.ADM-ANC-sidebarButton::before {
   content: "";
   position: absolute;
   top: 0;
@@ -121,12 +126,12 @@
   transition: all 0.5s ease;
 }
 
-.sidebarButton:hover::before {
+.ADM-ANC-sidebarButton:hover::before {
   left: 100%;
 }
 
 /* Contenu principal */
-.mainContent {
+.ADM-ANC-mainContent {
   margin-left: 290px; /* 180px (largeur sidebar) + 30px (marge gauche sidebar) + 80px (espace supplémentaire) */
   margin-right: 30px;
   padding: 20px;
@@ -138,7 +143,7 @@
 }
 
 /* Header */
-.header {
+.ADM-ANC-header {
   background: rgba(255, 255, 255, 0.85);
   border-radius: 20px;
   padding: 25px;
@@ -148,7 +153,7 @@
   z-index: 2;
 }
 
-.header h1 {
+.ADM-ANC-header h1 {
   font-size: 1.8rem;
   font-weight: 600;
   color: #052659;
@@ -160,19 +165,19 @@
   text-shadow: 0 1px 3px rgba(5, 38, 89, 0.1);
 }
 
-.header p {
+.ADM-ANC-header p {
   font-size: 1rem;
   color: #5483b3;
   margin: 8px 0 0;
 }
 
 /* Barre de recherche */
-.searchBar {
+.ADM-ANC-searchBar {
   position: relative;
   margin-bottom: 20px;
 }
 
-.searchBar input {
+.ADM-ANC-searchBar input {
   padding: 12px 15px 12px 40px;
   border: 1px solid rgba(84, 131, 179, 0.2);
   border-radius: 12px;
@@ -185,17 +190,17 @@
   box-sizing: border-box;
 }
 
-.searchBar input:focus {
+.ADM-ANC-searchBar input:focus {
   border-color: #5483b3;
   box-shadow: 0 0 15px rgba(84, 131, 179, 0.2);
   outline: none;
 }
 
-.searchBar input::placeholder {
+.ADM-ANC-searchBar input::placeholder {
   color: #7da0ca;
 }
 
-.searchIcon {
+.ADM-ANC-searchIcon {
   position: absolute;
   left: 15px;
   top: 50%;
@@ -205,7 +210,7 @@
 }
 
 /* Liste des événements */
-.eventList {
+.ADM-ANC-eventList {
   background: rgba(255, 255, 255, 0.85);
   border-radius: 20px;
   padding: 25px;
@@ -215,7 +220,7 @@
   z-index: 2;
 }
 
-.eventList h3 {
+.ADM-ANC-eventList h3 {
   font-size: 1.2rem;
   font-weight: 600;
   color: #052659;
@@ -232,11 +237,11 @@
   transition: all 0.4s ease;
 }
 
-.eventList h3:hover {
+.ADM-ANC-eventList h3:hover {
   transform: scale(1.02);
 }
 
-.eventList h3::after {
+.ADM-ANC-eventList h3::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -247,12 +252,12 @@
   transition: width 0.4s ease;
 }
 
-.eventList h3:hover::after {
+.ADM-ANC-eventList h3:hover::after {
   width: 100%;
 }
 
 /* Styles pour les sections Étudiants et Enseignants */
-.etudiantsSection, .enseignantsSection {
+.ADM-ANC-etudiantsSection, .ADM-ANC-enseignantsSection {
   margin-bottom: 30px;
   padding: 20px;
   border-radius: 15px;
@@ -261,15 +266,15 @@
   border: 1px solid rgba(84, 131, 179, 0.2);
 }
 
-.etudiantsSection {
+.ADM-ANC-etudiantsSection {
   background: rgba(200, 220, 255, 0.2); /* Fond légèrement bleuté pour les étudiants */
 }
 
-.enseignantsSection {
+.ADM-ANC-enseignantsSection {
   background: rgba(255, 200, 200, 0.2); /* Fond légèrement rosé pour les enseignants */
 }
 
-.etudiantsSection h4, .enseignantsSection h4 {
+.ADM-ANC-etudiantsSection h4, .ADM-ANC-enseignantsSection h4 {
   font-size: 1.1rem;
   font-weight: 600;
   color: #052659;
@@ -282,7 +287,7 @@
   -webkit-text-fill-color: transparent;
 }
 
-.eventList ul {
+.ADM-ANC-eventList ul {
   list-style: none;
   padding: 0;
   max-height: 400px;
@@ -292,7 +297,7 @@
   gap: 15px;
 }
 
-.eventItem {
+.ADM-ANC-eventItem {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -306,20 +311,20 @@
   backdrop-filter: blur(5px);
 }
 
-.eventItem:hover {
+.ADM-ANC-eventItem:hover {
   transform: translateY(-3px);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
   background: rgb(72, 108, 202);
   border-color: rgba(84, 131, 179, 0.4);
 }
 
-.eventInfo {
+.ADM-ANC-eventInfo {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.eventInfo h4 {
+.ADM-ANC-eventInfo h4 {
   font-size: 1.1rem;
   font-weight: 700;
   color: #0a1e3d;
@@ -329,19 +334,19 @@
   gap: 8px;
 }
 
-.annonceIcon {
+.ADM-ANC-annonceIcon {
   color: #0b2f54;
   font-size: 1.2rem;
 }
 
-.eventInfo p {
+.ADM-ANC-eventInfo p {
   font-size: 0.9rem;
   color: #5483b3;
   margin: 0;
   line-height: 1.4;
 }
 
-.eventStats p {
+.ADM-ANC-eventStats p {
   font-size: 0.9rem;
   color: #ffffff;
   margin: 0;
@@ -352,13 +357,13 @@
   transition: all 0.3s ease;
 }
 
-.eventStats p:hover {
+.ADM-ANC-eventStats p:hover {
   background: #3b669b;
   box-shadow: 0 0 10px rgba(125, 160, 202, 0.5);
 }
 
 /* Message "Aucune annonce" */
-.noResults {
+.ADM-ANC-noResults {
   text-align: center;
   color: #184976;
   font-size: 1.2rem;
@@ -369,7 +374,7 @@
 }
 
 /* Formulaire */
-.form {
+.ADM-ANC-form {
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -380,14 +385,14 @@
   z-index: 2;
 }
 
-.inputGroup {
+.ADM-ANC-inputGroup {
   position: relative;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.inputIcon {
+.ADM-ANC-inputIcon {
   position: absolute;
   left: 15px;
   top: 50%;
@@ -396,7 +401,7 @@
   font-size: 1.1rem;
 }
 
-.inputGroup input, .inputGroup textarea, .inputGroup select {
+.ADM-ANC-inputGroup input, .ADM-ANC-inputGroup textarea, .ADM-ANC-inputGroup select {
   padding: 15px;
   padding-left: 45px;
   border: 1px solid rgba(84, 131, 179, 0.2);
@@ -410,21 +415,21 @@
   box-sizing: border-box;
 }
 
-.inputGroup input:focus, .inputGroup textarea:focus, .inputGroup select:focus {
+.ADM-ANC-inputGroup input:focus, .ADM-ANC-inputGroup textarea:focus, .ADM-ANC-inputGroup select:focus {
   border-color: #5483b3;
   box-shadow: 0 0 15px rgba(84, 131, 179, 0.2);
   outline: none;
 }
 
-.inputGroup textarea, .inputGroup select {
+.ADM-ANC-inputGroup textarea, .ADM-ANC-inputGroup select {
   padding-left: 15px;
 }
 
-.inputGroup input::placeholder, .inputGroup textarea::placeholder {
+.ADM-ANC-inputGroup input::placeholder, .ADM-ANC-inputGroup textarea::placeholder {
   color: #7da0ca;
 }
 
-.inputGroup label {
+.ADM-ANC-inputGroup label {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -434,7 +439,7 @@
 }
 
 /* Section de filtrage */
-.filterSection {
+.ADM-ANC-filterSection {
   margin: 15px 0;
   padding: 20px;
   background: #f0f7ff;
@@ -443,18 +448,18 @@
   border: 1px solid rgba(84, 131, 179, 0.1);
 }
 
-.filterOptions {
+.ADM-ANC-filterOptions {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
 }
 
-.filterGroup {
+.ADM-ANC-filterGroup {
   flex: 1;
   min-width: 150px;
 }
 
-.filterGroup label {
+.ADM-ANC-filterGroup label {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -464,7 +469,7 @@
 }
 
 /* Modale */
-.modalOverlay {
+.ADM-ANC-modalOverlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -482,21 +487,21 @@
   pointer-events: none; /* Désactive les interactions quand invisible */
 }
 
-.modalOverlay.active {
+.ADM-ANC-modalOverlay.ADM-ANC-active {
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto; /* Active les interactions quand visible */
 }
 
-.modalOverlaySlideIn {
-  animation: slideInFromTop 0.4s ease-out forwards;
+.ADM-ANC-modalOverlaySlideIn {
+  animation: ADM-ANC-slideInFromTop 0.4s ease-out forwards;
 }
 
-.modalOverlayFadeOut {
-  animation: fadeOut 0.3s ease-in forwards;
+.ADM-ANC-modalOverlayFadeOut {
+  animation: ADM-ANC-fadeOut 0.3s ease-in forwards;
 }
 
-.modalContent {
+.ADM-ANC-modalContent {
   width: 100%;
   max-width: 500px;
   max-height: 80vh;
@@ -509,7 +514,7 @@
   backdrop-filter: blur(10px);
 }
 
-.modalContent h3 {
+.ADM-ANC-modalContent h3 {
   font-size: 1.6rem;
   font-weight: 600;
   color: #052659;
@@ -518,7 +523,7 @@
   text-shadow: 0 1px 3px rgba(5, 38, 89, 0.1);
 }
 
-.eventImage {
+.ADM-ANC-eventImage {
   max-height: 200px;
   margin-bottom: 20px;
   border-radius: 12px;
@@ -528,7 +533,7 @@
   border: 1px solid rgba(84, 131, 179, 0.2);
 }
 
-.description {
+.ADM-ANC-description {
   background: #f0f7ff;
   padding: 20px;
   border-radius: 12px;
@@ -536,14 +541,14 @@
   border: 1px solid rgba(84, 131, 179, 0.1);
 }
 
-.description p {
+.ADM-ANC-description p {
   font-size: 0.95rem;
   margin: 0;
   color: #052659;
   line-height: 1.6;
 }
 
-.modalContent p {
+.ADM-ANC-modalContent p {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -553,14 +558,14 @@
 }
 
 /* Boutons */
-.buttonGroup {
+.ADM-ANC-buttonGroup {
   display: flex;
   gap: 15px;
   margin-top: 25px;
   justify-content: center;
 }
 
-.buttonGroup button {
+.ADM-ANC-buttonGroup button {
   background: linear-gradient(135deg, #5483b3 0%, #052659 100%);
   color: #ffffff;
   padding: 12px 25px;
@@ -578,12 +583,12 @@
   overflow: hidden;
 }
 
-.buttonGroup button:hover {
+.ADM-ANC-buttonGroup button:hover {
   transform: translateY(-3px);
   box-shadow: 0 12px 25px rgba(5, 38, 89, 0.15), 0 0 15px rgba(125, 160, 202, 0.4);
 }
 
-.buttonGroup button::before {
+.ADM-ANC-buttonGroup button::before {
   content: "";
   position: absolute;
   top: 0;
@@ -594,47 +599,47 @@
   transition: all 0.5s ease;
 }
 
-.buttonGroup button:hover::before {
+.ADM-ANC-buttonGroup button:hover::before {
   left: 100%;
 }
 
-.editButton {
+.ADM-ANC-editButton {
   background: linear-gradient(135deg, #7da0ca 0%, #5483b3 100%);
 }
 
-.editButton:hover {
+.ADM-ANC-editButton:hover {
   background: linear-gradient(135deg, #5483b3 0%, #7da0ca 100%);
 }
 
-.deleteButton {
+.ADM-ANC-deleteButton {
   background: linear-gradient(135deg, #052659 0%, #021024 100%);
 }
 
-.deleteButton:hover {
+.ADM-ANC-deleteButton:hover {
   background: linear-gradient(135deg, #021024 0%, #052659 100%);
 }
 
-.closeButton {
+.ADM-ANC-closeButton {
   background: linear-gradient(135deg, #5483b3 0%, #7da0ca 100%);
 }
 
-.closeButton:hover {
+.ADM-ANC-closeButton:hover {
   background: linear-gradient(135deg, #7da0ca 0%, #5483b3 100%);
 }
 
 /* Animations */
-@keyframes pulseShape {
+@keyframes ADM-ANC-pulseShape {
   0% { transform: scale(1) translateY(0); }
   50% { transform: scale(1.05) translateY(-15px); }
   100% { transform: scale(1) translateY(0); }
 }
 
-@keyframes slideIn {
+@keyframes ADM-ANC-slideIn {
   from { transform: translateX(-100%); }
   to { transform: translateX(0); }
 }
 
-@keyframes slideInFromTop {
+@keyframes ADM-ANC-slideInFromTop {
   from {
       opacity: 0;
       transform: translateY(-50px);
@@ -645,7 +650,7 @@
   }
 }
 
-@keyframes fadeOut {
+@keyframes ADM-ANC-fadeOut {
   from {
       opacity: 1;
       transform: translateY(0);
@@ -658,7 +663,7 @@
 
 /* Responsive */
 @media (max-width: 992px) {
-  .sidebar {
+  .ADM-ANC-sidebar {
       position: relative;
       top: 0;
       left: 0;
@@ -667,22 +672,22 @@
       margin-bottom: 30px;
   }
 
-  .mainContent {
+  .ADM-ANC-mainContent {
       margin-left: 0;
       margin-right: 0;
   }
 
-  .eventList ul {
+  .ADM-ANC-eventList ul {
       grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 576px) {
-  .buttonGroup {
+  .ADM-ANC-buttonGroup {
       flex-direction: column;
   }
 
-  .modalContent {
+  .ADM-ANC-modalContent {
       padding: 20px;
   }
 }

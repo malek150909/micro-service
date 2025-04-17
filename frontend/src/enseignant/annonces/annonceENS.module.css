@@ -1,0 +1,1148 @@
+/* Conteneur principal */
+.ENS-ANC-container {
+  max-width: 1400px;
+  margin: 30px auto;
+  padding: 0;
+  position: relative;
+  display: block;
+}
+
+/* Formes abstraites en arrière-plan */
+.ENS-ANC-background-shapes {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ENS-ANC-shape {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.3;
+  animation: ENS-ANC-pulseShape 10s infinite ease-in-out;
+}
+
+.ENS-ANC-shape1 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, #ffffff 0%, #c1e8ff 100%);
+  top: 10%;
+  left: 10%;
+  filter: blur(50px);
+  animation-delay: 0s;
+}
+
+.ENS-ANC-shape2 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, #ffffff 0%, #7da0ca 100%);
+  bottom: 10%;
+  right: 10%;
+  filter: blur(40px);
+  animation-delay: 3s;
+}
+
+/* Sidebar */
+.ENS-ANC-sidebar {
+  background: linear-gradient(135deg, rgba(91, 135, 179, 0.95) 0%, rgba(17, 69, 148, 0.95) 100%);
+  border-radius: 0;
+  padding: 25px;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  position: fixed;
+  top: 0;
+  left: 30px;
+  width: 200px;
+  height: 100vh;
+  box-shadow: 0 15px 40px rgba(37, 100, 194, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  animation: ETD-ANC-slideIn 0.5s ease-out;
+  overflow-y: auto;
+  padding-bottom: 40px;
+}
+
+.ENS-ANC-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.ENS-ANC-logo h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.ENS-ANC-sidebar-button {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.9rem; /* Reduced from 1rem to 0.9rem for better fit */
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 10px 15px; /* Adjusted padding from 12px 20px to 10px 15px */
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+  white-space: normal; /* Allow text to wrap */
+  word-wrap: break-word; /* Ensure long words break to the next line */
+  line-height: 1.2; /* Improve readability with better line spacing */
+}
+
+.ENS-ANC-sidebar-icon {
+  font-size: 1.5rem;
+}
+
+.ENS-ANC-sidebar-button:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(125, 160, 202, 0.5));
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+.ENS-ANC-sidebar-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: all 0.5s ease;
+}
+
+.ENS-ANC-sidebar-button:hover::before {
+  left: 100%;
+}
+
+/* Contenu principal */
+.ENS-ANC-main-content {
+  margin-left: 250px;
+  margin-right: 30px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  min-height: 100vh;
+  z-index: 1;
+}
+
+/* Header */
+.ENS-ANC-header {
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15), 0 0 20px rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  z-index: 2;
+}
+
+.ENS-ANC-header h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #052659;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 3px rgba(5, 38, 89, 0.1);
+}
+
+.ENS-ANC-header p {
+  font-size: 1rem;
+  color: #5483b3;
+  margin: 8px 0 0;
+}
+
+/* Barre de recherche */
+.ENS-ANC-search-bar-container {
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+.ENS-ANC-search-bar {
+  position: relative;
+}
+
+.ENS-ANC-search-bar input {
+  padding: 12px 15px 12px 40px;
+  border: 1px solid rgba(84, 131, 179, 0.2);
+  border-radius: 12px;
+  font-size: 0.95rem;
+  background: #f0f7ff;
+  color: #052659;
+  width: 100%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.ENS-ANC-search-bar input:focus {
+  border-color: #5483b3;
+  box-shadow: 0 0 15px rgba(84, 131, 179, 0.2);
+  outline: none;
+}
+
+.ENS-ANC-search-bar input::placeholder {
+  color: #7da0ca;
+}
+
+.ENS-ANC-search-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #5483b3;
+  font-size: 1.1rem;
+}
+
+/* Liste des événements */
+.ENS-ANC-event-list {
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15), 0 0 20px rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(152, 166, 205, 0.5);
+  backdrop-filter: blur(10px);
+  z-index: 2;
+}
+
+.ENS-ANC-create-button {
+  margin-bottom: 30px;
+}
+
+#ENS-ANC-annonces-list,
+#ENS-ANC-mes-annonces-list {
+  list-style: none;
+  padding: 0;
+  max-height: 400px;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 15px;
+}
+
+.ENS-ANC-event-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(84, 131, 179, 0.2);
+  backdrop-filter: blur(5px);
+}
+
+.ENS-ANC-event-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+  background: rgb(72, 108, 202);
+  border-color: rgba(84, 131, 179, 0.4);
+}
+
+.ENS-ANC-event-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ENS-ANC-event-info h4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0a1e3d;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ENS-ANC-event-item:hover .ENS-ANC-event-info h4,
+.ENS-ANC-event-item:hover .ENS-ANC-event-info p {
+  color: #ffffff;
+}
+
+.ENS-ANC-annonce-icon {
+  color: #0b2f54;
+  font-size: 1.2rem;
+}
+
+.ENS-ANC-event-info p {
+  font-size: 0.9rem;
+  color: #5483b3;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.ENS-ANC-event-stats p {
+  font-size: 0.9rem;
+  color: #ffffff;
+  margin: 0;
+  font-weight: 500;
+  padding: 6px 12px;
+  background: #1b4d7f;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.ENS-ANC-event-stats p:hover {
+  background: #3b669b;
+  box-shadow: 0 0 10px rgba(125, 160, 202, 0.5);
+}
+
+/* Message "Aucune annonce" */
+.ENS-ANC-no-results {
+  text-align: center;
+  color: #184976;
+  font-size: 1.2rem;
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Formulaire */
+.ENS-ANC-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+}
+
+.ENS-ANC-input-group {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ENS-ANC-input-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #5483b3;
+  font-size: 1.1rem;
+}
+
+.ENS-ANC-input, .ENS-ANC-textarea, .ENS-ANC-select {
+  padding: 15px;
+  padding-left: 45px;
+  border: 1px solid rgba(84, 131, 179, 0.2);
+  border-radius: 12px;
+  font-size: 0.95rem;
+  background: #f0f7ff;
+  color: #052659;
+  width: 100%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.ENS-ANC-input:focus, .ENS-ANC-textarea:focus, .ENS-ANC-select:focus {
+  border-color: #5483b3;
+  box-shadow: 0 0 15px rgba(84, 131, 179, 0.2);
+  outline: none;
+}
+
+.ENS-ANC-textarea, .ENS-ANC-select {
+  padding-left: 15px;
+}
+
+.ENS-ANC-input::placeholder, .ENS-ANC-textarea::placeholder {
+  color: #7da0ca;
+}
+
+.ENS-ANC-input-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  color: #052659;
+  font-weight: 500;
+}
+
+/* Section de filtrage */
+.ENS-ANC-filter-section {
+  margin: 15px 0;
+  padding: 20px;
+  background: #f0f7ff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(5, 38, 89, 0.05);
+  border: 1px solid rgba(84, 131, 179, 0.1);
+}
+
+.ENS-ANC-filter-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.ENS-ANC-filter-group {
+  flex: 1;
+  min-width: 150px;
+}
+
+.ENS-ANC-filter-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  color: #052659;
+  margin-bottom: 8px;
+}
+
+/* Modale */
+.ENS-ANC-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(5, 38, 89, 0.5);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.ENS-ANC-modal-overlay.active {
+  animation: ENS-ANC-slideInFromTop 0.4s ease-out forwards;
+}
+
+.ENS-ANC-modal-content {
+  width: 100%;
+  max-width: 500px;
+  max-height: 80vh;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 15px 40px rgba(5, 38, 89, 0.2), 0 0 20px rgba(255, 255, 255, 0.3);
+  overflow-y: auto;
+  border: 1px solid rgba(84, 131, 179, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.ENS-ANC-modal-content h3 {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #052659;
+  margin-bottom: 20px;
+  text-align: center;
+  text-shadow: 0 1px 3px rgba(5, 38, 89, 0.1);
+}
+
+.ENS-ANC-modal-content .ENS-ANC-event-image {
+  max-height: 200px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  width: 100%;
+  object-fit: cover;
+  box-shadow: 0 8px 25px rgba(5, 38, 89, 0.1);
+  border: 1px solid rgba(84, 131, 179, 0.2);
+}
+
+.ENS-ANC-modal-content .ENS-ANC-description {
+  background: #f0f7ff;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(84, 131, 179, 0.1);
+}
+
+.ENS-ANC-modal-content .ENS-ANC-description p {
+  font-size: 0.95rem;
+  margin: 0;
+  color: #052659;
+  line-height: 1.6;
+}
+
+.ENS-ANC-modal-content p {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.95rem;
+  color: #5483b3;
+  margin: 12px 0;
+}
+
+/* Boutons */
+.ENS-ANC-button-group {
+  display: flex;
+  gap: 15px;
+  margin-top: 25px;
+  justify-content: center;
+}
+
+.ENS-ANC-button {
+  background: linear-gradient(135deg, #5483b3 0%, #052659 100%);
+  color: #ffffff;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 8px 20px rgba(5, 38, 89, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.ENS-ANC-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(5, 38, 89, 0.15), 0 0 15px rgba(125, 160, 202, 0.4);
+}
+
+.ENS-ANC-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: all 0.5s ease;
+}
+
+.ENS-ANC-button:hover::before {
+  left: 100%;
+}
+
+.ENS-ANC-edit-button {
+  background: linear-gradient(135deg, #7da0ca 0%, #5483b3 100%);
+}
+
+.ENS-ANC-edit-button:hover {
+  background: linear-gradient(135deg, #5483b3 0%, #7da0ca 100%);
+}
+
+.ENS-ANC-delete-button {
+  background: linear-gradient(135deg, #052659 0%, #021024 100%);
+}
+
+.ENS-ANC-delete-button:hover {
+  background: linear-gradient(135deg, #021024 0%, #052659 100%);
+}
+
+.ENS-ANC-close-button {
+  background: linear-gradient(135deg, #5483b3 0%, #7da0ca 100%);
+}
+
+.ENS-ANC-close-button:hover {
+  background: linear-gradient(135deg, #7da0ca 0%, #5483b3 100%);
+}
+
+/* Animations */
+@keyframes ENS-ANC-pulseShape {
+  0% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.05) translateY(-15px); }
+  100% { transform: scale(1) translateY(0); }
+}
+
+@keyframes ENS-ANC-slideIn {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes ENS-ANC-slideInFromTop {
+  from {
+      opacity: 0;
+      transform: translateY(-50px);
+  }
+  to {
+      opacity: 1;
+      transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .ENS-ANC-sidebar {
+      position: relative;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: auto;
+      margin-bottom: 40px;
+  }
+
+  .ENS-ANC-main-content {
+      margin-left: 0;
+      margin-right: 0;
+  }
+
+  #ENS-ANC-annonces-list,
+  #ENS-ANC-mes-annonces-list {
+      grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 576px) {
+  .ENS-ANC-button-group {
+      flex-direction: column;
+  }
+
+  .ENS-ANC-modal-content {
+      padding: 20px;
+  }
+}
+
+/* Messages d'erreur */
+.ENS-ANC-error-message {
+  color: #ef4444;
+  font-size: 0.9rem;
+  margin-top: 8px;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* Style général pour l'onglet "Gérer mes Sondages" */
+#ENS-ANC-mes-sondages-list {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+
+#ENS-ANC-mes-sondages-list .ENS-ANC-event-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--sondage-secondary);
+  border: 1px solid var(--sondage-border);
+  border-radius: 10px;
+  padding: 15px 20px;
+  margin-bottom: 15px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+#ENS-ANC-mes-sondages-list .ENS-ANC-event-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+#ENS-ANC-mes-sondages-list .ENS-ANC-event-info h4 {
+  color: var(--sondage-primary);
+  font-size: 1.2rem;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+#ENS-ANC-mes-sondages-list .ENS-ANC-event-info h4 .ENS-ANC-annonce-icon {
+  margin-right: 10px;
+  color: var(--sondage-primary);
+}
+
+#ENS-ANC-mes-sondages-list .ENS-ANC-event-info p {
+  color: var(--sondage-text);
+  font-size: 0.9rem;
+  margin: 5px 0 0;
+}
+
+/* Boutons dans la liste des sondages */
+#ENS-ANC-mes-sondages-list .ENS-ANC-edit-button,
+#ENS-ANC-mes-sondages-list .ENS-ANC-delete-button {
+  padding: 8px 12px;
+  margin-left: 10px;
+  border: none;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  display: inline-flex;
+  align-items: center;
+}
+
+#ENS-ANC-mes-sondages-list .ENS-ANC-edit-button {
+  background-color: var(--sondage-primary);
+  color: white;
+}
+
+#ENS-ANC-mes-sondages-list .ENS-ANC-edit-button:hover {
+  background-color: var(--sondage-hover);
+  transform: scale(1.05);
+}
+
+#ENS-ANC-mes-sondages-list .ENS-ANC-delete-button {
+  background-color: var(--sondage-danger);
+  color: white;
+}
+
+#ENS-ANC-mes-sondages-list .ENS-ANC-delete-button:hover {
+  background-color: #E55353;
+  transform: scale(1.05);
+}
+
+#ENS-ANC-mes-sondages-list .ENS-ANC-edit-button svg,
+#ENS-ANC-mes-sondages-list .ENS-ANC-delete-button svg {
+  margin-right: 5px;
+}
+
+/* Modale de création/modification de sondage */
+.ENS-ANC-modal-overlay.active .ENS-ANC-modal-content {
+  background-color: white;
+  border-radius: 15px;
+  padding: 30px;
+  max-width: 600px;
+  width: 90%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.ENS-ANC-modal-content h3 {
+  color: var(--sondage-primary);
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.ENS-ANC-modal-content .ENS-ANC-input-group {
+  margin-bottom: 20px;
+}
+
+.ENS-ANC-modal-content .ENS-ANC-input-group label {
+  display: block;
+  color: var(--sondage-text);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.ENS-ANC-modal-content .ENS-ANC-input-group input,
+.ENS-ANC-modal-content .ENS-ANC-input-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--sondage-border);
+  border-radius: 5px;
+  font-size: 1rem;
+  color: var(--sondage-text);
+  transition: border-color 0.3s ease;
+}
+
+.ENS-ANC-modal-content .ENS-ANC-input-group input:focus,
+.ENS-ANC-modal-content .ENS-ANC-input-group textarea:focus {
+  border-color: var(--sondage-primary);
+  outline: none;
+}
+
+.ENS-ANC-modal-content .ENS-ANC-input-group textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* Options du sondage */
+.ENS-ANC-option-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.ENS-ANC-option-group input {
+  flex: 1;
+  margin-right: 10px;
+}
+
+.ENS-ANC-option-group .ENS-ANC-remove-option-button {
+  background-color: var(--sondage-danger);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.ENS-ANC-option-group .ENS-ANC-remove-option-button:hover {
+  background-color: #E55353;
+}
+
+.ENS-ANC-add-option-button {
+  background-color: var(--sondage-primary);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.ENS-ANC-add-option-button:hover {
+  background-color: var(--sondage-hover);
+}
+
+.ENS-ANC-add-option-button svg {
+  margin-right: 5px;
+}
+
+/* Filtres (sections et groupes) */
+.ENS-ANC-filter-section h4 {
+  color: var(--sondage-primary);
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+}
+
+.ENS-ANC-filter-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.ENS-ANC-filter-group {
+  flex: 1;
+  min-width: 200px;
+}
+
+.ENS-ANC-filter-group label {
+  color: var(--sondage-text);
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.ENS-ANC-filter-group select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--sondage-border);
+  border-radius: 5px;
+  font-size: 1rem;
+  color: var(--sondage-text);
+  background-color: white;
+  transition: border-color 0.3s ease;
+}
+
+.ENS-ANC-filter-group select:focus {
+  border-color: var(--sondage-primary);
+  outline: none;
+}
+
+/* Boutons de la modale */
+.ENS-ANC-button-group {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.ENS-ANC-button-group button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  display: inline-flex;
+  align-items: center;
+}
+
+.ENS-ANC-button-group button[type="submit"] {
+  background-color: var(--sondage-primary);
+  color: white;
+}
+
+.ENS-ANC-button-group button[type="submit"]:hover {
+  background-color: var(--sondage-hover);
+  transform: scale(1.05);
+}
+
+.ENS-ANC-button-group .ENS-ANC-close-button {
+  background-color: #ccc;
+  color: white;
+}
+
+.ENS-ANC-button-group .ENS-ANC-close-button:hover {
+  background-color: #b3b3b3;
+  transform: scale(1.05);
+}
+
+.ENS-ANC-button-group button svg {
+  margin-right: 5px;
+}
+
+/* Modale de détails du sondage */
+.ENS-ANC-modal-body p {
+  color: var(--sondage-text);
+  font-size: 1rem;
+  margin: 10px 0;
+}
+
+.ENS-ANC-modal-body p strong {
+  color: var(--sondage-primary);
+}
+
+/* Modale de résultats du sondage */
+.ENS-ANC-modal-body h4 {
+  color: var(--sondage-primary);
+  font-size: 1.2rem;
+  margin: 20px 0 10px;
+}
+
+/* Conteneur des résultats */
+.ENS-ANC-sondage-results {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: var(--sondage-secondary);
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Message si aucun vote */
+.ENS-ANC-no-votes {
+  color: var(--sondage-text);
+  font-style: italic;
+  text-align: center;
+  margin: 20px 0;
+}
+
+/* Élément de résultat individuel */
+.ENS-ANC-result-item {
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.ENS-ANC-result-item:hover {
+  transform: translateY(-2px);
+}
+
+/* En-tête du résultat (option et stats) */
+.ENS-ANC-result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.ENS-ANC-result-option {
+  font-weight: 600;
+  color: var(--sondage-text);
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+}
+
+.ENS-ANC-most-voted-icon {
+  color: var(--most-voted);
+  margin-left: 8px;
+  font-size: 1.2rem;
+}
+
+.ENS-ANC-result-stats {
+  font-size: 0.95rem;
+  color: var(--sondage-text);
+  font-weight: 500;
+  background-color: var(--sondage-border);
+  padding: 4px 8px;
+  border-radius: 12px;
+}
+
+/* Barre de progression */
+.ENS-ANC-result-bar {
+  background-color: var(--sondage-border);
+  border-radius: 10px;
+  height: 30px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #e0e0e0;
+}
+
+.ENS-ANC-result-bar-fill {
+  height: 100%;
+  transition: width 1s ease-in-out;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Couleurs variées pour chaque option */
+.ENS-ANC-result-bar-fill.ENS-ANC-option-0 {
+  background: #4A90E2;
+}
+
+.ENS-ANC-result-bar-fill.ENS-ANC-option-1 {
+  background: #50C878;
+}
+
+.ENS-ANC-result-bar-fill.ENS-ANC-option-2 {
+  background: #FF6B6B;
+}
+
+.ENS-ANC-result-bar-fill.ENS-ANC-option-3 {
+  background: #FFD93D;
+}
+
+.ENS-ANC-result-bar-fill.ENS-ANC-option-4 {
+  background: #A569BD;
+}
+
+/* Étiquette dans la barre */
+.ENS-ANC-result-bar-label {
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  position: absolute;
+  right: 10px;
+}
+
+/* Total des votes */
+.ENS-ANC-total-votes {
+  text-align: center;
+  font-weight: 600;
+  color: var(--sondage-primary);
+  margin-top: 20px;
+  font-size: 1.1rem;
+}
+
+/* Animation au survol de la barre */
+.ENS-ANC-result-bar-fill:hover {
+  filter: brightness(1.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .ENS-ANC-result-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 5px;
+  }
+
+  .ENS-ANC-result-stats {
+      font-size: 0.85rem;
+  }
+
+  .ENS-ANC-result-bar {
+      height: 25px;
+  }
+
+  .ENS-ANC-result-bar-label {
+      font-size: 0.8rem;
+  }
+}
+
+/* Message d'erreur */
+.ENS-ANC-error-message {
+  color: var(--sondage-danger);
+  font-size: 0.9rem;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  #ENS-ANC-mes-sondages-list .ENS-ANC-event-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+  }
+
+  #ENS-ANC-mes-sondages-list .ENS-ANC-edit-button,
+  #ENS-ANC-mes-sondages-list .ENS-ANC-delete-button {
+      margin-left: 0;
+      width: 100%;
+      justify-content: center;
+  }
+
+  .ENS-ANC-filter-options {
+      flex-direction: column;
+      gap: 15px;
+  }
+
+  .ENS-ANC-button-group {
+      flex-direction: column;
+      gap: 10px;
+  }
+
+  .ENS-ANC-button-group button {
+      width: 100%;
+  }
+}
+
+.ENS-ANC-event-item {
+  cursor: default;
+}
+
+.ENS-ANC-modal-overlay.ENS-ANC-calendar-modal {
+  z-index: 1100 !important;
+}
+
+/* Style pour la modale de succès */
+.ENS-ANC-modal-overlay.ENS-ANC-success-modal {
+  z-index: 1200;
+}
+
+.ENS-ANC-modal-content.ENS-ANC-success-modal-content {
+  max-width: 400px;
+  text-align: center;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.ENS-ANC-success-modal-content h3 {
+  color: #052659;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.ENS-ANC-success-modal-content p {
+  color: #28a745;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.ENS-ANC-success-close-button {
+  background-color: #dc3545;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0 auto;
+}
+
+.ENS-ANC-success-close-button:hover {
+  background-color: #c82333;
+}

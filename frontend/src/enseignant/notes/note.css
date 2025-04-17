@@ -301,24 +301,6 @@
   overflow: hidden;
 }
 
-/* Titles */
-h1, h2, h3 {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #052659;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  letter-spacing: 0.5px;
-  position: relative;
-  padding-bottom: 10px;
-  background: linear-gradient(90deg, #0d3155, #7DA0CA);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
 /* Filters */
 .filters, .module-selection {
   display: flex;
@@ -420,7 +402,7 @@ h1, h2, h3 {
 }
 
 /* Buttons */
-button, .submit-btn, .delete-all-btn {
+ .submit-btn, .delete-all-btn {
   background: linear-gradient(135deg, #5483b3 0%, #052659 100%);
   color: #ffffff;
   padding: 12px 25px;
@@ -437,12 +419,12 @@ button, .submit-btn, .delete-all-btn {
   margin: 10px 0;
 }
 
-button:hover, .submit-btn:hover, .delete-all-btn:hover {
+ .submit-btn:hover, .delete-all-btn:hover {
   transform: translateY(-3px);
   box-shadow: 0 12px 25px rgba(5, 38, 89, 0.15);
 }
 
-button::before, .submit-btn::before, .delete-all-btn::before {
+ .submit-btn::before, .delete-all-btn::before {
   content: "";
   position: absolute;
   top: 0;
@@ -453,7 +435,7 @@ button::before, .submit-btn::before, .delete-all-btn::before {
   transition: all 0.5s ease;
 }
 
-button:hover::before, .submit-btn:hover::before, .delete-all-btn:hover::before {
+ .submit-btn:hover::before, .delete-all-btn:hover::before {
   left: 100%;
 }
 

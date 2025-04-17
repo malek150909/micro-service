@@ -31,6 +31,9 @@ import StudentGrades from "./etudiant/notes/pages/StudentGrades";
 import ENSlistetudiant from "./enseignant/listetudiant/TeacherDashboard";
 import ETDressources from "./etudiant/ressource/StudentDashboard";
 import NotesFeed from "./etudiant/note/notes";
+import SeanceSupp from "./enseignant/seance_supp/pages/seance_supp";
+import StudentPlanning from "./etudiant/planning/StudentPlanning";
+import Calendar from "./etudiant/calendrier/calendar";
 
 const PrivateRoute = ({ element }) => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -75,6 +78,9 @@ function App() {
                 <Route path="/ENSlistetudiant" element={<ENSlistetudiant />} />
                 <Route path="/ETDressources" element={<ETDressources />} />
                 <Route path="/notesFeed" element={<NotesFeed />} />
+                <Route path="/seanceSupp" element={<SeanceSupp />} />
+                <Route path="/studentPlanning" element={<StudentPlanning />} />
+                <Route path="/calendar" element={<Calendar />} />
             </Routes>
         </Router>
     );

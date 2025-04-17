@@ -8,8 +8,8 @@ import { saveAs } from "file-saver";
 import FilterForm from "../components/FilterForm";
 import ExamForm from "../components/ExamForm";
 import ExamList from "../components/ExamList";
-import { FaFilePdf, FaFileExcel, FaArrowLeft, FaUser } from 'react-icons/fa';
-import "../exam.css" ;
+import { FaFilePdf, FaFileExcel, FaArrowLeft, FaUser, FaHome } from 'react-icons/fa';
+import styles from "../exam.module.css";
 
 const MemoizedFilterForm = memo(FilterForm);
 const MemoizedExamForm = memo(ExamForm);
@@ -512,89 +512,87 @@ const ExamPlanning = () => {
   };
 
   return (
-    <div id="exams">
-    <div className="app-container">
-      <div className="background-shapes">
-        <div className="shape shape1"></div>
-        <div className="shape shape2"></div>
-      </div>
-      <div className="sidebar">
-        <div className="logo">
-          <h2>
-            <FaUser style={{ marginRight: '8px', verticalAlign: 'middle' }} /> Admin
-          </h2>
+      <div className={styles['ADM-EXM-app-container']}>
+        <div className={styles['ADM-EXM-background-shapes']}>
+          <div className={styles['ADM-EXM-shape']} className={styles['ADM-EXM-shape1']}></div>
+          <div className={styles['ADM-EXM-shape']} className={styles['ADM-EXM-shape2']}></div>
         </div>
-        <button className="sidebar-button" onClick={() => navigate('/admin')}>
-          <FaArrowLeft /> Retour à l'accueil
-        </button>
-      </div>
-      <div className="main-content">
-        <div className="header">
-          <h1>Planning des Examens{filters.ID_semestre ? ` - Semestre ${filters.ID_semestre}` : ""}</h1>
-          <p>Gérer les plannings des examens des facultés</p>
+        <div className={styles['ADM-EXM-sidebar']}>
+          <div className={styles['ADM-EXM-logo']}>
+            <h2>
+              Planning Des Examens 
+            </h2>
+          </div>
+          <button className={styles['ADM-EXM-sidebar-button']} onClick={() => navigate('/admin')}>
+            <FaHome /> Retour à l'accueil
+          </button>
         </div>
-        {error && (
-          <div className="error-message">
-            <p>{error}</p>
+        <div className={styles['ADM-EXM-main-content']}>
+          <div className={styles['ADM-EXM-header']}>
+            <h1>Planning des Examens{filters.ID_semestre ? ` - Semestre ${filters.ID_semestre}` : ""}</h1>
+            <p>Gérer les plannings des examens des facultés</p>
           </div>
-        )}
-        <div className="form-row">
-          <div className="filter-section">
-            <MemoizedFilterForm onFilter={handleFilter} onChange={handleFilterChange} onReset={handleResetFilters} />
-          </div>
-          <div className="exam-form-section">
-            <MemoizedExamForm
-              onAdd={handleAddExam}
-              disabled={false} // Let ExamForm handle its own disabled logic
-              modules={modules}
-              salles={salles}
-              semestres={semestres}
-              sectionId={filters.section}
-              selectedSemestre={filters.ID_semestre}
-              onFilterReset={handleResetFilters}
-              isFilterApplied={isFilterApplied}
-            />
-          </div>
-        </div>
-        <div className="list-section" ref={examListRef}>
-          {exams.length > 0 ? (
-            <>
-              {isLoadingModules ? (
-                <div className="message-container">
-                  <p className="no-results">Chargement des modules...</p>
-                </div>
-              ) : (
-                <MemoizedExamList
-                  exams={exams}
-                  onDelete={handleDeleteExam}
-                  onUpdate={handleUpdateExam}
-                  salles={salles}
-                  semestres={semestres}
-                  modules={modules}
-                />
-              )}
-              <div className="export-buttons">
-                <button onClick={exportToPDF}>
-                  <FaFilePdf style={{ marginRight: '8px' }} /> Exporter en PDF
-                </button>
-                <button onClick={exportToExcel}>
-                  <FaFileExcel style={{ marginRight: '8px' }} /> Exporter en Excel
-                </button>
-              </div>
-            </>
-          ) : (
-            <div className="message-container">
-              <p className="no-results">
-                {filters.section && isFilterApplied
-                  ? "Aucun examen trouvé."
-                  : "Sélectionnez une section et appliquez le filtre pour afficher ou créer un planning."}
-              </p>
+          {error && (
+            <div className={styles['ADM-EXM-error-message']}>
+              <p>{error}</p>
             </div>
           )}
+          <div className={styles['ADM-EXM-form-row']}>
+            <div className={styles['ADM-EXM-filter-section']}>
+              <MemoizedFilterForm onFilter={handleFilter} onChange={handleFilterChange} onReset={handleResetFilters} />
+            </div>
+            <div className={styles['ADM-EXM-exam-form-section']}>
+              <MemoizedExamForm
+                onAdd={handleAddExam}
+                disabled={false}
+                modules={modules}
+                salles={salles}
+                semestres={semestres}
+                sectionId={filters.section}
+                selectedSemestre={filters.ID_semestre}
+                onFilterReset={handleResetFilters}
+                isFilterApplied={isFilterApplied}
+              />
+            </div>
+          </div>
+          <div className={styles['ADM-EXM-list-section']} ref={examListRef}>
+            {exams.length > 0 ? (
+              <>
+                {isLoadingModules ? (
+                  <div className={styles['ADM-EXM-message-container']}>
+                    <p className={styles['ADM-EXM-no-results']}>Chargement des modules...</p>
+                  </div>
+                ) : (
+                  <MemoizedExamList
+                    exams={exams}
+                    onDelete={handleDeleteExam}
+                    onUpdate={handleUpdateExam}
+                    salles={salles}
+                    semestres={semestres}
+                    modules={modules}
+                  />
+                )}
+                <div className={styles['ADM-EXM-export-buttons']}>
+                  <button onClick={exportToPDF}>
+                    <FaFilePdf style={{ marginRight: '8px' }} /> Exporter en PDF
+                  </button>
+                  <button onClick={exportToExcel}>
+                    <FaFileExcel style={{ marginRight: '8px' }} /> Exporter en Excel
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className={styles['ADM-EXM-message-container']}>
+                <p className={styles['ADM-EXM-no-results']}>
+                  {filters.section && isFilterApplied
+                    ? "Aucun examen trouvé."
+                    : "Sélectionnez une section et appliquez le filtre pour afficher ou créer un planning."}
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
-    </div>
   );
 };
 

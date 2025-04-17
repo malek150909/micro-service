@@ -4,7 +4,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { motion } from 'framer-motion';
 import { FaList, FaDownload, FaHome, FaUsers } from 'react-icons/fa';
-import "./listetudiant.css";
+import styles from './listetudiant.module.css'; // Updated import
 
 const TeacherDashboard = () => {
   const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -33,7 +33,7 @@ const TeacherDashboard = () => {
           hideProgressBar: true,
           closeOnClick: true,
           pauseOnHover: true,
-          style: { backgroundColor: '#FF6B6B', color: '#fff', fontSize: '16px' },
+          className: styles['ENS-ETD-custom-toast-error'],
           icon: '❌',
         });
       }
@@ -70,7 +70,7 @@ const TeacherDashboard = () => {
           hideProgressBar: true,
           closeOnClick: true,
           pauseOnHover: true,
-          style: { backgroundColor: '#FF6B6B', color: '#fff', fontSize: '16px' },
+          className: styles['ENS-ETD-custom-toast-error'],
           icon: '❌',
         });
       }
@@ -101,7 +101,7 @@ const TeacherDashboard = () => {
         hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
-        style: { backgroundColor: '#50C878', color: '#fff', fontSize: '16px' },
+        className: styles['ENS-ETD-custom-toast-success'],
         icon: '✅',
       });
     } catch (err) {
@@ -111,7 +111,7 @@ const TeacherDashboard = () => {
         hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
-        style: { backgroundColor: '#FF6B6B', color: '#fff', fontSize: '16px' },
+        className: styles['ENS-ETD-custom-toast-error'],
         icon: '❌',
       });
     }
@@ -133,7 +133,7 @@ const TeacherDashboard = () => {
         hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
-        style: { backgroundColor: '#50C878', color: '#fff', fontSize: '16px' },
+        className: styles['ENS-ETD-custom-toast-success'],
         icon: '✅',
       });
     } catch (err) {
@@ -143,62 +143,48 @@ const TeacherDashboard = () => {
         hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
-        style: { backgroundColor: '#FF6B6B', color: '#fff', fontSize: '16px' },
+        className: styles['ENS-ETD-custom-toast-error'],
         icon: '❌',
       });
     }
   };
 
   return (
-    <>
-    <div id="ENSlistetuidants">
-      <div className="sidebar" style={{ backgroundColor: '#003087', borderRight: 'none', padding: '20px' }}>
-        <div className="logo" style={{ borderBottom: 'none' }}>
-          <h1 style={{ color: '#ffffff', fontSize: '25px', fontWeight: 'normal', margin: 0, textDecoration: 'none' }}>
-            <FaList /> Liste de mes etudiants
+    <div >
+      <div className={styles['ENS-ETD-sidebar']}>
+        <div className={styles['ENS-ETD-logo']}>
+          <h1 className={styles['ENS-ETD-h1']}>
+             Liste des etudiants
           </h1>
         </div>
         <button
-          className="sidebar-button"
+          className={`${styles['ENS-ETD-sidebar-button']} `}
           onClick={handleLogout}
-          style={{
-            backgroundColor: 'transparent',
-            color: '#ffffff',
-            border: 'none',
-            padding: '10px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            textDecoration: 'none',
-            marginTop: '20px',
-          }}
         >
-          <FaHome className="sidebar-icon" style={{ marginRight: '5px', color: '#ffffff' }} /> Retour 
+          <FaHome className={styles['ENS-ETD-sidebar-icon']} /> Retour
         </button>
       </div>
 
-      <div className="main-content">
-        <div className="main-header" style={{ backgroundColor: '#ffffff', padding: '30px', borderRadius: '10px', marginBottom: '20px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)' }}>
-          <h1 style={{ color: '#003087', fontSize: '36px', fontWeight: 'bold', margin: 0, fontFamily: 'Arial, sans-serif' }}>
+      <div className={styles['ENS-ETD-main-content']}>
+        <div className={styles['ENS-ETD-main-header']}>
+          <h1 className={styles['ENS-ETD-h1']}>
             <FaUsers /> Consultation des Étudiants
           </h1>
-          <p style={{ color: '#003087', fontSize: '16px', marginTop: '5px', fontStyle: 'italic' }}>
-            Accédez aux listes des étudiants de vos sections
-          </p>
+          <p>Accédez aux listes des étudiants de vos sections</p>
         </div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="student-section"
+          className={styles['ENS-ETD-student-section']}
         >
-          <h2>
+          <h2 className={styles['ENS-ETD-h2']}>
             Mes sections <FaList style={{ color: iconColor, fill: iconColor, verticalAlign: 'middle' }} />
           </h2>
 
           {sections.length === 0 ? (
-            <p className="no-sections">Aucune section trouvée.</p>
+            <p className={styles['ENS-ETD-no-sections']}>Aucune section trouvée.</p>
           ) : (
             <>
               <div style={{ marginBottom: '30px', textAlign: 'center', position: 'relative' }}>
@@ -219,21 +205,7 @@ const TeacherDashboard = () => {
                     id="section-select"
                     value={selectedSection}
                     onChange={(e) => setSelectedSection(e.target.value)}
-                    style={{
-                      padding: '12px 40px 12px 20px',
-                      borderRadius: '25px',
-                      border: '2px solid #003087',
-                      backgroundColor: '#ffffff',
-                      fontSize: '16px',
-                      color: '#333333',
-                      width: '100%',
-                      cursor: 'pointer',
-                      appearance: 'none',
-                      boxShadow: '0 3px 8px rgba(0, 0, 0, 0.1)',
-                      transition: 'all 0.3s ease',
-                    }}
-                    onMouseEnter={(e) => (e.target.style.borderColor = '#0056d2')}
-                    onMouseLeave={(e) => (e.target.style.borderColor = '#003087')}
+                    className={styles['ENS-ETD-input']}
                   >
                     {sections.map((section) => (
                       <option key={section.ID_section} value={section.ID_section}>
@@ -255,68 +227,49 @@ const TeacherDashboard = () => {
               </div>
 
               {students.length === 0 ? (
-                <p className="no-sections">Aucun étudiant trouvé pour cette section.</p>
+                <p className={styles['ENS-ETD-no-sections']}>Aucun étudiant trouvé pour cette section.</p>
               ) : (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
-                  className="section-item"
+                  className={styles['ENS-ETD-section-item']}
                 >
                   {updateNotification && (
-                    <div
-                      style={{
-                        backgroundColor: '#50C878',
-                        color: '#ffffff',
-                        padding: '10px',
-                        borderRadius: '5px',
-                        textAlign: 'center',
-                        marginBottom: '20px',
-                        fontSize: '16px',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                      }}
-                    >
+                    <div className={styles['ENS-ETD-notification']}>
                       <span>{updateNotification.contenu}</span>
                       <button
                         onClick={handleCloseMessage}
-                        style={{
-                          backgroundColor: 'transparent',
-                          border: 'none',
-                          color: '#ffffff',
-                          fontSize: '16px',
-                          cursor: 'pointer',
-                        }}
+                        className={styles['ENS-ETD-button']}
                       >
                         ✕
                       </button>
                     </div>
                   )}
-                  <h3>
+                  <h3 className={styles['ENS-ETD-h3']}>
                     {sections.find((s) => s.ID_section === selectedSection)?.niveau} -{' '}
                     {sections.find((s) => s.ID_section === selectedSection)?.nom_specialite} (
                     {sections.find((s) => s.ID_section === selectedSection)?.Nom_departement},{' '}
                     {sections.find((s) => s.ID_section === selectedSection)?.nom_faculte})
                   </h3>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
+                  <table className={styles['ENS-ETD-table']}>
                     <thead>
-                      <tr style={{ backgroundColor: '#e6e6e6' }}>
-                        <th style={{ padding: '10px', border: '1px solid #d3d3d3' }}>Matricule</th>
-                        <th style={{ padding: '10px', border: '1px solid #d3d3d3' }}>Nom</th>
-                        <th style={{ padding: '10px', border: '1px solid #d3d3d3' }}>Prénom</th>
-                        <th style={{ padding: '10px', border: '1px solid #d3d3d3' }}>État</th>
-                        <th style={{ padding: '10px', border: '1px solid #d3d3d3' }}>Groupe</th>
+                      <tr>
+                        <th>Matricule</th>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>État</th>
+                        <th>Groupe</th>
                       </tr>
                     </thead>
                     <tbody>
                       {students.map((student) => (
                         <tr key={student.Matricule}>
-                          <td style={{ padding: '10px', border: '1px solid #d3d3d3' }}>{student.Matricule}</td>
-                          <td style={{ padding: '10px', border: '1px solid #d3d3d3' }}>{student.nom}</td>
-                          <td style={{ padding: '10px', border: '1px solid #d3d3d3' }}>{student.prenom}</td>
-                          <td style={{ padding: '10px', border: '1px solid #d3d3d3' }}>{student.etat || 'Non défini'}</td>
-                          <td style={{ padding: '10px', border: '1px solid #d3d3d3' }}>
+                          <td>{student.Matricule}</td>
+                          <td>{student.nom}</td>
+                          <td>{student.prenom}</td>
+                          <td>{student.etat || 'Non défini'}</td>
+                          <td>
                             {student.num_groupe ? `Groupe ${student.num_groupe}` : 'Non assigné'}
                           </td>
                         </tr>
@@ -324,22 +277,10 @@ const TeacherDashboard = () => {
                     </tbody>
                   </table>
                   <button
-                    className="edit-btn"
+                    className={`${styles['ENS-ETD-edit-btn']} ${styles['ENS-ETD-button']}`}
                     onClick={handleDownloadPDF}
-                    style={{
-                      marginTop: '20px',
-                      padding: '10px 20px',
-                      backgroundColor: '#003087',
-                      color: '#ffffff',
-                      border: 'none',
-                      borderRadius: '8px',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '5px',
-                    }}
                   >
-                    <FaDownload style={{ color: '#ffffff', fill: '#ffffff' }} /> Télécharger en PDF
+                    <FaDownload /> Télécharger en PDF
                   </button>
                 </motion.div>
               )}
@@ -347,8 +288,7 @@ const TeacherDashboard = () => {
           )}
         </motion.div>
       </div>
-      </div>
-    </>
+    </div>
   );
 };
 

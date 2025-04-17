@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
-import "../module.css";
+import styles from "../module.module.css";
 
 const FilterForm = ({ onFilter }) => {
   const [filters, setFilters] = useState({
@@ -151,16 +151,15 @@ const FilterForm = ({ onFilter }) => {
   };
 
   return (
-    <div id="modules">
-    <div className="form-container">
+    <div className={styles['ADM-MDL-form-container']}>
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
         <h3>Chercher les modules d'une Section</h3>
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
-          <select name="faculte" value={filters.faculte} onChange={handleChange}>
+        <form className={styles['ADM-MDL-form']} onSubmit={handleSubmit} style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
+          <select name="faculte" value={filters.faculte} onChange={handleChange} className={styles['ADM-MDL-select']}>
             <option value="">Sélectionner une Faculté</option>
             {faculteOptions.map((option) => (
               <option key={option.ID_faculte} value={option.ID_faculte}>
@@ -169,7 +168,7 @@ const FilterForm = ({ onFilter }) => {
             ))}
           </select>
 
-          <select name="departement" value={filters.departement} onChange={handleChange}>
+          <select name="departement" value={filters.departement} onChange={handleChange} className={styles['ADM-MDL-select']}>
             <option value="">Sélectionner un Département</option>
             {departementOptions.map((option) => (
               <option key={option.ID_departement} value={option.ID_departement}>
@@ -178,7 +177,7 @@ const FilterForm = ({ onFilter }) => {
             ))}
           </select>
 
-          <select name="niveau" value={filters.niveau} onChange={handleChange}>
+          <select name="niveau" value={filters.niveau} onChange={handleChange} className={styles['ADM-MDL-select']}>
             <option value="">Sélectionner un Niveau</option>
             {niveauOptions.map((option) => (
               <option key={option.id} value={option.id}>
@@ -187,7 +186,7 @@ const FilterForm = ({ onFilter }) => {
             ))}
           </select>
 
-          <select name="specialite" value={filters.specialite} onChange={handleChange}>
+          <select name="specialite" value={filters.specialite} onChange={handleChange} className={styles['ADM-MDL-select']}>
             <option value="">Sélectionner une Spécialité</option>
             {specialiteOptions.map((option) => (
               <option key={option.ID_specialite} value={option.ID_specialite}>
@@ -196,7 +195,7 @@ const FilterForm = ({ onFilter }) => {
             ))}
           </select>
 
-          <select name="section" value={filters.section} onChange={handleChange}>
+          <select name="section" value={filters.section} onChange={handleChange} className={styles['ADM-MDL-select']}>
             <option value="">Sélectionner une Section</option>
             {sectionOptions.map((option) => (
               <option key={option.ID_section} value={option.ID_section}>
@@ -205,10 +204,9 @@ const FilterForm = ({ onFilter }) => {
             ))}
           </select>
 
-          <button type="submit">Filtrer</button>
+          <button type="submit" className={styles['ADM-MDL-button']}>Filtrer</button>
         </form>
       </motion.div>
-    </div>
     </div>
   );
 };

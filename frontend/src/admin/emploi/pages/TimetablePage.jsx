@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import TimetableFilter from '../components/TimetableFilter';
-import '../../../admin_css_files/EmploiDuTemps.css';
+import styles from '../ADM_EDT.module.css';
 
 function TimetablePage() {
   const [timetableData, setTimetableData] = useState(null);
@@ -10,7 +10,7 @@ function TimetablePage() {
   };
 
   return (
-    <div className="timetable-page">
+    <div className={styles['ADM-EDT-timetable-page']}>
       <TimetableFilter onFetch={handleTimetableFetch} />
     </div>
   );

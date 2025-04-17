@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import axios from 'axios';
 import { createPortal } from 'react-dom';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
-import '../exam.css';
+import styles from "../exam.module.css";
 
 const ExamModal = ({ exam, onClose, onSave, modules, salles: initialSalles, semestres }) => {
   const [formData, setFormData] = useState({
@@ -29,7 +29,7 @@ const ExamModal = ({ exam, onClose, onSave, modules, salles: initialSalles, seme
     const fetchSalles = async () => {
       if (formData.exam_date && formData.time_slot && formData.mode === 'presentiel') {
         try {
-          const response = await axios.get('http://localhost:8800/exams/salles', {
+          const response = await axios.get('http://localhost:8083/exams/salles', {
             params: {
               exam_date: formData.exam_date,
               time_slot: formData.time_slot,
@@ -59,7 +59,7 @@ const ExamModal = ({ exam, onClose, onSave, modules, salles: initialSalles, seme
   useEffect(() => {
     const validateForm = async () => {
       try {
-        const response = await axios.put(`http://localhost:8800/exams/${exam.ID_exam}`, {
+        const response = await axios.put(`http://localhost:8083/exams/${exam.ID_exam}`, {
           ...formData,
           ID_semestre: exam.ID_semestre,
         });
@@ -107,16 +107,15 @@ const ExamModal = ({ exam, onClose, onSave, modules, salles: initialSalles, seme
     setIsSalleDropdownOpen((prev) => !prev);
   };
 
-  return  createPortal(
-    <div id="exams">
+  return createPortal(
       <motion.div
-        className="modal-overlay"
+        className={styles['ADM-EXM-modal-overlay']}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
         <motion.div
-          className="modal-content"
+          className={styles['ADM-EXM-modal-content']}
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.8, opacity: 0 }}
@@ -124,9 +123,10 @@ const ExamModal = ({ exam, onClose, onSave, modules, salles: initialSalles, seme
         >
           <h3>Détails de l'Examen</h3>
           {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
-          <div className="modal-field">
+          <div className={styles['ADM-EXM-modal-field']}>
             <label>Module :</label>
             <select
+              className={styles['ADM-EXM-select']}
               name="ID_module"
               value={formData.ID_module}
               onChange={handleChange}
@@ -140,9 +140,10 @@ const ExamModal = ({ exam, onClose, onSave, modules, salles: initialSalles, seme
               ))}
             </select>
           </div>
-          <div className="modal-field">
+          <div className={styles['ADM-EXM-modal-field']}>
             <label>Date :</label>
             <input
+              className={styles['ADM-EXM-input']}
               type="date"
               name="exam_date"
               value={formData.exam_date}
@@ -150,9 +151,10 @@ const ExamModal = ({ exam, onClose, onSave, modules, salles: initialSalles, seme
               required
             />
           </div>
-          <div className="modal-field">
+          <div className={styles['ADM-EXM-modal-field']}>
             <label>Horaire :</label>
             <select
+              className={styles['ADM-EXM-select']}
               name="time_slot"
               value={formData.time_slot}
               onChange={handleChange}
@@ -173,9 +175,10 @@ const ExamModal = ({ exam, onClose, onSave, modules, salles: initialSalles, seme
               ))}
             </select>
           </div>
-          <div className="modal-field">
+          <div className={styles['ADM-EXM-modal-field']}>
             <label>Mode :</label>
             <select
+              className={styles['ADM-EXM-select']}
               name="mode"
               value={formData.mode}
               onChange={handleChange}
@@ -185,10 +188,10 @@ const ExamModal = ({ exam, onClose, onSave, modules, salles: initialSalles, seme
               <option value="en ligne">En Ligne</option>
             </select>
           </div>
-          <div className="modal-field">
+          <div className={styles['ADM-EXM-modal-field']}>
             <label>Salle(s) :</label>
-            <div className={`custom-dropdown ${isSalleDropdownOpen ? 'open' : ''}`}>
-              <div className="dropdown-header" onClick={toggleSalleDropdown}>
+            <div className={`${styles['ADM-EXM-custom-dropdown']} ${isSalleDropdownOpen ? styles['ADM-EXM-open'] : ''}`}>
+              <div className={styles['ADM-EXM-dropdown-header']} onClick={toggleSalleDropdown}>
                 <span>
                   {formData.ID_salles.length > 0
                     ? `${formData.ID_salles.length} salle(s) sélectionnée(s)`
@@ -197,11 +200,11 @@ const ExamModal = ({ exam, onClose, onSave, modules, salles: initialSalles, seme
                 {isSalleDropdownOpen ? <FaChevronUp /> : <FaChevronDown />}
               </div>
               {isSalleDropdownOpen && formData.mode === 'presentiel' && (
-                <div className="dropdown-menu">
+                <div className={styles['ADM-EXM-dropdown-menu']}>
                   {salles.map((salle, index) => (
                     <label
                       key={`${salle.ID_salle}-${index}`}
-                      className="checkbox-label"
+                      className={styles['ADM-EXM-checkbox-label']}
                     >
                       <input
                         type="checkbox"
@@ -217,7 +220,7 @@ const ExamModal = ({ exam, onClose, onSave, modules, salles: initialSalles, seme
               )}
             </div>
           </div>
-          <div className="modal-actions">
+          <div className={styles['ADM-EXM-modal-actions']}>
             <button onClick={handleSave} disabled={!isValid}>
               Sauvegarder
             </button>
@@ -225,7 +228,7 @@ const ExamModal = ({ exam, onClose, onSave, modules, salles: initialSalles, seme
           </div>
         </motion.div>
       </motion.div>
-    </div>,
+    ,
     document.body
   );
 };

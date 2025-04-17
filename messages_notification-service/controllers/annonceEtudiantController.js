@@ -36,7 +36,7 @@ const getAdminAnnonces = async (req, res) => {
             let image_url = annonce.image_url || '';
             if (image_url && !image_url.startsWith('http')) {
                 image_url = annonce.event_id
-                    ? `http://localhost:9000${image_url}`
+                    ? `http://localhost:8084${image_url}`
                     : `http://localhost:8082${image_url}`;
             }
             return { ...annonce, image_url };
@@ -438,6 +438,111 @@ const getCommentsForAnnonce = async (req, res) => {
     }
 };
 
+// Ajouter un événement administratif au calendrier de l'étudiant
+const addAdminEventToCalendar = async (req, res) => {
+    const { annonceId, matricule, time_slot, event_date } = req.body;
+
+    if (!annonceId || !matricule || !time_slot || !event_date) {
+        return res.status(400).json({ error: 'Veuillez fournir toutes les informations nécessaires.' });
+    }
+
+    try {
+        // Vérifier si l'annonce existe et est administrative
+        const [annonce] = await pool.query(
+            `
+            SELECT title, content
+            FROM annonce
+            WHERE id = ? AND admin_matricule IS NOT NULL
+            `,
+            [annonceId]
+        );
+
+        if (annonce.length === 0) {
+            return res.status(404).json({ error: 'Annonce administrative non trouvée.' });
+        }
+
+        // Vérifier si l'étudiant existe
+        const [etudiant] = await pool.query(
+            `
+            SELECT Matricule
+            FROM Etudiant
+            WHERE Matricule = ?
+            `,
+            [matricule]
+        );
+
+        if (etudiant.length === 0) {
+            return res.status(404).json({ error: 'Étudiant non trouvé.' });
+        }
+
+        // Vérifier si le time_slot est valide
+        const validTimeSlots = [
+            '08:00 - 09:30',
+            '09:40 - 11:10',
+            '11:20 - 12:50',
+            '13:00 - 14:30',
+            '14:40 - 16:10',
+            '16:20 - 17:50'
+        ];
+
+        if (!validTimeSlots.includes(time_slot)) {
+            return res.status(400).json({ error: 'Créneau horaire invalide.' });
+        }
+
+        // Formatter le titre et le contenu
+        const title = 'Événements administratifs';
+        const content = `L'événement administratif ${annonce[0].title} aura lieu ce jour-là`;
+
+        // Insérer l'événement dans CalendarEvent
+        await pool.query(
+            `
+            INSERT INTO CalendarEvent (matricule, title, content, event_date, time_slot)
+            VALUES (?, ?, ?, ?, ?)
+            `,
+            [matricule, title, content, event_date, time_slot]
+        );
+
+        res.status(201).json({ message: 'Événement ajouté au calendrier avec succès.' });
+    } catch (error) {
+        console.error('Erreur lors de l\'ajout au calendrier:', error);
+        res.status(500).json({ error: 'Une erreur est survenue lors de l\'ajout de l\'événement au calendrier.' });
+    }
+};
+
+// Vérifier si un événement est déjà dans le calendrier
+const checkCalendarEvent = async (req, res) => {
+    const { annonceId, matricule } = req.params;
+
+    try {
+        const [events] = await pool.query(
+            `
+            SELECT ID_event
+            FROM CalendarEvent
+            WHERE matricule = ? AND content LIKE ?
+            `,
+            [matricule, `%L'événement administratif ${await getAnnonceTitle(annonceId)}%`]
+        );
+
+        res.json({ isAdded: events.length > 0 });
+    } catch (error) {
+        console.error('Erreur lors de la vérification de l\'événement:', error);
+        res.status(500).json({ error: 'Une erreur est survenue lors de la vérification de l\'événement.' });
+    }
+};
+
+// Fonction utilitaire pour récupérer le titre de l'annonce
+const getAnnonceTitle = async (annonceId) => {
+    const [annonce] = await pool.query(
+        `
+        SELECT title
+        FROM annonce
+        WHERE id = ?
+        `,
+        [annonceId]
+    );
+    return annonce.length > 0 ? annonce[0].title : '';
+};
+
 module.exports = {
     getAdminAnnonces,
     getTeacherAnnonces,
@@ -447,4 +552,6 @@ module.exports = {
     addCommentToAnnonce,
     replyToComment,
     getCommentsForAnnonce,
+    addAdminEventToCalendar,
+    checkCalendarEvent
 };

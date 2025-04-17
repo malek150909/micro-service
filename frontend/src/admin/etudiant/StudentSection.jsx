@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { FaPlus, FaTrash, FaUpload, FaArrowLeft, FaFileExport, FaUsers } from 'react-icons/fa'; // Ajout de FaUsers
+import { FaPlus, FaTrash, FaUpload, FaArrowLeft, FaFileExport, FaUsers } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as XLSX from 'xlsx';
-import "./listetudiant.css" ;
+import styles from './listetudiant.module.css';
 
 const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes }) => {
   const [students, setStudents] = useState([]);
@@ -31,7 +31,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
     label: `Groupe ${i + 1}`
   }));
 
-  const iconColor = '#021A3F'; // Bleu très foncé
+  const iconColor = '#021A3F';
 
   const fetchStudents = async () => {
     try {
@@ -51,6 +51,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
         pauseOnHover: true,
         style: { backgroundColor: '#FF6B6B', color: '#fff', fontSize: '16px' },
         icon: '❌',
+        className: styles['ADM-ETD-custom-toast-error']
       });
     }
   };
@@ -70,6 +71,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
         pauseOnHover: true,
         style: { backgroundColor: '#FF6B6B', color: '#fff', fontSize: '16px' },
         icon: '❌',
+        className: styles['ADM-ETD-custom-toast-error']
       });
     }
   };
@@ -89,6 +91,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
         pauseOnHover: true,
         style: { backgroundColor: '#FF6B6B', color: '#fff', fontSize: '16px' },
         icon: '❌',
+        className: styles['ADM-ETD-custom-toast-error']
       });
       return;
     }
@@ -103,6 +106,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
         pauseOnHover: true,
         style: { backgroundColor: '#FF6B6B', color: '#fff', fontSize: '16px' },
         icon: '❌',
+        className: styles['ADM-ETD-custom-toast-error']
       });
       return;
     }
@@ -119,6 +123,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
           pauseOnHover: true,
           style: { backgroundColor: '#50C878', color: '#fff', fontSize: '16px' },
           icon: '✅',
+          className: styles['ADM-ETD-custom-toast-success']
         });
         setNewStudent({
           matricule: '',
@@ -144,6 +149,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
         pauseOnHover: true,
         style: { backgroundColor: '#FF6B6B', color: '#fff', fontSize: '16px' },
         icon: '❌',
+        className: styles['ADM-ETD-custom-toast-error']
       });
     }
   };
@@ -166,6 +172,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
           pauseOnHover: true,
           style: { backgroundColor: '#50C878', color: '#fff', fontSize: '16px' },
           icon: '✅',
+          className: styles['ADM-ETD-custom-toast-success']
         });
         setEditStudent(null);
       }
@@ -179,6 +186,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
         pauseOnHover: true,
         style: { backgroundColor: '#FF6B6B', color: '#fff', fontSize: '16px' },
         icon: '❌',
+        className: styles['ADM-ETD-custom-toast-error']
       });
     }
   };
@@ -195,6 +203,10 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
       cancelButtonColor: '#052659',
       background: 'rgba(255, 255, 255, 0.9)',
       color: '#052659',
+      customClass: {
+        confirmButton: styles['ADM-ETD-swal-confirm-btn'],
+        cancelButton: styles['ADM-ETD-swal-cancel-btn']
+      }
     });
 
     if (result.isConfirmed) {
@@ -210,6 +222,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
             pauseOnHover: true,
             style: { backgroundColor: '#50C878', color: '#fff', fontSize: '16px' },
             icon: '✅',
+            className: styles['ADM-ETD-custom-toast-success']
           });
         }
       } catch (err) {
@@ -222,6 +235,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
           pauseOnHover: true,
           style: { backgroundColor: '#FF6B6B', color: '#fff', fontSize: '16px' },
           icon: '❌',
+          className: styles['ADM-ETD-custom-toast-error']
         });
       }
     }
@@ -239,6 +253,10 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
       cancelButtonColor: '#052659',
       background: 'rgba(255, 255, 255, 0.9)',
       color: '#052659',
+      customClass: {
+        confirmButton: styles['ADM-ETD-swal-confirm-btn'],
+        cancelButton: styles['ADM-ETD-swal-cancel-btn']
+      }
     });
 
     if (result.isConfirmed) {
@@ -253,6 +271,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
           pauseOnHover: true,
           style: { backgroundColor: '#50C878', color: '#fff', fontSize: '16px' },
           icon: '✅',
+          className: styles['ADM-ETD-custom-toast-success']
         });
       } catch (err) {
         const errorMessage = err.response?.data?.error || 'Une erreur s’est produite.';
@@ -264,6 +283,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
           pauseOnHover: true,
           style: { backgroundColor: '#FF6B6B', color: '#fff', fontSize: '16px' },
           icon: '❌',
+          className: styles['ADM-ETD-custom-toast-error']
         });
       }
     }
@@ -280,6 +300,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
         pauseOnHover: true,
         style: { backgroundColor: '#FF6B6B', color: '#fff', fontSize: '16px' },
         icon: '❌',
+        className: styles['ADM-ETD-custom-toast-error']
       });
       return;
     }
@@ -306,6 +327,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
             fontSize: '16px',
           },
           icon: res.data.importedCount > 0 ? '✅' : 'ℹ️',
+          className: res.data.importedCount > 0 ? styles['ADM-ETD-custom-toast-success'] : styles['ADM-ETD-custom-toast-warning']
         });
 
         setImportDetails({
@@ -329,6 +351,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
           pauseOnHover: true,
           style: { backgroundColor: '#FF6B6B', color: '#fff', fontSize: '16px' },
           icon: '❌',
+          className: styles['ADM-ETD-custom-toast-error']
         });
       });
   };
@@ -356,18 +379,17 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
   };
 
   return (
-    <div id="listetudiants">
-    <div className="student-section">
-      <button className="back-btn" onClick={onBack}>
+    <div className={styles['ADM-ETD-student-section']}>
+      <button className={styles['ADM-ETD-back-btn']} onClick={onBack}>
         <FaArrowLeft /> Retour
       </button>
       <h2>Liste des étudiants <FaUsers style={{ color: iconColor, fill: iconColor, verticalAlign: 'middle' }} /></h2>
 
       <div style={{ marginBottom: '20px' }}>
         <h3>Importer via Excel</h3>
-        <div className="upload-section" style={{ marginBottom: '20px' }}>
-          <input type="file" accept=".xlsx, .xls" onChange={handleUpload} />
-          <button onClick={handleExportToExcel} className="edit-btn" style={{ marginLeft: '10px' }}>
+        <div className={styles['ADM-ETD-upload-section']} style={{ marginBottom: '20px' }}>
+          <input type="file" accept=".xlsx, .xls" onChange={handleUpload} className={styles['ADM-ETD-input']} />
+          <button onClick={handleExportToExcel} className={styles['ADM-ETD-edit-btn']} style={{ marginLeft: '10px' }}>
             <FaFileExport /> Exporter vers Excel
           </button>
         </div>
@@ -378,7 +400,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.5 }}
-            className="import-details"
+            className={styles['ADM-ETD-import-details']}
           >
             <h4>Résultat de l'importation :</h4>
             <p>Étudiants importés : {importDetails.importedCount}</p>
@@ -408,7 +430,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
               </div>
             )}
             <button
-              className="back-btn"
+              className={styles['ADM-ETD-back-btn']}
               onClick={handleCloseImportDetails}
               style={{ marginTop: '15px', display: 'block', marginLeft: 'auto', marginRight: 'auto' }}
             >
@@ -419,10 +441,10 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
 
         <h3>Gestion des étudiants</h3>
         <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-          <button className="edit-btn" onClick={() => setShowAddStudentForm(true)}>
+          <button className={styles['ADM-ETD-edit-btn']} onClick={() => setShowAddStudentForm(true)}>
             <FaPlus /> Ajouter un étudiant
           </button>
-          <button className="delete-section-btn" onClick={handleDeleteSection}>
+          <button className={styles['ADM-ETD-delete-section-btn']} onClick={handleDeleteSection}>
             <FaTrash /> Supprimer la section
           </button>
         </div>
@@ -430,34 +452,78 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
         <AnimatePresence>
           {showAddStudentForm && (
             <motion.div
-              className="add-student-form"
+              className={styles['ADM-ETD-add-student-form']}
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.5 }}
             >
               <h4>Ajouter un étudiant</h4>
-              <input placeholder="Matricule" value={newStudent.matricule} onChange={e => setNewStudent({ ...newStudent, matricule: e.target.value })} />
-              <input placeholder="Nom" value={newStudent.nom} onChange={e => setNewStudent({ ...newStudent, nom: e.target.value })} />
-              <input placeholder="Prénom" value={newStudent.prenom} onChange={e => setNewStudent({ ...newStudent, prenom: e.target.value })} />
-              <input placeholder="Email" value={newStudent.email} onChange={e => setNewStudent({ ...newStudent, email: e.target.value })} />
-              <input placeholder="Niveau" value={newStudent.niveau} readOnly />
-              <select value={newStudent.etat} onChange={e => setNewStudent({ ...newStudent, etat: e.target.value })}>
+              <input
+                placeholder="Matricule"
+                value={newStudent.matricule}
+                onChange={e => setNewStudent({ ...newStudent, matricule: e.target.value })}
+                className={styles['ADM-ETD-input']}
+              />
+              <input
+                placeholder="Nom"
+                value={newStudent.nom}
+                onChange={e => setNewStudent({ ...newStudent, nom: e.target.value })}
+                className={styles['ADM-ETD-input']}
+              />
+              <input
+                placeholder="Prénom"
+                value={newStudent.prenom}
+                onChange={e => setNewStudent({ ...newStudent, prenom: e.target.value })}
+                className={styles['ADM-ETD-input']}
+              />
+              <input
+                placeholder="Email"
+                value={newStudent.email}
+                onChange={e => setNewStudent({ ...newStudent, email: e.target.value })}
+                className={styles['ADM-ETD-input']}
+              />
+              <input
+                placeholder="Niveau"
+                value={newStudent.niveau}
+                readOnly
+                className={styles['ADM-ETD-input']}
+              />
+              <select
+                value={newStudent.etat}
+                onChange={e => setNewStudent({ ...newStudent, etat: e.target.value })}
+                className={styles['ADM-ETD-select']}
+              >
                 <option value="">-- Aucun état --</option>
                 {['Ajourné', 'Admis', 'Admis avec dettes', 'Réintégré'].map(e => <option key={e} value={e}>{e}</option>)}
               </select>
-              <input type="date" placeholder="Année d'inscription" value={newStudent.anneeInscription} onChange={e => setNewStudent({ ...newStudent, anneeInscription: e.target.value })} />
-              <input placeholder="Spécialité" value={newStudent.nomSpecialite} readOnly />
-              <select value={newStudent.num_groupe} onChange={e => setNewStudent({ ...newStudent, num_groupe: e.target.value })}>
+              <input
+                type="date"
+                placeholder="Année d'inscription"
+                value={newStudent.anneeInscription}
+                onChange={e => setNewStudent({ ...newStudent, anneeInscription: e.target.value })}
+                className={styles['ADM-ETD-input']}
+              />
+              <input
+                placeholder="Spécialité"
+                value={newStudent.nomSpecialite}
+                readOnly
+                className={styles['ADM-ETD-input']}
+              />
+              <select
+                value={newStudent.num_groupe}
+                onChange={e => setNewStudent({ ...newStudent, num_groupe: e.target.value })}
+                className={styles['ADM-ETD-select']}
+              >
                 <option value="">-- Sélectionner un groupe --</option>
                 {groupOptions.map(option => (
                   <option key={option.value} value={option.value}>{option.label}</option>
                 ))}
               </select>
-              <button onClick={handleAddStudent} className="edit-btn">
+              <button onClick={handleAddStudent} className={styles['ADM-ETD-edit-btn']}>
                 <FaPlus /> Ajouter
               </button>
-              <button onClick={() => setShowAddStudentForm(false)} style={{ marginLeft: '10px' }} className="back-btn">
+              <button onClick={() => setShowAddStudentForm(false)} style={{ marginLeft: '10px' }} className={styles['ADM-ETD-back-btn']}>
                 Annuler
               </button>
             </motion.div>
@@ -465,54 +531,112 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
         </AnimatePresence>
       </div>
 
-      <table>
+      <table className={styles['ADM-ETD-table']}>
         <thead>
-          <tr>
-            <th>Matricule</th>
-            <th>Nom</th>
-            <th>Prénom</th>
-            <th>Email</th>
-            <th>Niveau</th>
-            <th>État</th>
-            <th>Année</th>
-            <th>Groupe</th>
-            <th>Actions</th>
+          <tr className={styles['ADM-ETD-tr']}>
+            <th className={styles['ADM-ETD-th']}>Matricule</th>
+            <th className={styles['ADM-ETD-th']}>Nom</th>
+            <th className={styles['ADM-ETD-th']}>Prénom</th>
+            <th className={styles['ADM-ETD-th']}>Email</th>
+            <th className={styles['ADM-ETD-th']}>Niveau</th>
+            <th className={styles['ADM-ETD-th']}>État</th>
+            <th className={styles['ADM-ETD-th']}>Année</th>
+            <th className={styles['ADM-ETD-th']}>Groupe</th>
+            <th className={styles['ADM-ETD-th']}>Actions</th>
           </tr>
         </thead>
         <tbody>
           {students.map(s => (
-            <tr key={s.Matricule}>
-              <td>{s.Matricule}</td>
-              <td>{editStudent?.Matricule === s.Matricule ? <input value={editStudent.nom} onChange={e => setEditStudent({ ...editStudent, nom: e.target.value })} /> : s.nom}</td>
-              <td>{editStudent?.Matricule === s.Matricule ? <input value={editStudent.prenom} onChange={e => setEditStudent({ ...editStudent, prenom: e.target.value })} /> : s.prenom}</td>
-              <td>{editStudent?.Matricule === s.Matricule ? <input value={editStudent.email} onChange={e => setEditStudent({ ...editStudent, email: e.target.value })} /> : s.email}</td>
-              <td>{editStudent?.Matricule === s.Matricule ? <input value={editStudent.niveau} onChange={e => setEditStudent({ ...editStudent, niveau: e.target.value })} /> : s.niveau}</td>
-              <td>{editStudent?.Matricule === s.Matricule ? (
-                <select value={editStudent.etat} onChange={e => setEditStudent({ ...editStudent, etat: e.target.value })}>
-                  <option value="">-- Aucun état --</option>
-                  {['Ajourné', 'Admis', 'Admis avec dettes', 'Réintégré'].map(e => <option key={e} value={e}>{e}</option>)}
-                </select>
-              ) : s.etat || 'Non défini'}</td>
-              <td>{s.annee_inscription || 'Non défini'}</td>
-              <td>{editStudent?.Matricule === s.Matricule ? (
-                <select value={editStudent.num_groupe} onChange={e => setEditStudent({ ...editStudent, num_groupe: e.target.value })}>
-                  <option value="">-- Sélectionner un groupe --</option>
-                  {groupOptions.map(option => (
-                    <option key={option.value} value={option.value}>{option.label}</option>
-                  ))}
-                </select>
-              ) : s.num_groupe || 'Non assigné'}</td>
-              <td>
+            <tr key={s.Matricule} className={styles['ADM-ETD-tr']}>
+              <td className={styles['ADM-ETD-td']}>{s.Matricule}</td>
+              <td className={styles['ADM-ETD-td']}>
                 {editStudent?.Matricule === s.Matricule ? (
-                  <button className="edit-btn" onClick={() => handleEditStudent(s)}>
+                  <input
+                    value={editStudent.nom}
+                    onChange={e => setEditStudent({ ...editStudent, nom: e.target.value })}
+                    className={styles['ADM-ETD-input']}
+                  />
+                ) : (
+                  s.nom
+                )}
+              </td>
+              <td className={styles['ADM-ETD-td']}>
+                {editStudent?.Matricule === s.Matricule ? (
+                  <input
+                    value={editStudent.prenom}
+                    onChange={e => setEditStudent({ ...editStudent, prenom: e.target.value })}
+                    className={styles['ADM-ETD-input']}
+                  />
+                ) : (
+                  s.prenom
+                )}
+              </td>
+              <td className={styles['ADM-ETD-td']}>
+                {editStudent?.Matricule === s.Matricule ? (
+                  <input
+                    value={editStudent.email}
+                    onChange={e => setEditStudent({ ...editStudent, email: e.target.value })}
+                    className={styles['ADM-ETD-input']}
+                  />
+                ) : (
+                  s.email
+                )}
+              </td>
+              <td className={styles['ADM-ETD-td']}>
+                {editStudent?.Matricule === s.Matricule ? (
+                  <input
+                    value={editStudent.niveau}
+                    onChange={e => setEditStudent({ ...editStudent, niveau: e.target.value })}
+                    className={styles['ADM-ETD-input']}
+                  />
+                ) : (
+                  s.niveau
+                )}
+              </td>
+              <td className={styles['ADM-ETD-td']}>
+                {editStudent?.Matricule === s.Matricule ? (
+                  <select
+                    value={editStudent.etat}
+                    onChange={e => setEditStudent({ ...editStudent, etat: e.target.value })}
+                    className={styles['ADM-ETD-select']}
+                  >
+                    <option value="">-- Aucun état --</option>
+                    {['Ajourné', 'Admis', 'Admis avec dettes', 'Réintégré'].map(e => (
+                      <option key={e} value={e}>{e}</option>
+                    ))}
+                  </select>
+                ) : (
+                  s.etat || 'Non défini'
+                )}
+              </td>
+              <td className={styles['ADM-ETD-td']}>{s.annee_inscription || 'Non défini'}</td>
+              <td className={styles['ADM-ETD-td']}>
+                {editStudent?.Matricule === s.Matricule ? (
+                  <select
+                    value={editStudent.num_groupe}
+                    onChange={e => setEditStudent({ ...editStudent, num_groupe: e.target.value })}
+                    className={styles['ADM-ETD-select']}
+                  >
+                    <option value="">-- Sélectionner un groupe --</option>
+                    {groupOptions.map(option => (
+                      <option key={option.value} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                ) : (
+                  s.num_groupe || 'Non assigné'
+                )}
+              </td>
+              <td className={styles['ADM-ETD-td']}>
+                {editStudent?.Matricule === s.Matricule ? (
+                  <button className={styles['ADM-ETD-edit-btn']} onClick={() => handleEditStudent(s)}>
                     <FaPlus /> Sauvegarder
                   </button>
                 ) : (
-                  <button className="edit-btn" onClick={() => setEditStudent(s)}>
+                  <button className={styles['ADM-ETD-edit-btn']} onClick={() => setEditStudent(s)}>
                     <FaPlus /> Modifier
                   </button>
                 )}
-                <button className="delete-btn" onClick={() => handleDeleteStudent(s.Matricule)}>
+                <button className={styles['ADM-ETD-delete-btn']} onClick={() => handleDeleteStudent(s.Matricule)}>
                   <FaTrash /> Supprimer
                 </button>
               </td>
@@ -520,7 +644,6 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
           ))}
         </tbody>
       </table>
-    </div>
     </div>
   );
 };

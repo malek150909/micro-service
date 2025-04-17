@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { FaFilter, FaSearch } from 'react-icons/fa'; // Ajout de FaSearch
-import "./listetudiant.css" ;
+import { FaFilter, FaSearch } from 'react-icons/fa';
+import styles from './listetudiant.module.css';
 
 const FilterPanel = ({ onFilter }) => {
   const [filters, setFilters] = useState({
@@ -15,7 +15,7 @@ const FilterPanel = ({ onFilter }) => {
   const [departements, setDepartements] = useState([]);
   const [specialites, setSpecialites] = useState([]);
 
-  const iconColor = '#021A3F'; // Bleu très foncé
+  const iconColor = '#021A3F';
 
   useEffect(() => {
     console.log('FilterPanel monté');
@@ -56,6 +56,7 @@ const FilterPanel = ({ onFilter }) => {
           pauseOnHover: true,
           style: { backgroundColor: '#FF6B6B', color: '#fff', fontSize: '16px' },
           icon: '❌',
+          className: styles['ADM-ETD-custom-toast-error']
         });
       });
   }, []);
@@ -87,6 +88,7 @@ const FilterPanel = ({ onFilter }) => {
         pauseOnHover: true,
         style: { backgroundColor: '#FF6B6B', color: '#fff', fontSize: '16px' },
         icon: '❌',
+        className: styles['ADM-ETD-custom-toast-error']
       });
       return;
     }
@@ -119,6 +121,7 @@ const FilterPanel = ({ onFilter }) => {
         pauseOnHover: true,
         style: { backgroundColor: '#FF6B6B', color: '#fff', fontSize: '16px' },
         icon: '❌',
+        className: styles['ADM-ETD-custom-toast-error']
       });
     }
   };
@@ -136,15 +139,14 @@ const FilterPanel = ({ onFilter }) => {
   });
 
   return (
-    <div id="listetudiants">
-    <div className="filter-panel">
+    <div className={styles['ADM-ETD-filter-panel']}>
       <h3>Filtrer les sections <FaSearch style={{ color: iconColor, fill: iconColor, verticalAlign: 'middle' }} /></h3>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
         <select
           name="niveau"
           value={filters.niveau}
           onChange={handleChange}
-          className="filter-select"
+          className={styles['ADM-ETD-filter-select']}
         >
           <option value="">-- Sélectionner un niveau --</option>
           {['L1', 'L2', 'L3', 'M1', 'M2'].map(n => (
@@ -156,7 +158,7 @@ const FilterPanel = ({ onFilter }) => {
           name="idFaculte"
           value={filters.idFaculte}
           onChange={handleChange}
-          className="filter-select"
+          className={styles['ADM-ETD-filter-select']}
         >
           <option value="">-- Sélectionner une faculté --</option>
           {facultes.map(f => {
@@ -173,7 +175,7 @@ const FilterPanel = ({ onFilter }) => {
           name="idDepartement"
           value={filters.idDepartement}
           onChange={handleChange}
-          className="filter-select"
+          className={styles['ADM-ETD-filter-select']}
           disabled={!filters.idFaculte}
         >
           <option value="">-- Sélectionner un département --</option>
@@ -195,7 +197,7 @@ const FilterPanel = ({ onFilter }) => {
           name="idSpecialite"
           value={filters.idSpecialite}
           onChange={handleChange}
-          className="filter-select"
+          className={styles['ADM-ETD-filter-select']}
           disabled={!filters.idDepartement}
         >
           <option value="">-- Sélectionner une spécialité --</option>
@@ -213,11 +215,10 @@ const FilterPanel = ({ onFilter }) => {
           )}
         </select>
 
-        <button onClick={handleFilterSubmit} className="filter-btn">
+        <button onClick={handleFilterSubmit} className={styles['ADM-ETD-filter-btn']}>
           <FaFilter /> Filtrer
         </button>
       </div>
-    </div>
     </div>
   );
 };

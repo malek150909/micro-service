@@ -1,0 +1,673 @@
+/* Conteneur principal */
+.ETD-DOC-container {
+    max-width: 1400px;
+    margin: 30px auto;
+    padding: 0;
+    position: relative;
+}
+
+/* Formes abstraites en arrière-plan avec animation subtile */
+.ETD-DOC-background-shapes {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.ETD-DOC-shape {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.15;
+    animation: ETD-DOC-pulseShape 10s infinite ease-in-out;
+}
+
+.ETD-DOC-shape1 {
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, #ffffff 0%, #c1e8ff 100%);
+    top: -250px;
+    left: -100px;
+    filter: blur(50px);
+    animation-delay: 0s;
+}
+
+.ETD-DOC-shape2 {
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, #ffffff 0%, #7da0ca 100%);
+    bottom: -200px;
+    right: -100px;
+    filter: blur(40px);
+    animation-delay: 3s;
+}
+
+@keyframes ETD-DOC-pulseShape {
+    0% { transform: scale(1) translateY(0); }
+    50% { transform: scale(1.05) translateY(-15px); }
+    100% { transform: scale(1) translateY(0); }
+}
+
+/* Sidebar */
+.ETD-DOC-sidebar {
+    background: linear-gradient(135deg, rgba(91, 135, 179, 0.95) 0%, rgba(17, 69, 148, 0.95) 100%);
+    border-radius: 0;
+    padding: 25px;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    position: fixed;
+    top: 0;
+    left: 30px;
+    width: 200px; /* Increased from 150px to 200px */
+    height: 100vh;
+    box-shadow: 0 15px 40px rgba(37, 100, 194, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    animation: ETD-DOC-slideIn 0.5s ease-out;
+    overflow-y: auto;
+    padding-bottom: 40px;
+}
+
+@keyframes ETD-DOC-slideIn {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
+}
+
+.ETD-DOC-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.ETD-DOC-logo h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Boutons de la barre latérale ajustés pour prendre toute la largeur sans centrage */
+.ETD-DOC-sidebar-button {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 0.9rem; /* Reduced from 1rem to 0.9rem for better fit */
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 10px 15px; /* Adjusted padding from 12px 20px to 10px 15px */
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+    margin: 0;
+    white-space: normal; /* Allow text to wrap */
+    word-wrap: break-word; /* Ensure long words break to the next line */
+    line-height: 1.2; /* Improve readability with better line spacing */
+}
+
+.ETD-DOC-sidebar-button:hover {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(125, 160, 202, 0.5));
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+.ETD-DOC-sidebar-button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: all 0.5s ease;
+}
+
+.ETD-DOC-sidebar-button:hover::before {
+    left: 100%;
+}
+
+/* Contenu principal */
+.ETD-DOC-main-content {
+    margin-left: 310px;
+    margin-right: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* Header */
+.ETD-DOC-header {
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15), 0 0 20px rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+}
+
+.ETD-DOC-header h1 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #052659;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 3px rgba(5, 38, 89, 0.1);
+}
+
+.ETD-DOC-header p {
+    font-size: 1rem;
+    color: #5483b3;
+    margin: 8px 0 0;
+}
+
+/* Grille de contenu */
+.ETD-DOC-content-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr; /* Changed to give more space to Documents */
+    gap: 30px;
+}
+
+/* Graphique */
+.ETD-DOC-chart-container {
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15), 0 0 20px rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.ETD-DOC-chart-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #052659;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: 0.5px;
+    position: relative;
+    padding-bottom: 10px;
+    background: linear-gradient(90deg, #0d3155, #7DA0CA);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: all 0.4s ease;
+}
+
+.ETD-DOC-chart-title:hover {
+    transform: scale(1.02);
+}
+
+.ETD-DOC-chart-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 2px;
+    background: linear-gradient(90deg, #06223e, #7DA0CA);
+    transition: width 0.4s ease;
+}
+
+.ETD-DOC-chart-title:hover::after {
+    width: 100%;
+}
+
+/* Liste des documents */
+.ETD-DOC-document-list {
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15), 0 0 20px rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.ETD-DOC-document-list h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #052659;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: 0.5px;
+    position: relative;
+    padding-bottom: 10px;
+    background: linear-gradient(90deg, #0c3156, #7DA0CA);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: all 0.4s ease;
+}
+
+.ETD-DOC-document-list h3:hover {
+    transform: scale(1.02);
+}
+
+.ETD-DOC-document-list h3::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 2px;
+    background: linear-gradient(90deg, #042649, #7DA0CA);
+    transition: width 0.4s ease;
+}
+
+.ETD-DOC-document-list h3:hover::after {
+    width: 100%;
+}
+
+.ETD-DOC-document-list ul {
+    list-style: none;
+    padding: 0;
+    max-height: 470px;
+    overflow-y: auto;
+}
+
+.ETD-DOC-document-list ul::-webkit-scrollbar {
+    width: 6px;
+}
+
+.ETD-DOC-document-list ul::-webkit-scrollbar-track {
+    background: #f0f7ff;
+    border-radius: 10px;
+}
+
+.ETD-DOC-document-list ul::-webkit-scrollbar-thumb {
+    background: #7da0ca;
+    border-radius: 10px;
+}
+
+.ETD-DOC-document-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.7);
+    margin-bottom: 12px;
+    box-shadow: 0 4px 15px rgba(5, 38, 89, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(5px);
+}
+
+/* Increase padding for AdminDashboard document items to fill the container */
+.ETD-DOC-document-list .ETD-DOC-document-item {
+    padding: 10px; /* Increased padding for AdminDashboard */
+    min-height: 110px; /* Ensure items take up more vertical space */
+}
+
+/* Ensure StudentDashboard document items remain as before */
+.ETD-DOC-student-dashboard .ETD-DOC-document-item {
+    padding: 15px; /* Keep original padding for StudentDashboard */
+    min-height: auto; /* Let StudentDashboard items adjust naturally */
+}
+
+.ETD-DOC-document-info h3 {
+    font-size: 1.2rem; /* Increased font size for document titles */
+    font-weight: 600;
+    color: #173d78;
+    margin: 0;
+    letter-spacing: 0.3px;
+}
+
+.ETD-DOC-document-info p {
+    font-size: 0.9rem;
+    color: #5483b3;
+    margin: 10px 0 0; /* Increased margin to add space between title and description */
+}
+
+/* Style for the "Télécharger" button */
+.ETD-DOC-document-info a {
+    display: inline-flex; /* Use flex to align icon and text */
+    align-items: center;
+    gap: 8px;
+    background: #335c86; /* Solid color matching the design */
+    color: #ffffff; /* White text for contrast */
+    padding: 8px 16px; /* Padding to make it look like a button */
+    border-radius: 12px; /* Match the border-radius of other buttons */
+    text-decoration: none; /* Remove default underline */
+    font-size: 0.9rem;
+    font-weight: 500;
+    box-shadow: 0 4px 15px rgba(5, 38, 89, 0.1); /* Subtle shadow for depth */
+    transition: transform 0.3s ease; /* Keep transform transition for hover */
+}
+
+/* Ensure the color doesn't change on hover, but allow a slight lift effect */
+.ETD-DOC-document-info a:hover {
+    transform: translateY(-2px); /* Slight lift on hover */
+    background: #5483b3; /* Keep the same color */
+    color: #ffffff; /* Keep the same text color */
+}
+
+/* Simplified Custom File Input */
+.ETD-DOC-custom-file-input {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Reduced gap */
+    width: 100%;
+}
+
+.ETD-DOC-custom-file-input input[type="file"] {
+    display: none; /* Hide the default file input */
+}
+
+.ETD-DOC-custom-file-label {
+    background: #5483b3; /* Solid color instead of gradient */
+    color: #ffffff;
+    padding: 8px 16px; /* Adjusted padding for text-only button */
+    border-radius: 8px; /* Smaller border-radius */
+    font-size: 0.85rem; /* Smaller font size */
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(5, 38, 89, 0.1); /* Lighter shadow */
+    transition: background 0.3s ease; /* Simplified transition */
+}
+
+.ETD-DOC-custom-file-label:hover {
+    background: #7da0ca; /* Lighter shade on hover */
+}
+
+.ETD-DOC-file-name {
+    font-size: 0.85rem; /* Smaller font size */
+    color: #5483b3;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Modale */
+.ETD-DOC-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(5, 38, 89, 0.5);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+}
+
+.ETD-DOC-modal-overlay.ETD-DOC-active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.ETD-DOC-modal-content {
+    width: 100%;
+    max-width: 500px;
+    max-height: 80vh;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 15px 40px rgba(5, 38, 89, 0.2), 0 0 20px rgba(255, 255, 255, 0.3);
+    overflow-y: auto;
+    border: 1px solid rgba(84, 131, 179, 0.2);
+    backdrop-filter: blur(10px);
+    position: relative;
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.3s ease 0.1s, transform 0.3s ease 0.1s;
+}
+
+.ETD-DOC-modal-overlay.ETD-DOC-active .ETD-DOC-modal-content {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.ETD-DOC-modal-content h3 {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #052659;
+    margin-bottom: 20px;
+    text-align: center;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 3px rgba(5, 38, 89, 0.1);
+}
+
+.ETD-DOC-modal-content p {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.95rem;
+    color: #5483b3;
+    margin: 12px 0;
+    line-height: 1.5;
+}
+
+/* Formulaire */
+.ETD-DOC-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.ETD-DOC-input-group {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ETD-DOC-input-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #5483b3;
+    font-size: 1.1rem;
+    transition: color 0.3s ease;
+}
+
+.ETD-DOC-input:focus + .ETD-DOC-input-icon,
+.ETD-DOC-textarea:focus + .ETD-DOC-input-icon,
+.ETD-DOC-select:focus + .ETD-DOC-input-icon {
+    color: #7da0ca;
+}
+
+.ETD-DOC-input,
+.ETD-DOC-textarea,
+.ETD-DOC-select {
+    padding: 15px;
+    padding-left: 45px;
+    border: 1px solid rgba(84, 131, 179, 0.2);
+    border-radius: 12px;
+    font-size: 0.95rem;
+    background: #f0f7ff;
+    color: #052659;
+    width: 100%;
+    box-shadow: 0 4px 15px rgba(5, 38, 89, 0.05);
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.ETD-DOC-input:focus,
+.ETD-DOC-textarea:focus,
+.ETD-DOC-select:focus {
+    border-color: #5483b3;
+    box-shadow: 0 0 15px rgba(84, 131, 179, 0.2);
+    outline: none;
+}
+
+.ETD-DOC-textarea,
+.ETD-DOC-select {
+    padding-left: 15px;
+}
+
+.ETD-DOC-input::placeholder,
+.ETD-DOC-textarea::placeholder {
+    color: #7da0ca;
+}
+
+.ETD-DOC-input-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    color: #052659;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.ETD-DOC-edit-button {
+    background: linear-gradient(135deg, #7da0ca 0%, #5483b3 100%);
+}
+
+.ETD-DOC-delete-button {
+    background: linear-gradient(135deg, #052659 0%, #021024 100%);
+}
+
+.ETD-DOC-close-button {
+    background: linear-gradient(135deg, #5483b3 0%, #7da0ca 100%);
+}
+
+/* Message "Aucun résultat" */
+.ETD-DOC-no-results {
+    text-align: center;
+    color: #5483b3;
+    font-size: 1rem;
+    padding: 25px;
+}
+
+/* Style spécifique pour la modale d'erreur */
+.ETD-DOC-error-modal {
+    max-width: 300px;
+    text-align: center;
+}
+
+.ETD-DOC-error-modal p {
+    color: #052659;
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+}
+
+/* Adjust document-list for student dashboard */
+.ETD-DOC-student-dashboard .ETD-DOC-document-list {
+    width: 100%;
+}
+
+/* Style for icons */
+.ETD-DOC-icon {
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+/* Style spécifique pour la modale de confirmation de suppression */
+.ETD-DOC-delete-modal {
+    max-width: 400px;
+    text-align: center;
+}
+
+.ETD-DOC-delete-modal p {
+    color: #052659;
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+}
+
+/* Adjust icon size and color for specific elements */
+.ETD-DOC-sidebar-button .ETD-DOC-icon,
+.ETD-DOC-chart-title .ETD-DOC-icon,
+.ETD-DOC-document-list h3 .ETD-DOC-icon,
+.ETD-DOC-document-item h3 .ETD-DOC-icon,
+.ETD-DOC-document-info a .ETD-DOC-icon,
+.ETD-DOC-document-actions button .ETD-DOC-icon,
+.ETD-DOC-modal-content h3 .ETD-DOC-icon,
+button .ETD-DOC-icon {
+    font-size: 1rem;
+    color: inherit;
+}
+
+/* Ensure icons in labels align properly */
+.ETD-DOC-input-group label .ETD-DOC-input-icon {
+    position: static;
+    transform: none;
+    margin-right: 8px;
+    font-size: 1.1rem;
+    color: #5483b3;
+}
+
+/* Style for error modal icon */
+.ETD-DOC-error-modal h3 .ETD-DOC-icon {
+    color: #052659;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .ETD-DOC-sidebar {
+        position: relative;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: auto;
+        margin-bottom: 30px;
+    }
+
+    .ETD-DOC-main-content {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .ETD-DOC-content-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 576px) {
+    .ETD-DOC-button-group {
+        flex-direction: column;
+    }
+
+    .ETD-DOC-modal-content {
+        padding: 20px;
+    }
+
+    .ETD-DOC-custom-file-input {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .ETD-DOC-custom-file-label {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .ETD-DOC-file-name {
+        width: 100%;
+        text-align: center;
+    }
+}

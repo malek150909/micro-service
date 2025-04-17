@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FaArrowLeft, FaBook, FaDownload, FaExclamationTriangle, FaHome, FaUser } from 'react-icons/fa';
+import styles from "./doc.module.css";
 
 function StudentDashboard() {
     const navigate = useNavigate();
@@ -65,69 +66,67 @@ function StudentDashboard() {
     };
 
     return (
-        <div id="docs">
-        <div className="container student-dashboard">
-            <div className="background-shapes">
-                <div className="shape shape1"></div>
-                <div className="shape shape2"></div>
-            </div>
-
-            <div className="sidebar">
-                <div className="logo">
-                    <h2><FaUser /> Étudiant</h2>
-                </div>
-                <button className="sidebar-button" onClick={handleBack}>
-                    <FaHome /> Retour à l’accueil
-                </button>
-            </div>
-
-            <div className="main-content">
-                <div className="header">
-                    <h1>Documents Étudiant</h1>
-                    <p>Voir et télécharger les documents de votre faculté</p>
+            <div className={`${styles['ETD-DOC-container']} ${styles['ETD-DOC-student-dashboard']}`}>
+                <div className={styles['ETD-DOC-background-shapes']}>
+                    <div className={`${styles['ETD-DOC-shape']} ${styles['ETD-DOC-shape1']}`}></div>
+                    <div className={`${styles['ETD-DOC-shape']} ${styles['ETD-DOC-shape2']}`}></div>
                 </div>
 
-                <div className="document-list">
-                    <h3>
-                        <FaBook /> Documents
-                    </h3>
-                    {error && (
-                        <div className="modal-overlay active">
-                            <div className="modal-content error-modal">
-                                <h3>
-                                    <FaExclamationTriangle /> Erreur
-                                </h3>
-                                <p>{error}</p>
-                                <button className="close-button" onClick={() => setError('')}>
-                                    Fermer
-                                </button>
+                <div className={styles['ETD-DOC-sidebar']}>
+                    <div className={styles['ETD-DOC-logo']}>
+                        <h2>Documents Administatifs</h2>
+                    </div>
+                    <button className={styles['ETD-DOC-sidebar-button']} onClick={handleBack}>
+                        <FaHome /> Retour à l’accueil
+                    </button>
+                </div>
+
+                <div className={styles['ETD-DOC-main-content']}>
+                    <div className={styles['ETD-DOC-header']}>
+                        <h1>Documents Étudiant</h1>
+                        <p>Voir et télécharger les documents de votre faculté</p>
+                    </div>
+
+                    <div className={styles['ETD-DOC-document-list']}>
+                        <h3>
+                            <FaBook /> Documents
+                        </h3>
+                        {error && (
+                            <div className={`${styles['ETD-DOC-modal-overlay']} ${styles['ETD-DOC-active']}`}>
+                                <div className={`${styles['ETD-DOC-modal-content']} ${styles['ETD-DOC-error-modal']}`}>
+                                    <h3>
+                                        <FaExclamationTriangle className={styles['ETD-DOC-icon']} /> Erreur
+                                    </h3>
+                                    <p>{error}</p>
+                                    <button className={styles['ETD-DOC-close-button']} onClick={() => setError('')}>
+                                        Fermer
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    )}
-                    {documents.length === 0 ? (
-                        <div className="no-results">Aucun document trouvé pour votre faculté.</div>
-                    ) : (
-                        <ul>
-                            {documents.map(doc => (
-                                <li key={doc.ID_document} className="document-item">
-                                    <div className="document-info">
-                                        <h3>
-                                            <FaBook /> {doc.titre}
-                                        </h3>
-                                        <p>{doc.description || 'Aucune description'}</p>
-                                        <br />
-                                        <a href={`http://localhost:8083${doc.fichier_url}`} download target="_blank" rel="noopener noreferrer">
-                                            <FaDownload /> Télécharger
-                                        </a>
-                                    </div>
-                                </li>
-                            ))}
-                        </ul>
-                    )}
+                        )}
+                        {documents.length === 0 ? (
+                            <div className={styles['ETD-DOC-no-results']}>Aucun document trouvé pour votre faculté.</div>
+                        ) : (
+                            <ul>
+                                {documents.map(doc => (
+                                    <li key={doc.ID_document} className={styles['ETD-DOC-document-item']}>
+                                        <div className={styles['ETD-DOC-document-info']}>
+                                            <h3>
+                                                <FaBook className={styles['ETD-DOC-icon']} /> {doc.titre}
+                                            </h3>
+                                            <p>{doc.description || 'Aucune description'}</p>
+                                            <br />
+                                            <a href={`http://localhost:8083${doc.fichier_url}`} download target="_blank" rel="noopener noreferrer">
+                                                <FaDownload className={styles['ETD-DOC-icon']} /> Télécharger
+                                            </a>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
                 </div>
             </div>
-        </div>
-        </div>
     );
 }
 

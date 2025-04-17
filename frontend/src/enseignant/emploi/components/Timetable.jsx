@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import ReactDOM from 'react-dom'; // Ajout de ReactDOM pour le portail
-import SessionModal from './SessionModal'; // Réimportation de SessionModal
-import '../css/EmploiDuTemps.css';
+import ReactDOM from 'react-dom';
+import SessionModal from './SessionModal';
+import styles from '../css/EmploiDuTemps.module.css'; // Already correct
 import { FaHome } from 'react-icons/fa';
 
 const Timetable = () => {
@@ -63,7 +63,7 @@ const Timetable = () => {
     if (!isModalOpen || !selectedSession) return null;
 
     return ReactDOM.createPortal(
-      <SessionModal session={selectedSession} onClose={closeModal} />,
+      <SessionModal session={selectedSession} onClose={closeModal} styles={styles} />, // Pass styles as a prop
       document.body
     );
   };
@@ -73,48 +73,48 @@ const Timetable = () => {
   }
 
   return (
-    <div className="teacher-timetable-wrapper">
-      <div className="sidebar">
-        <div className="logo"><h2>Emplois du temps</h2></div>
-        <button className="sidebar-button" onClick={() => navigate('/enseignant')}>
+    <div className={styles['ENS-EDT-teacher-timetable-wrapper']}>
+      <div className={styles['ENS-EDT-sidebar']}>
+        <div className={styles['ENS-EDT-logo']}><h2>Emplois du temps</h2></div>
+        <button className={styles['ENS-EDT-sidebar-button']} onClick={() => navigate('/enseignant')}>
           <FaHome /> Retour
         </button>
       </div>
-      <div className="timetable-container">
-        <h2 className="timetable-title">Votre Emploi du temps</h2>
-        <table className="modern-timetable-table">
+      <div className={styles['ENS-EDT-timetable-container']}>
+        <h2 className={styles['ENS-EDT-timetable-title']}>Votre Emploi du temps</h2>
+        <table className={styles['ENS-EDT-modern-timetable-table']}>
           <thead>
             <tr>
-              <th className="modern-th">Jour</th>
+              <th className={styles['ENS-EDT-modern-th']}>Jour</th>
               {timeSlots.map(slot => (
-                <th key={slot} className="modern-th">{slot}</th>
+                <th key={slot} className={styles['ENS-EDT-modern-th']}>{slot}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {days.map(day => (
-              <tr key={day} className="modern-tr">
-                <td className="modern-day">{day}</td>
+              <tr key={day} className={styles['ENS-EDT-modern-tr']}>
+                <td className={styles['ENS-EDT-modern-day']}>{day}</td>
                 {timeSlots.map(slot => {
                   const session = seances.find(s => s.jour === day && s.time_slot === slot);
                   return (
                     <td
                       key={`${day}-${slot}`}
                       onClick={() => handleCellClick(day, slot)}
-                      className="modern-td"
+                      className={styles['ENS-EDT-modern-td']}
                     >
                       {session ? (
-                        <div className="session-card">
-                          <span className="session-type">{session.type_seance}</span>
-                          <span className="session-module">{session.nom_module}</span>
-                          <span className="session-room">Salle: {session.nom_salle}</span>
+                        <div className={styles['ENS-EDT-session-card']}>
+                          <span className={styles['ENS-EDT-session-type']}>{session.type_seance}</span>
+                          <span className={styles['ENS-EDT-session-module']}>{session.nom_module}</span>
+                          <span className={styles['ENS-EDT-session-room']}>Salle: {session.nom_salle}</span>
                           {(session.type_seance === 'TP' || session.type_seance === 'TD') && session.num_groupe && (
-                            <span className="session-group">Groupe: {session.num_groupe}</span>
+                            <span className={styles['ENS-EDT-session-group']}>Groupe: {session.num_groupe}</span>
                           )}
-                          <span className="session-section">{`(${session.niveau} ${session.nom_specialite} ${session.nom_section})`}</span>
+                          <span className={styles['ENS-EDT-session-section']}>{`(${session.niveau} ${session.nom_specialite} ${session.nom_section})`}</span>
                         </div>
                       ) : (
-                        <span className="empty-slot">-</span>
+                        <span className={styles['ENS-EDT-empty-slot']}>-</span>
                       )}
                     </td>
                   );

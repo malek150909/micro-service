@@ -1,0 +1,965 @@
+/* App Container */
+.ADM-EXM-app-container {
+  position: relative;
+}
+
+/* Background Shapes */
+.ADM-EXM-background-shapes {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ADM-EXM-shape {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.15;
+  animation: ADM-EXM-pulseShape 10s infinite ease-in-out;
+}
+
+.ADM-EXM-shape1 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, #ffffff 0%, #c1e8ff 100%);
+  top: -250px;
+  left: -100px;
+  filter: blur(50px);
+  animation-delay: 0s;
+}
+
+.ADM-EXM-shape2 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, #ffffff 0%, #7da0ca 100%);
+  bottom: -200px;
+  right: -100px;
+  filter: blur(40px);
+  animation-delay: 3s;
+}
+
+@keyframes ADM-EXM-pulseShape {
+  0% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.05) translateY(-15px); }
+  100% { transform: scale(1) translateY(0); }
+}
+
+/* Sidebar */
+.ADM-EXM-sidebar {
+  background: linear-gradient(135deg, rgba(91, 135, 179, 0.95) 0%, rgba(17, 69, 148, 0.95) 100%);
+  border-radius: 0;
+  padding: 25px;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  position: fixed;
+  top: 0;
+  left: 30px;
+  width: 200px; /* Increased from 150px to 200px */
+  height: 100vh;
+  box-shadow: 0 15px 40px rgba(37, 100, 194, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  animation: ADM-EXM-slideIn 0.5s ease-out;
+  overflow-y: auto;
+  padding-bottom: 40px;
+}
+
+@keyframes ADM-EXM-slideIn {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+.ADM-EXM-sidebar .ADM-EXM-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.ADM-EXM-sidebar .ADM-EXM-logo h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.ADM-EXM-sidebar-button {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.9rem; /* Reduced from 1rem to 0.9rem for better fit */
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 10px 15px; /* Adjusted padding from 12px 20px to 10px 15px */
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+  white-space: normal; /* Allow text to wrap */
+  word-wrap: break-word; /* Ensure long words break to the next line */
+  line-height: 1.2; /* Improve readability with better line spacing */
+}
+
+.ADM-EXM-sidebar-button:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(125, 160, 202, 0.5));
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+.ADM-EXM-sidebar-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: all 0.5s ease;
+}
+
+.ADM-EXM-sidebar-button:hover::before {
+  left: 100%;
+}
+
+/* Main Content */
+.ADM-EXM-main-content {
+  margin-left: 310px;
+  margin-right: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding: 30px 0;
+}
+
+/* Header */
+.ADM-EXM-header {
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15), 0 0 20px rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+}
+
+.ADM-EXM-header h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #052659;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 3px rgba(5, 38, 89, 0.1);
+}
+
+.ADM-EXM-header p {
+  font-size: 1rem;
+  color: #5483b3;
+  margin: 8px 0 0;
+}
+
+/* Form Row (FilterForm and ExamForm) */
+.ADM-EXM-form-row {
+  display: flex;
+  gap: 30px;
+  flex-wrap: nowrap;
+}
+
+.ADM-EXM-filter-section,
+.ADM-EXM-exam-form-section {
+  flex: 1;
+  min-width: 300px;
+}
+
+/* List Section (ExamList) */
+.ADM-EXM-list-section {
+  margin-top: 30px;
+}
+
+/* Form Container (FilterForm and ExamForm) */
+.ADM-EXM-form-container {
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15), 0 0 20px rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: visible;
+}
+
+.ADM-EXM-form-container h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #052659;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: 0.5px;
+  position: relative;
+  padding-bottom: 10px;
+  background: linear-gradient(90deg, #0d3155, #7DA0CA);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transition: all 0.4s ease;
+}
+
+.ADM-EXM-form-container h3:hover {
+  transform: scale(1.02);
+}
+
+.ADM-EXM-form-container h3::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 50px;
+  height: 2px;
+  background: linear-gradient(90deg, #06223e, #7DA0CA);
+  transition: width 0.4s ease;
+}
+
+.ADM-EXM-form-container h3:hover::after {
+  width: 100%;
+}
+
+/* Form Styles */
+.ADM-EXM-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.ADM-EXM-input,
+.ADM-EXM-select {
+  padding: 12px;
+  border: 1px solid rgba(84, 131, 179, 0.2);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: #f0f7ff;
+  color: #052659;
+  width: 100%;
+  box-shadow: 0 4px 15px rgba(5, 38, 89, 0.05);
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.ADM-EXM-input:focus,
+.ADM-EXM-select:focus {
+  border-color: #5483b3;
+  box-shadow: 0 0 15px rgba(84, 131, 179, 0.2);
+  outline: none;
+}
+
+.ADM-EXM-input::placeholder {
+  color: #7da0ca;
+}
+
+/* Multi-Select Dropdown Styles */
+.ADM-EXM-select[multiple] {
+  height: 120px;
+  padding: 8px;
+  border: 1px solid rgba(84, 131, 179, 0.2);
+  border-radius: 8px;
+  background: #f0f7ff;
+  font-size: 0.95rem;
+  color: #052659;
+  transition: all 0.3s ease;
+}
+
+.ADM-EXM-select[multiple] option {
+  padding: 5px;
+}
+
+.ADM-EXM-select[multiple] option:disabled {
+  color: #999;
+  background-color: #f0f0f0;
+}
+
+.ADM-EXM-select[multiple]:focus {
+  border-color: #5483b3;
+  box-shadow: 0 0 15px rgba(84, 131, 179, 0.2);
+  outline: none;
+}
+
+/* Exam List Container */
+.ADM-EXM-exam-list {
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15), 0 0 20px rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: visible;
+}
+
+.ADM-EXM-exam-list h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #052659;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: 0.5px;
+  position: relative;
+  padding-bottom: 10px;
+  background: linear-gradient(90deg, #0c3156, #7DA0CA);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transition: all 0.4s ease;
+}
+
+.ADM-EXM-exam-list h3:hover {
+  transform: scale(1.02);
+}
+
+.ADM-EXM-exam-list h3::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 50px;
+  height: 2px;
+  background: linear-gradient(90deg, #042649, #7DA0CA);
+  transition: width 0.4s ease;
+}
+
+.ADM-EXM-exam-list h3:hover::after {
+  width: 100%;
+}
+
+/* Exam Table */
+.ADM-EXM-exam-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 15px 0;
+}
+
+.ADM-EXM-exam-table th,
+.ADM-EXM-exam-table td {
+  padding: 15px;
+  text-align: center;
+  border-bottom: 1px solid rgba(84, 131, 179, 0.2);
+}
+
+.ADM-EXM-exam-table th {
+  background: #052659;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.ADM-EXM-exam-table th:nth-child(4),
+.ADM-EXM-exam-table td:nth-child(4) {
+  min-width: 200px;
+}
+
+.ADM-EXM-exam-table td {
+  color: #052659;
+  font-size: 0.9rem;
+}
+
+.ADM-EXM-exam-table tr {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.ADM-EXM-exam-table tr:nth-child(even) {
+  background: rgba(240, 247, 255, 0.7);
+}
+
+.ADM-EXM-exam-table tr:hover {
+  background: inherit;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Message Container for No Results */
+.ADM-EXM-message-container {
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15), 0 0 20px rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  text-align: center;
+}
+
+.ADM-EXM-message-container .ADM-EXM-no-results {
+  color: #5483b3;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Modal Overlay and Content */
+.ADM-EXM-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(5, 38, 89, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.ADM-EXM-modal-content {
+  width: 100%;
+  max-width: 500px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 15px 40px rgba(5, 38, 89, 0.2), 0 0 20px rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(84, 131, 179, 0.2);
+  position: relative;
+  z-index: 1001;
+  text-align: center;
+}
+
+.ADM-EXM-modal-content h3 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #052659;
+  margin-bottom: 15px;
+  text-align: center;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 3px rgba(5, 38, 89, 0.1);
+}
+
+/* Modal Fields */
+.ADM-EXM-modal-field {
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.ADM-EXM-modal-field label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: #052659;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.ADM-EXM-modal-field input,
+.ADM-EXM-modal-field select {
+  padding: 10px;
+  border: 1px solid rgba(84, 131, 179, 0.2);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: #f0f7ff;
+  color: #052659;
+  width: 100%;
+  box-shadow: 0 4px 15px rgba(5, 38, 89, 0.05);
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.ADM-EXM-modal-field select[multiple] {
+  height: 100px;
+}
+
+.ADM-EXM-modal-field input:focus,
+.ADM-EXM-modal-field select:focus {
+  border-color: #5483b3;
+  box-shadow: 0 0 15px rgba(84, 131, 179, 0.2);
+  outline: none;
+}
+
+/* Modal Actions */
+.ADM-EXM-modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  justify-content: center;
+}
+
+.ADM-EXM-modal-actions button {
+  background: linear-gradient(135deg, #5483b3 0%, #052659 100%);
+  color: #ffffff;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 8px 20px rgba(5, 38, 89, 0.1);
+  transition: all 0.3s ease;
+  letter-spacing: 0.3px;
+  position: relative;
+  overflow: hidden;
+}
+
+.ADM-EXM-modal-actions button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(5, 38, 89, 0.15), 0 0 15px rgba(125, 160, 202, 0.4);
+}
+
+.ADM-EXM-modal-actions button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: all 0.5s ease;
+}
+
+.ADM-EXM-modal-actions button:hover::before {
+  left: 100%;
+}
+
+.ADM-EXM-modal-actions button:last-child {
+  background: linear-gradient(135deg, #5483b3 0%, #7da0ca 100%);
+}
+
+/* Export Buttons */
+.ADM-EXM-export-buttons {
+  margin: 20px 0;
+  display: flex;
+  gap: 15px;
+}
+
+.ADM-EXM-export-buttons button {
+  background: linear-gradient(135deg, #5483b3 0%, #052659 100%);
+  color: #ffffff;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 8px 20px rgba(5, 38, 89, 0.1);
+  transition: all 0.3s ease;
+  letter-spacing: 0.3px;
+  position: relative;
+  overflow: hidden;
+  flex: 1;
+  justify-content: center;
+}
+
+.ADM-EXM-export-buttons button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(5, 38, 89, 0.15), 0 0 15px rgba(125, 160, 202, 0.4);
+}
+
+.ADM-EXM-export-buttons button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: all 0.5s ease;
+}
+
+.ADM-EXM-export-buttons button:hover::before {
+  left: 100%;
+}
+
+/* Buttons in Exam Table (Modifier, Supprimer) */
+.ADM-EXM-exam-table button {
+  background: linear-gradient(135deg, #5483b3 0%, #052659 100%);
+  color: #ffffff;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  margin-right: 10px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 8px 20px rgba(5, 38, 89, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.ADM-EXM-exam-table button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(5, 38, 89, 0.15), 0 0 15px rgba(125, 160, 202, 0.4);
+}
+
+.ADM-EXM-exam-table button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: all 0.5s ease;
+}
+
+.ADM-EXM-exam-table button:hover::before {
+  left: 100%;
+}
+
+.ADM-EXM-exam-table button:last-child {
+  background: linear-gradient(135deg, #052659 0%, #021024 100%);
+}
+
+/* Form Buttons (Ajouter, Filtrer, etc.) */
+.ADM-EXM-form-container button {
+  background: linear-gradient(135deg, #5483b3 0%, #052659 100%);
+  color: #ffffff;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 8px 20px rgba(5, 38, 89, 0.1);
+  transition: all 0.3s ease;
+  letter-spacing: 0.3px;
+  position: relative;
+  overflow: hidden;
+  justify-content: center;
+}
+
+.ADM-EXM-form-container button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(5, 38, 89, 0.15), 0 0 15px rgba(125, 160, 202, 0.4);
+}
+
+.ADM-EXM-form-container button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: all 0.5s ease;
+}
+
+.ADM-EXM-form-container button:hover::before {
+  left: 100%;
+}
+
+/* Error Message in ExamPlanning */
+.ADM-EXM-error-message {
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 20px;
+  padding: 15px 30px;
+  box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15), 0 0 20px rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  text-align: center;
+}
+
+.ADM-EXM-error-message p {
+  color: #ff4d4f;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* Error Messages in Modal */
+.ADM-EXM-modal-content p[style*="color"] {
+  color: #ff4d4f;
+  font-size: 0.95rem;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+/* No Results Message */
+.ADM-EXM-no-results {
+  text-align: center;
+  color: #5483b3;
+  font-size: 1rem;
+  padding: 25px;
+}
+
+/* Error Modal Specific Styles */
+.ADM-EXM-error-modal {
+  max-width: 300px;
+  text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+  .ADM-EXM-sidebar {
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    margin-bottom: 30px;
+  }
+
+  .ADM-EXM-main-content {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .ADM-EXM-form-row {
+    flex-wrap: wrap;
+  }
+
+  .ADM-EXM-filter-section,
+  .ADM-EXM-exam-form-section {
+    min-width: 100%;
+  }
+
+  .ADM-EXM-exam-table th:nth-child(4),
+  .ADM-EXM-exam-table td:nth-child(4) {
+    min-width: 150px;
+  }
+}
+
+@media (max-width: 576px) {
+  .ADM-EXM-export-buttons {
+    flex-direction: column;
+  }
+
+  .ADM-EXM-modal-content {
+    padding: 15px;
+    max-width: 90%;
+  }
+
+  .ADM-EXM-modal-field select[multiple] {
+    height: 80px;
+  }
+
+  .ADM-EXM-exam-table th,
+  .ADM-EXM-exam-table td {
+    padding: 10px;
+    font-size: 0.85rem;
+  }
+
+  .ADM-EXM-exam-table th:nth-child(4),
+  .ADM-EXM-exam-table td:nth-child(4) {
+    min-width: 120px;
+  }
+}
+
+/* Welcome Page Styles */
+.ADM-EXM-welcome-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #ffffff 0%, #86b4ec 50%, #082e54 100%);
+  padding: 20px;
+}
+
+.ADM-EXM-welcome-content {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15);
+  max-width: 600px;
+  width: 100%;
+}
+
+.ADM-EXM-welcome-content h1 {
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: #052659;
+  margin-bottom: 20px;
+}
+
+.ADM-EXM-welcome-content p {
+  font-size: 1.1rem;
+  color: #5483b3;
+  margin-bottom: 30px;
+}
+
+.ADM-EXM-welcome-content button {
+  background: linear-gradient(135deg, #5483b3 0%, #052659 100%);
+  color: #ffffff;
+  padding: 12px 30px;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ADM-EXM-welcome-content button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(5, 38, 89, 0.15);
+}
+
+/* Custom Dropdown Styles */
+.ADM-EXM-custom-dropdown {
+  position: relative;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.ADM-EXM-dropdown-header {
+  padding: 12px 16px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  background: linear-gradient(135deg, #f0f7ff 0%, #e6f0fa 100%);
+  color: #052659;
+  width: 100%;
+  box-shadow: 0 4px 15px rgba(5, 38, 89, 0.1);
+  transition: all 0.3s ease-in-out;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.ADM-EXM-dropdown-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 10px;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(84, 131, 179, 0.3), rgba(125, 160, 202, 0.5));
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+.ADM-EXM-dropdown-header:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 20px rgba(5, 38, 89, 0.15);
+  background: linear-gradient(135deg, #e6f0fa 0%, #d9e8ff 100%);
+}
+
+.ADM-EXM-dropdown-header:focus {
+  box-shadow: 0 0 15px rgba(84, 131, 179, 0.3);
+  outline: none;
+}
+
+.ADM-EXM-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #f0f7ff 0%, #e6f0fa 100%);
+  border: 1px solid rgba(84, 131, 179, 0.2);
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(5, 38, 89, 0.15);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  padding: 8px 0;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+  scroll-behavior: smooth;
+}
+
+.ADM-EXM-custom-dropdown.ADM-EXM-open .ADM-EXM-dropdown-menu {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.ADM-EXM-checkbox-label {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: #052659;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.ADM-EXM-checkbox-label input[type="checkbox"] {
+  margin-right: 10px;
+  accent-color: #5483b3;
+}
+
+.ADM-EXM-checkbox-label input[type="checkbox"]:disabled + span {
+  color: #999;
+  cursor: not-allowed;
+}
+
+.ADM-EXM-checkbox-label:hover {
+  background: linear-gradient(135deg, rgba(84, 131, 179, 0.1), rgba(125, 160, 202, 0.05));
+  transform: translateX(2px);
+}
+
+/* Disabled Form Container */
+.ADM-EXM-form-container.ADM-EXM-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+/* Disabled Form Inputs */
+.ADM-EXM-form-container.ADM-EXM-disabled .ADM-EXM-input,
+.ADM-EXM-form-container.ADM-EXM-disabled .ADM-EXM-select,
+.ADM-EXM-form-container.ADM-EXM-disabled button {
+  background: #f1efef;
+  color: #353046;
+  border-color: rgba(84, 131, 179, 0.1);
+  cursor: not-allowed;
+}
+
+/* Disabled Dropdown */
+.ADM-EXM-custom-dropdown.ADM-EXM-disabled .ADM-EXM-dropdown-header {
+  background: #f7f6f6;
+  color: #353046;
+  border-color: rgba(84, 131, 179, 0.1);
+  cursor: not-allowed;
+  pointer-events: none;
+  transform: none;
+  box-shadow: none;
+}
+
+.ADM-EXM-custom-dropdown.ADM-EXM-disabled .ADM-EXM-dropdown-header::before {
+  background: none;
+}
+
+.ADM-EXM-custom-dropdown.ADM-EXM-disabled .ADM-EXM-dropdown-header:hover {
+  transform: none;
+  box-shadow: none;
+  background: #353046;
+}

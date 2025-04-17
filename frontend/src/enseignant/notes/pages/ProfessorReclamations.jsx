@@ -57,8 +57,6 @@ const ProfessorReclamations = () => {
   };
 
   const handleBack = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
     navigate('/GESENS');
   };
 

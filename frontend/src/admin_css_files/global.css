@@ -7,18 +7,36 @@ body {
   color: #021024;
   overflow-x: hidden;
   position: relative;
-  min-height: 100vh;
+  min-height: 100vh ;
 }
-  :root {
-    --primary: #021024;    /* Bleu très foncé */
-    --secondary: #052659;  /* Bleu foncé */
-    --accent: #5483B3;     /* Bleu moyen */
-    --light-accent: #7DA0CA; /* Bleu clair */
-    --background: #C1E8FF; /* Fond bleu très clair */
-    --card-bg: #FFFFFF;    /* Blanc pour les cartes */
-    --text: #021024;       /* Texte principal */
-    --text-light: #7DA0CA; /* Texte clair */
-    --white: #FFFFFF;
+:root {
+  --primary: #021024; /* Bleu très foncé */
+  --secondary: #052659; /* Bleu foncé */
+  --accent: #5483b3; /* Bleu moyen */
+  --light-accent: #7da0ca; /* Bleu clair */
+  --background: #c1e8ff; /* Fond bleu très clair */
+  --card-bg: #ffffff; /* Blanc pour les cartes */
+  --text: #021024; /* Texte principal */
+  --text-light: #7da0ca; /* Texte clair */
+  --white: #ffffff;
+  --beige: #f5f5dc; /* Beige doux */
+
+  /* Couleur pour les séances supplémentaires - bleu-vert */
+  --supp-color: #3ea0cd; /* Bleu-vert (turquoise) */
+  --supp-color-dark: #7db9db; /* Version plus foncée */
+
+  /* Couleur pour les événements administratifs - orange */
+  --admin-color: #FF9A8B; /* Orange clair */
+  --admin-color-dark: #FF9A8B; /* Orange moyen */
+
+  /* Variables pour les ombres et les rayons de bordure */
+  --shadow-soft: 0 8px 30px rgba(2, 16, 36, 0.1);
+  --shadow-medium: 0 10px 25px rgba(2, 16, 36, 0.15);
+  --shadow-strong: 0 15px 35px rgba(2, 16, 36, 0.2);
+  --border-radius-sm: 8px;
+  --border-radius-md: 12px;
+  --border-radius-lg: 16px;
+  --transition-standard: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
  * {
     margin: 0;

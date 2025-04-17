@@ -48,12 +48,43 @@ const Enseignant = () => {
     };
 
     const items = [
-        { title: "Ressources", description: "Consulter et ajouter des ressources", route: "/ressources", icon: <FaBook /> },
-        { title: "Notes", description: "Consulter les notes des étudiants", route: "/notes", icon: <FaClipboardList /> },
-        { title: "Annonces", description: "Consulter les annonces", route: "/annoncesENS", icon: <FaBullhorn /> },
-        { title: "Emploi du Temps", description: "Consulter votre emploi du temps", route: "/ENSemploi", icon: <FaCalendar /> },
-        { title: "Liste des Étudiants", description: "Consulter les listes des étudiants", route: "/ENSlistetudiant", icon: <FaUsers /> },
-    ];
+        { 
+          title: "Ressources", 
+          description: "Consultez et enrichissez les ressources pédagogiques.", 
+          route: "/ressources", 
+          icon: <FaBook /> 
+        },
+        { 
+          title: "Notes", 
+          description: "Accédez et gérez les notes des étudiants.", 
+          route: "/notes", 
+          icon: <FaClipboardList /> 
+        },
+        { 
+          title: "Annonces", 
+          description: "Consultez les annonces et informations officielles.", 
+          route: "/annoncesENS", 
+          icon: <FaBullhorn /> 
+        },
+        { 
+          title: "Emploi du Temps", 
+          description: "Visualisez votre emploi du temps personnalisé.", 
+          route: "/ENSemploi", 
+          icon: <FaCalendar /> 
+        },
+        { 
+          title: "Liste des Étudiants", 
+          description: "Consultez les listes détaillées des étudiants.", 
+          route: "/ENSlistetudiant", 
+          icon: <FaUsers /> 
+        },
+        { 
+          title: "Séances Supplémentaires", 
+          description: "Planifiez et gérez les séances supplémentaires.", 
+          route: "/seanceSupp", 
+          icon: <FaCalendar /> 
+        }
+      ];
 
     const calendarDays = Array.from({ length: 30 }, (_, i) => i + 1); // Jours d'avril
     const currentDay = 5; // 5 avril 2025
@@ -66,30 +97,30 @@ const Enseignant = () => {
     };
 
     return (
-        <div className={`${styles.mainContainer} ${isLoaded ? styles.mainContainerLoaded : ''}`}>
+        <div className={`${styles['MAIN-mainContainer']} ${isLoaded ? styles['MAIN-mainContainerLoaded'] : ''}`}>
             {/* Sidebar */}
-            <div className={styles.sidebar}>
-                <div className={styles.sidebarMenu}>
-                    <button onClick={handleEditProfile} className={styles.sidebarItem}>
-                        <FaUser className={styles.sidebarIcon} />
+            <div className={styles['MAIN-sidebar']}>
+                <div className={styles['MAIN-sidebarMenu']}>
+                    <button onClick={handleEditProfile} className={styles['MAIN-sidebarItem']}>
+                        <FaUser className={styles['MAIN-sidebarIcon']} />
                     </button>
-                    <button onClick={handleMessages} className={styles.sidebarItem}>
-                        <FaEnvelope className={styles.sidebarIcon} />
+                    <button onClick={handleMessages} className={styles['MAIN-sidebarItem']}>
+                        <FaEnvelope className={styles['MAIN-sidebarIcon']} />
                     </button>
-                    <button onClick={handleNotificationClick} className={styles.sidebarItem}>
-                        <FaBell className={styles.sidebarIcon} />
+                    <button onClick={handleNotificationClick} className={styles['MAIN-sidebarItem']}>
+                        <FaBell className={styles['MAIN-sidebarIcon']} />
                     </button>
-                    <button onClick={handleLogout} className={styles.sidebarItem}>
-                        <FaSignOutAlt className={styles.sidebarIcon} />
+                    <button onClick={handleLogout} className={styles['MAIN-sidebarItem']}>
+                        <FaSignOutAlt className={styles['MAIN-sidebarIcon']} />
                     </button>
                 </div>
             </div>
 
             {/* Main Content */}
-            <div className={styles.mainContent}>
+            <div className={styles['MAIN-mainContent']}>
                 {/* Welcome Message */}
                 {showWelcome && user && (
-                    <div className={`${styles.welcomeMessage} ${isLoaded ? styles.welcomeMessageSlideIn : ''}`}>
+                    <div className={`${styles['MAIN-welcomeMessage']} ${isLoaded ? styles['MAIN-welcomeMessageSlideIn'] : ''}`}>
                         <h1>Bienvenue, {user.nom} {user.prenom} !</h1>
                         <p>Que souhaitez-vous faire aujourd'hui ?</p>
                     </div>
@@ -97,10 +128,10 @@ const Enseignant = () => {
 
                 {/* Notification Modal */}
                 {showNotificationModal && (
-                    <div className={`${styles.notificationModal} ${showNotificationModal ? styles.notificationModalActive : ''}`}>
-                        <div className={`${styles.notificationModalContent} ${showNotificationModal ? styles.notificationModalContentActive : ''}`}>
+                    <div className={`${styles['MAIN-notificationModal']} ${showNotificationModal ? styles['MAIN-notificationModalActive'] : ''}`}>
+                        <div className={`${styles['MAIN-notificationModalContent']} ${showNotificationModal ? styles['MAIN-notificationModalContentActive'] : ''}`}>
                             <button
-                                className={styles.closeModalBtn}
+                                className={styles['MAIN-closeModalBtn']}
                                 onClick={() => setShowNotificationModal(false)}
                             >
                                 X
@@ -111,38 +142,38 @@ const Enseignant = () => {
                 )}
 
                 {/* Main Layout */}
-                <div className={styles.mainLayout}>
+                <div className={styles['MAIN-mainLayout']}>
                     {/* Cards Section */}
-                    <div className={styles.cardsSection}>
-                        <div className={styles.cardsGrid}>
+                    <div className={styles['MAIN-cardsSection']}>
+                        <div className={styles['MAIN-cardsGrid']}>
                             {items.map((item, index) => (
-                                <div key={index} onClick={() => navigate(item.route)} className={styles.card}>
-                                    <div className={styles.cardIcon}>{item.icon}</div>
-                                    <div className={styles.cardContent}>
-                                        <h3 className={styles.cardTitle}>{item.title}</h3>
-                                        <p className={styles.cardDescription}>{item.description}</p>
+                                <div key={index} onClick={() => navigate(item.route)} className={styles['MAIN-card']}>
+                                    <div className={styles['MAIN-cardIcon']}>{item.icon}</div>
+                                    <div className={styles['MAIN-cardContent']}>
+                                        <h3 className={styles['MAIN-cardTitle']}>{item.title}</h3>
+                                        <p className={styles['MAIN-cardDescription']}>{item.description}</p>
                                     </div>
-                                    <FaChevronRight className={styles.cardArrow} />
+                                    <FaChevronRight className={styles['MAIN-cardArrow']} />
                                 </div>
                             ))}
                         </div>
                     </div>
 
                     {/* Right Column: Calendar and To-Do List */}
-                    <div className={styles.rightColumn}>
+                    <div className={styles['MAIN-rightColumn']}>
                         {/* Calendar */}
-                        <div className={styles.calendarSection}>
+                        <div className={styles['MAIN-calendarSection']}>
                             <h3>Avril 2025</h3>
-                            <div className={styles.calendarGrid}>
+                            <div className={styles['MAIN-calendarGrid']}>
                                 {["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map((day, index) => (
-                                    <div key={index} className={styles.calendarDayHeader}>
+                                    <div key={index} className={styles['MAIN-calendarDayHeader']}>
                                         {day}
                                     </div>
                                 ))}
                                 {calendarDays.map((day, index) => (
                                     <div
                                         key={index}
-                                        className={`${styles.calendarDay} ${day === currentDay ? styles.currentDay : ''}`}
+                                        className={`${styles['MAIN-calendarDay']} ${day === currentDay ? styles['MAIN-currentDay'] : ''}`}
                                     >
                                         {day}
                                     </div>
@@ -151,10 +182,10 @@ const Enseignant = () => {
                         </div>
 
                         {/* To-Do List */}
-                        <div className={styles.todoSection}>
+                        <div className={styles['MAIN-todoSection']}>
                             <h3>Tâches d'aujourd'hui</h3>
-                            <div className={styles.todoList}>
-                                <div className={styles.todoInput}>
+                            <div className={styles['MAIN-todoList']}>
+                                <div className={styles['MAIN-todoInput']}>
                                     <input
                                         type="text"
                                         value={newTask}
@@ -166,12 +197,12 @@ const Enseignant = () => {
                                     </button>
                                 </div>
                                 {todoList.map((item, index) => (
-                                    <div key={index} className={styles.todoItem}>
-                                        <div className={styles.todoDetails}>
+                                    <div key={index} className={styles['MAIN-todoItem']}>
+                                        <div className={styles['MAIN-todoDetails']}>
                                             <p>{item.task}</p>
-                                            <div className={styles.todoProgress}>
+                                            <div className={styles['MAIN-todoProgress']}>
                                                 <div
-                                                    className={styles.progressBar}
+                                                    className={styles['MAIN-progressBar']}
                                                     style={{ width: `${item.progress}%` }}
                                                 ></div>
                                             </div>
