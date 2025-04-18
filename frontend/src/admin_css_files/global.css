@@ -1,14 +1,3 @@
-body {
-  font-family: "Poppins", sans-serif;
-  background: linear-gradient(135deg, #ffffff 0%, #86b4ec 50%, #082e54 100%);
-  background-attachment: fixed;
-  margin: 0;
-  padding: 0;
-  color: #021024;
-  overflow-x: hidden;
-  position: relative;
-  min-height: 900vh ;
-}
 :root {
   --primary: #021024; /* Bleu très foncé */
   --secondary: #052659; /* Bleu foncé */
@@ -38,6 +27,18 @@ body {
   --border-radius-lg: 16px;
   --transition-standard: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* Fond global avec une dégradation de bleu clair (pas trop foncé) */
+body {
+  background: linear-gradient(135deg, var(--white) 0%, var(--light-accent) 50%, var(--background) 100%) !important;
+  background-attachment: fixed;
+  color: var(--text);
+  font-family: "Poppins", sans-serif;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
  * {
     margin: 0;
     padding: 0;

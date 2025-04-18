@@ -5,6 +5,8 @@ import axios from "axios"
 import { format, addMonths, subMonths, addDays, subDays } from "date-fns"
 import { fr } from "date-fns/locale"
 import { CalendarIcon, Clock, Edit, Trash, X, Home, ChevronLeft, ChevronRight } from "lucide-react"
+import { useNavigate } from "react-router-dom"
+import { FaHome } from "react-icons/fa"
 import SmallCalendar from "./SmallCalendar.jsx"
 import EventModal from "./EventModal.jsx"
 import styles from "./calendar.module.css"
@@ -16,22 +18,33 @@ function Calendar() {
   const [showModal, setShowModal] = useState(false)
   const [selectedTime, setSelectedTime] = useState(null)
   const [showEventDetails, setShowEventDetails] = useState(null)
+  const [editEvent, setEditEvent] = useState(null)
+  const navigate = useNavigate()
 
   const token = localStorage.getItem("token")
   const role = localStorage.getItem("role")
+
+  const timeSlots = [
+    "08:00 - 09:30",
+    "09:40 - 11:10",
+    "11:20 - 12:50",
+    "13:00 - 14:30",
+    "14:40 - 16:10",
+    "16:20 - 17:50",
+  ]
 
   const fetchEvents = async (date) => {
     try {
       const response = await axios.get(`http://localhost:8083/calendar/${format(date, "yyyy-MM-dd")}`, {
         headers: { Authorization: `Bearer ${token}` },
-      });
-      console.log("Événements récupérés:", response.data);
+      })
+      console.log("Événements récupérés:", response.data)
       response.data.forEach((event) => {
-        console.log(`Événement: ${event.title}, Type: ${event.type}`);
-      });
-      setEvents(response.data);
+        console.log(`Événement: ${event.title}, Type: ${event.type}, ID: ${event.ID_event}, Time_slot: ${event.time_slot}`)
+      })
+      setEvents(response.data)
     } catch (error) {
-      console.error("Erreur lors de la récupération des événements:", error);
+      console.error("Erreur lors de la récupération des événements:", error)
     }
   }
 
@@ -45,11 +58,14 @@ function Calendar() {
   }
 
   const handleCellClick = (time) => {
+    console.log("Cellule cliquée, time:", time)
     setSelectedTime(time)
+    setEditEvent(null)
     setShowModal(true)
   }
 
   const handleEventClick = (event) => {
+    console.log("Événement cliqué:", event)
     setShowEventDetails(event)
   }
 
@@ -63,46 +79,38 @@ function Calendar() {
     setCurrentDate(newDate)
   }
 
-  const timeSlots = [
-    "08:00 - 09:30",
-    "09:40 - 11:10",
-    "11:20 - 12:50",
-    "13:00 - 14:30",
-    "14:40 - 16:10",
-    "16:20 - 17:50",
-  ]
-
   const dayName = format(selectedDate, "EEEE", { locale: fr })
 
   return (
     <div className={styles['CLD-calendar-container']}>
-      <a href="#" className={styles['CLD-home-link']}>
-        <Home className={styles['CLD-icon']} size={16} />
-        Retour à l'accueil
-      </a>
+      <button className={styles['CLD-home-link']} onClick={() => navigate("/etudiant")}>
+          <FaHome /> Retour à l'accueil
+        </button>
 
       <div className={styles['CLD-title-container']}>
         <h1 className={styles['CLD-main-title']}>
           <CalendarIcon className={styles['CLD-icon']} size={28} />
           Mon Calendrier
         </h1>
-        <p className={styles['CLD-subtitle']}>Bienvenue sur votre calendrier, que vous avez comme plan pour aujourd'hui?</p>
+        <p className={styles['CLD-subtitle']}>
+          Bienvenue sur votre calendrier, que vous avez comme plan pour aujourd'hui?
+        </p>
       </div>
 
       <div className={styles['CLD-calendar-body']}>
         <div className={styles['CLD-daily-view-header']}>
-          <button className={`${styles['CLD-nav-btn']} ${styles['CLD-icon-btn']}`} onClick={() => handleDayChange("prev")}>
-          {"<"}
+          <button className={styles['CLD-prev-day']} onClick={() => handleDayChange("prev")}>
+            {"<"}
           </button>
           <div className={styles['CLD-date-title-container']}>
             <h2>
-              <CalendarIcon className={styles['CLD-icon']} size={22} />
+            <CalendarIcon className="CLD-icon" size={22} />
               {format(selectedDate, "d MMMM yyyy", { locale: fr })}
             </h2>
             <p className={styles['CLD-day-name']}>{dayName}</p>
           </div>
-          <button className={`${styles['CLD-nav-btn']} ${styles['CLD-icon-btn']}`} onClick={() => handleDayChange("next")}>
-          {">"}
+          <button className={styles['CLD-next-day']} onClick={() => handleDayChange("next")}>
+            {">"}
           </button>
         </div>
 
@@ -134,8 +142,8 @@ function Calendar() {
                                 : ""
                             }`}
                             onClick={(e) => {
-                              e.stopPropagation();
-                              handleEventClick(event);
+                              e.stopPropagation()
+                              handleEventClick(event)
                             }}
                           >
                             <span>{event.title}</span>
@@ -173,7 +181,12 @@ function Calendar() {
         <EventModal
           time={selectedTime}
           date={selectedDate}
-          onClose={() => setShowModal(false)}
+          event={editEvent}
+          timeSlots={timeSlots}
+          onClose={() => {
+            setShowModal(false)
+            setEditEvent(null)
+          }}
           onSave={() => fetchEvents(selectedDate)}
           role={role}
         />
@@ -185,28 +198,27 @@ function Calendar() {
             <p>{showEventDetails.content}</p>
             {showEventDetails.canDelete && (
               <button
-                className={`${styles['CLD-action-btn']} ${styles['CLD-icon-btn']}`}
                 onClick={async () => {
                   try {
                     if (showEventDetails.type === "personal" || showEventDetails.type === "administratif") {
                       await axios.delete(`http://localhost:8083/calendar/event/${showEventDetails.ID_event}`, {
                         headers: { Authorization: `Bearer ${token}` },
-                      });
+                      })
                     } else if (showEventDetails.type === "supp_session") {
                       await axios.delete(
                         `http://localhost:8083/calendar/supp-session/${showEventDetails.ID_seance_supp}`,
                         { headers: { Authorization: `Bearer ${token}` } },
-                      );
+                      )
                     } else if (showEventDetails.type === "club_event") {
                       await axios.delete(
                         `http://localhost:8083/calendar/club-event/${showEventDetails.ID_club_evenement}`,
                         { headers: { Authorization: `Bearer ${token}` } },
-                      );
+                      )
                     }
-                    fetchEvents(selectedDate);
-                    setShowEventDetails(null);
+                    fetchEvents(selectedDate)
+                    setShowEventDetails(null)
                   } catch (error) {
-                    alert("Erreur lors de la suppression");
+                    alert("Erreur lors de la suppression")
                   }
                 }}
               >
@@ -216,21 +228,19 @@ function Calendar() {
             )}
             {showEventDetails.canEdit && (
               <button
-                className={`${styles['CLD-action-btn']} ${styles['CLD-icon-btn']}`}
                 onClick={() => {
-                  setSelectedTime(showEventDetails.time_slot);
-                  setShowModal(true);
-                  setShowEventDetails(null);
+                  console.log("Préparation modification, événement:", showEventDetails)
+                  setEditEvent(showEventDetails)
+                  setSelectedTime(showEventDetails.time_slot || timeSlots[0])
+                  setShowModal(true)
+                  setShowEventDetails(null)
                 }}
               >
                 <Edit className={styles['CLD-icon']} size={16} />
                 Modifier
               </button>
             )}
-            <button
-              className={`${styles['CLD-action-btn']} ${styles['CLD-icon-btn']}`}
-              onClick={() => setShowEventDetails(null)}
-            >
+            <button onClick={() => setShowEventDetails(null)}>
               <X className={styles['CLD-icon']} size={16} />
               Fermer
             </button>

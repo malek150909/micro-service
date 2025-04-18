@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from "react"
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, subDays, addDays } from "date-fns"
+import axios from "axios"
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react"
 import styles from "./calendar.module.css"
 
 function SmallCalendar({ currentDate, onDateClick, onMonthChange }) {
   const [monthDays, setMonthDays] = useState([])
   const [daysWithEvents, setDaysWithEvents] = useState([])
-  const storedUser = JSON.parse(localStorage.getItem("user"))
-  const matricule = storedUser?.Matricule
+  const token = localStorage.getItem("token")
 
   useEffect(() => {
     const start = startOfMonth(currentDate)
@@ -26,31 +26,18 @@ function SmallCalendar({ currentDate, onDateClick, onMonthChange }) {
 
     const fetchEventsForMonth = async () => {
       try {
-        const token = localStorage.getItem('token')
-        if (!token) {
-          throw new Error('Aucun token trouvé')
-        }
-
         const startDate = format(start, "yyyy-MM-dd")
         const endDate = format(end, "yyyy-MM-dd")
-        const response = await fetch(`http://localhost:8083/calendar/${startDate}/${endDate}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
+        const response = await axios.get(`http://localhost:8083/calendar/${startDate}/${endDate}`, {
+          headers: { Authorization: `Bearer ${token}` },
         })
+        console.log("Événements du mois récupérés:", response.data)
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-
-        const data = await response.json()
-        console.log("Événements du mois récupérés:", data)
-
-        const eventDays = data
+        const eventDays = response.data
           .map((event) => {
             let eventDate = null
 
+            // Événements personnels et administratifs (tous deux dans CalendarEvent)
             if ((event.type === "personal" || event.type === "administratif") && event.event_date) {
               if (typeof event.event_date === "string") {
                 eventDate = event.event_date.includes(" ")
@@ -63,6 +50,7 @@ function SmallCalendar({ currentDate, onDateClick, onMonthChange }) {
               return eventDate
             }
 
+            // Séances supplémentaires
             if (event.type === "supp_session" && event.date_seance) {
               if (typeof event.date_seance === "string") {
                 eventDate = event.date_seance.includes(" ")
@@ -75,6 +63,7 @@ function SmallCalendar({ currentDate, onDateClick, onMonthChange }) {
               return eventDate
             }
 
+            // Événements de club
             if (event.type === "club_event" && event.date_evenement) {
               eventDate = format(new Date(event.date_evenement), "yyyy-MM-dd")
               console.log(`Événement de club détecté: ${eventDate} (brut: ${event.date_evenement})`)
@@ -95,20 +84,20 @@ function SmallCalendar({ currentDate, onDateClick, onMonthChange }) {
     }
 
     fetchEventsForMonth()
-  }, [currentDate, matricule])
+  }, [currentDate])
 
   return (
     <div className={styles['CLD-small-calendar']}>
       <div className={styles['CLD-calendar-header']}>
-        <button className={styles['CLD-nav-btn']} onClick={() => onMonthChange("prev")}>
-          {"<"} {/* Remplacement temporaire de l'icône par du texte */}
+        <button onClick={() => onMonthChange("prev")}>
+          {"<"}
         </button>
         <h3>
           <Calendar className={styles['CLD-icon']} size={18} />
           {format(currentDate, "MMMM yyyy")}
         </h3>
-        <button className={styles['CLD-nav-btn']} onClick={() => onMonthChange("next")}>
-          {">"} {/* Remplacement temporaire de l'icône par du texte */}
+        <button onClick={() => onMonthChange("next")}>
+          {">"}
         </button>
       </div>
       <div className={styles['CLD-days-header']}>
@@ -132,9 +121,7 @@ function SmallCalendar({ currentDate, onDateClick, onMonthChange }) {
           return (
             <div
               key={index}
-              className={`${styles['CLD-day']} ${
-                !isCurrentMonth ? styles['CLD-empty-day'] : ""
-              } ${isToday ? styles['CLD-today'] : ""} ${hasEvent ? styles['CLD-has-event'] : ""}`}
+              className={`${styles['CLD-day']} ${!isCurrentMonth ? styles['CLD-empty-day'] : ""} ${isToday ? styles['CLD-today'] : ""} ${hasEvent ? styles['CLD-has-event'] : ""}`}
               onClick={() => isCurrentMonth && onDateClick(day)}
             >
               {day.getDate()}

@@ -411,6 +411,57 @@ const Etudiant = () => {
                     </div>
                 )}
 
+                {/* Upcoming Events Section */}
+                <div className={styles['MAIN-eventsSection']}>
+                    <h3>Événements à venir</h3>
+                    <div className={styles['MAIN-eventsHorizontal']}>
+                        {upcomingEvents.length === 0 ? (
+                            <p className={styles['MAIN-noEvents']}>Aucun événement à venir.</p>
+                        ) : (
+                            upcomingEvents.map((event, index) => (
+                                <div
+                                    key={index}
+                                    className={styles['MAIN-eventCard']}
+                                    onClick={() => openEventDetailsModal(event)}
+                                >
+                                    <div className={styles['MAIN-eventCardIcon']}>
+                                        {getEventIcon(event.type)}
+                                    </div>
+                                    <div className={styles['MAIN-eventCardContent']}>
+                                        <h4 className={styles['MAIN-eventCardTitle']}>{event.title}</h4>
+                                        <p className={styles['MAIN-eventCardDate']}>
+                                            {new Date(
+                                                event.event_date || event.date_seance || event.date_evenement
+                                            ).toLocaleDateString("fr-FR", {
+                                                day: "numeric",
+                                                month: "long",
+                                                year: "numeric",
+                                            })}
+                                        </p>
+                                        <p className={styles['MAIN-eventCardTime']}>{event.time_slot}</p>
+                                        <p className={styles['MAIN-eventCardType']}>
+                                            {event.type === "personal"
+                                                ? "Personnel"
+                                                : event.type === "administratif"
+                                                ? "Administratif"
+                                                : event.type === "supp_session"
+                                                ? "Séance supplémentaire"
+                                                : "Événement de club"}
+                                        </p>
+                                    </div>
+                                    <FaChevronRight className={styles['MAIN-eventCardArrow']} />
+                                </div>
+                            ))
+                        )}
+                    </div>
+                    <button
+                        onClick={() => navigate("/calendar")}
+                        className={styles['MAIN-seeMoreButton']}
+                    >
+                        Voir plus
+                    </button>
+                </div>
+
                 {/* Main Layout */}
                 <div className={styles['MAIN-mainLayout']}>
                     {/* Cards Section */}
@@ -429,75 +480,35 @@ const Etudiant = () => {
                         </div>
                     </div>
 
-                    {/* Right Column: Upcoming Events and Notes */}
+                    {/* Right Column: Notes */}
                     <div className={styles['MAIN-rightColumn']}>
-                        {/* Upcoming Events Section */}
-                        <div className={styles['MAIN-eventsSection']}>
-                            <h3>Événements à venir</h3>
-                            <div className={styles['MAIN-eventsList']}>
-                                {upcomingEvents.length === 0 ? (
-                                    <p>Aucun événement à venir.</p>
-                                ) : (
-                                    upcomingEvents.map((event, index) => (
-                                        <div
-                                            key={index}
-                                            className={styles['MAIN-eventItem']}
-                                            onClick={() => openEventDetailsModal(event)}
-                                        >
-                                            <div className={styles['MAIN-eventIcon']}>
-                                                {getEventIcon(event.type)}
-                                            </div>
-                                            <div className={styles['MAIN-eventContent']}>
-                                                <p className={styles['MAIN-eventTitle']}>{event.title}</p>
-                                                <p className={styles['MAIN-eventDetails']}>
-                                                    {new Date(
-                                                        event.event_date || event.date_seance || event.date_evenement
-                                                    ).toLocaleDateString("fr-FR", {
-                                                        day: "numeric",
-                                                        month: "long",
-                                                        year: "numeric",
-                                                    })}
-                                                </p>
-                                                <p className={styles['MAIN-eventDetails']}>{event.time_slot}</p>
-                                            </div>
-                                        </div>
-                                    ))
-                                )}
-                                <button
-                                    onClick={() => navigate("/calendar")}
-                                    className={styles['MAIN-seeMoreButton']}
-                                >
-                                    Voir plus
-                                </button>
-                            </div>
-                        </div>
-
                         {/* Notes Section */}
                         <div className={styles['MAIN-notesSection']}>
                             <h3>Dernières Notes</h3>
-                            <div className={styles['MAIN-notesList']}>
+                            <div className={styles['MAIN-notesGrid']}>
                                 <button onClick={openAddNoteModal} className={styles['MAIN-addButton']}>
                                     Ajouter
                                 </button>
                                 {notes.length === 0 ? (
-                                    <p>Aucune note récente.</p>
+                                    <p className={styles['MAIN-noNotes']}>Aucune note récente.</p>
                                 ) : (
                                     notes.map((note, index) => (
                                         <div
                                             key={index}
-                                            className={`${styles['MAIN-noteItem']} ${index % 2 === 0 ? styles['MAIN-rotatePositive'] : styles['MAIN-rotateNegative']}`}
+                                            className={styles['MAIN-noteCard']}
                                             onClick={() => openDetailsModal(note)}
                                         >
-                                            <div className={styles['MAIN-noteContent']}>
-                                                <p className={styles['MAIN-noteTitle']}>{note.title}</p>
-                                                <p className={styles['MAIN-noteSnippet']}>
+                                            <div className={styles['MAIN-noteCardContent']}>
+                                                <h4 className={styles['MAIN-noteCardTitle']}>{note.title}</h4>
+                                                <p className={styles['MAIN-noteCardSnippet']}>
                                                     {note.content.substring(0, 50) +
                                                         (note.content.length > 50 ? "..." : "")}
                                                 </p>
-                                                <p className={styles['MAIN-noteDate']}>
-                                                    {new Date(note.updated_at || note.created_at).toLocaleString()}
+                                                <p className={styles['MAIN-noteCardDate']}>
+                                                    {new Date(note.updated_at || note.created_at).toLocaleDateString()}
                                                 </p>
                                             </div>
+                                            <FaChevronRight className={styles['MAIN-noteCardArrow']} />
                                         </div>
                                     ))
                                 )}
