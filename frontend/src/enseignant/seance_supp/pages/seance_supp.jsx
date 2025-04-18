@@ -74,7 +74,7 @@ function Dashboard() {
         </div>
         <button className={styles['ENS-SUPP-sidebar-button']} onClick={handleHomeClick}>
           <FaHome className={styles['ENS-SUPP-sidebar-icon']} />
-          Retourner à l'Accueil
+          Retour à l'accueil
         </button>
       </aside>
       <main className={styles['ENS-SUPP-main-content']}>

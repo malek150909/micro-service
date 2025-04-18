@@ -161,7 +161,7 @@ const TeacherDashboard = () => {
           className={`${styles['ENS-ETD-sidebar-button']} `}
           onClick={handleLogout}
         >
-          <FaHome className={styles['ENS-ETD-sidebar-icon']} /> Retour
+          <FaHome className={styles['ENS-ETD-sidebar-icon']} /> Retour a l'accueil
         </button>
       </div>
 

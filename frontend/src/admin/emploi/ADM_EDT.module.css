@@ -39,7 +39,7 @@
 
 /* Sidebar */
 .ADM-EDT-sidebar {
-  background: linear-gradient(135deg, rgba(91, 135, 179, 0.95) 0%, rgba(17, 69, 148, 0.95) 100%);
+  background: linear-gradient(135deg,  #3a6a9e 30%, #082e54 100%);
   border-radius: 0;
   padding: 25px;
   color: #ffffff;
@@ -562,19 +562,23 @@
 }
 
 .ADM-EDT-timetable-btn.ADM-EDT-export-pdf {
-  background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+  background: linear-gradient(135deg, #5483b3 0%, #052659 100%);
 }
 
 .ADM-EDT-timetable-btn.ADM-EDT-export-pdf:hover {
-  background: linear-gradient(135deg, #cc0000 0%, #ff4444 100%);
+  background: linear-gradient(135deg, #5483b3 0%, #052659 100%);
+  box-shadow: 0 12px 25px rgba(5, 38, 89, 0.15), 0 0 15px rgba(125, 160, 202, 0.4);
+
 }
 
 .ADM-EDT-timetable-btn.ADM-EDT-export-excel {
-  background: linear-gradient(135deg, #00cc00 0%, #009900 100%);
+  background: linear-gradient(135deg, #5483b3 0%, #052659 100%);
 }
 
 .ADM-EDT-timetable-btn.ADM-EDT-export-excel:hover {
-  background: linear-gradient(135deg, #009900 0%, #00cc00 100%);
+  background: linear-gradient(135deg, #5483b3 0%, #052659 100%);
+  box-shadow: 0 12px 25px rgba(5, 38, 89, 0.15), 0 0 15px rgba(125, 160, 202, 0.4);
+
 }
 
 .ADM-EDT-timetable-filter-btn.ADM-EDT-generate-btn {

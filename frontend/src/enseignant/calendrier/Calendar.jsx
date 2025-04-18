@@ -19,7 +19,7 @@ function Calendar() {
   const [selectedTime, setSelectedTime] = useState(null)
   const [showEventDetails, setShowEventDetails] = useState(null)
   const [editEvent, setEditEvent] = useState(null)
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const token = localStorage.getItem("token")
   const role = localStorage.getItem("role")
@@ -83,9 +83,9 @@ function Calendar() {
 
   return (
     <div className={styles['CLD-calendar-container']}>
-      <button className={styles['CLD-home-link']} onClick={() => navigate("/etudiant")}>
-          <FaHome /> Retour à l'accueil
-        </button>
+      <button className={styles['CLD-home-link']} onClick={() => navigate("/enseignant")}>
+                <FaHome /> Retour à l'accueil
+      </button>
 
       <div className={styles['CLD-title-container']}>
         <h1 className={styles['CLD-main-title']}>

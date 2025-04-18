@@ -48,7 +48,7 @@
 
 /* Sidebar */
 .ADM-ANC-sidebar {
-  background: linear-gradient(135deg, rgba(91, 135, 179, 0.95) 0%, rgba(17, 69, 148, 0.95) 100%);
+  background: linear-gradient(135deg,  #3a6a9e 30%, #082e54 100%);
   border-radius: 0;
   padding: 25px;
   color: #ffffff;
@@ -67,6 +67,15 @@
   animation: ADM-ENS-slideIn 0.5s ease-out;
   overflow-y: auto;
   padding-bottom: 40px;
+}
+
+@keyframes ADM-ENS-slideIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
 }
 
 .ADM-ANC-logo {

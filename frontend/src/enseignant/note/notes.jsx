@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaPlus, FaEdit, FaTrash, FaEye, FaTimes, FaHome, FaUser } from "react-icons/fa";
+import { FaPlus, FaEdit, FaTrash, FaEye, FaTimes, FaHome } from "react-icons/fa";
 import styles from "./notes.module.css";
 
 const NotesFeed = () => {
@@ -25,7 +25,7 @@ const NotesFeed = () => {
 
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
-        if (!storedUser || storedUser.role !== "etudiant") {
+        if (!storedUser || storedUser.role !== "enseignant") {
             navigate("/");
         } else {
             console.log("User loaded:", storedUser);
@@ -37,7 +37,7 @@ const NotesFeed = () => {
     const fetchNotes = async (matricule) => {
         try {
             const response = await fetch(`${API_URL}/notes/${matricule}`);
-            if (!response.ok) throw new Error("Erreur lors du chargement des notes.");
+            if (!response.ok) throw new Error(`Erreur lors du chargement des notes: ${response.statusText}`);
             const data = await response.json();
             console.log("Fetched notes:", data);
             setNotes(Array.isArray(data) ? data : []);
@@ -47,24 +47,39 @@ const NotesFeed = () => {
     };
 
     const addNote = async () => {
-        if (!newNoteTitle.trim() || !newNoteContent.trim()) return;
+        if (!newNoteTitle.trim() || !newNoteContent.trim()) {
+            setMessageModalContent({ type: "error", text: "Le titre et le contenu ne peuvent pas être vides." });
+            setShowMessageModal(true);
+            return;
+        }
         try {
+            const token = localStorage.getItem("token");
             const response = await fetch(`${API_URL}/notes`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
                 body: JSON.stringify({
                     matricule: user.Matricule,
                     title: newNoteTitle,
                     content: newNoteContent,
                 }),
             });
-            if (!response.ok) throw new Error("Erreur lors de l’ajout de la note.");
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Erreur lors de l’ajout de la note: ${response.status} ${response.statusText} - ${errorText}`);
+            }
             setNewNoteTitle("");
             setNewNoteContent("");
             setShowAddModal(false);
             fetchNotes(user.Matricule);
+            setMessageModalContent({ type: "success", text: "Note ajoutée avec succès !" });
+            setShowMessageModal(true);
         } catch (err) {
             console.error("Erreur lors de l’ajout de la note :", err.message);
+            setMessageModalContent({ type: "error", text: `Erreur lors de l’ajout de la note : ${err.message}` });
+            setShowMessageModal(true);
         }
     };
 
@@ -137,7 +152,8 @@ const NotesFeed = () => {
         const noteId = note.ID_note || note.id;
         if (!noteId) {
             console.error("Note ID is missing in note object:", note);
-            alert("Erreur : Impossible de modifier la note car l'ID est manquant.");
+            setMessageModalContent({ type: "error", text: "Erreur : Impossible de modifier la note car l'ID est manquant." });
+            setShowMessageModal(true);
             return;
         }
         setEditNoteId(noteId);
@@ -173,7 +189,7 @@ const NotesFeed = () => {
     };
 
     const handleBack = () => {
-        navigate("/etudiant");
+        navigate("/enseignant");
     };
 
     const openDeleteConfirmModal = (id) => {
@@ -209,7 +225,7 @@ const NotesFeed = () => {
             <div className={styles['NOTE-sidebar']}>
                 <div className={styles['NOTE-logo']}>
                     <h2>
-                        Mes Notes
+                        Notes des Enseignant
                     </h2>
                 </div>
                 <button className={styles['NOTE-sidebarButton']} onClick={handleBack}>
@@ -219,8 +235,8 @@ const NotesFeed = () => {
 
             <div className={styles['NOTE-mainContent']}>
                 <div className={styles['NOTE-header']}>
-                    <h1>Mes Notes</h1>
-                    <p>Gérez vos notes personnelles ici</p>
+                    <h1>Notes des Enseignant</h1>
+                    <p>Gérez vos Notes ici</p>
                 </div>
 
                 <button onClick={() => setShowAddModal(true)} className={styles['NOTE-addButton']}>

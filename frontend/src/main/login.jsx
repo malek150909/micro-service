@@ -1,101 +1,124 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { FaUser, FaLock } from "react-icons/fa";
-import "../admin_css_files/LoginPage.css";
+import { useState } from "react"
+import { useNavigate } from "react-router-dom"
+import { FaUser, FaLock } from "react-icons/fa"
+import styles from "../admin_css_files/LoginPage.module.css"
 
 const Login = () => {
-  const [matricule, setMatricule] = useState("");
-  const [password, setPassword] = useState("");
-  const navigate = useNavigate();
+  const [matricule, setMatricule] = useState("")
+  const [password, setPassword] = useState("")
+  const [errors, setErrors] = useState({ matricule: "", password: "", general: "" })
+  const [isTransitioning, setIsTransitioning] = useState(false)
+  const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
+    let hasError = false
+    const newErrors = { matricule: "", password: "", general: "" }
+
+    if (!matricule) {
+      newErrors.matricule = "Veuillez entrer votre matricule"
+      hasError = true
+    }
+    if (!password) {
+      newErrors.password = "Veuillez entrer votre mot de passe"
+      hasError = true
+    }
+
+    setErrors(newErrors)
+
+    if (hasError) return
+
+    setIsTransitioning(true)
 
     try {
       const response = await fetch("http://localhost:8081/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ matricule, password }),
-      });
+      })
 
-      const data = await response.json();
+      const data = await response.json()
 
       if (response.ok) {
-        localStorage.setItem("user", JSON.stringify(data.user));
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("matricule", data.user.Matricule);
+        localStorage.setItem("user", JSON.stringify(data.user))
+        localStorage.setItem("token", data.token)
+        localStorage.setItem("matricule", data.user.Matricule)
 
-        if (data.user.role === "admin") navigate("/admin");
-        else if (data.user.role === "enseignant") navigate("/enseignant");
-        else if (data.user.role === "etudiant") navigate("/etudiant");
-        else {
-          console.error("Erreur : Votre rôle n'est pas reconnu.");
-        }
+        setTimeout(() => {
+          if (data.user.role === "admin") navigate("/admin")
+          else if (data.user.role === "enseignant") navigate("/enseignant")
+          else if (data.user.role === "etudiant") navigate("/etudiant")
+          else {
+            console.error("Erreur : Votre rôle n'est pas reconnu.")
+            setIsTransitioning(false)
+            setErrors({ ...newErrors, general: "Rôle non reconnu" })
+          }
+        }, 300)
       } else {
-        console.error(data.error || "Erreur : Matricule ou mot de passe incorrect.");
+        setIsTransitioning(false)
+        if (data.error.includes("matricule")) {
+          setErrors({ ...newErrors, matricule: "Matricule non trouvé" })
+        } else if (data.error.includes("mot de passe")) {
+          setErrors({ ...newErrors, password: "Mot de passe incorrect" })
+        } else {
+          setErrors({ ...newErrors, general: "Erreur de connexion. Vérifiez vos identifiants." })
+        }
       }
     } catch (error) {
-      console.error("Erreur:", error);
+      console.error("Erreur:", error)
+      setIsTransitioning(false)
+      setErrors({ ...newErrors, general: "Erreur serveur. Veuillez réessayer." })
     }
-  };
+  }
 
   return (
-    <div id="logins">
-      <div className="LOG-l-container">
-        {/* Image de fond avec overlay */}
-        <div className="LOG-background-section">
-          <div className="LOG-overlay"></div>
+    <div className={`${styles['LOG-login-page']} ${isTransitioning ? styles['LOG-fade-out'] : ""}`}>
+      <div className={styles['LOG-login-background']}></div>
+      <div className={styles['LOG-login-card']}>
+        <div className={styles['LOG-login-logo-section']}>
+          <img src="/usthb-logo.png" alt="USTHB Logo" className={styles['LOG-login-logo']} />
         </div>
-
-        {/* SVG pour la découpe en S avec dégradé (inversé) */}
-        <svg className="LOG-wave-divider" viewBox="0 0 100 100" preserveAspectRatio="none">
-          <defs>
-            <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" style={{ stopColor: "#5483b3", stopOpacity: 1 }} />
-              <stop offset="100%" style={{ stopColor: "#ffffff", stopOpacity: 1 }} />
-            </linearGradient>
-          </defs>
-          <path fill="url(#gradient)" d="M0,0 L50,0 C40,20 60,40 50,60 C40,80 60,100 50,100 L0,100 Z" />
-        </svg>
-
-        {/* Section du formulaire (déplacée à gauche) */}
-        <div className="LOG-form-section">
-          <div className="LOG-login-container">
-            <img src="/usthb-logo.png" alt="USTHB Logo" className="LOG-logo" />
-            <h2>USTHB</h2>
-            <p>Votre Portail Universitaire</p>
-            <form onSubmit={handleSubmit}>
-              <div className="LOG-input-group">
-                <FaUser className="LOG-input-icon" />
+        <div className={styles['LOG-login-form-section']}>
+          <h1 className={styles['LOG-login-title']}>Votre Portail Universitaire</h1>
+          <h2 className={styles['LOG-login-subtitle']}></h2>
+          {errors.general && <span className={`${styles['LOG-error-message']} ${styles['LOG-general-error']}`}>{errors.general}</span>}
+          <form onSubmit={handleSubmit} className={styles['LOG-login-form']}>
+            <div className={styles['LOG-login-input-group']}>
+              <div className={styles['LOG-input-with-icon']}>
+                <FaUser className={styles['LOG-login-input-icon']} />
                 <input
                   type="text"
-                  className="LOG-login-input"
+                  className={styles['LOG-login-input']}
                   value={matricule}
                   onChange={(e) => setMatricule(e.target.value)}
-                  required
-                  placeholder="Entrez votre matricule"
+                  placeholder="Matricule"
                 />
               </div>
-              <div className="LOG-input-group">
-                <FaLock className="LOG-input-icon" />
+              {errors.matricule && <span className={styles['LOG-error-message']}>{errors.matricule}</span>}
+            </div>
+            <div className={styles['LOG-login-input-group']}>
+              <div className={styles['LOG-input-with-icon']}>
+                <FaLock className={styles['LOG-login-input-icon']} />
                 <input
                   type="password"
-                  className="LOG-login-input"
+                  className={styles['LOG-login-input']}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  required
-                  placeholder="Entrez votre mot de passe"
+                  placeholder="Mot de passe"
                 />
               </div>
-              <button type="submit" className="LOG-login-btn">
-                Connexion
+              {errors.password && <span className={styles['LOG-error-message']}>{errors.password}</span>}
+            </div>
+            <div className={styles['LOG-login-actions']}>
+              <button type="submit" className={styles['LOG-login-button']} disabled={isTransitioning}>
+                Connecter
               </button>
-            </form>
-          </div>
+            </div>
+          </form>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Login;
+export default Login

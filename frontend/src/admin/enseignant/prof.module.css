@@ -285,7 +285,7 @@
 
 /* Sidebar */
 .ProfSidebar {
-  background: linear-gradient(135deg, rgba(91, 135, 179, 0.95) 0%, rgba(17, 69, 148, 0.95) 100%);
+  background: linear-gradient(135deg,  #3a6a9e 30%, #082e54 100%);
   padding: 25px;
   color: #ffffff;
   display: flex;

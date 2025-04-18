@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaHome, FaLock } from "react-icons/fa";
+import { FaHome, FaLock, FaUser } from "react-icons/fa";
 import "../admin_css_files/edit_profil.css";
 
 const EditProfile = () => {
@@ -116,7 +116,7 @@ const EditProfile = () => {
         <div id="edit-profil">
             <aside className="sidebar">
                 <div className="logo">
-                    <h2>👤 Profil</h2>
+                    <h2><FaUser/> Profil</h2>
                 </div>
                 <button className="sidebar-button" onClick={handleBack}>
                     <FaHome /> Retour à l'accueil

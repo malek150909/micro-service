@@ -30,10 +30,12 @@ import ProfessorReclamations from "./enseignant/notes/pages/ProfessorReclamation
 import StudentGrades from "./etudiant/notes/pages/StudentGrades";
 import ENSlistetudiant from "./enseignant/listetudiant/TeacherDashboard";
 import ETDressources from "./etudiant/ressource/StudentDashboard";
-import NotesFeed from "./etudiant/note/notes";
+import ETDNotesFeed from "./etudiant/note/notes";
+import ENSNotesFeed from "./enseignant/note/notes";
 import SeanceSupp from "./enseignant/seance_supp/pages/seance_supp";
 import StudentPlanning from "./etudiant/planning/StudentPlanning";
-import Calendar from "./etudiant/calendrier/calendar";
+import ETDCalendar from "./etudiant/calendrier/calendar";
+import ENSCalendar from "./enseignant/calendrier/Calendar";
 
 const PrivateRoute = ({ element }) => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -77,10 +79,12 @@ function App() {
                 <Route path="/ETDGRD" element={<StudentGrades />} />
                 <Route path="/ENSlistetudiant" element={<ENSlistetudiant />} />
                 <Route path="/ETDressources" element={<ETDressources />} />
-                <Route path="/notesFeed" element={<NotesFeed />} />
+                <Route path="/ETDnotesFeed" element={<ETDNotesFeed />} />
+                <Route path="/ENSnotesFeed" element={<ENSNotesFeed />} />
                 <Route path="/seanceSupp" element={<SeanceSupp />} />
                 <Route path="/studentPlanning" element={<StudentPlanning />} />
-                <Route path="/calendar" element={<Calendar />} />
+                <Route path="/ETDcalendar" element={<ETDCalendar />} />
+                <Route path="/ENScalendar" element={<ENSCalendar />} />
             </Routes>
         </Router>
     );

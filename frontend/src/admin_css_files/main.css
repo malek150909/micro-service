@@ -1,0 +1,927 @@
+.MAIN-mainContainer {
+    background: linear-gradient(180deg, #5483b3, #c1e8ff);
+    transition: opacity 0.8s ease-in-out, transform 0.8s ease-out;
+    min-height: 100vh;
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  
+  .MAIN-mainContainerLoaded {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .MAIN-sidebar {
+    width: 70px;
+    background: linear-gradient(180deg, #0c346b, #052659);
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    box-shadow: 5px 0 20px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 70vh;
+  }
+  
+  .MAIN-sidebarMenu {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    justify-content: center;
+    height: 100%;
+  }
+  
+  .MAIN-sidebarItem {
+    background: none;
+    border: none;
+    padding: 12px;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+  
+  .MAIN-sidebarItem::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+  
+  .MAIN-sidebarItem:hover::before {
+    opacity: 1;
+  }
+  
+  .MAIN-sidebarItem:hover {
+    transform: scale(1.1);
+  }
+  
+  .MAIN-sidebarIcon {
+    font-size: 1.2rem;
+    color: #ffffff;
+    z-index: 1;
+  }
+  
+  .MAIN-mainContent {
+    flex: 1;
+    padding: 30px;
+    margin-left: 70px;
+    position: relative;
+  }
+  
+  .MAIN-welcomeMessage {
+    margin-bottom: 20px;
+    transform: translateX(-50px);
+    opacity: 0;
+    transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  
+  .MAIN-welcomeMessageSlideIn {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  
+  .MAIN-welcomeMessage h1 {
+    font-size: 2rem;
+    font-family: poppins, sans-serif;
+    font-weight: 800;
+    color: #c1e8ff;
+    margin-bottom: 5px;
+    background: linear-gradient(90deg, #ffffff, #113150);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .MAIN-welcomeMessage p {
+    font-size: 1rem;
+    color: #c1e8ff;
+    font-weight: 400;
+  }
+  
+  .MAIN-mainLayout {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .MAIN-cardsSection {
+    flex: 3;
+  }
+  
+  .MAIN-cardsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 15px;
+  }
+  
+  .MAIN-card {
+    background: linear-gradient(145deg, #ffffff, #c1e8ff);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    border: 2px solid transparent;
+    animation: MAIN-scaleIn 0.5s ease-out forwards;
+    animation-play-state: paused;
+  }
+  
+  .MAIN-mainContainerLoaded .MAIN-card {
+    animation-play-state: running;
+    animation-delay: calc(var(--card-index, 0) * 0.1s);
+  }
+  
+  .MAIN-card:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    border-color: #5483b3;
+  }
+  
+  .MAIN-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(84, 131, 179, 0.1), rgba(2, 16, 36, 0.1));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .MAIN-card:hover::before {
+    opacity: 1;
+  }
+  
+  .MAIN-cardIcon {
+    position: absolute;
+    top: -25px;
+    left: 20px;
+    width: 40px;
+    height: 40px;
+    background: #092754;
+    border-radius: 30%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #ffffff;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  .MAIN-cardContent {
+    margin-top: 35px;
+  }
+  
+  .MAIN-cardTitle {
+    font-size: 1.3rem;
+    color: #021024;
+    margin-bottom: 5px;
+    font-weight: 900;
+  }
+  
+  .MAIN-cardDescription {
+    color: #052659;
+    font-size: 0.90rem;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+  
+  .MAIN-cardArrow {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #5483b3;
+    font-size: 1.2rem;
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+  
+  .MAIN-card:hover .MAIN-cardArrow {
+    opacity: 1;
+    right: 10px;
+  }
+  
+  .MAIN-rightColumn {
+    flex: 1;
+    max-width: 350px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .MAIN-calendarSection {
+    background: linear-gradient(145deg, #7da0ca, #c1e8ff);
+    padding: 15px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  }
+  
+  .MAIN-calendarSection h3 {
+    font-size: 1.2rem;
+    color: #021024;
+    margin-bottom: 10px;
+  }
+  
+  .MAIN-calendarGrid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    text-align: center;
+  }
+  
+  .MAIN-calendarDayHeader {
+    font-size: 0.75rem;
+    color: #021024;
+    font-weight: 600;
+    padding: 5px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+  }
+  
+  .MAIN-calendarDay {
+    padding: 5px;
+    font-size: 0.9rem;
+    color: #021024;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    transition: background 0.3s ease;
+  }
+  
+  .MAIN-calendarDay:hover {
+    background: #5483b3;
+    color: #ffffff;
+  }
+  
+  .MAIN-currentDay {
+    background: #5483b3;
+    color: #ffffff;
+    border: 2px solid #021024;
+  }
+  
+  /* Events Section */
+  .MAIN-eventsSection {
+    animation: MAIN-slideInFromBottom 0.6s ease-out forwards;
+    animation-delay: 0.2s;
+    opacity: 0;
+  }
+  
+  .MAIN-eventsSection h3 {
+    font-size: 1.6rem;
+    color: #021024;
+    margin-bottom: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "popping", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+      "Helvetica Neue", sans-serif;
+    font-weight: 700;
+    background: linear-gradient(90deg, #5483b3, #021024);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .MAIN-eventsHorizontal {
+    display: flex;
+    overflow-x: auto;
+    gap: 15px;
+    padding-bottom: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: #5483b3 #e6f0ff;
+  }
+  
+  .MAIN-eventsHorizontal::-webkit-scrollbar {
+    height: 8px;
+  }
+  
+  .MAIN-eventsHorizontal::-webkit-scrollbar-track {
+    background: #e6f0ff;
+    border-radius: 4px;
+  }
+  
+  .MAIN-eventsHorizontal::-webkit-scrollbar-thumb {
+    background: #5483b3;
+    border-radius: 4px;
+  }
+  
+  .MAIN-eventCard {
+    background: linear-gradient(145deg, #ffffff, #84aad3);
+    padding: 12px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #5483b3;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    min-width: 250px;
+    max-width: 280px;
+  }
+  
+  .MAIN-eventCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(84, 131, 179, 0.3);
+    background: linear-gradient(145deg, #e6f0ff, #ffffff);
+  }
+  
+  .MAIN-eventCard::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(84, 131, 179, 0.1), rgba(2, 16, 36, 0.1));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .MAIN-eventCard:hover::before {
+    opacity: 1;
+  }
+  
+  .MAIN-eventCardIcon {
+    width: 36px;
+    height: 36px;
+    background: #07244f;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    color: #ffffff;
+    flex-shrink: 0;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  }
+  
+  .MAIN-eventCardContent {
+    flex: 1;
+    font-family: -apple-system, BlinkMacSystemFont, "popping", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+      "Helvetica Neue", sans-serif;
+  }
+  
+  .MAIN-eventCardTitle {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0 0 4px;
+    color: #021024;
+  }
+  
+  .MAIN-eventCardDate {
+    font-size: 0.85rem;
+    color: #052659;
+    margin: 0;
+  }
+  
+  .MAIN-eventCardTime {
+    font-size: 0.8rem;
+    color: #666;
+    margin: 2px 0;
+  }
+  
+  .MAIN-eventCardType {
+    font-size: 0.8rem;
+    color: #5483b3;
+    font-weight: 600;
+    margin: 2px 0;
+  }
+  
+  .MAIN-eventCardArrow {
+    color: #12406e;
+    font-size: 1.1rem;
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+  
+  .MAIN-eventCard:hover .MAIN-eventCardArrow {
+    opacity: 1;
+    transform: translateX(5px);
+  }
+  
+  .MAIN-noEvents {
+    font-size: 0.9rem;
+    color: #666;
+    text-align: center;
+    padding: 10px;
+    width: 100%;
+  }
+  
+  /* Notes Section */
+  .MAIN-notesSection {
+    animation: MAIN-slideInFromRight 0.6s ease-out forwards;
+    animation-delay: 0.4s;
+    opacity: 0;
+  }
+  
+  .MAIN-notesSection h3 {
+    font-size: 1.4rem;
+    color: #082245;
+    margin-bottom: 15px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+      "Helvetica Neue", sans-serif;
+    font-weight: 700;
+    background: linear-gradient(90deg, #5483b3, #021024);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .MAIN-notesGrid {
+    display: grid;
+    gap: 15px;
+  }
+  
+  .MAIN-addButton {
+    background: linear-gradient(135deg, #082247, #0e356e);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 12px;
+    color: #ffffff;
+    cursor: pointer;
+    margin-bottom: 15px;
+    align-self: flex-start;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  
+  .MAIN-addButton:hover {
+    background: linear-gradient(135deg, #052659, #021024);
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  .MAIN-noteCard {
+    background: linear-gradient(145deg, #e3dcc6, #e1dfd3); /* Fond beige conservé */
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ffeb3b; /* Bordure jaune conservée */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .MAIN-noteCard::before {
+    content: "• • • • • • • • •";
+    position: absolute;
+    top: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fff; /* Cercles blancs pour les perforations */
+    font-size: 0.8rem;
+    letter-spacing: 4px;
+    z-index: 2;
+  }
+  
+  .MAIN-noteCard::after {
+    content: "";
+    position: absolute;
+    top: -5px;
+    left: 0;
+    width: 100%;
+    height: 10px;
+    background: linear-gradient(145deg, #e3dcc6, #e1dfd3); /* Même fond beige */
+    border-bottom: 1px dashed #ccc; /* Bord en pointillés pour l'effet perforé */
+    z-index: 1;
+  }
+  
+  .MAIN-noteCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  }
+  
+  .MAIN-noteCardContent {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+      "Helvetica Neue", sans-serif;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .MAIN-noteCardTitle {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0;
+    color: #021024;
+  }
+  
+  .MAIN-noteCardSnippet {
+    font-size: 0.9rem;
+    color: #052659;
+    margin: 0;
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  
+  .MAIN-noteCardDate {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: auto;
+  }
+  
+  .MAIN-noteCardArrow {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #5483b3;
+    font-size: 1.2rem;
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+  
+  .MAIN-noteCard:hover .MAIN-noteCardArrow {
+    opacity: 1;
+    transform: translateY(-50%) translateX(5px);
+  }
+  
+  .MAIN-noNotes {
+    font-size: 0.9rem;
+    color: #666;
+    text-align: center;
+    padding: 10px;
+  }
+  
+  .MAIN-seeMoreButton {
+    background: linear-gradient(135deg, #021024, #052659);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 12px;
+    color: #ffffff;
+    cursor: pointer;
+    margin-top: 15px;
+    align-self: center;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  
+  .MAIN-seeMoreButton:hover {
+    background: linear-gradient(135deg, #052659, #021024);
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Modal Overlay */
+  .MAIN-modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(5, 38, 89, 0.5);
+    backdrop-filter: blur(8px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .MAIN-modalOverlayActive {
+    display: flex;
+    animation: MAIN-slideInFromTop 0.4s ease-out forwards;
+  }
+  
+  /* Fallback for centering if flex fails */
+  .MAIN-modalOverlay[data-modal] {
+    display: none;
+  }
+  
+  .MAIN-modalOverlayActive[data-modal] {
+    display: block;
+  }
+  
+  .MAIN-modalOverlayActive[data-modal] .MAIN-modalContent {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  
+  /* Modal Content Base Styles */
+  .MAIN-modalContent {
+    width: 100%;
+    max-width: 500px;
+    max-height: 80vh;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 15px 40px rgba(5, 38, 89, 0.2), 0 0 20px rgba(255, 255, 255, 0.3);
+    overflow-y: auto;
+    border: 1px solid rgba(84, 131, 179, 0.2);
+    backdrop-filter: blur(10px);
+    position: relative;
+  }
+  
+  /* Event Modal */
+  .MAIN-eventModal {
+    background: #ffffff;
+    border: 1px solid #5483b3;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(84, 131, 179, 0.2);
+    padding: 25px;
+    max-width: 600px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+      "Helvetica Neue", sans-serif;
+  }
+  
+  .MAIN-eventModal h3 {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #021024;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .MAIN-eventContentText {
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 15px;
+    color: #333;
+  }
+  
+  /* Sticky Note Modal */
+  .MAIN-stickyNote {
+    background: #fff9c4;
+    border: 1px solid #ffeb3b;
+    border-radius: 8px;
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    max-width: 600px;
+    font-family: "Shadows Into Light", cursive;
+    color: #333;
+  }
+  
+  .MAIN-stickyNote h3 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .MAIN-modalBody {
+    font-family: "Shadows Into Light", cursive;
+    color: #333;
+  }
+  
+  .MAIN-noteContentText {
+    font-size: 1.1rem;
+    line-height: 1.4;
+    margin-bottom: 15px;
+  }
+  
+  /* Add Note Modal */
+  .MAIN-addNoteModal {
+    max-width: 600px;
+  }
+  
+  /* Large Modal */
+  .MAIN-largeModal {
+    max-width: 600px;
+  }
+  
+  /* Buttons */
+  .MAIN-buttonGroup {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+    justify-content: center;
+  }
+  
+  .MAIN-buttonGroup button {
+    background: linear-gradient(135deg, #5483b3 0%, #052659 100%);
+    color: #ffffff;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 8px 20px rgba(5, 38, 89, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .MAIN-buttonGroup button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(5, 38, 89, 0.15), 0 0 15px rgba(125, 160, 202, 0.4);
+  }
+  
+  .MAIN-closeButtonTopRight {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: #333;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1001;
+    padding: 5px;
+  }
+  
+  .MAIN-closeButtonTopRight:hover {
+    color: #ff4444;
+  }
+  
+  /* Input and Textarea */
+  .MAIN-titleInput {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-family: "Shadows Into Light", cursive;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .MAIN-linedText {
+    width: 100%;
+    background: repeating-linear-gradient(to bottom, transparent, transparent 29px, #ccc 29px, #ccc 30px);
+    line-height: 30px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    font-family: "Shadows Into Light", cursive;
+    font-size: 1rem;
+    resize: vertical;
+    color: #333;
+  }
+  
+  /* Animations */
+  @keyframes MAIN-slideInFromTop {
+    from {
+      opacity: 0;
+      transform: translateY(-50px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Styles pour la modale de notification */
+  .MAIN-notificationModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(2, 16, 36, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+  }
+  
+  .MAIN-notificationModalActive {
+    opacity: 1;
+  }
+  
+  .MAIN-notificationModalContent {
+    background: linear-gradient(145deg, #ffffff, #c1e8ff);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    position: relative;
+    min-width: 300px;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    border: 2px solid #5483b3;
+    transform: scale(0.9);
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .MAIN-notificationModalContentActive {
+    transform: scale(1);
+  }
+  
+  .MAIN-notificationListWrapper {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 10px;
+  }
+  
+  .MAIN-closeModalBtn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #021024;
+    border: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    font-size: 1rem;
+    color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s ease, transform 0.3s ease;
+  }
+  
+  .MAIN-closeModalBtn:hover {
+    background: #052659;
+    transform: scale(1.1);
+  }
+  
+  .MAIN-editContainer {
+    width: 100%;
+    display: flex;
+    gap: 10px;
+  }
+  
+  .MAIN-editInput {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #5483b3;
+    border-radius: 5px;
+    font-size: 1rem;
+  }
+  
+  .MAIN-editContainer button {
+    background: linear-gradient(135deg, #021024, #052659);
+    color: #ffffff;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  /* Add these new animation keyframes at the end of the file */
+  @keyframes MAIN-fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes MAIN-slideInFromRight {
+    from {
+      transform: translateX(50px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes MAIN-slideInFromBottom {
+    from {
+      transform: translateY(30px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes MAIN-scaleIn {
+    from {
+      transform: scale(0.9);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  

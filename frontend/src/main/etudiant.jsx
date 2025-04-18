@@ -218,7 +218,7 @@ const Etudiant = () => {
             icon: <FaCalendar />,
         },
         {
-            title: "Moyennes",
+            title: "Resultats Academiques",
             description: "Visualisez vos résultats académiques et moyennes.",
             route: "/ETDGRD",
             icon: <FaChartBar />,
@@ -232,7 +232,7 @@ const Etudiant = () => {
         {
             title: "Mes Notes",
             description: "Créez, organisez et consultez vos notes personnelles.",
-            route: "/notesFeed",
+            route: "/ETDnotesFeed",
             icon: <FaStickyNote />,
         },
         {
@@ -244,7 +244,7 @@ const Etudiant = () => {
         {
             title: "calendar",
             description: "Consultez votre planning des Examens.",
-            route: "/calendar",
+            route: "/ETDcalendar",
             icon: <FaCalendarAlt />,
         },
     ];
@@ -455,7 +455,7 @@ const Etudiant = () => {
                         )}
                     </div>
                     <button
-                        onClick={() => navigate("/calendar")}
+                        onClick={() => navigate("/ETDcalendar")}
                         className={styles['MAIN-seeMoreButton']}
                     >
                         Voir plus
@@ -513,7 +513,7 @@ const Etudiant = () => {
                                     ))
                                 )}
                                 <button
-                                    onClick={() => navigate("/notesFeed")}
+                                    onClick={() => navigate("/ETDnotesFeed")}
                                     className={styles['MAIN-seeMoreButton']}
                                 >
                                     Voir plus

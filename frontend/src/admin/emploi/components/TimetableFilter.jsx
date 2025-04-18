@@ -270,13 +270,14 @@ function TimetableFilter() {
           <h2>Emplois Du Temps</h2>
         </div>
         <button className={styles['ADM-EDT-sidebar-button']} onClick={() => navigate('/admin')}>
-          <FaHome /> Retour
-        </button>
+          <FaHome /> Retour à l'accueil
+        </button> 
         <button
           type="button"
           onClick={handleGenerateTimetables}
           className={`${styles['ADM-EDT-sidebar-button']} ${styles['ADM-EDT-generate-btn']}`}
         >
+          
           Générer tous les emplois
         </button>
       </div>

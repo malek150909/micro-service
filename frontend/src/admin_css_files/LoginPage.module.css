@@ -1,0 +1,258 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap");
+
+.LOG-login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.LOG-login-page.LOG-fade-out {
+  opacity: 0;
+  transform: scale(0.98);
+}
+
+.LOG-login-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("/image.jpg");
+  background-size: cover;
+  background-position: center;
+  filter: blur(8px);
+  z-index: -1;
+}
+
+.LOG-login-background::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(84, 131, 179, 0.4);
+}
+
+/* Add keyframes for the entrance animation */
+@keyframes slideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Update the .LOG-login-card class to include the animation */
+.LOG-login-card {
+  display: flex;
+  width: 90%;
+  max-width: 800px;
+  height: 500px;
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: var(--box-shadow);
+  z-index: 1;
+  animation: slideIn 0.6s ease-out forwards; /* Apply the animation */
+  border-radius: 25px;
+}
+
+.LOG-login-logo-section {
+  flex: 0 0 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #3a6a9e 30%, #082e54 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.LOG-login-logo-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("/image.jpg");
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  z-index: -1;
+}
+
+.LOG-login-logo {
+  width: 100px;
+  height: 100px;
+  filter: brightness(0) invert(1);
+}
+
+.LOG-login-form-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 40px;
+  background-color: var(--light-bg);
+}
+
+.LOG-login-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  font-family: poppins, sans-serif;
+  color: var(--text);
+  margin-bottom: 5px;
+  text-align: center;
+}
+
+.LOG-login-subtitle {
+  font-size: 1.2rem;
+  font-weight: 300;
+  color: var(--text-light);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.LOG-login-form {
+  width: 80%;
+  margin: 0 auto; /* centre horizontalement */
+}
+
+.LOG-login-input-group {
+  margin-bottom: 25px;
+}
+
+.LOG-input-with-icon {
+  display: flex;
+  align-items: center;
+}
+
+.LOG-login-input-icon {
+  color: var(--text-light);
+  font-size: 1.2rem;
+  margin-right: 12px; /* Légèrement augmenté pour un look moderne */
+}
+
+.LOG-login-input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px; /* Coins arrondis pour un style moderne */
+  font-size: 1rem;
+  color: var(--text);
+  background-color: rgba(255, 255, 255, 0.9); /* Fond légèrement opaque */
+  outline: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.LOG-login-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(84, 131, 179, 0.2);
+  transform: translateY(-2px); /* Légère élévation au focus */
+}
+
+.LOG-login-input::placeholder {
+  color: var(--text-light);
+  opacity: 0.7;
+}
+
+.LOG-error-message {
+  color: var(--error);
+  font-size: 0.9rem;
+  font-weight: 400;
+  margin-top: 5px;
+  display: block;
+}
+
+.LOG-general-error {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.LOG-login-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.LOG-login-button {
+  padding: 12px 30px;
+  border: none;
+  border-radius: 30px;
+  background: linear-gradient(to right, var(--primary), var(--secondary));
+  color: var(--white);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin: 0 auto; /* centre horizontalement */
+}
+
+.LOG-login-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(84, 131, 179, 0.3);
+}
+
+.LOG-login-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.LOG-logout-content {
+  text-align: center;
+}
+
+.LOG-logout-content p {
+  font-size: 1rem;
+  color: var(--text);
+  margin-bottom: 20px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .LOG-login-card {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .LOG-login-logo-section {
+    flex: none;
+    padding: 30px 0;
+  }
+
+  .LOG-login-logo {
+    width: 80px;
+    height: 80px;
+  }
+
+  .LOG-login-form-section {
+    padding: 30px 20px;
+  }
+
+  .LOG-login-actions {
+    justify-content: center;
+  }
+
+  .LOG-login-button {
+    width: 100%;
+  }
+
+  .LOG-login-title {
+    font-size: 1.5rem;
+  }
+
+  .LOG-login-subtitle {
+    font-size: 1rem;
+  }
+}

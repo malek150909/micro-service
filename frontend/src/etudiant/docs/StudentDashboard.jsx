@@ -71,7 +71,6 @@ function StudentDashboard() {
                     <div className={`${styles['ETD-DOC-shape']} ${styles['ETD-DOC-shape1']}`}></div>
                     <div className={`${styles['ETD-DOC-shape']} ${styles['ETD-DOC-shape2']}`}></div>
                 </div>
-
                 <div className={styles['ETD-DOC-sidebar']}>
                     <div className={styles['ETD-DOC-logo']}>
                         <h2>Documents Administatifs</h2>
@@ -91,19 +90,6 @@ function StudentDashboard() {
                         <h3>
                             <FaBook /> Documents
                         </h3>
-                        {error && (
-                            <div className={`${styles['ETD-DOC-modal-overlay']} ${styles['ETD-DOC-active']}`}>
-                                <div className={`${styles['ETD-DOC-modal-content']} ${styles['ETD-DOC-error-modal']}`}>
-                                    <h3>
-                                        <FaExclamationTriangle className={styles['ETD-DOC-icon']} /> Erreur
-                                    </h3>
-                                    <p>{error}</p>
-                                    <button className={styles['ETD-DOC-close-button']} onClick={() => setError('')}>
-                                        Fermer
-                                    </button>
-                                </div>
-                            </div>
-                        )}
                         {documents.length === 0 ? (
                             <div className={styles['ETD-DOC-no-results']}>Aucun document trouvé pour votre faculté.</div>
                         ) : (

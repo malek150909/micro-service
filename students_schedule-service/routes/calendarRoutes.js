@@ -7,7 +7,7 @@ import {
     deletePersonalEvent,
     deleteSupplementarySession,
     deleteClubEvent,
-} from '../controllers/calendar.js';
+} from '../controllers/calendarController.js';
 
 const router = express.Router();
 

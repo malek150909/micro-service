@@ -77,7 +77,7 @@ const Timetable = () => {
       <div className={styles['ENS-EDT-sidebar']}>
         <div className={styles['ENS-EDT-logo']}><h2>Emplois du temps</h2></div>
         <button className={styles['ENS-EDT-sidebar-button']} onClick={() => navigate('/enseignant')}>
-          <FaHome /> Retour
+          <FaHome /> Retour a l'accueil
         </button>
       </div>
       <div className={styles['ENS-EDT-timetable-container']}>
