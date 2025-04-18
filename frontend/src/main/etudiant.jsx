@@ -1,23 +1,28 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaUser, FaEnvelope, FaSignOutAlt, FaBell, FaChevronRight, FaCalendar, FaBook, FaUsers, FaClipboardList, FaBullhorn, FaPlus, FaTimes } from "react-icons/fa";
+import { FaUser, FaEnvelope, FaSignOutAlt, FaBell, FaChevronRight, FaCalendar, FaUsers, FaClipboardList, FaBullhorn, FaTimes, FaChartBar, FaFolderOpen, FaStickyNote, FaCalendarAlt, FaBook, FaClipboard } from "react-icons/fa";
 import NotificationBell from "./NotificationBell";
-import styles from "../admin_css_files/main.module.css"; // Nouveau CSS Module
+import styles from "../admin_css_files/main.module.css";
+import axios from "axios";
 
 const Etudiant = () => {
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const [showWelcome, setShowWelcome] = useState(false);
-    const [notes, setNotes] = useState([]); // State for recent notes
-    const [newNoteTitle, setNewNoteTitle] = useState(""); // State for new note title
-    const [newNoteContent, setNewNoteContent] = useState(""); // State for new note content
+    const [notes, setNotes] = useState([]);
+    const [newNoteTitle, setNewNoteTitle] = useState("");
+    const [newNoteContent, setNewNoteContent] = useState("");
     const [isLoaded, setIsLoaded] = useState(false);
     const [showNotificationModal, setShowNotificationModal] = useState(false);
-    const [showAddNoteModal, setShowAddNoteModal] = useState(false); // State for add note modal
-    const [showDetailsModal, setShowDetailsModal] = useState(false); // State for details modal
-    const [selectedNote, setSelectedNote] = useState(null); // State for selected note
+    const [showAddNoteModal, setShowAddNoteModal] = useState(false);
+    const [showDetailsModal, setShowDetailsModal] = useState(false);
+    const [selectedNote, setSelectedNote] = useState(null);
+    const [upcomingEvents, setUpcomingEvents] = useState([]);
+    const [showEventDetailsModal, setShowEventDetailsModal] = useState(false);
+    const [selectedEvent, setSelectedEvent] = useState(null);
 
-    const API_URL = "http://localhost:8083/notes"; // API URL for notes
+    const API_URL = "http://localhost:8083/notes";
+    const CALENDAR_API_URL = "http://localhost:8083/calendar";
 
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -32,7 +37,8 @@ const Etudiant = () => {
             }
             setTimeout(() => setIsLoaded(true), 100);
             console.log("Utilisateur chargé dans Etudiant :", storedUser);
-            fetchRecentNotes(storedUser.Matricule); // Fetch recent notes on mount
+            fetchRecentNotes(storedUser.Matricule);
+            fetchUpcomingEvents();
         }
     }, [navigate]);
 
@@ -42,7 +48,6 @@ const Etudiant = () => {
             const response = await fetch(`${API_URL}/notes/${matricule}`);
             if (!response.ok) throw new Error("Erreur lors du chargement des notes.");
             const data = await response.json();
-            // Sort notes by updated_at (or created_at if updated_at is not available) and take the top 3
             const sortedNotes = (Array.isArray(data) ? data : [])
                 .sort((a, b) => new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at))
                 .slice(0, 3);
@@ -50,6 +55,56 @@ const Etudiant = () => {
         } catch (err) {
             console.error("Erreur lors de la récupération des notes :", err.message);
         }
+    };
+
+    // Fetch upcoming events for the next 30 days
+    const fetchUpcomingEvents = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            const today = new Date();
+            const endDate = new Date(today);
+            endDate.setDate(today.getDate() + 30);
+
+            const startDateFormatted = formatDate(today);
+            const endDateFormatted = formatDate(endDate);
+
+            const response = await axios.get(`${CALENDAR_API_URL}/${startDateFormatted}/${endDateFormatted}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            if (response.data && Array.isArray(response.data)) {
+                const sortedEvents = response.data
+                    .filter((event) => {
+                        const eventDateTime = new Date(
+                            `${event.event_date || event.date_seance || event.date_evenement} ${event.time_slot.split(" - ")[0]}`
+                        );
+                        return eventDateTime > today;
+                    })
+                    .sort((a, b) => {
+                        const dateA = new Date(
+                            `${a.event_date || a.date_seance || a.date_evenement} ${a.time_slot.split(" - ")[0]}`
+                        );
+                        const dateB = new Date(
+                            `${b.event_date || b.date_seance || b.date_evenement} ${b.time_slot.split(" - ")[0]}`
+                        );
+                        return dateA - dateB;
+                    })
+                    .slice(0, 3);
+                setUpcomingEvents(sortedEvents);
+            } else {
+                setUpcomingEvents([]);
+            }
+        } catch (err) {
+            console.error("Erreur lors de la récupération des événements :", err.message);
+        }
+    };
+
+    // Helper function to format date as YYYY-MM-DD
+    const formatDate = (date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
     };
 
     // Add a new note
@@ -68,8 +123,8 @@ const Etudiant = () => {
             if (!response.ok) throw new Error("Erreur lors de l’ajout de la note.");
             setNewNoteTitle("");
             setNewNoteContent("");
-            setShowAddNoteModal(false); // Close the modal
-            fetchRecentNotes(user.Matricule); // Refresh the notes list
+            setShowAddNoteModal(false);
+            fetchRecentNotes(user.Matricule);
         } catch (err) {
             console.error("Erreur lors de l’ajout de la note :", err.message);
         }
@@ -111,65 +166,88 @@ const Etudiant = () => {
         setNewNoteContent("");
     };
 
-    const items = [
-        { 
-          title: "Documents Administratifs", 
-          description: "Consultez, créez et gérez vos documents administratifs.", 
-          route: "/docsEtudiant", 
-          icon: <FaClipboardList /> 
-        },
-        { 
-          title: "Annonces", 
-          description: "Accédez aux dernières annonces et informations officielles.", 
-          route: "/AnnoncesETD", 
-          icon: <FaBullhorn /> 
-        },
-        { 
-          title: "Clubs", 
-          description: "Découvrez et participez aux activités des clubs étudiants.", 
-          route: "/clubsETD", 
-          icon: <FaUsers /> 
-        },
-        { 
-          title: "Emploi du Temps", 
-          description: "Consultez votre emploi du temps personnalisé.", 
-          route: "/ETDemploi", 
-          icon: <FaCalendar /> 
-        },
-        { 
-          title: "Moyennes", 
-          description: "Visualisez vos résultats académiques et moyennes.", 
-          route: "/ETDGRD", 
-          icon: <FaBook /> 
-        },
-        { 
-          title: "Ressources", 
-          description: "Accédez aux ressources pédagogiques et supports de cours.", 
-          route: "/ETDressources", 
-          icon: <FaBook /> 
-        },
-        { 
-          title: "Mes Notes", 
-          description: "Créez, organisez et consultez vos notes personnelles.", 
-          route: "/notesFeed", 
-          icon: <FaBook /> 
-        },
-        { 
-            title: "Planning", 
-            description: "Consultez votre planning des Examens.", 
-            route: "/studentPlanning", 
-            icon: <FaBook /> 
-          },
-          { 
-            title: "calendar", 
-            description: "Consultez votre planning des Examens.", 
-            route: "/calendar", 
-            icon: <FaBook /> 
-          }
-      ];
+    const openEventDetailsModal = (event) => {
+        setSelectedEvent(event);
+        setShowEventDetailsModal(true);
+    };
 
-    const calendarDays = Array.from({ length: 30 }, (_, i) => i + 1); // Jours d'avril
-    const currentDay = 5; // 5 avril 2025
+    const closeEventDetailsModal = (e) => {
+        if (e) e.stopPropagation();
+        setShowEventDetailsModal(false);
+        setSelectedEvent(null);
+    };
+
+    const getEventIcon = (type) => {
+        switch (type) {
+            case "personal":
+                return <FaCalendar />;
+            case "administratif":
+                return <FaClipboard />;
+            case "supp_session":
+                return <FaBook />;
+            case "club_event":
+                return <FaUsers />;
+            default:
+                return <FaCalendar />;
+        }
+    };
+
+    const items = [
+        {
+            title: "Documents Administratifs",
+            description: "Consultez, créez et gérez vos documents administratifs.",
+            route: "/docsEtudiant",
+            icon: <FaClipboardList />,
+        },
+        {
+            title: "Annonces",
+            description: "Accédez aux dernières annonces et informations officielles.",
+            route: "/AnnoncesETD",
+            icon: <FaBullhorn />,
+        },
+        {
+            title: "Clubs",
+            description: "Découvrez et participez aux activités des clubs étudiants.",
+            route: "/clubsETD",
+            icon: <FaUsers />,
+        },
+        {
+            title: "Emploi du Temps",
+            description: "Consultez votre emploi du temps personnalisé.",
+            route: "/ETDemploi",
+            icon: <FaCalendar />,
+        },
+        {
+            title: "Moyennes",
+            description: "Visualisez vos résultats académiques et moyennes.",
+            route: "/ETDGRD",
+            icon: <FaChartBar />,
+        },
+        {
+            title: "Ressources",
+            description: "Accédez aux ressources pédagogiques et supports de cours.",
+            route: "/ETDressources",
+            icon: <FaFolderOpen />,
+        },
+        {
+            title: "Mes Notes",
+            description: "Créez, organisez et consultez vos notes personnelles.",
+            route: "/notesFeed",
+            icon: <FaStickyNote />,
+        },
+        {
+            title: "Planning",
+            description: "Consultez votre planning des Examens.",
+            route: "/studentPlanning",
+            icon: <FaCalendarAlt />,
+        },
+        {
+            title: "calendar",
+            description: "Consultez votre planning des Examens.",
+            route: "/calendar",
+            icon: <FaCalendarAlt />,
+        },
+    ];
 
     return (
         <div className={`${styles['MAIN-mainContainer']} ${isLoaded ? styles['MAIN-mainContainerLoaded'] : ''}`}>
@@ -211,7 +289,7 @@ const Etudiant = () => {
                             >
                                 X
                             </button>
-                            <div className={styles['MAIN-notificationListWrapper']}> {/* Ajout d'un conteneur */}
+                            <div className={styles['MAIN-notificationListWrapper']}>
                                 <NotificationBell showModal={true} />
                             </div>
                         </div>
@@ -252,7 +330,7 @@ const Etudiant = () => {
                     </div>
                 )}
 
-                {/* Details Modal */}
+                {/* Note Details Modal */}
                 {showDetailsModal && selectedNote && (
                     <div className={`${styles['MAIN-modalOverlay']} ${showDetailsModal ? styles['MAIN-modalOverlayActive'] : ''}`} data-modal="details">
                         <div className={`${styles['MAIN-modalContent']} ${styles['MAIN-stickyNote']}`}>
@@ -285,6 +363,54 @@ const Etudiant = () => {
                     </div>
                 )}
 
+                {/* Event Details Modal */}
+                {showEventDetailsModal && selectedEvent && (
+                    <div className={`${styles['MAIN-modalOverlay']} ${showEventDetailsModal ? styles['MAIN-modalOverlayActive'] : ''}`} data-modal="event-details">
+                        <div className={`${styles['MAIN-modalContent']} ${styles['MAIN-eventModal']}`}>
+                            <button
+                                className={styles['MAIN-closeButtonTopRight']}
+                                onClick={(e) => closeEventDetailsModal(e)}
+                            >
+                                <FaTimes />
+                            </button>
+                            <h3>{selectedEvent.title}</h3>
+                            <div className={styles['MAIN-modalBody']}>
+                                <p className={styles['MAIN-eventContentText']}>
+                                    <strong>Date :</strong>{" "}
+                                    {new Date(
+                                        selectedEvent.event_date || selectedEvent.date_seance || selectedEvent.date_evenement
+                                    ).toLocaleDateString("fr-FR", {
+                                        day: "numeric",
+                                        month: "long",
+                                        year: "numeric",
+                                    })}
+                                </p>
+                                <p className={styles['MAIN-eventContentText']}>
+                                    <strong>Horaire :</strong> {selectedEvent.time_slot}
+                                </p>
+                                <p className={styles['MAIN-eventContentText']}>
+                                    <strong>Type :</strong>{" "}
+                                    {selectedEvent.type === "personal"
+                                        ? "Personnel"
+                                        : selectedEvent.type === "administratif"
+                                        ? "Administratif"
+                                        : selectedEvent.type === "supp_session"
+                                        ? "Séance supplémentaire"
+                                        : "Événement de club"}
+                                </p>
+                                <p className={styles['MAIN-eventContentText']}>
+                                    <strong>Description :</strong> {selectedEvent.content || "Aucune description disponible"}
+                                </p>
+                            </div>
+                            <div className={styles['MAIN-buttonGroup']}>
+                                <button className={styles['MAIN-closeButton']} onClick={(e) => closeEventDetailsModal(e)}>
+                                    <FaTimes /> Fermer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* Main Layout */}
                 <div className={styles['MAIN-mainLayout']}>
                     {/* Cards Section */}
@@ -303,19 +429,56 @@ const Etudiant = () => {
                         </div>
                     </div>
 
-                    {/* Right Column: Calendar and Notes */}
+                    {/* Right Column: Upcoming Events and Notes */}
                     <div className={styles['MAIN-rightColumn']}>
-                        
+                        {/* Upcoming Events Section */}
+                        <div className={styles['MAIN-eventsSection']}>
+                            <h3>Événements à venir</h3>
+                            <div className={styles['MAIN-eventsList']}>
+                                {upcomingEvents.length === 0 ? (
+                                    <p>Aucun événement à venir.</p>
+                                ) : (
+                                    upcomingEvents.map((event, index) => (
+                                        <div
+                                            key={index}
+                                            className={styles['MAIN-eventItem']}
+                                            onClick={() => openEventDetailsModal(event)}
+                                        >
+                                            <div className={styles['MAIN-eventIcon']}>
+                                                {getEventIcon(event.type)}
+                                            </div>
+                                            <div className={styles['MAIN-eventContent']}>
+                                                <p className={styles['MAIN-eventTitle']}>{event.title}</p>
+                                                <p className={styles['MAIN-eventDetails']}>
+                                                    {new Date(
+                                                        event.event_date || event.date_seance || event.date_evenement
+                                                    ).toLocaleDateString("fr-FR", {
+                                                        day: "numeric",
+                                                        month: "long",
+                                                        year: "numeric",
+                                                    })}
+                                                </p>
+                                                <p className={styles['MAIN-eventDetails']}>{event.time_slot}</p>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                                <button
+                                    onClick={() => navigate("/calendar")}
+                                    className={styles['MAIN-seeMoreButton']}
+                                >
+                                    Voir plus
+                                </button>
+                            </div>
+                        </div>
 
                         {/* Notes Section */}
                         <div className={styles['MAIN-notesSection']}>
                             <h3>Dernières Notes</h3>
                             <div className={styles['MAIN-notesList']}>
-                                {/* "Ajouter" button */}
                                 <button onClick={openAddNoteModal} className={styles['MAIN-addButton']}>
                                     Ajouter
                                 </button>
-                                {/* List of recent notes */}
                                 {notes.length === 0 ? (
                                     <p>Aucune note récente.</p>
                                 ) : (
@@ -338,7 +501,6 @@ const Etudiant = () => {
                                         </div>
                                     ))
                                 )}
-                                {/* "Voir plus" button */}
                                 <button
                                     onClick={() => navigate("/notesFeed")}
                                     className={styles['MAIN-seeMoreButton']}

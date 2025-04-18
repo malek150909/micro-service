@@ -260,6 +260,73 @@
   border: 2px solid #021024;
 }
 
+/* Events Section */
+.MAIN-eventsSection {
+  background: #ffffff;
+  padding: 15px;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e0e7ff;
+}
+
+.MAIN-eventsSection h3 {
+  font-size: 1.2rem;
+  color: #021024;
+  margin-bottom: 15px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.MAIN-eventsList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.MAIN-eventItem {
+  background: #ffffff;
+  padding: 12px;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid #5483b3;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.MAIN-eventItem:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(84, 131, 179, 0.2);
+}
+
+.MAIN-eventIcon {
+  font-size: 1.5rem;
+  color: #5483b3;
+  flex-shrink: 0;
+}
+
+.MAIN-eventContent {
+  flex: 1;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  color: #333;
+}
+
+.MAIN-eventTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.4;
+  color: #021024;
+}
+
+.MAIN-eventDetails {
+  font-size: 0.85rem;
+  margin: 2px 0 0;
+  line-height: 1.3;
+  color: #666;
+}
+
 /* Notes Section */
 .MAIN-notesSection {
   background: linear-gradient(145deg, #7da0ca, #c1e8ff);
@@ -422,6 +489,32 @@
   border: 1px solid rgba(84, 131, 179, 0.2);
   backdrop-filter: blur(10px);
   position: relative;
+}
+
+/* Event Modal */
+.MAIN-eventModal {
+  background: #ffffff;
+  border: 1px solid #5483b3;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(84, 131, 179, 0.2);
+  padding: 25px;
+  max-width: 600px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.MAIN-eventModal h3 {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #021024;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.MAIN-eventContentText {
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 15px;
+  color: #333;
 }
 
 /* Sticky Note Modal */

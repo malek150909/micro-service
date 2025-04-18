@@ -7,7 +7,7 @@ body {
   color: #021024;
   overflow-x: hidden;
   position: relative;
-  min-height: 100vh ;
+  min-height: 900vh ;
 }
 :root {
   --primary: #021024; /* Bleu très foncé */

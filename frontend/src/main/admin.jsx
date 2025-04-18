@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaUser, FaEnvelope, FaSignOutAlt, FaBell, FaChevronRight, FaCalendar, FaBook, FaUsers, FaClipboardList, FaBullhorn, FaPlus } from "react-icons/fa";
+import { FaUser, FaEnvelope, FaSignOutAlt, FaBell, FaChevronRight, FaCalendar, FaBook, FaUsers, FaClipboardList, FaBullhorn } from "react-icons/fa";
 import NotificationBell from "./NotificationBell";
 import styles from "../admin_css_files/main.module.css"; // Import du CSS Module
 
@@ -8,12 +8,6 @@ const Admin = () => {
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const [showWelcome, setShowWelcome] = useState(false);
-    const [todoList, setTodoList] = useState([
-        { task: "Créer un nouvel événement", progress: 90, due: "Aujourd'hui" },
-        { task: "Valider les documents", progress: 50, due: "Demain" },
-        { task: "Publier une annonce", progress: 100, due: "Cette semaine" }
-    ]);
-    const [newTask, setNewTask] = useState("");
     const [isLoaded, setIsLoaded] = useState(false);
     const [showNotificationModal, setShowNotificationModal] = useState(false);
 
@@ -103,16 +97,6 @@ const Admin = () => {
         }
       ];
 
-    const calendarDays = Array.from({ length: 30 }, (_, i) => i + 1); // Jours d'avril
-    const currentDay = 5; // 5 avril 2025
-
-    const addTask = () => {
-        if (newTask.trim()) {
-            setTodoList([...todoList, { task: newTask, progress: 0, due: "Aujourd'hui" }]);
-            setNewTask("");
-        }
-    };
-
     return (
         <div className={`${styles['MAIN-mainContainer']} ${isLoaded ? styles['MAIN-mainContainerLoaded'] : ''}`}>
             {/* Sidebar */}
@@ -139,7 +123,7 @@ const Admin = () => {
                 {showWelcome && user && (
                     <div className={`${styles['MAIN-welcomeMessage']} ${isLoaded ? styles['MAIN-welcomeMessageSlideIn'] : ''}`}>
                         <h1>Bienvenue, {user.nom} {user.prenom} !</h1>
-                        <p>Que souhaitez-vous faire aujourd'hui ?</p>
+                        <p>Que souhaitez-vous faire aujourd&apos;hui ?</p>
                     </div>
                 )}
 
@@ -173,61 +157,6 @@ const Admin = () => {
                                     <FaChevronRight className={styles['MAIN-cardArrow']} />
                                 </div>
                             ))}
-                        </div>
-                    </div>
-
-                    {/* Right Column: Calendar and To-Do List */}
-                    <div className={styles['MAIN-rightColumn']}>
-                        {/* Calendar */}
-                        <div className={styles['MAIN-calendarSection']}>
-                            <h3>Avril 2025</h3>
-                            <div className={styles['MAIN-calendarGrid']}>
-                                {["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map((day, index) => (
-                                    <div key={index} className={styles['MAIN-calendarDayHeader']}>
-                                        {day}
-                                    </div>
-                                ))}
-                                {calendarDays.map((day, index) => (
-                                    <div
-                                        key={index}
-                                        className={`${styles['MAIN-calendarDay']} ${day === currentDay ? styles['MAIN-currentDay'] : ''}`}
-                                    >
-                                        {day}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* To-Do List */}
-                        <div className={styles['MAIN-todoSection']}>
-                            <h3>Tâches d'aujourd'hui</h3>
-                            <div className={styles['MAIN-todoList']}>
-                                <div className={styles['MAIN-todoInput']}>
-                                    <input
-                                        type="text"
-                                        value={newTask}
-                                        onChange={(e) => setNewTask(e.target.value)}
-                                        placeholder="Ajouter une tâche..."
-                                    />
-                                    <button onClick={addTask}>
-                                        <FaPlus />
-                                    </button>
-                                </div>
-                                {todoList.map((item, index) => (
-                                    <div key={index} className={styles['MAIN-todoItem']}>
-                                        <div className={styles['MAIN-todoDetails']}>
-                                            <p>{item.task}</p>
-                                            <div className={styles['MAIN-todoProgress']}>
-                                                <div
-                                                    className={styles['MAIN-progressBar']}
-                                                    style={{ width: `${item.progress}%` }}
-                                                ></div>
-                                            </div>
-                                            <span>{item.due}</span>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
                         </div>
                     </div>
                 </div>
