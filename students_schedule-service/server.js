@@ -42,5 +42,5 @@ app.use('/calendar',authMiddleware, calendarRoutes);
 
 const PORT = 8083;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on http://courses.localhost`);
 });

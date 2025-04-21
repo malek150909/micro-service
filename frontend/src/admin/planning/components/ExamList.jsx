@@ -14,7 +14,7 @@ const ExamList = ({ exams, onDelete, onUpdate, salles, semestres, modules = [] }
   const [availableSalles, setAvailableSalles] = useState(salles);
   const [isSalleDropdownOpen, setIsSalleDropdownOpen] = useState(false);
 
-  const API_URL = "http://localhost:8083";
+  const API_URL = "http://courses.localhost";
 
   const closeModal = () => {
     setShowModal(false);

@@ -131,7 +131,7 @@ exports.createEvenement = async (req, res) => {
 
     // Construire l'URL complète pour l'image
     const fullImageUrl = image_url && !image_url.startsWith('http')
-      ? `http://localhost:8084${image_url}`
+      ? `http://events.localhost${image_url}`
       : image_url || '';
 
     res.json({
@@ -154,7 +154,7 @@ exports.getAllEvenements = async (req, res) => {
     const [results] = await pool.query(sql);
     const evenementsWithFullUrl = results.map(evenement => {
       const fullImageUrl = evenement.image_url && !evenement.image_url.startsWith('http')
-        ? `http://localhost:8084${evenement.image_url}`
+        ? `http://events.localhost${evenement.image_url}`
         : evenement.image_url || '';
       console.log('Image URL pour événement', evenement.ID_evenement, ':', fullImageUrl);
       return {
@@ -384,7 +384,7 @@ exports.updateEvenement = async (req, res) => {
     }
 
     const fullImageUrl = image_url && !image_url.startsWith('http')
-      ? `http://localhost:8084${image_url}`
+      ? `http://events.localhost${image_url}`
       : image_url || '';
     console.log('URL complète renvoyée pour mise à jour :', fullImageUrl);
 

@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const bodyParser = require('body-parser');
+const authMiddleware = require('./middleware/auth'); // Middleware d'authentification (si nécessaire)
 const annonceRoutes = require('./routes/annonceRoutes');
 const userRoutes = require('./routes/userRoutes');
 const messageRoutes = require('./routes/messageRoutes');
@@ -24,7 +25,7 @@ app.use(bodyParser.json()); // Parsing JSON avant les routes (optionnel si vous 
 app.use(express.urlencoded({ extended: true }));
 
 // Routes (après les middlewares qui consomment le flux)
-app.use('/annonces', annonceRoutes);
+app.use('/annonces',authMiddleware ,annonceRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/", messageRoutes);
 app.use('/ressources', resourceRoutes);

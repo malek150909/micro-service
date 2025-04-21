@@ -18,7 +18,7 @@ const EtudiantDashboard = () => {
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const matricule = storedUser?.Matricule;
 
-  const API_URL = 'http://localhost:8084';
+  const API_URL = 'http://events.localhost';
 
   useEffect(() => {
     const fetchClubs = async () => {

@@ -31,7 +31,7 @@ function StudentDashboard() {
     const fetchStudentData = async () => {
       try {
         console.log('Appel API /ETDressources/login avec matricule:', matricule);
-        const response = await axios.post('http://localhost:8083/ETDressources/login', { matricule });
+        const response = await axios.post('http://courses.localhost/ETDressources/login', { matricule });
         console.log('Réponse API /ETDressources/login:', response.data);
         const { sectionId, niveau } = response.data;
         if (!sectionId || !niveau) {
@@ -75,7 +75,7 @@ function StudentDashboard() {
     setIsFetching(true);
     try {
       console.log('Appel API /ETDressources/modules avec:', { sectionId, semester });
-      const response = await axios.get('http://localhost:8083/ETDressources/modules', {
+      const response = await axios.get('http://courses.localhost/ETDressources/modules', {
         params: { sectionId, semester },
       });
       console.log('Réponse API /ETDressources/modules:', response.data);
@@ -98,7 +98,7 @@ function StudentDashboard() {
   const fetchResources = async (moduleId, type) => {
     try {
       console.log('Appel API /ETDressources/resources avec:', { moduleId, sectionId, type });
-      const response = await axios.get('http://localhost:8083/ETDressources/resources', {
+      const response = await axios.get('http://courses.localhost/ETDressources/resources', {
         params: { moduleId, sectionId, type },
       });
       console.log('Réponse API /ETDressources/resources:', response.data);
@@ -297,7 +297,7 @@ function StudentDashboard() {
                           {resource.date_upload}
                         </span>
                         <a
-                          href={`http://localhost:8082${resource.fichier_url}`}
+                          href={`http://messaging.localhost${resource.fichier_url}`}
                           download
                           target="_blank"
                           rel="noopener noreferrer"

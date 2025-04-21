@@ -29,7 +29,7 @@ const ExamModal = ({ exam, onClose, onSave, modules, salles: initialSalles, seme
     const fetchSalles = async () => {
       if (formData.exam_date && formData.time_slot && formData.mode === 'presentiel') {
         try {
-          const response = await axios.get('http://localhost:8083/exams/salles', {
+          const response = await axios.get('http://courses.localhost/exams/salles', {
             params: {
               exam_date: formData.exam_date,
               time_slot: formData.time_slot,
@@ -59,7 +59,7 @@ const ExamModal = ({ exam, onClose, onSave, modules, salles: initialSalles, seme
   useEffect(() => {
     const validateForm = async () => {
       try {
-        const response = await axios.put(`http://localhost:8083/exams/${exam.ID_exam}`, {
+        const response = await axios.put(`http://courses.localhost/exams/${exam.ID_exam}`, {
           ...formData,
           ID_semestre: exam.ID_semestre,
         });

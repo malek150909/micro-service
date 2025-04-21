@@ -11,7 +11,7 @@ const FilterPanel = ({ onFilter }) => {
 
   useEffect(() => {
     setLoading(true);
-    axios.get('http://localhost:8081/api/filters')
+    axios.get('http://users.localhost/api/filters')
       .then(res => {
         setFacultes(res.data.facultes || []);
         setLoading(false);
@@ -24,7 +24,7 @@ const FilterPanel = ({ onFilter }) => {
 
   useEffect(() => {
     if (filters.idFaculte) {
-      axios.get(`http://localhost:8081/api/departements/${filters.idFaculte}`)
+      axios.get(`http://users.localhost/api/departements/${filters.idFaculte}`)
         .then(res => {
           setDepartements(res.data || []);
         })
@@ -44,7 +44,7 @@ const FilterPanel = ({ onFilter }) => {
       alert('Veuillez remplir tous les champs');
       return;
     }
-    axios.post('http://localhost:8081/api/enseignants/filtrer', filters)
+    axios.post('http://users.localhost/api/enseignants/filtrer', filters)
       .then(res => {
         onFilter(res.data);
       })

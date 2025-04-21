@@ -36,8 +36,8 @@ const getAdminAnnonces = async (req, res) => {
             let image_url = annonce.image_url || '';
             if (image_url && !image_url.startsWith('http')) {
                 image_url = annonce.event_id
-                    ? `http://localhost:8084${image_url}`
-                    : `http://localhost:8082${image_url}`;
+                    ? `http://events.localhost${image_url}`
+                    : `http://messaging.localhost${image_url}`;
             }
             return { ...annonce, image_url };
         });

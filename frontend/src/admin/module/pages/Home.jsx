@@ -9,7 +9,7 @@ import { FaBook, FaFilter, FaPlus, FaHome } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import styles from "../module.module.css";
 
-const API_URL = 'http://localhost:8083/modules';
+const API_URL = 'http://courses.localhost/modules';
 
 const Home = () => {
   const [modules, setModules] = useState([]);

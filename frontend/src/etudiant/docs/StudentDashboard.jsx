@@ -26,7 +26,7 @@ function StudentDashboard() {
     const fetchStudentFaculty = async (storedUser) => {
         try {
             console.log('Fetching faculty for student:', storedUser.Matricule);
-            const response = await axios.get('http://localhost:8083/documents/student/faculty', {
+            const response = await axios.get('http://courses.localhost/documents/student/faculty', {
                 headers: { matricule: storedUser.Matricule }
             });
             console.log('Response from /documents/student/faculty:', response.data);
@@ -46,7 +46,7 @@ function StudentDashboard() {
     const fetchDocuments = async (ID_faculte, matricule) => {
         try {
             console.log('Fetching documents for faculte:', ID_faculte);
-            const response = await axios.get(`http://localhost:8083/documents/faculte/${ID_faculte}`, {
+            const response = await axios.get(`http://courses.localhost/documents/faculte/${ID_faculte}`, {
                 headers: { matricule }
             });
             console.log('Documents fetched:', response.data);
@@ -102,7 +102,7 @@ function StudentDashboard() {
                                             </h3>
                                             <p>{doc.description || 'Aucune description'}</p>
                                             <br />
-                                            <a href={`http://localhost:8083${doc.fichier_url}`} download target="_blank" rel="noopener noreferrer">
+                                            <a href={`http://courses.localhost${doc.fichier_url}`} download target="_blank" rel="noopener noreferrer">
                                                 <FaDownload className={styles['ETD-DOC-icon']} /> Télécharger
                                             </a>
                                         </div>

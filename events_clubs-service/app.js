@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const authMiddleware = require('./middleware/auth'); // Assurez-vous que ce middleware est correctement configuré
 
 const evenementRoutes = require('./routes/evenementRoutes'); 
 const clubRoutes = require('./routes/clubRoutes');
@@ -28,7 +29,7 @@ app.use('/demandesCLUB', demandeRoutes);
 app.use('/notificationsCLUB', notificationRoutes);
 app.use('/api/club-events', evenementCLUBRoutes);  
 app.use('/messagesCLUB', messageRoutes); 
-app.use('/clubsADM', clubADMRoutes); 
+app.use('/clubsADM',authMiddleware ,clubADMRoutes); 
 app.use('/Clubs', filterADMRoutes); 
 app.use('/demandesADM', demandeADMRoutes); 
 

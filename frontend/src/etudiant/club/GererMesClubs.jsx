@@ -52,7 +52,7 @@ const GererMesClubs = ({ clubsGerant, setClubsGerant, setError }) => {
     "16:20 - 17:50"
   ];
 
-  const API_URL = 'http://localhost:8084';
+  const API_URL = 'http://events.localhost';
 
   useEffect(() => {
     const initialIndexes = {};

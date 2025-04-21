@@ -21,7 +21,7 @@ const FilterForm = ({ onFilter }) => {
   useEffect(() => {
     const fetchFacultes = async () => {
       try {
-        const response = await axios.get('http://localhost:8083/modules/facultes');
+        const response = await axios.get('http://courses.localhost/modules/facultes');
         setFaculteOptions(response.data);
       } catch (error) {
         console.error('Erreur de récupération des facultés:', error);
@@ -33,7 +33,7 @@ const FilterForm = ({ onFilter }) => {
   useEffect(() => {
     const fetchDepartements = async () => {
       try {
-        const response = await axios.get('http://localhost:8083/modules/departements', {
+        const response = await axios.get('http://courses.localhost/modules/departements', {
           params: { faculte: filters.faculte },
         });
         setDepartementOptions(response.data);
@@ -62,7 +62,7 @@ const FilterForm = ({ onFilter }) => {
   useEffect(() => {
     const fetchNiveaux = async () => {
       try {
-        const response = await axios.get('http://localhost:8083/modules/niveaux', {
+        const response = await axios.get('http://courses.localhost/modules/niveaux', {
           params: { departement: filters.departement },
         });
         setNiveauOptions(response.data);
@@ -89,7 +89,7 @@ const FilterForm = ({ onFilter }) => {
   useEffect(() => {
     const fetchSpecialites = async () => {
       try {
-        const response = await axios.get('http://localhost:8083/modules/specialites', {
+        const response = await axios.get('http://courses.localhost/modules/specialites', {
           params: { departement: filters.departement, niveau: filters.niveau },
         });
         setSpecialiteOptions(response.data);
@@ -114,7 +114,7 @@ const FilterForm = ({ onFilter }) => {
   useEffect(() => {
     const fetchSections = async () => {
       try {
-        const response = await axios.get('http://localhost:8083/modules/sections', {
+        const response = await axios.get('http://courses.localhost/modules/sections', {
           params: {
             specialite: filters.specialite,
             niveau: filters.niveau,

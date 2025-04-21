@@ -34,7 +34,7 @@ function Home() {
                 return;
             }
 
-            const response = await fetch('http://localhost:8082/ressources/resources', {
+            const response = await fetch('http://messaging.localhost/ressources/resources', {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'matricule': matricule
@@ -78,7 +78,7 @@ function Home() {
                 return;
             }
 
-            const response = await fetch(`http://localhost:8082/ressources/resources/${id}`, {
+            const response = await fetch(`http://messaging.localhost/ressources/resources/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -185,7 +185,7 @@ function Home() {
                                                             </div>
                                                             <div className={styles['ENS-RES-resource-actions']}>
                                                                 <a
-                                                                    href={`http://localhost:8082${resource.fichier_url}`}
+                                                                    href={`http://messaging.localhost${resource.fichier_url}`}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
                                                                     className={styles['ENS-RES-download-link']}
@@ -267,7 +267,7 @@ const ResourceModal = ({ resource, onClose, onUpdate, matricule }) => {
         }
 
         try {
-            const response = await fetch(`http://localhost:8082/ressources/resources/${resource.ID_ressource}`, {
+            const response = await fetch(`http://messaging.localhost/ressources/resources/${resource.ID_ressource}`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -324,7 +324,7 @@ const ResourceModal = ({ resource, onClose, onUpdate, matricule }) => {
                                     <FaFileUpload className={styles['ENS-RES-input-icon']} />
                                     Fichier Actuel
                                 </label>
-                                <a href={`http://localhost:8082${resource.fichier_url}`} target="_blank" rel="noopener noreferrer">
+                                <a href={`http://messaging.localhost${resource.fichier_url}`} target="_blank" rel="noopener noreferrer">
                                     {resource.fichier_url.split('/').pop()}
                                 </a>
                             </div>
@@ -398,7 +398,7 @@ const ResourceModal = ({ resource, onClose, onUpdate, matricule }) => {
                                     <FaFileUpload className={styles['ENS-RES-input-icon']} />
                                     Fichier Actuel
                                 </label>
-                                <a href={`http://localhost:8082${resource.fichier_url}`} target="_blank" rel="noopener noreferrer">
+                                <a href={`http://messaging.localhost${resource.fichier_url}`} target="_blank" rel="noopener noreferrer">
                                     {resource.fichier_url.split('/').pop()}
                                 </a>
                             </div>

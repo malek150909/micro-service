@@ -35,7 +35,7 @@ function Calendar() {
 
   const fetchEvents = async (date) => {
     try {
-      const response = await axios.get(`http://localhost:8083/calendar/${format(date, "yyyy-MM-dd")}`, {
+      const response = await axios.get(`http://courses.localhost/calendar/${format(date, "yyyy-MM-dd")}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       console.log("Événements récupérés:", response.data)
@@ -201,17 +201,17 @@ function Calendar() {
                 onClick={async () => {
                   try {
                     if (showEventDetails.type === "personal" || showEventDetails.type === "administratif") {
-                      await axios.delete(`http://localhost:8083/calendar/event/${showEventDetails.ID_event}`, {
+                      await axios.delete(`http://courses.localhost/calendar/event/${showEventDetails.ID_event}`, {
                         headers: { Authorization: `Bearer ${token}` },
                       })
                     } else if (showEventDetails.type === "supp_session") {
                       await axios.delete(
-                        `http://localhost:8083/calendar/supp-session/${showEventDetails.ID_seance_supp}`,
+                        `http://courses.localhost/calendar/supp-session/${showEventDetails.ID_seance_supp}`,
                         { headers: { Authorization: `Bearer ${token}` } },
                       )
                     } else if (showEventDetails.type === "club_event") {
                       await axios.delete(
-                        `http://localhost:8083/calendar/club-event/${showEventDetails.ID_club_evenement}`,
+                        `http://courses.localhost/calendar/club-event/${showEventDetails.ID_club_evenement}`,
                         { headers: { Authorization: `Bearer ${token}` } },
                       )
                     }

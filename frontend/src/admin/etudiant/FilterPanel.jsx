@@ -26,7 +26,7 @@ const FilterPanel = ({ onFilter }) => {
     setDepartements([]);
     setSpecialites([]);
 
-    axios.get('http://localhost:8081/listeETD/filters')
+    axios.get('http://users.localhost/listeETD/filters')
       .then(res => {
         const fetchedFacultes = res.data.facultes || [];
         const fetchedDepartements = res.data.departements || [];
@@ -94,7 +94,7 @@ const FilterPanel = ({ onFilter }) => {
     }
 
     try {
-      const res = await axios.post('http://localhost:8081/listeETD/etudiants/filtrer', {
+      const res = await axios.post('http://users.localhost/listeETD/etudiants/filtrer', {
         niveau: filters.niveau,
         idFaculte: parseInt(filters.idFaculte),
         idDepartement: parseInt(filters.idDepartement),

@@ -85,7 +85,7 @@ function AdminDashboard() {
         try {
             setLoadingFaculties(true);
             console.log('Fetching faculties...');
-            const response = await axios.get('http://localhost:8083/documents/faculties', {
+            const response = await axios.get('http://courses.localhost/documents/faculties', {
                 headers: { matricule: storedUser.Matricule }
             });
             console.log('Faculties fetched:', response.data);
@@ -102,7 +102,7 @@ function AdminDashboard() {
     const fetchDocuments = async () => {
         try {
             console.log('Fetching documents for faculte:', selectedFaculte);
-            const response = await axios.get(`http://localhost:8083/documents/faculte/${selectedFaculte}`, {
+            const response = await axios.get(`http://courses.localhost/documents/faculte/${selectedFaculte}`, {
                 headers: { matricule: user.Matricule }
             });
             console.log('Documents fetched:', response.data);
@@ -133,7 +133,7 @@ function AdminDashboard() {
             formDataToSend.append('file', formData.file);
 
             console.log('Sending request to create document...');
-            const response = await axios.post('http://localhost:8083/documents', formDataToSend, {
+            const response = await axios.post('http://courses.localhost/documents', formDataToSend, {
                 headers: {
                     matricule: user.Matricule,
                     'Content-Type': 'multipart/form-data'
@@ -185,7 +185,7 @@ function AdminDashboard() {
                 formDataToSend.append('fichier_url', editDocument.fichier_url);
             }
 
-            await axios.put(`http://localhost:8083/documents/${editDocument.ID_document}`, formDataToSend, {
+            await axios.put(`http://courses.localhost/documents/${editDocument.ID_document}`, formDataToSend, {
                 headers: {
                     matricule: user.Matricule,
                     'Content-Type': 'multipart/form-data'
@@ -211,7 +211,7 @@ function AdminDashboard() {
         try {
             setError('');
             console.log('Deleting document with ID:', documentToDelete.ID_document);
-            const response = await axios.delete(`http://localhost:8083/documents/${documentToDelete.ID_document}`, {
+            const response = await axios.delete(`http://courses.localhost/documents/${documentToDelete.ID_document}`, {
                 headers: { matricule: user.Matricule }
             });
             console.log('Delete response:', response.data);
@@ -378,7 +378,7 @@ function AdminDashboard() {
                                             </h3>
                                             <p>{doc.description || 'Aucune description'}</p>
                                             <p> {new Date(doc.date_upload).toLocaleDateString('fr-FR')}</p> <br />
-                                            <a href={`http://localhost:8083/${doc.fichier_url}`} download target="_blank" rel="noopener noreferrer">
+                                            <a href={`http://courses.localhost/${doc.fichier_url}`} download target="_blank" rel="noopener noreferrer">
                                                 <FaDownload /> Télécharger
                                             </a>
                                         </div>

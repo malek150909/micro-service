@@ -43,7 +43,7 @@ const ExamPlanning = () => {
 
   const examListRef = useRef(null);
 
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8083";
+  const API_URL = import.meta.env.VITE_API_URL || "http://courses.localhost";
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -514,8 +514,7 @@ const ExamPlanning = () => {
   return (
       <div className={styles['ADM-EXM-app-container']}>
         <div className={styles['ADM-EXM-background-shapes']}>
-          <div className={styles['ADM-EXM-shape']} className={styles['ADM-EXM-shape1']}></div>
-          <div className={styles['ADM-EXM-shape']} className={styles['ADM-EXM-shape2']}></div>
+          <div className={styles['ADM-EXM-shape']} ></div>
         </div>
         <div className={styles['ADM-EXM-sidebar']}>
           <div className={styles['ADM-EXM-logo']}>

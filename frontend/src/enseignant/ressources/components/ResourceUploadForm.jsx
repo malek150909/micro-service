@@ -37,7 +37,7 @@ const ResourceUploadForm = ({
           return;
         }
 
-        const response = await fetch('http://localhost:8082/ressources/sections', {
+        const response = await fetch('http://messaging.localhost/ressources/sections', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'matricule': matricule
@@ -78,7 +78,7 @@ const ResourceUploadForm = ({
         return;
       }
 
-      const response = await fetch(`http://localhost:8082/ressources/modules/${sectionId}`, {
+      const response = await fetch(`http://messaging.localhost/ressources/modules/${sectionId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'matricule': matricule
@@ -151,7 +151,7 @@ const ResourceUploadForm = ({
     formDataToSend.append('file', formData.file);
 
     try {
-      const response = await fetch('http://localhost:8082/ressources/upload', {
+      const response = await fetch('http://messaging.localhost/ressources/upload', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

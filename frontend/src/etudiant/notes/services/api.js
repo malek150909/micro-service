@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8083/grades', // Adjust to your backend URL
+  baseURL: 'http://courses.localhost/grades', // Adjust to your backend URL
 });
 
 api.interceptors.request.use(

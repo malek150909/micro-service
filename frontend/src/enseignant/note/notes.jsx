@@ -21,7 +21,7 @@ const NotesFeed = () => {
     const [showMessageModal, setShowMessageModal] = useState(false);
     const [messageModalContent, setMessageModalContent] = useState({ type: "", text: "" });
 
-    const API_URL = "http://localhost:8083/notes";
+    const API_URL = "http://courses.localhost/notes";
 
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user"));

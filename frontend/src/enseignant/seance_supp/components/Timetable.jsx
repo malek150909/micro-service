@@ -101,7 +101,7 @@ function Timetable({ sectionTimetable, profTimetable, matricule, sectionId, onSe
       setIsSallesLoading(true);
       try {
         const response = await fetch(
-          `http://localhost:8083/SUPPprof/rooms?date=${date}&timeSlot=${timeSlot}&excludeSessionId=${sessionId}&currentSalleId=${currentSalleId}`
+          `http://courses.localhost/SUPPprof/rooms?date=${date}&timeSlot=${timeSlot}&excludeSessionId=${sessionId}&currentSalleId=${currentSalleId}`
         );
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const data = await response.json();
@@ -157,7 +157,7 @@ function Timetable({ sectionTimetable, profTimetable, matricule, sectionId, onSe
   const fetchModules = async () => {
     setIsModulesLoading(true);
     try {
-      const response = await fetch(`http://localhost:8083/SUPPprof/modules?matricule=${matricule}&sectionId=${sectionId}`);
+      const response = await fetch(`http://courses.localhost/SUPPprof/modules?matricule=${matricule}&sectionId=${sectionId}`);
       if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
       const data = await response.json();
       console.log('Fetched modules:', data);
@@ -183,7 +183,7 @@ function Timetable({ sectionTimetable, profTimetable, matricule, sectionId, onSe
     debounce(async (sectionId) => {
       setIsGroupsLoading(true);
       try {
-        const response = await fetch(`http://localhost:8083/SUPPprof/groups?sectionId=${sectionId}`);
+        const response = await fetch(`http://courses.localhost/SUPPprof/groups?sectionId=${sectionId}`);
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const data = await response.json();
         const formattedGroups = (data || []).map(group => ({
@@ -281,7 +281,7 @@ function Timetable({ sectionTimetable, profTimetable, matricule, sectionId, onSe
       groupeIds = session.groupe_ids.split(',').map(id => String(id).trim());
     } else if (session.num_groupe) {
       try {
-        const response = await fetch(`http://localhost:8083/SUPPprof/groups?sectionId=${sessionSectionId}`);
+        const response = await fetch(`http://courses.localhost/SUPPprof/groups?sectionId=${sessionSectionId}`);
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const groups = await response.json();
         const numGroupeArray = session.num_groupe.split(',').map(num => num.trim());
@@ -366,7 +366,7 @@ function Timetable({ sectionTimetable, profTimetable, matricule, sectionId, onSe
     console.log('Submitting modification payload:', payload);
 
     try {
-      const response = await fetch('http://localhost:8083/SUPPprof/modify-session', {
+      const response = await fetch('http://courses.localhost/SUPPprof/modify-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -393,7 +393,7 @@ function Timetable({ sectionTimetable, profTimetable, matricule, sectionId, onSe
   const confirmDeleteSession = async () => {
     if (sessionToDelete) {
       try {
-        const response = await fetch(`http://localhost:8083/SUPPprof/delete-session/${sessionToDelete}`, { method: 'DELETE' });
+        const response = await fetch(`http://courses.localhost/SUPPprof/delete-session/${sessionToDelete}`, { method: 'DELETE' });
         const data = await response.json();
         if (data.success) {
           onSessionModified();

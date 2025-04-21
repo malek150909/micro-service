@@ -34,7 +34,7 @@ const ListEnseignant = () => {
 
   // Fetch faculties on mount
   useEffect(() => {
-    axios.get('http://localhost:8081/api/facultes')
+    axios.get('http://users.localhost/api/facultes')
       .then(res => setFacultes(res.data || []))
       .catch(err => {
         toast.error('Erreur lors de la récupération des facultés: ' + err.message, { autoClose: 3000 });
@@ -46,7 +46,7 @@ const ListEnseignant = () => {
   useEffect(() => {
     if (newTeacherForm.idFaculte || filters.idFaculte) {
       const activeIdFaculte = newTeacherForm.idFaculte || filters.idFaculte;
-      axios.get(`http://localhost:8081/api/departements/${activeIdFaculte}`)
+      axios.get(`http://users.localhost/api/departements/${activeIdFaculte}`)
         .then(res => setDepartements(res.data || []))
         .catch(err => {
           toast.error('Erreur lors de la récupération des départements: ' + err.message, { autoClose: 3000 });
@@ -66,7 +66,7 @@ const ListEnseignant = () => {
   useEffect(() => {
     if (newTeacherForm.idDepartement || filters.idDepartement) {
       const activeIdDepartement = newTeacherForm.idDepartement || filters.idDepartement;
-      axios.get(`http://localhost:8081/api/specialites/${activeIdDepartement}`)
+      axios.get(`http://users.localhost/api/specialites/${activeIdDepartement}`)
         .then(res => setSpecialites(res.data || []))
         .catch(err => {
           toast.error('Erreur lors de la récupération des spécialités: ' + err.message, { autoClose: 3000 });
@@ -83,7 +83,7 @@ const ListEnseignant = () => {
   // Fetch sections when specialty changes
   useEffect(() => {
     if (filters.idSpecialite) {
-      axios.get(`http://localhost:8081/api/sections/${filters.idSpecialite}`)
+      axios.get(`http://users.localhost/api/sections/${filters.idSpecialite}`)
         .then(res => setSections(res.data || []))
         .catch(err => {
           toast.error('Erreur lors de la récupération des sections: ' + err.message, { autoClose: 3000 });
@@ -99,7 +99,7 @@ const ListEnseignant = () => {
   // Fetch available modules based on filters
   useEffect(() => {
     if (filters.idSpecialite) {
-      axios.get('http://localhost:8081/api/modules/filtered', {
+      axios.get('http://users.localhost/api/modules/filtered', {
         params: {
           idFaculte: newTeacherForm.idFaculte || filters.idFaculte || '',
           idDepartement: newTeacherForm.idDepartement || filters.idDepartement || '',

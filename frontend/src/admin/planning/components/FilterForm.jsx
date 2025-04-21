@@ -32,7 +32,7 @@ const FilterForm = ({ onFilter, onChange }) => {
     semestres: {},
   });
 
-  const API_URL = 'http://localhost:8083';
+  const API_URL = 'http://courses.localhost';
 
   // Fetch Facultes
   useEffect(() => {

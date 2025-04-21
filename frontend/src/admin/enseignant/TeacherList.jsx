@@ -22,14 +22,14 @@ const TeacherList = () => {
   const [showAddForm, setShowAddForm] = useState(false);
 
   useEffect(() => {
-    axios.get('http://localhost:8081/api/facultes')
+    axios.get('http://users.localhost/api/facultes')
       .then(res => setFacultes(res.data))
       .catch(err => console.error('Error fetching facultes:', err));
   }, []);
 
   useEffect(() => {
     if (filters.idFaculte) {
-      axios.get(`http://localhost:8081/api/departements/${filters.idFaculte}`)
+      axios.get(`http://users.localhost/api/departements/${filters.idFaculte}`)
         .then(res => {
           setDepartements(res.data);
           setFilters((prev) => ({ ...prev, idDepartement: '', idSpecialite: '' }));
@@ -43,7 +43,7 @@ const TeacherList = () => {
 
   useEffect(() => {
     if (filters.idDepartement) {
-      axios.get(`http://localhost:8081/api/specialites/${filters.idDepartement}`)
+      axios.get(`http://users.localhost/api/specialites/${filters.idDepartement}`)
         .then(res => {
           setSpecialites(res.data);
           setFilters((prev) => ({ ...prev, idSpecialite: '' }));
@@ -56,7 +56,7 @@ const TeacherList = () => {
 
   const handleFilterSubmit = () => {
     if (filters.idSpecialite) {
-      axios.get('http://localhost:8081/api/enseignants/filtered', { params: filters })
+      axios.get('http://users.localhost/api/enseignants/filtered', { params: filters })
         .then(res => {
           setTeachers(res.data);
           setShowTeachers(true);
@@ -84,7 +84,7 @@ const TeacherList = () => {
   const handleAddTeacher = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:8081/api/enseignants', {
+      await axios.post('http://users.localhost/api/enseignants', {
         ...newTeacher,
         modules: newTeacher.modules.map(m => parseInt(m)),
       });

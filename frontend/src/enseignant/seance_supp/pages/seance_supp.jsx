@@ -19,7 +19,7 @@ function Dashboard() {
   const fetchSections = async () => {
     if (matricule) {
       try {
-        const response = await fetch(`http://localhost:8083/SUPPprof/sections/${matricule}`);
+        const response = await fetch(`http://courses.localhost/SUPPprof/sections/${matricule}`);
         if (!response.ok) throw new Error(`HTTP error: ${response.status} ${response.statusText}`);
         const fetchedSections = await response.json();
         setSections(fetchedSections);
@@ -35,7 +35,7 @@ function Dashboard() {
   const fetchTimetables = async () => {
     if (selectedSection && matricule) {
       try {
-        const response = await fetch(`http://localhost:8083/SUPPprof/timetables?matricule=${matricule}&sectionId=${selectedSection}`);
+        const response = await fetch(`http://courses.localhost/SUPPprof/timetables?matricule=${matricule}&sectionId=${selectedSection}`);
         if (!response.ok) throw new Error(`HTTP error: ${response.status} ${response.statusText}`);
         const data = await response.json();
         setSectionTimetable({

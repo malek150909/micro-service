@@ -31,7 +31,7 @@ const Login = () => {
     setIsTransitioning(true)
 
     try {
-      const response = await fetch("http://localhost:8081/login", {
+      const response = await fetch("http://users.localhost/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ matricule, password }),

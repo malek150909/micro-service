@@ -5,20 +5,44 @@ http:
       service: "users-service"
       entryPoints:
         - "web"
-
+    courses:
+      rule: "Host(`courses.localhost`)"
+      service: "courses-service"
+      entryPoints:
+        - "web"
+    messaging:
+      rule: "Host(`messaging.localhost`)"
+      service: "messaging-service"
+      entryPoints:
+        - "web"
+    events:
+      rule: "Host(`events.localhost`)"
+      service: "events-service"
+      entryPoints:
+        - "web"
     frontend:
       rule: "Host(`plateform.universitaire`)"
       service: "frontend"
       entryPoints:
         - "web"
-
   services:
     users-service:
       loadBalancer:
         servers:
           - url: "http://localhost:8081"
-
+    courses-service:
+      loadBalancer:
+        servers:
+          - url: "http://localhost:8083"
+    messaging-service:
+      loadBalancer:
+        servers:
+          - url: "http://localhost:8082"
+    events-service:
+      loadBalancer:
+        servers:
+          - url: "http://localhost:8084"
     frontend:
       loadBalancer:
         servers:
-          - url: "http://localhost:9000"
+          - url: "http://localhost:8085"

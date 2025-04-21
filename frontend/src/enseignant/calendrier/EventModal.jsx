@@ -33,7 +33,7 @@ function EventModal({ time, date, onClose, onSave, role, event, timeSlots }) {
       }
       if (event) {
         await axios.put(
-          `http://localhost:8083/calendar/event/${event.ID_event}`,
+          `http://courses.localhost/calendar/event/${event.ID_event}`,
           {
             title,
             content,
@@ -44,7 +44,7 @@ function EventModal({ time, date, onClose, onSave, role, event, timeSlots }) {
         )
       } else {
         await axios.post(
-          "http://localhost:8083/calendar/event",
+          "http://courses.localhost/calendar/event",
           {
             title,
             content,

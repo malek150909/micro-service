@@ -20,7 +20,7 @@ const ModuleModal = ({ module, onClose, onSave }) => {
   const handleSave = async () => {
     try {
       console.log('Données envoyées au backend pour mise à jour :', formData);
-      await axios.put(`http://localhost:8083/modules/${module.ID_module}`, formData);
+      await axios.put(`http://courses.localhost/modules/${module.ID_module}`, formData);
       onSave(formData);
       onClose();
     } catch (error) {

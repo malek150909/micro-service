@@ -20,7 +20,7 @@ const NotificationBell = ({ onNotificationClick, showModal }) => {
 
   const fetchNotifications = async () => {
     try {
-      const response = await fetch(`http://localhost:8082/notifications`, {
+      const response = await fetch(`http://messaging.localhost/notifications`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -41,7 +41,7 @@ const NotificationBell = ({ onNotificationClick, showModal }) => {
 
   const deleteNotification = async (id) => {
     try {
-      const response = await fetch(`http://localhost:8082/notifications/${id}`, {
+      const response = await fetch(`http://messaging.localhost/notifications/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -56,7 +56,7 @@ const NotificationBell = ({ onNotificationClick, showModal }) => {
 
   const deleteAllNotifications = async () => {
     try {
-      const response = await fetch(`http://localhost:8082/notifications/all`, {
+      const response = await fetch(`http://messaging.localhost/notifications/all`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -71,7 +71,7 @@ const NotificationBell = ({ onNotificationClick, showModal }) => {
 
   const markAsSeen = async (id) => {
     try {
-      const response = await fetch(`http://localhost:8082/notifications/seen/${id}`, {
+      const response = await fetch(`http://messaging.localhost/notifications/seen/${id}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

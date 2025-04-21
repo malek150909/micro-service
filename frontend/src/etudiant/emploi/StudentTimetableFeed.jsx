@@ -47,7 +47,7 @@ const StudentTimetableFeed = () => {
   const fetchTimetable = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:8083/timetableETD/seances', {
+      const response = await axios.get('http://courses.localhost/timetableETD/seances', {
         headers: { Authorization: `Bearer ${token}` },
       });
       setSeances(response.data);

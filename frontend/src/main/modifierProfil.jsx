@@ -73,7 +73,7 @@ const EditProfile = () => {
         console.log("Données envoyées au backend :", payload);
 
         try {
-            const response = await fetch("http://localhost:8081/update-password", {
+            const response = await fetch("http://users.localhost/update-password", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

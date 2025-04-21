@@ -23,7 +23,7 @@ const SessionModal = ({ session, onClose, styles }) => { // Add styles prop
   const fetchSpecialites = async () => {
     const token = localStorage.getItem('token');
     try {
-      const res = await axios.get('http://localhost:8083/timetableENS/specialites', {
+      const res = await axios.get('http://courses.localhost/timetableENS/specialites', {
         headers: { Authorization: `Bearer ${token}` },
       });
       setSpecialites(res.data);
@@ -37,7 +37,7 @@ const SessionModal = ({ session, onClose, styles }) => { // Add styles prop
     const token = localStorage.getItem('token');
     try {
       const res = await axios.get(
-        `http://localhost:8083/timetableENS/sections?specialite_id=${formData.ID_specialite}`,
+        `http://courses.localhost/timetableENS/sections?specialite_id=${formData.ID_specialite}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setSections(res.data);
@@ -51,7 +51,7 @@ const SessionModal = ({ session, onClose, styles }) => { // Add styles prop
     const token = localStorage.getItem('token');
     try {
       const res = await axios.get(
-        `http://localhost:8083/timetableENS/modules?section_id=${formData.ID_section}`,
+        `http://courses.localhost/timetableENS/modules?section_id=${formData.ID_section}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setModules(res.data);
@@ -65,7 +65,7 @@ const SessionModal = ({ session, onClose, styles }) => { // Add styles prop
     const token = localStorage.getItem('token');
     try {
       const res = await axios.get(
-        `http://localhost:8083/timetableENS/groupes?section_id=${formData.ID_section}`,
+        `http://courses.localhost/timetableENS/groupes?section_id=${formData.ID_section}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setGroupes(res.data);
@@ -79,7 +79,7 @@ const SessionModal = ({ session, onClose, styles }) => { // Add styles prop
     const token = localStorage.getItem('token');
     try {
       const res = await axios.get(
-        `http://localhost:8083/timetableENS/salles?type_seance=${formData.type_seance}`,
+        `http://courses.localhost/timetableENS/salles?type_seance=${formData.type_seance}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setSalles(res.data);
@@ -110,7 +110,7 @@ const SessionModal = ({ session, onClose, styles }) => { // Add styles prop
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      await axios.post('http://localhost:8083/timetableENS', formData, {
+      await axios.post('http://courses.localhost/timetableENS', formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       onClose();
@@ -123,7 +123,7 @@ const SessionModal = ({ session, onClose, styles }) => { // Add styles prop
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`http://localhost:8083/timetableENS/${formData.ID_seance}`, formData, {
+      await axios.put(`http://courses.localhost/timetableENS/${formData.ID_seance}`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       onClose();
@@ -136,7 +136,7 @@ const SessionModal = ({ session, onClose, styles }) => { // Add styles prop
     if (window.confirm('Voulez-vous vraiment supprimer cette séance ?')) {
       try {
         const token = localStorage.getItem('token');
-        await axios.delete(`http://localhost:8083/timetableENS/${formData.ID_seance}`, {
+        await axios.delete(`http://courses.localhost/timetableENS/${formData.ID_seance}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         onClose();

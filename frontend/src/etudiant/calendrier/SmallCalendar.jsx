@@ -28,7 +28,7 @@ function SmallCalendar({ currentDate, onDateClick, onMonthChange }) {
       try {
         const startDate = format(start, "yyyy-MM-dd")
         const endDate = format(end, "yyyy-MM-dd")
-        const response = await axios.get(`http://localhost:8083/calendar/${startDate}/${endDate}`, {
+        const response = await axios.get(`http://courses.localhost/calendar/${startDate}/${endDate}`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         console.log("Événements du mois récupérés:", response.data)

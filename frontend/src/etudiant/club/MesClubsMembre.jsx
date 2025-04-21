@@ -20,7 +20,7 @@ const MesClubsMembre = ({ clubsMembre, setClubsMembre, setError }) => {
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const matricule = storedUser?.Matricule;
 
-  const API_URL = 'http://localhost:8084';
+  const API_URL = 'http://events.localhost';
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });

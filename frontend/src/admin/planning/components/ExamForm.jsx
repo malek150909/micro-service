@@ -43,7 +43,7 @@ const ExamForm = ({ onAdd, disabled, modules, salles: initialSalles, semestres, 
     const fetchSalles = async () => {
       if (examData.exam_date && examData.time_slot && examData.mode === 'presentiel') {
         try {
-          const response = await axios.get('http://localhost:8083/exams/salles', {
+          const response = await axios.get('http://courses.localhost/exams/salles', {
             params: {
               exam_date: examData.exam_date,
               time_slot: examData.time_slot,

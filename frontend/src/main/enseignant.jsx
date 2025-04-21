@@ -21,8 +21,8 @@ const Enseignant = () => {
     const [showDetailsModal, setShowDetailsModal] = useState(false);
     const [selectedNote, setSelectedNote] = useState(null);
 
-    const CALENDAR_API_URL = "http://localhost:8083/calendar";
-    const API_URL = "http://localhost:8083/notes";
+    const CALENDAR_API_URL = "http://courses.localhost/calendar";
+    const API_URL = "http://courses.localhost/notes";
 
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user"));

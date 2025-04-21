@@ -33,7 +33,7 @@ function TimetableDisplay({ timetable, sectionId, semestre, onRefresh }) {
   useEffect(() => {
     if (sectionId && semestre) {
       console.log('Fetching session options for sectionId:', sectionId, 'and semestre:', semestre);
-      fetch(`http://localhost:8083/timetable/session-options?sectionId=${sectionId}&semestre=${semestre}`)
+      fetch(`http://courses.localhost/timetable/session-options?sectionId=${sectionId}&semestre=${semestre}`)
         .then(response => {
           if (!response.ok) {
             throw new Error(`Erreur réseau: ${response.status} - ${response.statusText}`);
@@ -57,7 +57,7 @@ function TimetableDisplay({ timetable, sectionId, semestre, onRefresh }) {
         });
 
       console.log('Fetching section details for sectionId:', sectionId);
-      fetch(`http://localhost:8083/timetable/section-details?sectionId=${sectionId}`)
+      fetch(`http://courses.localhost/timetable/section-details?sectionId=${sectionId}`)
         .then(response => {
           console.log('Section details response status:', response.status);
           if (!response.ok) {
@@ -187,7 +187,7 @@ function TimetableDisplay({ timetable, sectionId, semestre, onRefresh }) {
       return;
     }
     try {
-      const response = await fetch(`http://localhost:8083/timetable/module-enseignants?moduleId=${moduleId}`);
+      const response = await fetch(`http://courses.localhost/timetable/module-enseignants?moduleId=${moduleId}`);
       const data = await response.json();
       console.log('Filtered enseignants for moduleId', moduleId, ':', data.enseignants);
       if (data.success) {
@@ -215,7 +215,7 @@ function TimetableDisplay({ timetable, sectionId, semestre, onRefresh }) {
         throw new Error('ID de séance invalide');
       }
       console.log('Deleting session with ID:', sessionId);
-      const response = await fetch(`http://localhost:8083/timetable/session/${sessionId}`, {
+      const response = await fetch(`http://courses.localhost/timetable/session/${sessionId}`, {
         method: 'DELETE',
       });
       const text = await response.text();
@@ -297,8 +297,8 @@ function TimetableDisplay({ timetable, sectionId, semestre, onRefresh }) {
         ID_groupe: editForm.type_seance === 'cours' || editForm.type_seance === 'En ligne' ? null : editForm.ID_groupe
       };
       const url = isAdding
-        ? 'http://localhost:8083/timetable/session'
-        : `http://localhost:8083/timetable/session/${selectedSession.ID_seance}`;
+        ? 'http://courses.localhost/timetable/session'
+        : `http://courses.localhost/timetable/session/${selectedSession.ID_seance}`;
       const method = isAdding ? 'POST' : 'PUT';
 
       const response = await fetch(url, {

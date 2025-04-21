@@ -20,7 +20,7 @@ const TeacherDashboard = () => {
   useEffect(() => {
     const fetchSections = async () => {
       try {
-        const res = await axios.get(`http://localhost:8081/ENSlisteETD/${matricule}/sections`);
+        const res = await axios.get(`http://users.localhost/ENSlisteETD/${matricule}/sections`);
         setSections(res.data);
         if (res.data.length > 0) {
           setSelectedSection(res.data[0].ID_section);
@@ -49,11 +49,11 @@ const TeacherDashboard = () => {
     const fetchStudentsAndNotifications = async () => {
       try {
         // Charger les étudiants
-        const studentsRes = await axios.get(`http://localhost:8081/ENSlisteETD/${matricule}/section/${selectedSection}/students`);
+        const studentsRes = await axios.get(`http://users.localhost/ENSlisteETD/${matricule}/section/${selectedSection}/students`);
         setStudents(studentsRes.data);
 
         // Vérifier les notifications pour cette section
-        const notificationsRes = await axios.get(`http://localhost:8081/ENSlisteETD/${matricule}/section/${selectedSection}/notifications`);
+        const notificationsRes = await axios.get(`http://users.localhost/ENSlisteETD/${matricule}/section/${selectedSection}/notifications`);
         console.log('Notifications récupérées:', notificationsRes.data);
         const notifications = notificationsRes.data;
 
@@ -83,7 +83,7 @@ const TeacherDashboard = () => {
     if (!selectedSection) return;
 
     try {
-      const res = await axios.get(`http://localhost:8081/ENSlisteETD/${matricule}/section/${selectedSection}/pdf`, {
+      const res = await axios.get(`http://users.localhost/ENSlisteETD/${matricule}/section/${selectedSection}/pdf`, {
         responseType: 'blob',
       });
 
@@ -125,7 +125,7 @@ const TeacherDashboard = () => {
     if (!updateNotification) return;
 
     try {
-      await axios.delete(`http://localhost:8081/ENSlisteETD/notifications/${updateNotification.ID_notification}`);
+      await axios.delete(`http://users.localhost/ENSlisteETD/notifications/${updateNotification.ID_notification}`);
       setUpdateNotification(null);
       toast.success('Message de mise à jour supprimé.', {
         position: 'top-right',

@@ -31,7 +31,7 @@ function StudentPlanning() {
     const fetchStudentData = async () => {
       try {
         console.log('Appel API /studentPlanning/login avec matricule:', matricule);
-        const response = await axios.post('http://localhost:8083/studentPlanning/login', {
+        const response = await axios.post('http://courses.localhost/studentPlanning/login', {
           matricule,
         });
         console.log('Réponse API /studentPlanning/login:', response.data);
@@ -64,7 +64,7 @@ function StudentPlanning() {
 
     try {
       console.log('Appel API /studentPlanning/exams avec:', { sectionId, semester: semesterInt });
-      const response = await axios.get('http://localhost:8083/studentPlanning/exams', {
+      const response = await axios.get('http://courses.localhost/studentPlanning/exams', {
         params: { sectionId, semester: semesterInt },
       });
       console.log('Réponse API /studentPlanning/exams:', response.data);

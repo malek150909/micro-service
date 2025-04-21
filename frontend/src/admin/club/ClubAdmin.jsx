@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaPlus, FaEdit, FaTrash, FaUsers, FaTimes, FaEnvelope, FaSearch, FaCheck, FaUser, FaHome } from 'react-icons/fa';
-import styles from './club.module.css'; // Mise à jour de l'importation
+import styles from './club.module.css';
 
 const Toast = ({ message, type, onClose }) => {
   useEffect(() => {
@@ -18,7 +18,7 @@ const Toast = ({ message, type, onClose }) => {
   );
 };
 
-const ClubAdmin = ({ adminMatricule, handleLogout }) => {
+const ClubAdmin = ({ handleLogout }) => {
   const navigate = useNavigate();
   const [clubs, setClubs] = useState([]);
   const [demandes, setDemandes] = useState([]);
@@ -56,7 +56,7 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
     onConfirm: () => {},
   });
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8084';
+  const API_URL = 'http://events.localhost';
 
   const addToast = (message, type) => {
     const id = Date.now();
@@ -66,14 +66,38 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
     }, 3000);
   };
 
+  const getFetchOptions = (method, body = null) => {
+    const token = localStorage.getItem('token');
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    const options = { method, headers };
+    if (body) {
+      options.body = JSON.stringify(body);
+    }
+    return options;
+  };
+
+  const handleResponse = async (response) => {
+    if (response.status === 401) {
+      localStorage.removeItem('token');
+      navigate('/login');
+      throw new Error('Accès non autorisé - Veuillez vous reconnecter');
+    }
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Erreur: ${response.status} ${response.statusText} - ${errorText}`);
+    }
+    return response.json();
+  };
+
   const fetchDemandes = async () => {
     try {
-      const response = await fetch(`${API_URL}/demandesADM`);
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Erreur lors de la récupération des demandes: ${response.status} ${response.statusText} - ${errorText}`);
-      }
-      const data = await response.json();
+      const response = await fetch(`${API_URL}/demandesADM`, getFetchOptions('GET'));
+      const data = await handleResponse(response);
       setDemandes(data);
     } catch (err) {
       setError(err.message);
@@ -82,14 +106,17 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
   };
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+
     const fetchClubs = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${API_URL}/clubsADM`);
-        if (!response.ok) {
-          throw new Error('Erreur lors de la récupération des clubs');
-        }
-        const data = await response.json();
+        const response = await fetch(`${API_URL}/clubsADM`, getFetchOptions('GET'));
+        const data = await handleResponse(response);
         setClubs(data);
       } catch (err) {
         setError(err.message);
@@ -101,11 +128,8 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
 
     const fetchFacultes = async () => {
       try {
-        const response = await fetch(`${API_URL}/Clubs/facultes`);
-        if (!response.ok) {
-          throw new Error('Erreur lors de la récupération des facultés');
-        }
-        const data = await response.json();
+        const response = await fetch(`${API_URL}/Clubs/facultes`, getFetchOptions('GET'));
+        const data = await handleResponse(response);
         setFacultes(data);
       } catch (err) {
         setError(err.message);
@@ -116,7 +140,7 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
     fetchClubs();
     fetchDemandes();
     fetchFacultes();
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     const fetchDepartements = async () => {
@@ -129,11 +153,8 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
         return;
       }
       try {
-        const response = await fetch(`${API_URL}/Clubs/departements?id_faculte=${filters.id_faculte}`);
-        if (!response.ok) {
-          throw new Error('Erreur lors de la récupération des départements');
-        }
-        const data = await response.json();
+        const response = await fetch(`${API_URL}/Clubs/departements?id_faculte=${filters.id_faculte}`, getFetchOptions('GET'));
+        const data = await handleResponse(response);
         setDepartements(data);
         setSpecialites([]);
         setSections([]);
@@ -158,11 +179,8 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
         return;
       }
       try {
-        const response = await fetch(`${API_URL}/Clubs/specialites?id_departement=${filters.id_departement}`);
-        if (!response.ok) {
-          throw new Error('Erreur lors de la récupération des spécialités');
-        }
-        const data = await response.json();
+        const response = await fetch(`${API_URL}/Clubs/specialites?id_departement=${filters.id_departement}`, getFetchOptions('GET'));
+        const data = await handleResponse(response);
         setSpecialites(data);
         setSections([]);
         setEtudiants([]);
@@ -185,11 +203,8 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
         return;
       }
       try {
-        const response = await fetch(`${API_URL}/Clubs/sections?id_specialite=${filters.id_specialite}`);
-        if (!response.ok) {
-          throw new Error('Erreur lors de la récupération des sections');
-        }
-        const data = await response.json();
+        const response = await fetch(`${API_URL}/Clubs/sections?id_specialite=${filters.id_specialite}`, getFetchOptions('GET'));
+        const data = await handleResponse(response);
         setSections(data);
         setEtudiants([]);
         setFilteredEtudiants([]);
@@ -210,11 +225,8 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
         return;
       }
       try {
-        const response = await fetch(`${API_URL}/clubsADM/etudiants/filters?id_section=${filters.id_section}`);
-        if (!response.ok) {
-          throw new Error('Erreur lors de la récupération des étudiants');
-        }
-        const data = await response.json();
+        const response = await fetch(`${API_URL}/clubsADM/etudiants/filters?id_section=${filters.id_section}`, getFetchOptions('GET'));
+        const data = await handleResponse(response);
         setEtudiants(data);
         setFilteredEtudiants(data);
       } catch (err) {
@@ -288,25 +300,13 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
     try {
       const url = editMode ? `${API_URL}/clubsADM/${editClubId}` : `${API_URL}/clubsADM`;
       const method = editMode ? 'PUT' : 'POST';
+      const response = await fetch(url, getFetchOptions(method, data));
+      const result = await handleResponse(response);
 
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Erreur lors de la soumission');
-      }
-
-      const result = await response.json();
       setSuccess(result.message || (editMode ? 'Club modifié avec succès' : 'Club créé avec succès'));
       addToast(result.message || (editMode ? 'Club modifié avec succès' : 'Club créé avec succès'), 'success');
 
-      const updatedClubs = await fetch(`${API_URL}/clubsADM`).then((res) => res.json());
+      const updatedClubs = await fetch(`${API_URL}/clubsADM`, getFetchOptions('GET')).then(handleResponse);
       setClubs(updatedClubs);
       setShowModal(false);
       setFormData({ nom: '', description_club: '', gerant_matricule: '' });
@@ -343,16 +343,9 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
       setError(null);
       setSuccess(null);
 
-      const response = await fetch(`${API_URL}/clubsADM/${id}`, {
-        method: 'DELETE',
-      });
+      const response = await fetch(`${API_URL}/clubsADM/${id}`, getFetchOptions('DELETE'));
+      const result = await handleResponse(response);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Erreur lors de la suppression du club');
-      }
-
-      const result = await response.json();
       setSuccess(result.message || 'Club supprimé avec succès');
       addToast(result.message || 'Club supprimé avec succès', 'success');
       setClubs(clubs.filter((club) => club.ID_club !== id));
@@ -367,23 +360,12 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
       setError(null);
       setSuccess(null);
 
-      const response = await fetch(`${API_URL}/demandesADM/accepter/${demande.ID_demande}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ gerant_matricule: demande.matricule_etudiant }),
-      });
+      const response = await fetch(`${API_URL}/demandesADM/accepter/${demande.ID_demande}`, getFetchOptions('PUT', { gerant_matricule: demande.matricule_etudiant }));
+      const result = await handleResponse(response);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Erreur lors de l’acceptation de la demande');
-      }
-
-      const result = await response.json();
       setSuccess(result.message || 'Demande acceptée avec succès');
       addToast(result.message || 'Demande acceptée avec succès', 'success');
-      const updatedClubs = await fetch(`${API_URL}/clubsADM`).then((res) => res.json());
+      const updatedClubs = await fetch(`${API_URL}/clubsADM`, getFetchOptions('GET')).then(handleResponse);
       setClubs(updatedClubs);
       fetchDemandes();
     } catch (err) {
@@ -397,16 +379,9 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
       setError(null);
       setSuccess(null);
 
-      const response = await fetch(`${API_URL}/demandesADM/refuser/${id}`, {
-        method: 'PUT',
-      });
+      const response = await fetch(`${API_URL}/demandesADM/refuser/${id}`, getFetchOptions('PUT'));
+      const result = await handleResponse(response);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Erreur lors du refus de la demande');
-      }
-
-      const result = await response.json();
       setSuccess(result.message || 'Demande refusée avec succès');
       addToast(result.message || 'Demande refusée avec succès', 'success');
       fetchDemandes();
@@ -418,7 +393,7 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
 
   if (loading) {
     return (
-      <div id="clubs">
+      <div >
         <div className={styles['ADM-CLUB-container']}>Chargement...</div>
       </div>
     );
@@ -450,13 +425,13 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
           <FaHome /> Retour à l'accueil
         </button>
         <button
-          className={`${styles['ADM-CLUB-sidebar-button']} ${activeTab === 'clubs' ? styles['active'] : ''}`}
+          className={`${styles['ADM-CLUB-sidebar-button']} ${activeTab === 'clubs' ? styles['ADM-CLUB-active'] : ''}`}
           onClick={() => setActiveTab('clubs')}
         >
           <FaUsers /> Gestion des Clubs
         </button>
         <button
-          className={`${styles['ADM-CLUB-sidebar-button']} ${activeTab === 'demandes' ? styles['active'] : ''}`}
+          className={`${styles['ADM-CLUB-sidebar-button']} ${activeTab === 'demandes' ? styles['ADM-CLUB-active'] : ''}`}
           onClick={() => setActiveTab('demandes')}
         >
           <FaEnvelope /> Gérer les Demandes
@@ -480,7 +455,7 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
               </div>
 
               <div className={styles['ADM-CLUB-content-grid']}>
-                <div className={styles['ADM-CLUB-club-grid']}>
+                <div className molecules={styles['ADM-CLUB-club-grid']}>
                   {clubs.length === 0 ? (
                     <div className={styles['ADM-CLUB-no-results']}>Aucun club disponible</div>
                   ) : (
@@ -615,7 +590,7 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
       </main>
 
       {showModal && (
-        <div className={`${styles['ADM-CLUB-modal-overlay']} ${styles['active']}`}>
+        <div className={`${styles['ADM-CLUB-modal-overlay']} ${styles['ADM-CLUB-active']}`}>
           <div className={styles['ADM-CLUB-modal-content']}>
             <h3>{editMode ? 'Modifier un Club' : 'Créer un Club'}</h3>
             <form onSubmit={handleSubmit}>
@@ -758,7 +733,7 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
       )}
 
       {showViewModal && selectedClub && (
-        <div className={`${styles['ADM-CLUB-modal-overlay']} ${styles['active']}`}>
+        <div className={`${styles['ADM-CLUB-modal-overlay']} ${styles['ADM-CLUB-active']}`}>
           <div className={styles['ADM-CLUB-modal-content']}>
             <h3>Détails du Club</h3>
             <div style={{ textAlign: 'center', marginBottom: '20px' }}>
@@ -801,7 +776,7 @@ const ClubAdmin = ({ adminMatricule, handleLogout }) => {
       )}
 
       {confirmModal.isOpen && (
-        <div className={`${styles['ADM-CLUB-modal-overlay']} ${styles['active']}`}>
+        <div className={`${styles['ADM-CLUB-modal-overlay']} ${styles['ADM-CLUB-active']}`}>
           <div className={styles['ADM-CLUB-confirm-modal']}>
             <h3>Confirmation</h3>
             <p>{confirmModal.message}</p>

@@ -29,7 +29,7 @@ function AddSession({ sectionId, onSessionAdded }) {
     const fetchModules = async () => {
       try {
         console.log('Fetching modules with matricule:', matricule, 'and sectionId:', sectionId);
-        const response = await fetch(`http://localhost:8083/SUPPprof/modules?matricule=${matricule}&sectionId=${sectionId}`);
+        const response = await fetch(`http://courses.localhost/SUPPprof/modules?matricule=${matricule}&sectionId=${sectionId}`);
         if (!response.ok) {
           throw new Error(`HTTP error: ${response.status} ${response.statusText}`);
         }
@@ -76,7 +76,7 @@ function AddSession({ sectionId, onSessionAdded }) {
 
   useEffect(() => {
     if (typeSeance === 'TD' || typeSeance === 'TP') {
-      fetch(`http://localhost:8083/SUPPprof/groups?sectionId=${sectionId}`)
+      fetch(`http://courses.localhost/SUPPprof/groups?sectionId=${sectionId}`)
         .then((res) => res.json())
         .then((data) => {
           console.log('Groups response:', data);
@@ -94,7 +94,7 @@ function AddSession({ sectionId, onSessionAdded }) {
 
   useEffect(() => {
     if (date && timeSlot && mode === 'presentiel') {
-      fetch(`http://localhost:8083/SUPPprof/rooms?date=${date}&timeSlot=${timeSlot}`)
+      fetch(`http://courses.localhost/SUPPprof/rooms?date=${date}&timeSlot=${timeSlot}`)
         .then((res) => res.json())
         .then((data) => {
           console.log('Rooms response:', data);
@@ -164,7 +164,7 @@ function AddSession({ sectionId, onSessionAdded }) {
     console.log('Date being sent to backend:', date);
 
     try {
-      const response = await fetch('http://localhost:8083/SUPPprof/add-session', {
+      const response = await fetch('http://courses.localhost/SUPPprof/add-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ matricule, sectionId, salleId, moduleId, typeSeance, groupeIds, date, timeSlot, mode }),

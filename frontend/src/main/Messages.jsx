@@ -34,7 +34,7 @@ const Messages = () => {
   const fetchReceivedMessages = async (matricule) => {
     const token = localStorage.getItem("token");
     try {
-      const response = await fetch("http://localhost:8082/api/messages/received", {
+      const response = await fetch("http://messaging.localhost/api/messages/received", {
         headers: { "Authorization": `Bearer ${token}` },
       });
       const data = await response.json();
@@ -55,7 +55,7 @@ const Messages = () => {
     const token = localStorage.getItem("token");
     const normalizedEmail = emailInput.trim().toLowerCase();
     try {
-      const response = await fetch(`http://localhost:8082/api/users/search?email=${normalizedEmail}`, {
+      const response = await fetch(`http://messaging.localhost/api/users/search?email=${normalizedEmail}`, {
         headers: { "Authorization": `Bearer ${token}` },
       });
       const data = await response.json();
@@ -85,7 +85,7 @@ const Messages = () => {
     const token = localStorage.getItem("token");
     try {
       const response = await fetch(
-        `http://localhost:8082/api/messages?expediteur=${user.Matricule}&destinataire=${recipientMatricule}`,
+        `http://messaging.localhost/api/messages?expediteur=${user.Matricule}&destinataire=${recipientMatricule}`,
         { headers: { "Authorization": `Bearer ${token}` } }
       );
       const data = await response.json();
@@ -108,7 +108,7 @@ const Messages = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:8082/api/messages", {
+      const response = await fetch("http://messaging.localhost/api/messages", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -150,7 +150,7 @@ const Messages = () => {
   const markMessagesAsRead = async (expediteurMatricule) => {
     const token = localStorage.getItem("token");
     try {
-      await fetch(`http://localhost:8082/api/messages/mark-as-read`, {
+      await fetch(`http://messaging.localhost/api/messages/mark-as-read`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -293,7 +293,7 @@ const Messages = () => {
                           <div className={styles['MSG-file-attachment']}>
                             <span>Fichier : {msg.fileName || "Fichier sans nom"}</span>
                             <a
-                              href={`http://localhost:8082/uploads/${msg.filePath}`}
+                              href={`http://messaging.localhost/uploads/${msg.filePath}`}
                               target="_blank"
                               rel="noopener noreferrer"
                             >

@@ -19,7 +19,7 @@ const TeacherSection = ({ teacher, onBack }) => {
 
   useEffect(() => {
     // Fetch teacher details and modules
-    axios.get(`http://localhost:8081/api/enseignants/${teacher.Matricule}`)
+    axios.get(`http://users.localhost/api/enseignants/${teacher.Matricule}`)
       .then(res => {
         setTeacherDetails(res.data.enseignant);
         setModules(res.data.modules);
@@ -35,14 +35,14 @@ const TeacherSection = ({ teacher, onBack }) => {
       });
 
     // Fetch all faculties
-    axios.get('http://localhost:8081/api/facultes')
+    axios.get('http://users.localhost/api/facultes')
       .then(res => setFacultes(res.data))
       .catch(err => toast.error('Erreur lors de la récupération des facultés: ' + err.message, { autoClose: 3000 }));
   }, [teacher]);
 
   useEffect(() => {
     if (filters.idFaculte) {
-      axios.get(`http://localhost:8081/api/departements/${filters.idFaculte}`)
+      axios.get(`http://users.localhost/api/departements/${filters.idFaculte}`)
         .then(res => setDepartements(res.data))
         .catch(err => toast.error('Erreur lors de la récupération des départements: ' + err.message, { autoClose: 3000 }));
     }
@@ -50,7 +50,7 @@ const TeacherSection = ({ teacher, onBack }) => {
 
   useEffect(() => {
     if (filters.idDepartement) {
-      axios.get(`http://localhost:8081/api/specialites/${filters.idDepartement}`)
+      axios.get(`http://users.localhost/api/specialites/${filters.idDepartement}`)
         .then(res => setSpecialites(res.data))
         .catch(err => toast.error('Erreur lors de la récupération des spécialités: ' + err.message, { autoClose: 3000 }));
     }
@@ -58,7 +58,7 @@ const TeacherSection = ({ teacher, onBack }) => {
 
   useEffect(() => {
     if (filters.idSpecialite) {
-      axios.get(`http://localhost:8081/api/sections/${filters.idSpecialite}`)
+      axios.get(`http://users.localhost/api/sections/${filters.idSpecialite}`)
         .then(res => setSections(res.data))
         .catch(err => toast.error('Erreur lors de la récupération des sections: ' + err.message, { autoClose: 3000 }));
     }
@@ -66,7 +66,7 @@ const TeacherSection = ({ teacher, onBack }) => {
 
   useEffect(() => {
     if (filters.idSpecialite) {
-      axios.get('http://localhost:8081/api/modules/filtered', {
+      axios.get('http://users.localhost/api/modules/filtered', {
         params: {
           idFaculte: filters.idFaculte || '',
           idDepartement: filters.idDepartement || '',
@@ -84,7 +84,7 @@ const TeacherSection = ({ teacher, onBack }) => {
 
   const handleDelete = () => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer cet enseignant ?')) {
-      axios.delete(`http://localhost:8081/api/enseignants/${teacher.Matricule}`)
+      axios.delete(`http://users.localhost/api/enseignants/${teacher.Matricule}`)
         .then(() => {
           toast.success('Enseignant supprimé avec succès', { autoClose: 3000 });
           onBack();
@@ -108,10 +108,10 @@ const TeacherSection = ({ teacher, onBack }) => {
   };
 
   const handleUpdate = () => {
-    axios.put(`http://localhost:8081/api/enseignants/${teacher.Matricule}`, formData)
+    axios.put(`http://users.localhost/api/enseignants/${teacher.Matricule}`, formData)
       .then(() => {
         toast.success('Enseignant mis à jour avec succès', { autoClose: 3000 });
-        axios.get(`http://localhost:8081/api/enseignants/${teacher.Matricule}`)
+        axios.get(`http://users.localhost/api/enseignants/${teacher.Matricule}`)
           .then(res => {
             setTeacherDetails(res.data.enseignant);
             setModules(res.data.modules);

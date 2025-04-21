@@ -35,7 +35,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
 
   const fetchStudents = async () => {
     try {
-      const res = await axios.get(`http://localhost:8081/listeETD/sections/${sectionId}/etudiants`);
+      const res = await axios.get(`http://users.localhost/listeETD/sections/${sectionId}/etudiants`);
       const normalizedStudents = res.data.map(student => ({
         ...student,
         num_groupe: student.groupId || student.num_groupe || '',
@@ -59,7 +59,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
   const fetchNomSpecialite = async () => {
     if (!idSpecialite) return;
     try {
-      const res = await axios.get(`http://localhost:8081/listeETD/specialites/${idSpecialite}`);
+      const res = await axios.get(`http://users.localhost/listeETD/specialites/${idSpecialite}`);
       setNomSpecialite(res.data.nom_specialite || '');
       setNewStudent(prev => ({ ...prev, nomSpecialite: res.data.nom_specialite || '' }));
     } catch (err) {
@@ -112,7 +112,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
     }
 
     try {
-      const res = await axios.post(`http://localhost:8081/listeETD/sections/${sectionId}/etudiants`, newStudent);
+      const res = await axios.post(`http://users.localhost/listeETD/sections/${sectionId}/etudiants`, newStudent);
       if (res.status === 201) {
         await fetchStudents();
         toast.success(`Étudiant ajouté avec succès ! Groupe assigné: ${newStudent.num_groupe}`, {
@@ -158,7 +158,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
     if (!editStudent) return;
 
     try {
-      const res = await axios.put(`http://localhost:8081/listeETD/etudiants/${student.Matricule}`, {
+      const res = await axios.put(`http://users.localhost/listeETD/etudiants/${student.Matricule}`, {
         ...editStudent,
         sectionId: sectionId
       });
@@ -211,7 +211,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
 
     if (result.isConfirmed) {
       try {
-        const res = await axios.delete(`http://localhost:8081/listeETD/etudiants/${matricule}`);
+        const res = await axios.delete(`http://users.localhost/listeETD/etudiants/${matricule}`);
         if (res.status === 200) {
           await fetchStudents();
           toast.success('Étudiant supprimé avec succès !', {
@@ -261,7 +261,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
 
     if (result.isConfirmed) {
       try {
-        await axios.delete(`http://localhost:8081/listeETD/sections/${sectionId}`);
+        await axios.delete(`http://users.localhost/listeETD/sections/${sectionId}`);
         onBack();
         toast.success('Section supprimée avec succès !', {
           position: 'top-right',
@@ -309,7 +309,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
     formData.append('file', file);
 
     axios
-      .post(`http://localhost:8081/listeETD/sections/${sectionId}/upload`, formData, {
+      .post(`http://users.localhost/listeETD/sections/${sectionId}/upload`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
       .then(res => {

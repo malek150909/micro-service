@@ -127,7 +127,7 @@ const listetudiant = () => {
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch('http://localhost:8081/listeETD/sections', {
+        fetch('http://users.localhost/listeETD/sections', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ idSpecialite, niveau, nombreGroupes: nombreGroupesInt, nom_section: nomSection }),
@@ -193,7 +193,7 @@ const listetudiant = () => {
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch(`http://localhost:8081/listeETD/sections/${idSection}`, {
+        fetch(`http://users.localhost/listeETD/sections/${idSection}`, {
           method: 'DELETE',
         })
           .then(res => {

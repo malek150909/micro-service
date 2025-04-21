@@ -49,7 +49,7 @@ const AnnonceENS = ({ handleLogout }) => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     const matricule = storedUser?.Matricule;
 
-    const API_URL = 'http://localhost:8082';
+    const API_URL = 'http://messaging.localhost';
 
     const showMessage = (msg, type) => {
         setMessage(msg);
