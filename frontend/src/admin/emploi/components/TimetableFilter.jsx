@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ReactDOM from 'react-dom'; // Ajouter cette importation
 import TimetableDisplay from './TimetableDisplay';
 import styles from '../ADM_EDT.module.css';
 import { FaHome, FaFilePdf, FaFileExcel } from 'react-icons/fa';
@@ -259,6 +260,32 @@ function TimetableFilter() {
     }
   };
 
+  // Fonction pour rendre le modal
+  const renderModal = () => {
+    if (!showModal) return null;
+
+    return ReactDOM.createPortal(
+      <div className={styles['ADM-EDT-modal-overlay']}>
+        <div className={styles['ADM-EDT-modal-content']}>
+          <h3>Génération des emplois</h3>
+          <p>Génération pour semestre 1 ou semestre 2 ?</p>
+          <div className={styles['ADM-EDT-modal-actions']}>
+            <button onClick={() => handleModalChoice(true)} className={`${styles['ADM-EDT-timetable-btn']} ${styles['ADM-EDT-save']}`}>
+              Semestre 1
+            </button>
+            <button onClick={() => handleModalChoice(false)} className={`${styles['ADM-EDT-timetable-btn']} ${styles['ADM-EDT-save']}`}>
+              Semestre 2
+            </button>
+            <button onClick={() => setShowModal(false)} className={`${styles['ADM-EDT-timetable-btn']} ${styles['ADM-EDT-cancel']}`}>
+              Annuler
+            </button>
+          </div>
+        </div>
+      </div>,
+      document.body // Rendre le modal directement dans document.body
+    );
+  };
+
   return (
     <div>
       <div className={styles['ADM-EDT-background-shapes']}>
@@ -277,7 +304,6 @@ function TimetableFilter() {
           onClick={handleGenerateTimetables}
           className={`${styles['ADM-EDT-sidebar-button']} ${styles['ADM-EDT-generate-btn']}`}
         >
-          
           Générer tous les emplois
         </button>
       </div>
@@ -322,7 +348,7 @@ function TimetableFilter() {
           </div>
           <div className={styles['ADM-EDT-form-group']}>
             <label>Section:</label>
-            <select value={sectionId} onClick={(e) => setSectionId(e.target.value)} disabled={!specialtyId}>
+            <select value={sectionId} onChange={(e) => setSectionId(e.target.value)} disabled={!specialtyId}>
               <option value="">Sélectionner une section</option>
               {sections.map(section => (
                 <option key={section.ID_section} value={section.ID_section}>{section.nom_section}</option>
@@ -343,32 +369,11 @@ function TimetableFilter() {
             </select>
           </div>
           <div className={styles['ADM-EDT-form-buttons']}>
-          <button type="submit" className={styles['ADM-EDT-timetable-filter-btn']} disabled={!sectionId || !semestre}>
-            Filtrer
-          </button>
-        </div>
-        </form>
-        
-
-        {showModal && (
-          <div className={styles['ADM-EDT-modal-overlay']}>
-            <div className={styles['ADM-EDT-modal-content']}>
-              <h3>Génération des emplois</h3>
-              <p>Génération pour semestre 1 ou semestre 2 ?</p>
-              <div className={styles['ADM-EDT-modal-actions']}>
-                <button onClick={() => handleModalChoice(true)} className={`${styles['ADM-EDT-timetable-btn']} ${styles['ADM-EDT-save']}`}>
-                  Semestre 1
-                </button>
-                <button onClick={() => handleModalChoice(false)} className={`${styles['ADM-EDT-timetable-btn']} ${styles['ADM-EDT-save']}`}>
-                  Semestre 2
-                </button>
-                <button onClick={() => setShowModal(false)} className={`${styles['ADM-EDT-timetable-btn']} ${styles['ADM-EDT-cancel']}`}>
-                  Annuler
-                </button>
-              </div>
-            </div>
+            <button type="submit" className={styles['ADM-EDT-timetable-filter-btn']} disabled={!sectionId || !semestre}>
+              Filtrer
+            </button>
           </div>
-        )}
+        </form>
 
         {error && <p className={styles['ADM-EDT-timetable-filter-error']}>{error}</p>}
         <TimetableDisplay
@@ -379,6 +384,7 @@ function TimetableFilter() {
           onRefresh={handleRefresh}
         />
       </div>
+      {renderModal()} {/* Ajouter le rendu du modal ici */}
     </div>
   );
 }
