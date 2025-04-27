@@ -1,4 +1,4 @@
-/* Formes abstraites en arrière-plan */
+/* Formes abstraites en arriÃ¨re-plan */
 .ADM-ETD-background-shapes {
   position: fixed;
   top: 0;
@@ -39,7 +39,7 @@
 
 /* Sidebar */
 .ADM-ETD-sidebar {
-  background: linear-gradient(135deg,  #3a6a9e 30%, #082e54 100%);
+  background: linear-gradient(135deg, #3a6a9e 30%, #082e54 100%);
   border-radius: 0;
   padding: 25px;
   color: #ffffff;
@@ -49,7 +49,7 @@
   position: fixed;
   top: 0;
   left: 30px;
-  width: 200px; /* Increased from 150px to 200px */
+  width: 200px;
   height: 100vh;
   box-shadow: 0 15px 40px rgba(37, 100, 194, 0.35);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -89,12 +89,12 @@
   background: rgba(255, 255, 255, 0.1);
   color: #ffffff;
   text-decoration: none;
-  font-size: 0.9rem; /* Reduced from 1rem to 0.9rem for better fit */
+  font-size: 0.9rem;
   display: flex;
   align-items: center;
   justify-content: flex-start;
   gap: 12px;
-  padding: 10px 15px; /* Adjusted padding from 12px 20px to 10px 15px */
+  padding: 10px 15px;
   border: none;
   border-radius: 12px;
   cursor: pointer;
@@ -104,9 +104,9 @@
   position: relative;
   overflow: hidden;
   margin: 0;
-  white-space: normal; /* Allow text to wrap */
-  word-wrap: break-word; /* Ensure long words break to the next line */
-  line-height: 1.2; /* Improve readability with better line spacing */
+  white-space: normal;
+  word-wrap: break-word;
+  line-height: 1.2;
 }
 
 .ADM-ETD-sidebar-icon {
@@ -177,7 +177,7 @@
 
 /* Conteneur principal */
 .ADM-ETD-container {
-  max-width: 1400px;
+  max-width: 1800px;
   margin: 30px auto;
   padding: 0;
   position: relative;
@@ -255,6 +255,11 @@
   color: #7da0ca;
 }
 
+/* Table wrapper */
+.table-wrapper {
+  width: 100%;
+}
+
 /* Tableaux */
 .ADM-ETD-table {
   width: 100%;
@@ -267,9 +272,10 @@
 }
 
 .ADM-ETD-th, .ADM-ETD-td {
-  padding: 15px 20px;
+  padding: 8px 5px;
   text-align: left;
   border-bottom: 1px solid rgba(84, 131, 179, 0.2);
+  font-size: 0.85rem;
 }
 
 .ADM-ETD-th {
@@ -280,6 +286,53 @@
 
 .ADM-ETD-tr:hover {
   background: rgba(72, 108, 202, 0.1);
+}
+
+/* Column-specific styles */
+.ADM-ETD-th-matricule, .ADM-ETD-td-matricule {
+  width: 8%;
+}
+
+.ADM-ETD-th-nom, .ADM-ETD-td-nom {
+  width: 8%;
+}
+
+.ADM-ETD-th-prenom, .ADM-ETD-td-prenom {
+  width: 8%;
+}
+
+.ADM-ETD-th-email, .ADM-ETD-td-email {
+  width: 15%;
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+.ADM-ETD-th-niveau, .ADM-ETD-td-niveau {
+  width: 5%;
+}
+
+.ADM-ETD-th-etat, .ADM-ETD-td-etat {
+  width: 10%;
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+.ADM-ETD-th-annee, .ADM-ETD-td-annee {
+  width: 10%;
+}
+
+.ADM-ETD-th-groupe, .ADM-ETD-td-groupe {
+  width: 5%;
+}
+
+.ADM-ETD-th-password, .ADM-ETD-td-password {
+  width: 10%;
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+.ADM-ETD-th-actions, .ADM-ETD-td-actions {
+  width: 15%;
 }
 
 /* Liste des sections */
@@ -407,6 +460,8 @@
 
 .ADM-ETD-edit-btn {
   background: linear-gradient(135deg, #7da0ca 0%, #5483b3 100%);
+  padding: 8px 15px;
+  font-size: 0.85rem;
 }
 
 .ADM-ETD-edit-btn:hover {
@@ -415,6 +470,8 @@
 
 .ADM-ETD-delete-btn, .ADM-ETD-delete-section-btn {
   background: linear-gradient(135deg, #052659 0%, #021024 100%);
+  padding: 8px 15px;
+  font-size: 0.85rem;
 }
 
 .ADM-ETD-delete-btn:hover, .ADM-ETD-delete-section-btn:hover {
@@ -433,7 +490,7 @@
   background: linear-gradient(135deg, #5483b3 0%, #052659 100%);
 }
 
-/* Styles pour les toasts personnalisés */
+/* Styles pour les toasts personnalisÃ©s */
 .ADM-ETD-custom-toast {
   font-family: 'Poppins', sans-serif;
 }
@@ -542,7 +599,7 @@
   }
 }
 
-/* Amélioration du style de FilterPanel */
+/* AmÃ©lioration du style de FilterPanel */
 .ADM-ETD-filter-panel {
   background: rgba(255, 255, 255, 0.9);
   border-radius: 20px;
@@ -582,7 +639,7 @@
   border-color: #5483b3;
 }
 
-/* Amélioration du style de AddSectionForm */
+/* AmÃ©lioration du style de AddSectionForm */
 .ADM-ETD-add-section-form {
   background: rgba(255, 255, 255, 0.9);
   padding: 25px;
@@ -623,7 +680,7 @@
   border-color: #5483b3;
 }
 
-/* Ajout de la gestion du défilement horizontal pour .student-section */
+/* Gestion du tableau */
 .ADM-ETD-student-section {
   background: rgba(255, 255, 255, 0.9);
   border-radius: 20px;
@@ -632,76 +689,10 @@
   border: 1px solid rgba(152, 166, 205, 0.6);
   backdrop-filter: blur(12px);
   transition: transform 0.3s ease;
-  overflow-x: auto;
+  box-sizing: border-box;
 }
 
-/* Ajustement de la largeur minimale du tableau */
-.ADM-ETD-student-section .ADM-ETD-table {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 15px;
-  box-shadow: 0 12px 30px rgba(5, 38, 89, 0.18), 0 0 20px rgba(255, 255, 255, 0.25);
-  border: 1px solid rgba(152, 166, 205, 0.6);
-  width: 100%;
-  min-width: 900px;
-}
-
-/* Ajustement des colonnes pour réduire leur largeur */
-.ADM-ETD-student-section .ADM-ETD-th,
-.ADM-ETD-student-section .ADM-ETD-td {
-  padding: 15px 10px;
-  text-align: left;
-  border-bottom: 1px solid rgba(84, 131, 179, 0.2);
-  font-size: 0.9rem;
-  white-space: nowrap;
-}
-
-/* Ajustement des colonnes spécifiques pour réduire leur largeur */
-.ADM-ETD-student-section .ADM-ETD-th:nth-child(1),
-.ADM-ETD-student-section .ADM-ETD-td:nth-child(1) {
-  width: 80px;
-}
-
-.ADM-ETD-student-section .ADM-ETD-th:nth-child(2),
-.ADM-ETD-student-section .ADM-ETD-td:nth-child(2) {
-  width: 100px;
-}
-
-.ADM-ETD-student-section .ADM-ETD-th:nth-child(3),
-.ADM-ETD-student-section .ADM-ETD-td:nth-child(3) {
-  width: 100px;
-}
-
-.ADM-ETD-student-section .ADM-ETD-th:nth-child(4),
-.ADM-ETD-student-section .ADM-ETD-td:nth-child(4) {
-  width: 150px;
-}
-
-.ADM-ETD-student-section .ADM-ETD-th:nth-child(5),
-.ADM-ETD-student-section .ADM-ETD-td:nth-child(5) {
-  width: 60px;
-}
-
-.ADM-ETD-student-section .ADM-ETD-th:nth-child(6),
-.ADM-ETD-student-section .ADM-ETD-td:nth-child(6) {
-  width: 100px;
-}
-
-.ADM-ETD-student-section .ADM-ETD-th:nth-child(7),
-.ADM-ETD-student-section .ADM-ETD-td:nth-child(7) {
-  width: 100px;
-}
-
-.ADM-ETD-student-section .ADM-ETD-th:nth-child(8),
-.ADM-ETD-student-section .ADM-ETD-td:nth-child(8) {
-  width: 60px;
-}
-
-.ADM-ETD-student-section .ADM-ETD-th:nth-child(9),
-.ADM-ETD-student-section .ADM-ETD-td:nth-child(9) {
-  width: 120px;
-}
-
-/* Ajustement des inputs dans le tableau pour éviter qu'ils ne débordent */
+/* Ajustement des inputs dans le tableau pour Ã©viter qu'ils ne dÃ©bordent */
 .ADM-ETD-student-section .ADM-ETD-td .ADM-ETD-input,
 .ADM-ETD-student-section .ADM-ETD-td .ADM-ETD-select {
   width: 100%;
@@ -710,8 +701,8 @@
   font-size: 0.85rem;
 }
 
-/* Style général pour les titres avec icônes et trait animé */
- .ADM-ETD-filter-panel h3, .ADM-ETD-student-section h2, .ADM-ETD-student-section h4 {
+/* Style gÃ©nÃ©ral pour les titres avec icÃ´nes et trait animÃ© */
+.ADM-ETD-filter-panel h3, .ADM-ETD-student-section h2, .ADM-ETD-student-section h4 {
   position: relative;
   display: inline-block;
   padding-bottom: 10px;
@@ -721,7 +712,7 @@
 }
 
 /* Ajout d'un trait en dessous des titres */
- .ADM-ETD-filter-panel h3::after, .ADM-ETD-student-section h2::after, .ADM-ETD-student-section h4::after {
+.ADM-ETD-filter-panel h3::after, .ADM-ETD-student-section h2::after, .ADM-ETD-student-section h4::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -735,11 +726,11 @@
 }
 
 /* Animation du trait au survol */
- .ADM-ETD-filter-panel h3:hover::after, .ADM-ETD-student-section h2:hover::after, .ADM-ETD-student-section h4:hover::after {
+.ADM-ETD-filter-panel h3:hover::after, .ADM-ETD-student-section h2:hover::after, .ADM-ETD-student-section h4:hover::after {
   width: 100%;
 }
 
 /* Changement de couleur du titre au survol */
- .ADM-ETD-filter-panel h3:hover, .ADM-ETD-student-section h2:hover, .ADM-ETD-student-section h4:hover {
+.ADM-ETD-filter-panel h3:hover, .ADM-ETD-student-section h2:hover, .ADM-ETD-student-section h4:hover {
   color: #5483b3;
 }

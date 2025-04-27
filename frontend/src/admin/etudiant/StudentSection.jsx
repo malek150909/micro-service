@@ -25,6 +25,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
   const [editStudent, setEditStudent] = useState(null);
   const [showAddStudentForm, setShowAddStudentForm] = useState(false);
   const [importDetails, setImportDetails] = useState(null);
+  const [passwords, setPasswords] = useState({}); // Store generated passwords temporarily
 
   const groupOptions = Array.from({ length: nombreGroupes }, (_, i) => ({
     value: i + 1,
@@ -40,8 +41,16 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
         ...student,
         num_groupe: student.groupId || student.num_groupe || '',
       }));
-      console.log('Données normalisées des étudiants:', normalizedStudents);
       setStudents(normalizedStudents);
+
+      // Extract passwords from the API response (assuming the backend returns them)
+      const newPasswords = {};
+      res.data.forEach(student => {
+        if (student.generatedPassword) {
+          newPasswords[student.Matricule] = student.generatedPassword;
+        }
+      });
+      setPasswords(prev => ({ ...prev, ...newPasswords }));
     } catch (err) {
       toast.error('Impossible de charger la liste des étudiants.', {
         position: 'top-right',
@@ -115,6 +124,13 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
       const res = await axios.post(`http://users.localhost/listeETD/sections/${sectionId}/etudiants`, newStudent);
       if (res.status === 201) {
         await fetchStudents();
+        // Store the generated password
+        if (res.data.generatedPassword) {
+          setPasswords(prev => ({
+            ...prev,
+            [matriculeNum]: res.data.generatedPassword
+          }));
+        }
         toast.success(`Étudiant ajouté avec succès ! Groupe assigné: ${newStudent.num_groupe}`, {
           position: 'top-right',
           autoClose: 3000,
@@ -192,6 +208,20 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
   };
 
   const handleDeleteStudent = async (matricule) => {
+    if (!matricule || isNaN(parseInt(matricule, 10))) {
+      toast.error('Matricule invalide.', {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        style: { backgroundColor: '#FF6B6B', color: '#fff', fontSize: '16px' },
+        icon: '❌',
+        className: styles['ADM-ETD-custom-toast-error']
+      });
+      return;
+    }
+  
     const result = await Swal.fire({
       title: 'Confirmer la suppression ?',
       text: 'Cette action est irréversible.',
@@ -208,12 +238,19 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
         cancelButton: styles['ADM-ETD-swal-cancel-btn']
       }
     });
-
+  
     if (result.isConfirmed) {
       try {
+        console.log('Suppression étudiant avec matricule:', matricule);
         const res = await axios.delete(`http://users.localhost/listeETD/etudiants/${matricule}`);
+        console.log('Réponse API:', res.data);
         if (res.status === 200) {
           await fetchStudents();
+          setPasswords(prev => {
+            const newPasswords = { ...prev };
+            delete newPasswords[matricule];
+            return newPasswords;
+          });
           toast.success('Étudiant supprimé avec succès !', {
             position: 'top-right',
             autoClose: 3000,
@@ -226,7 +263,8 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
           });
         }
       } catch (err) {
-        const errorMessage = err.response?.data?.error || 'Une erreur s’est produite.';
+        console.error('Erreur lors de la suppression:', err.response?.data, err.message);
+        const errorMessage = err.response?.data?.error || err.response?.data?.message || 'Une erreur s’est produite.';
         toast.error(errorMessage, {
           position: 'top-right',
           autoClose: 3000,
@@ -263,6 +301,8 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
       try {
         await axios.delete(`http://users.localhost/listeETD/sections/${sectionId}`);
         onBack();
+        // Clear passwords for this section
+        setPasswords({});
         toast.success('Section supprimée avec succès !', {
           position: 'top-right',
           autoClose: 3000,
@@ -313,7 +353,6 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
         headers: { 'Content-Type': 'multipart/form-data' },
       })
       .then(res => {
-        console.log('Données renvoyées par l\'API après importation:', res.data);
         const toastType = res.data.importedCount > 0 ? toast.success : toast.info;
         toastType(res.data.message, {
           position: 'top-right',
@@ -329,6 +368,17 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
           icon: res.data.importedCount > 0 ? '✅' : 'ℹ️',
           className: res.data.importedCount > 0 ? styles['ADM-ETD-custom-toast-success'] : styles['ADM-ETD-custom-toast-warning']
         });
+
+        // Store generated passwords from imported students
+        if (res.data.importedStudents) {
+          const newPasswords = {};
+          res.data.importedStudents.forEach(student => {
+            if (student.generatedPassword) {
+              newPasswords[student.matricule] = student.generatedPassword;
+            }
+          });
+          setPasswords(prev => ({ ...prev, ...newPasswords }));
+        }
 
         setImportDetails({
           importedCount: res.data.importedCount,
@@ -366,6 +416,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
       État: student.etat || 'Non défini',
       Année: student.annee_inscription || 'Non défini',
       Groupe: student.num_groupe || 'Non assigné',
+      Motdepasse: passwords[student.Matricule] || 'Non disponible'
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(exportData);
@@ -389,7 +440,7 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
         <h3>Importer via Excel</h3>
         <div className={styles['ADM-ETD-upload-section']} style={{ marginBottom: '20px' }}>
           <input type="file" accept=".xlsx, .xls" onChange={handleUpload} className={styles['ADM-ETD-input']} />
-          <button onClick={handleExportToExcel} className={styles['ADM-ETD-edit-btn']} style={{ marginLeft: '10px' }}>
+          <button onClick={handleExportToExcel} className={styles['ADM-ETD-edit-btn']} style={{ marginLeft: '10px', marginTop: '20px' }}>
             <FaFileExport /> Exporter vers Excel
           </button>
         </div>
@@ -531,119 +582,125 @@ const StudentSection = ({ sectionId, onBack, niveau, idSpecialite, nombreGroupes
         </AnimatePresence>
       </div>
 
-      <table className={styles['ADM-ETD-table']}>
-        <thead>
-          <tr className={styles['ADM-ETD-tr']}>
-            <th className={styles['ADM-ETD-th']}>Matricule</th>
-            <th className={styles['ADM-ETD-th']}>Nom</th>
-            <th className={styles['ADM-ETD-th']}>Prénom</th>
-            <th className={styles['ADM-ETD-th']}>Email</th>
-            <th className={styles['ADM-ETD-th']}>Niveau</th>
-            <th className={styles['ADM-ETD-th']}>État</th>
-            <th className={styles['ADM-ETD-th']}>Année</th>
-            <th className={styles['ADM-ETD-th']}>Groupe</th>
-            <th className={styles['ADM-ETD-th']}>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {students.map(s => (
-            <tr key={s.Matricule} className={styles['ADM-ETD-tr']}>
-              <td className={styles['ADM-ETD-td']}>{s.Matricule}</td>
-              <td className={styles['ADM-ETD-td']}>
-                {editStudent?.Matricule === s.Matricule ? (
-                  <input
-                    value={editStudent.nom}
-                    onChange={e => setEditStudent({ ...editStudent, nom: e.target.value })}
-                    className={styles['ADM-ETD-input']}
-                  />
-                ) : (
-                  s.nom
-                )}
-              </td>
-              <td className={styles['ADM-ETD-td']}>
-                {editStudent?.Matricule === s.Matricule ? (
-                  <input
-                    value={editStudent.prenom}
-                    onChange={e => setEditStudent({ ...editStudent, prenom: e.target.value })}
-                    className={styles['ADM-ETD-input']}
-                  />
-                ) : (
-                  s.prenom
-                )}
-              </td>
-              <td className={styles['ADM-ETD-td']}>
-                {editStudent?.Matricule === s.Matricule ? (
-                  <input
-                    value={editStudent.email}
-                    onChange={e => setEditStudent({ ...editStudent, email: e.target.value })}
-                    className={styles['ADM-ETD-input']}
-                  />
-                ) : (
-                  s.email
-                )}
-              </td>
-              <td className={styles['ADM-ETD-td']}>
-                {editStudent?.Matricule === s.Matricule ? (
-                  <input
-                    value={editStudent.niveau}
-                    onChange={e => setEditStudent({ ...editStudent, niveau: e.target.value })}
-                    className={styles['ADM-ETD-input']}
-                  />
-                ) : (
-                  s.niveau
-                )}
-              </td>
-              <td className={styles['ADM-ETD-td']}>
-                {editStudent?.Matricule === s.Matricule ? (
-                  <select
-                    value={editStudent.etat}
-                    onChange={e => setEditStudent({ ...editStudent, etat: e.target.value })}
-                    className={styles['ADM-ETD-select']}
-                  >
-                    <option value="">-- Aucun état --</option>
-                    {['Ajourné', 'Admis', 'Admis avec dettes', 'Réintégré'].map(e => (
-                      <option key={e} value={e}>{e}</option>
-                    ))}
-                  </select>
-                ) : (
-                  s.etat || 'Non défini'
-                )}
-              </td>
-              <td className={styles['ADM-ETD-td']}>{s.annee_inscription || 'Non défini'}</td>
-              <td className={styles['ADM-ETD-td']}>
-                {editStudent?.Matricule === s.Matricule ? (
-                  <select
-                    value={editStudent.num_groupe}
-                    onChange={e => setEditStudent({ ...editStudent, num_groupe: e.target.value })}
-                    className={styles['ADM-ETD-select']}
-                  >
-                    <option value="">-- Sélectionner un groupe --</option>
-                    {groupOptions.map(option => (
-                      <option key={option.value} value={option.value}>{option.label}</option>
-                    ))}
-                  </select>
-                ) : (
-                  s.num_groupe || 'Non assigné'
-                )}
-              </td>
-              <td className={styles['ADM-ETD-td']}>
-                {editStudent?.Matricule === s.Matricule ? (
-                  <button className={styles['ADM-ETD-edit-btn']} onClick={() => handleEditStudent(s)}>
-                    <FaPlus /> Sauvegarder
-                  </button>
-                ) : (
-                  <button className={styles['ADM-ETD-edit-btn']} onClick={() => setEditStudent(s)}>
-                    <FaPlus /> Modifier
-                  </button>
-                )}
-                <button className={styles['ADM-ETD-delete-btn']} onClick={() => handleDeleteStudent(s.Matricule)}>
-                  <FaTrash /> Supprimer
-                </button>
-              </td>
+      <div className={styles['table-wrapper']}>
+        <table className={styles['ADM-ETD-table']}>
+          <thead>
+            <tr className={styles['ADM-ETD-tr']}>
+              <th className={styles['ADM-ETD-th-matricule']}>Matricule</th>
+              <th className={styles['ADM-ETD-th-nom']}>Nom</th>
+              <th className={styles['ADM-ETD-th-prenom']}>Prénom</th>
+              <th className={styles['ADM-ETD-th-email']}>Email</th>
+              <th className={styles['ADM-ETD-th-niveau']}>Niveau</th>
+              <th className={styles['ADM-ETD-th-etat']}>État</th>
+              <th className={styles['ADM-ETD-th-annee']}>Année</th>
+              <th className={styles['ADM-ETD-th-groupe']}>Groupe</th>
+              <th className={styles['ADM-ETD-th-password']}>Mot de passe</th>
+              <th className={styles['ADM-ETD-th-actions']}>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {students.map(s => (
+              <tr key={s.Matricule} className={styles['ADM-ETD-tr']}>
+                <td className={styles['ADM-ETD-td-matricule']}>{s.Matricule}</td>
+                <td className={styles['ADM-ETD-td-nom']}>
+                  {editStudent?.Matricule === s.Matricule ? (
+                    <input
+                      value={editStudent.nom}
+                      onChange={e => setEditStudent({ ...editStudent, nom: e.target.value })}
+                      className={styles['ADM-ETD-input']}
+                    />
+                  ) : (
+                    s.nom
+                  )}
+                </td>
+                <td className={styles['ADM-ETD-td-prenom']}>
+                  {editStudent?.Matricule === s.Matricule ? (
+                    <input
+                      value={editStudent.prenom}
+                      onChange={e => setEditStudent({ ...editStudent, prenom: e.target.value })}
+                      className={styles['ADM-ETD-input']}
+                    />
+                  ) : (
+                    s.prenom
+                  )}
+                </td>
+                <td className={styles['ADM-ETD-td-email']}>
+                  {editStudent?.Matricule === s.Matricule ? (
+                    <input
+                      value={editStudent.email}
+                      onChange={e => setEditStudent({ ...editStudent, email: e.target.value })}
+                      className={styles['ADM-ETD-input']}
+                    />
+                  ) : (
+                    s.email
+                  )}
+                </td>
+                <td className={styles['ADM-ETD-td-niveau']}>
+                  {editStudent?.Matricule === s.Matricule ? (
+                    <input
+                      value={editStudent.niveau}
+                      readOnly
+                      className={styles['ADM-ETD-input']}
+                    />
+                  ) : (
+                    s.niveau
+                  )}
+                </td>
+                <td className={styles['ADM-ETD-td-etat']}>
+                  {editStudent?.Matricule === s.Matricule ? (
+                    <select
+                      value={editStudent.etat}
+                      onChange={e => setEditStudent({ ...editStudent, etat: e.target.value })}
+                      className={styles['ADM-ETD-select']}
+                    >
+                      <option value="">-- Aucun état --</option>
+                      {['Ajourné', 'Admis', 'Admis avec dettes', 'Réintégré'].map(e => (
+                        <option key={e} value={e}>{e}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    s.etat || 'Non défini'
+                  )}
+                </td>
+                <td className={styles['ADM-ETD-td-annee']}>{s.annee_inscription || 'Non défini'}</td>
+                <td className={styles['ADM-ETD-td-groupe']}>
+                  {editStudent?.Matricule === s.Matricule ? (
+                    <select
+                      value={editStudent.num_groupe}
+                      onChange={e => setEditStudent({ ...editStudent, num_groupe: e.target.value })}
+                      className={styles['ADM-ETD-select']}
+                    >
+                      <option value="">-- Sélectionner un groupe --</option>
+                      {groupOptions.map(option => (
+                        <option key={option.value} value={option.value}>{option.label}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    s.num_groupe || 'Non assigné'
+                  )}
+                </td>
+                <td className={styles['ADM-ETD-td-password']}>
+                  {passwords[s.Matricule] || 'Non disponible'}
+                </td>
+                <td className={styles['ADM-ETD-td-actions']}>
+                  {editStudent?.Matricule === s.Matricule ? (
+                    <button className={styles['ADM-ETD-edit-btn']} onClick={() => handleEditStudent(s)}>
+                      <FaPlus /> Sauvegarder
+                    </button>
+                  ) : (
+                    <button className={styles['ADM-ETD-edit-btn']} onClick={() => setEditStudent(s)}>
+                      <FaPlus /> Modifier
+                    </button>
+                  )}
+                  <button className={styles['ADM-ETD-delete-btn']} onClick={() => handleDeleteStudent(s.Matricule)}>
+                    <FaTrash /> Supprimer
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

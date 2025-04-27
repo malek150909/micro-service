@@ -4,26 +4,45 @@ const fs = require('fs').promises;
 
 exports.createEvenement = async (req, res) => {
   try {
-    // Extraire les données de req.body (champs texte)
+    console.log('Requête POST reçue, req.body brut :', req.body);
+    console.log('Fichier reçu :', req.file);
+
+    // Extraire les données de req.body
     const {
       nom_evenement,
       description_evenement,
       date_evenement,
       lieu,
       capacite,
-      organisateur_admin, // Correspond à matricule
+      organisateur_admin,
       target_type,
       target_filter,
-      clubId = null, // Optionnel, par défaut null
-      time_slots = null // Optionnel, par défaut null
+      clubId = null,
+      time_slots = null
     } = req.body;
 
-    // Extraire l'image de req.file (si fournie)
+    console.log('date_evenement extrait :', date_evenement);
+
+    // Extraire l'image
     const image_url = req.file ? `/Uploads/${req.file.filename}` : req.body.image_url || null;
 
     // Validation des champs obligatoires
-    if (!nom_evenement || !date_evenement || !lieu || !capacite) {
-      return res.status(400).json({ message: 'Les champs nom_evenement, date_evenement, lieu et capacite sont requis' });
+    if (!nom_evenement || !date_evenement || !lieu || !capacite || !organisateur_admin) {
+      return res.status(400).json({ message: 'Les champs nom_evenement, date_evenement, lieu, capacite et organisateur_admin sont requis' });
+    }
+
+    // Validation du format de date_evenement (YYYY-MM-DD HH:mm:ss)
+    const dateRegex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
+    if (!dateRegex.test(date_evenement)) {
+      console.error('Format de date_evenement invalide :', date_evenement);
+      return res.status(400).json({ message: 'Format de date invalide. Utilisez le format YYYY-MM-DD HH:mm:ss (par exemple, 2025-04-29 10:00:00).' });
+    }
+
+    // Vérifier que l'heure n'est pas 00:00:00
+    const [, timePart] = date_evenement.split(' ');
+    if (timePart === '00:00:00') {
+      console.error('Heure nulle détectée :', date_evenement);
+      return res.status(400).json({ message: 'L\'heure de l\'événement ne peut pas être 00:00:00.' });
     }
 
     // Validation de la date
@@ -31,21 +50,23 @@ exports.createEvenement = async (req, res) => {
     try {
       eventDate = new Date(date_evenement);
       if (isNaN(eventDate.getTime())) {
-        return res.status(400).json({ message: 'Format de date invalide. Utilisez le format YYYY-MM-DD.' });
+        console.error('Date invalide après parsing :', date_evenement);
+        return res.status(400).json({ message: 'Date invalide. Vérifiez le format YYYY-MM-DD HH:mm:ss.' });
       }
     } catch (err) {
-      return res.status(400).json({ message: 'Format de date invalide. Utilisez le format YYYY-MM-DD.' });
+      console.error('Erreur de parsing de date_evenement :', err.message, 'Valeur :', date_evenement);
+      return res.status(400).json({ message: 'Erreur lors du parsing de la date. Utilisez le format YYYY-MM-DD HH:mm:ss.' });
     }
 
     const currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0);
-    eventDate.setHours(0, 0, 0, 0);
-
     if (eventDate <= currentDate) {
-      return res.status(400).json({ message: 'La date de l\'événement doit être strictement supérieure à la date courante.' });
+      return res.status(400).json({ message: 'La date de l\'événement doit être postérieure à la date courante.' });
     }
 
-    // Vérification de l'image si fournie
+    // Extraire l'heure pour la colonne heure_evenement (si conservée)
+    const heure_evenement = timePart;
+
+    // Vérification de l'image
     if (image_url && image_url.startsWith('/Uploads/')) {
       const sourcePath = path.join(__dirname, '..', image_url);
       try {
@@ -57,33 +78,37 @@ exports.createEvenement = async (req, res) => {
       }
     }
 
-    // Insérer l'événement dans la table Evenement
+    // Insérer l'événement
     const eventSql = `
-      INSERT INTO Evenement (nom_evenement, description_evenement, date_evenement, lieu, capacite, image_url, organisateur_admin)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO Evenement (nom_evenement, description_evenement, date_evenement, heure_evenement, lieu, capacite, image_url, organisateur_admin, target_type)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     const eventValues = [
       nom_evenement,
       description_evenement || 'Pas de description',
       date_evenement,
+      heure_evenement, // Ajout de heure_evenement
       lieu,
-      capacite,
+      parseInt(capacite),
       image_url || null,
-      organisateur_admin || 0
+      parseInt(organisateur_admin),
+      target_type || 'Etudiants'
     ];
+
+    console.log('Valeurs à insérer dans Evenement :', eventValues);
 
     const [eventResult] = await pool.query(eventSql, eventValues);
     const eventId = eventResult.insertId;
     console.log('Événement créé, ID :', eventId);
 
-    // Récupérer le nom du club pour le contenu de la publication (si clubId est fourni)
+    // Récupérer le nom du club
     let nomClub = 'Club inconnu';
     if (clubId) {
-      const [club] = await pool.query('SELECT nom FROM Club WHERE ID_club = ?', [clubId]);
+      const [club] = await pool.query('SELECT nom FROM Club WHERE ID_club = ?', [parseInt(clubId)]);
       nomClub = club[0]?.nom || 'Club inconnu';
     }
 
-    // Créer une annonce associée
+    // Créer une annonce
     const content = `Nouveau événement : ${description_evenement || 'Détails à venir'} - Date : ${date_evenement} - Lieu : ${lieu}`;
     const effectiveTargetType = target_type || 'Etudiants';
     const effectiveTargetFilter = target_filter ? (typeof target_filter === 'string' ? JSON.parse(target_filter) : target_filter) : { tous: true, faculte: '', departement: '', specialite: '' };
@@ -96,18 +121,20 @@ exports.createEvenement = async (req, res) => {
       nom_evenement,
       content,
       image_url || '',
-      organisateur_admin || 0,
+      parseInt(organisateur_admin),
       eventId,
       effectiveTargetType,
       JSON.stringify(effectiveTargetFilter),
       null
     ];
 
+    console.log('Valeurs à insérer dans annonce :', annonceValues);
+
     const [annonceResult] = await pool.query(annonceSql, annonceValues);
     const annonceId = annonceResult.insertId;
     console.log(`Annonce créée pour l'événement ${eventId} : ID ${annonceId}`);
 
-    // Générer des notifications pour tous les étudiants
+    // Générer des notifications
     const query = 'SELECT Matricule FROM Etudiant';
     const [destinataires] = await pool.query(query);
     console.log(`Destinataires trouvés :`, destinataires);
@@ -118,7 +145,7 @@ exports.createEvenement = async (req, res) => {
       const notificationValues = destinataires.map(d => [
         new Date(),
         notificationMessage,
-        organisateur_admin || 0,
+        parseInt(organisateur_admin),
         d.Matricule
       ]);
       await pool.query(
@@ -129,9 +156,9 @@ exports.createEvenement = async (req, res) => {
       notificationIds.push(...destinataires.map((_, i) => annonceId + i));
     }
 
-    // Construire l'URL complète pour l'image
+    // URL complète pour l'image
     const fullImageUrl = image_url && !image_url.startsWith('http')
-      ? `http://events.localhost${image_url}`
+      ? `http://localhost:8084${image_url}`
       : image_url || '';
 
     res.json({
@@ -147,14 +174,13 @@ exports.createEvenement = async (req, res) => {
   }
 };
 
-// Conserver les autres fonctions telles quelles
 exports.getAllEvenements = async (req, res) => {
   const sql = 'SELECT * FROM Evenement';
   try {
     const [results] = await pool.query(sql);
     const evenementsWithFullUrl = results.map(evenement => {
       const fullImageUrl = evenement.image_url && !evenement.image_url.startsWith('http')
-        ? `http://events.localhost${evenement.image_url}`
+        ? `http://localhost:8084${evenement.image_url}`
         : evenement.image_url || '';
       console.log('Image URL pour événement', evenement.ID_evenement, ':', fullImageUrl);
       return {
@@ -173,16 +199,16 @@ exports.deleteEvenement = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const [eventResult] = await pool.query('SELECT nom_evenement FROM Evenement WHERE ID_evenement = ?', [id]);
+    const [eventResult] = await pool.query('SELECT nom_evenement FROM Evenement WHERE ID_evenement = ?', [parseInt(id)]);
     if (eventResult.length === 0) {
       return res.status(404).json({ message: 'Événement non trouvé' });
     }
     const title = eventResult[0].nom_evenement;
 
-    await pool.query('DELETE FROM annonce WHERE event_id = ?', [id]);
+    await pool.query('DELETE FROM annonce WHERE event_id = ?', [parseInt(id)]);
     console.log(`Annonce supprimée pour l'événement ${id}`);
 
-    const [deleteResult] = await pool.query('DELETE FROM Evenement WHERE ID_evenement = ?', [id]);
+    const [deleteResult] = await pool.query('DELETE FROM Evenement WHERE ID_evenement = ?', [parseInt(id)]);
     if (deleteResult.affectedRows === 0) {
       return res.status(404).json({ message: 'Événement non trouvé' });
     }
@@ -199,66 +225,95 @@ exports.deleteEvenement = async (req, res) => {
 
 exports.updateEvenement = async (req, res) => {
   const { id } = req.params;
-  const { nom_evenement, description_evenement, date_evenement, lieu, capacite, organisateur_admin, target_type, target_filter } = req.body;
+  console.log(`Requête PUT reçue pour ID : ${id}, req.body brut :`, req.body);
+  console.log('Fichier reçu :', req.file);
+
+  const {
+    nom_evenement,
+    description_evenement,
+    date_evenement,
+    lieu,
+    capacite,
+    organisateur_admin,
+    target_type,
+    target_filter
+  } = req.body;
+
+  console.log('date_evenement extrait :', date_evenement);
+
   const image_url = req.file ? `/Uploads/${req.file.filename}` : req.body.image_url || null;
 
-  console.log('Fichier image reçu pour mise à jour :', req.file ? req.file.filename : 'Aucun fichier');
-  console.log('image_url pour mise à jour événement :', image_url);
-  console.log('target_type reçu :', target_type);
-  console.log('target_filter brut reçu :', target_filter);
+  // Validation des champs obligatoires
+  if (!nom_evenement || !date_evenement || !lieu || !capacite || !organisateur_admin) {
+    return res.status(400).json({ message: 'Les champs nom_evenement, date_evenement, lieu, capacite et organisateur_admin sont requis' });
+  }
+
+  // Validation du format de date_evenement (YYYY-MM-DD HH:mm:ss)
+  const dateRegex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
+  if (!dateRegex.test(date_evenement)) {
+    console.error('Format de date_evenement invalide :', date_evenement);
+    return res.status(400).json({ message: 'Format de date invalide. Utilisez le format YYYY-MM-DD HH:mm:ss (par exemple, 2025-04-29 10:00:00).' });
+  }
+
+  // Vérifier que l'heure n'est pas 00:00:00
+  const [, timePart] = date_evenement.split(' ');
+  if (timePart === '00:00:00') {
+    console.error('Heure nulle détectée :', date_evenement);
+    return res.status(400).json({ message: 'L\'heure de l\'événement ne peut pas être 00:00:00.' });
+  }
 
   // Validation de la date
   let eventDate;
   try {
     eventDate = new Date(date_evenement);
     if (isNaN(eventDate.getTime())) {
-      throw new Error('Format de date invalide');
+      console.error('Date invalide après parsing :', date_evenement);
+      return res.status(400).json({ message: 'Date invalide. Vérifiez le format YYYY-MM-DD HH:mm:ss.' });
     }
   } catch (err) {
-    console.error('Erreur de parsing de la date :', err.message);
-    return res.status(400).json({ message: 'Erreur : Format de date invalide. Utilisez le format YYYY-MM-DD.' });
+    console.error('Erreur de parsing de date_evenement :', err.message, 'Valeur :', date_evenement);
+    return res.status(400).json({ message: 'Erreur lors du parsing de la date. Utilisez le format YYYY-MM-DD HH:mm:ss.' });
   }
 
   const currentDate = new Date();
-  currentDate.setHours(0, 0, 0, 0);
-  eventDate.setHours(0, 0, 0, 0);
-
-  console.log('Date courante :', currentDate.toISOString().split('T')[0]);
-  console.log('Date de l\'événement :', eventDate.toISOString().split('T')[0]);
-
   if (eventDate <= currentDate) {
-    console.log('Validation échouée : Date de l\'événement <= date courante');
-    return res.status(400).json({ message: 'Erreur : La date de l\'événement doit être strictement supérieure à la date courante.' });
+    return res.status(400).json({ message: 'La date de l\'événement doit être postérieure à la date courante.' });
   }
 
-  const uploadsBasePath = path.join(__dirname, '..', 'Uploads');
-  const sourcePath = req.file ? path.join(uploadsBasePath, req.file.filename) : null;
+  // Extraire l'heure pour la colonne heure_evenement (si conservée)
+  const heure_evenement = timePart;
 
-  if (req.file && sourcePath) {
+  // Vérification de l'image
+  if (image_url && image_url.startsWith('/Uploads/')) {
+    const sourcePath = path.join(__dirname, '..', image_url);
     try {
       await fs.access(sourcePath);
-      console.log('Fichier source trouvé :', sourcePath);
+      console.log('Fichier image trouvé :', sourcePath);
     } catch (err) {
-      console.error('Fichier source introuvable :', err);
-      return res.status(500).json({ message: 'Fichier source introuvable', error: err.message });
+      console.error('Fichier image introuvable :', err);
+      return res.status(400).json({ message: 'Fichier image introuvable' });
     }
   }
 
   const eventSql = `
     UPDATE Evenement 
-    SET nom_evenement = ?, description_evenement = ?, date_evenement = ?, lieu = ?, capacite = ?, organisateur_admin = ?, image_url = ? 
+    SET nom_evenement = ?, description_evenement = ?, date_evenement = ?, heure_evenement = ?, lieu = ?, capacite = ?, organisateur_admin = ?, image_url = ?, target_type = ?
     WHERE ID_evenement = ?
   `;
   const eventValues = [
-    nom_evenement || 'Événement sans nom',
+    nom_evenement,
     description_evenement || 'Pas de description',
-    date_evenement || null,
-    lieu || 'Lieu non spécifié',
-    capacite || 0,
-    organisateur_admin || 0,
+    date_evenement,
+    heure_evenement,
+    lieu,
+    parseInt(capacite),
+    parseInt(organisateur_admin),
     image_url,
-    id
+    target_type || 'Etudiants',
+    parseInt(id)
   ];
+
+  console.log('Valeurs à mettre à jour dans Evenement :', eventValues);
 
   try {
     const [eventResult] = await pool.query(eventSql, eventValues);
@@ -266,11 +321,11 @@ exports.updateEvenement = async (req, res) => {
       return res.status(404).json({ message: 'Événement non trouvé' });
     }
 
-    const content = `Nouveau événement : ${description_evenement || 'Détails à venir'} - Date : ${date_evenement || 'Non spécifiée'} - Lieu : ${lieu || 'Non spécifié'}`;
+    const content = `Nouveau événement : ${description_evenement || 'Détails à venir'} - Date : ${date_evenement} - Lieu : ${lieu}`;
 
-    const effectiveTargetType = (target_type || 'Etudiants').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const effectiveTargetType = target_type || 'Etudiants';
     const effectiveTargetFilter = target_filter ? (typeof target_filter === 'string' ? JSON.parse(target_filter) : target_filter) : { tous: true, faculte: '', departement: '', specialite: '' };
-    console.log('effectiveTargetType normalisé :', effectiveTargetType);
+    console.log('effectiveTargetType :', effectiveTargetType);
     console.log('effectiveTargetFilter après parsing :', effectiveTargetFilter);
 
     const annonceSql = `
@@ -279,16 +334,17 @@ exports.updateEvenement = async (req, res) => {
       WHERE event_id = ?
     `;
     const annonceValues = [
-      nom_evenement || 'Événement sans nom',
+      nom_evenement,
       content,
       image_url || '',
-      organisateur_admin || 0,
+      parseInt(organisateur_admin),
       effectiveTargetType,
       JSON.stringify(effectiveTargetFilter),
       null,
-      id
+      parseInt(id)
     ];
-    console.log('image_url pour mise à jour annonce :', image_url || '');
+
+    console.log('Valeurs à mettre à jour dans annonce :', annonceValues);
 
     const [annonceResult] = await pool.query(annonceSql, annonceValues);
     console.log(`Annonce mise à jour pour l'événement ${id}`);
@@ -367,11 +423,11 @@ exports.updateEvenement = async (req, res) => {
     console.log(`Destinataires trouvés :`, destinataires);
 
     if (destinataires.length > 0) {
-      const notificationMessage = `Annonce modifiée - nouveau evenement est la : ${nom_evenement}`;
+      const notificationMessage = `Annonce modifiée - nouvel événement : ${nom_evenement}`;
       const notificationValues = destinataires.map(d => [
         new Date(),
         notificationMessage,
-        organisateur_admin || 0,
+        parseInt(organisateur_admin),
         d.Matricule
       ]);
       await pool.query(
@@ -384,7 +440,7 @@ exports.updateEvenement = async (req, res) => {
     }
 
     const fullImageUrl = image_url && !image_url.startsWith('http')
-      ? `http://events.localhost${image_url}`
+      ? `http://localhost:8084${image_url}`
       : image_url || '';
     console.log('URL complète renvoyée pour mise à jour :', fullImageUrl);
 

@@ -1,5 +1,3 @@
-/* evenement.module.css */
-
 /* Conteneur principal */
 .ADM-EVN-container {
     max-width: 1400px;
@@ -60,25 +58,25 @@
 
 /* Sidebar */
 .ADM-EVN-sidebar {
-    background: linear-gradient(135deg,  #3a6a9e 30%, #082e54 100%);
+    background: linear-gradient(135deg, #3a6a9e 30%, #082e54 100%);
     border-radius: 0;
-  padding: 25px;
-  color: #ffffff;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  position: fixed;
-  top: 0;
-  left: 30px;
-  width: 200px; /* Increased from 150px to 200px */
-  height: 100vh;
-  box-shadow: 0 15px 40px rgba(37, 100, 194, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  z-index: 1000;
-  animation: ADM-EVN-slideIn 0.5s ease-out;
-  overflow-y: auto;
-  padding-bottom: 40px;
+    padding: 25px;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    position: fixed;
+    top: 0;
+    left: 30px;
+    width: 200px;
+    height: 100vh;
+    box-shadow: 0 15px 40px rgba(37, 100, 194, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    animation: ADM-EVN-slideIn 0.5s ease-out;
+    overflow-y: auto;
+    padding-bottom: 40px;
 }
 
 @keyframes ADM-EVN-slideIn {
@@ -102,29 +100,29 @@
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Boutons de la barre latérale ajustés pour prendre toute la largeur sans centrage */
+/* Boutons de la barre latérale */
 .ADM-EVN-sidebar-button {
     background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-  text-decoration: none;
-  font-size: 0.9rem; /* Reduced from 1rem to 0.9rem for better fit */
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 12px;
-  padding: 10px 15px; /* Adjusted padding from 12px 20px to 10px 15px */
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  width: 100%;
-  box-sizing: border-box;
-  position: relative;
-  overflow: hidden;
-  margin: 0;
-  white-space: normal; /* Allow text to wrap */
-  word-wrap: break-word; /* Ensure long words break to the next line */
-  line-height: 1.2; /* Improve readability with better line spacing */
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+    margin: 0;
+    white-space: normal;
+    word-wrap: break-word;
+    line-height: 1.2;
 }
 
 .ADM-EVN-sidebar-button:hover {
@@ -188,69 +186,15 @@
 /* Grille de contenu */
 .ADM-EVN-content-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 1fr; /* Simplifié pour une seule colonne */
     gap: 30px;
-}
-
-/* Graphique */
-.ADM-EVN-chart-container {
-    background: rgba(255, 255, 255, 0.85);
-    border-radius: 20px;
-    padding: 25px;
-    box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15), 0 0 20px rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    backdrop-filter: blur(10px);
-    position: relative;
-    overflow: hidden;
-}
-
-.ADM-EVN-chart-title {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: #052659;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    letter-spacing: 0.5px;
-    position: relative;
-    padding-bottom: 10px;
-    background: linear-gradient(90deg, #0d3155, #7DA0CA);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    transition: all 0.4s ease;
-}
-
-.ADM-EVN-chart-title:hover {
-    transform: scale(1.02);
-}
-
-.ADM-EVN-chart-title::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 50px;
-    height: 2px;
-    background: linear-gradient(90deg, #06223e, #7DA0CA);
-    transition: width 0.4s ease;
-}
-
-.ADM-EVN-chart-title:hover::after {
-    width: 100%;
-}
-
-.ADM-EVN-chart-wrapper {
-    max-width: 100%;
-    height: 300px;
-    position: relative;
 }
 
 /* Liste des événements */
 .ADM-EVN-event-list {
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.9);
     border-radius: 20px;
-    padding: 25px;
+    padding: 30px;
     box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15), 0 0 20px rgba(255, 255, 255, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.5);
     backdrop-filter: blur(10px);
@@ -259,16 +203,16 @@
 }
 
 .ADM-EVN-event-list-h3 {
-    font-size: 1.2rem;
-    font-weight: 600;
+    font-size: 1.4rem;
+    font-weight: 700;
     color: #052659;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     letter-spacing: 0.5px;
     position: relative;
-    padding-bottom: 10px;
+    padding-bottom: 12px;
     background: linear-gradient(90deg, #0c3156, #7DA0CA);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -284,8 +228,8 @@
     position: absolute;
     bottom: 0;
     left: 0;
-    width: 50px;
-    height: 2px;
+    width: 60px;
+    height: 3px;
     background: linear-gradient(90deg, #042649, #7DA0CA);
     transition: width 0.4s ease;
 }
@@ -297,28 +241,29 @@
 .ADM-EVN-search-container {
     position: relative;
     width: 100%;
-    margin-bottom: 20px;
+    max-width: 500px;
+    margin-bottom: 25px;
     display: flex;
     align-items: center;
-    background: rgba(255, 255, 255, 0.7);
-    border-radius: 12px;
-    padding: 5px 10px;
-    box-shadow: 0 4px 15px rgba(3, 19, 44, 0.05);
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 15px;
+    padding: 8px 12px;
+    box-shadow: 0 4px 15px rgba(3, 19, 44, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(8px);
     transition: all 0.3s ease;
 }
 
 .ADM-EVN-search-container:hover {
-    box-shadow: 0 6px 20px rgba(5, 38, 89, 0.1);
+    box-shadow: 0 6px 20px rgba(5, 38, 89, 0.15);
 }
 
 .ADM-EVN-search-bar {
     width: 100%;
     padding: 12px 40px 12px 15px;
     border: none;
-    border-radius: 12px;
-    font-size: 0.9rem;
+    border-radius: 15px;
+    font-size: 0.95rem;
     background: transparent;
     color: #052659;
 }
@@ -328,25 +273,26 @@
 }
 
 .ADM-EVN-search-bar::placeholder {
-    color: #3c70af;
+    color: #7da0ca;
 }
 
 .ADM-EVN-search-icon {
     position: absolute;
     right: 15px;
     color: #0c2a46;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
 }
 
+/* Style modernisé pour la liste des événements */
 .ADM-EVN-event-list-ul {
     list-style: none;
     padding: 0;
-    max-height: 400px;
+    max-height: 600px;
     overflow-y: auto;
 }
 
 .ADM-EVN-event-list-ul::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
 }
 
 .ADM-EVN-event-list-ul::-webkit-scrollbar-track {
@@ -361,101 +307,151 @@
 
 .ADM-EVN-event-item {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.7);
-    margin-bottom: 12px;
-    box-shadow: 0 4px 15px rgba(5, 38, 89, 0.05);
+    flex-direction: column;
+    padding: 20px;
+    border-radius: 15px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(240, 247, 255, 0.95));
+    margin-bottom: 15px;
+    box-shadow: 0 8px 20px rgba(5, 38, 89, 0.1), 0 0 15px rgba(255, 255, 255, 0.2);
     cursor: pointer;
     transition: all 0.3s ease;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(5px);
+    border: 1px solid rgba(84, 131, 179, 0.2);
+    backdrop-filter: blur(8px);
+    position: relative;
+    overflow: hidden;
 }
 
 .ADM-EVN-event-item:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(5, 38, 89, 0.15), 0 0 15px rgba(125, 160, 202, 0.3);
-    background: rgba(145, 187, 218, 0.9);
-    border-color: rgba(84, 131, 179, 0.3);
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(5, 38, 89, 0.15), 0 0 20px rgba(125, 160, 202, 0.4);
+    background: linear-gradient(145deg, rgba(255, 255, 255, 1), rgba(200, 232, 255, 0.95));
 }
 
-.ADM-EVN-event-item:last-child {
-    margin-bottom: 0;
+.ADM-EVN-event-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+    background: linear-gradient(180deg, #5483b3, #7da0ca);
+    transition: width 0.3s ease;
+}
+
+.ADM-EVN-event-item:hover::before {
+    width: 8px;
+}
+
+.ADM-EVN-event-info {
+    flex: 1;
 }
 
 .ADM-EVN-event-info-h4 {
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: 600;
-    color: #173d78;
-    margin: 0;
+    color: #052659;
+    margin: 0 0 8px;
     letter-spacing: 0.3px;
 }
 
 .ADM-EVN-event-info-p {
     font-size: 0.9rem;
     color: #5483b3;
-    margin: 5px 0 0;
+    margin: 0;
+    line-height: 1.5;
 }
 
-/* Statistiques avec survol en bleu clair au lieu de gris */
+.ADM-EVN-event-stats {
+    margin-top: 10px;
+}
+
 .ADM-EVN-event-stats-p {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: #ffffff;
     margin: 0;
     font-weight: 500;
-    padding: 5px 10px;
-    background: #5483b3;
-    border-radius: 8px;
+    padding: 6px 12px;
+    background: linear-gradient(135deg, #5483b3, #7da0ca);
+    border-radius: 10px;
     letter-spacing: 0.3px;
     transition: all 0.3s ease;
+    display: inline-block;
 }
 
 .ADM-EVN-event-stats-p:hover {
-    background: #7da0ca; /* Bleu clair au lieu de gris */
-    box-shadow: 0 0 10px rgba(125, 160, 202, 0.5);
+    background: linear-gradient(135deg, #7da0ca, #91bbea);
+    box-shadow: 0 0 12px rgba(125, 160, 202, 0.5);
 }
 
-/* Modale */
+/* Modale agrandie */
 .ADM-EVN-modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(5, 38, 89, 0.5);
+    background: rgba(5, 38, 89, 0.6);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    animation: ADM-EVN-fadeIn 0.3s ease-out;
+}
+
+@keyframes ADM-EVN-fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 .ADM-EVN-modal-content {
-   width: 100%;
-    max-width: 500px;
-    max-height: 80vh;
-    background: white; /* Changé pour mieux voir */
-    border-radius: 10px;
-    padding: 20px;
+    width: 100%;
+    max-width: 700px; /* Agrandi de 500px à 700px */
+    max-height: 90vh; /* Agrandi de 80vh à 90vh */
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 30px;
     overflow-y: auto;
-    border: 1px solid #ccc;
+    box-shadow: 0 15px 40px rgba(5, 38, 89, 0.2), 0 0 30px rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    transform: scale(0.8);
+    animation: ADM-EVN-scaleIn 0.3s ease-out forwards;
+}
+
+@keyframes ADM-EVN-scaleIn {
+    to { transform: scale(1); }
+}
+
+.ADM-EVN-modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.ADM-EVN-modal-content::-webkit-scrollbar-track {
+    background: #f0f7ff;
+    border-radius: 10px;
+}
+
+.ADM-EVN-modal-content::-webkit-scrollbar-thumb {
+    background: #7da0ca;
+    border-radius: 10px;
 }
 
 .ADM-EVN-modal-content-h3 {
-    font-size: 1.6rem;
-    font-weight: 600;
+    font-size: 1.8rem;
+    font-weight: 700;
     color: #052659;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     text-align: center;
     letter-spacing: 0.5px;
-    text-shadow: 0 1px 3px rgba(5, 38, 89, 0.1);
+    background: linear-gradient(90deg, #0c3156, #7DA0CA);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .ADM-EVN-event-image {
-    max-height: 200px;
-    margin-bottom: 20px;
-    border-radius: 12px;
+    max-height: 250px;
+    margin-bottom: 25px;
+    border-radius: 15px;
     width: 100%;
     object-fit: cover;
     box-shadow: 0 8px 25px rgba(5, 38, 89, 0.1);
@@ -471,7 +467,7 @@
 }
 
 .ADM-EVN-description-p {
-    font-size: 0.95rem;
+    font-size: 1rem;
     margin: 0;
     color: #052659;
     line-height: 1.6;
@@ -480,10 +476,10 @@
 .ADM-EVN-modal-content-p {
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 0.95rem;
+    gap: 12px;
+    font-size: 1rem;
     color: #5483b3;
-    margin: 12px 0;
+    margin: 15px 0;
     line-height: 1.5;
 }
 
@@ -491,14 +487,14 @@
 .ADM-EVN-form {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 25px;
 }
 
 .ADM-EVN-input-group {
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
 }
 
 .ADM-EVN-input-icon {
@@ -507,7 +503,7 @@
     top: 50%;
     transform: translateY(-50%);
     color: #5483b3;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     transition: color 0.3s ease;
 }
 
@@ -563,10 +559,10 @@
 
 /* Section de filtrage */
 .ADM-EVN-filter-section {
-    margin: 15px 0;
-    padding: 20px;
+    margin: 20px 0;
+    padding: 25px;
     background: #f0f7ff;
-    border-radius: 12px;
+    border-radius: 15px;
     box-shadow: 0 4px 15px rgba(5, 38, 89, 0.05);
     border: 1px solid rgba(84, 131, 179, 0.1);
     transition: all 0.3s ease;
@@ -579,12 +575,12 @@
 .ADM-EVN-filter-options {
     display: flex;
     flex-wrap: wrap;
-    gap: 20px;
+    gap: 25px;
 }
 
 .ADM-EVN-filter-group {
     flex: 1;
-    min-width: 150px;
+    min-width: 200px;
 }
 
 .ADM-EVN-filter-group-label {
@@ -593,29 +589,29 @@
     gap: 8px;
     font-weight: 500;
     color: #052659;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 
 /* Boutons */
 .ADM-EVN-button-group {
     display: flex;
-    gap: 15px;
-    margin-top: 25px;
+    gap: 20px;
+    margin-top: 30px;
     justify-content: center;
 }
 
 .ADM-EVN-button {
     background: linear-gradient(135deg, #5483b3 0%, #052659 100%);
     color: #ffffff;
-    padding: 12px 25px;
+    padding: 14px 30px;
     border: none;
     border-radius: 12px;
-    font-size: 0.95rem;
+    font-size: 1rem;
     font-weight: 500;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     box-shadow: 0 8px 20px rgba(5, 38, 89, 0.1);
     transition: all 0.3s ease;
     letter-spacing: 0.3px;
@@ -659,18 +655,21 @@
 .ADM-EVN-no-results {
     text-align: center;
     color: #5483b3;
-    font-size: 1rem;
-    padding: 25px;
+    font-size: 1.1rem;
+    padding: 30px;
+    background: #f0f7ff;
+    border-radius: 12px;
 }
 
+/* Messages d'erreur */
 .ADM-EVN-error-message {
     color: #ffffff;
     font-size: 0.85rem;
-    margin-left: 10px;
-    display: inline-block;
+    margin-top: 5px;
+    display: block;
     background: rgba(255, 59, 48, 0.7);
-    padding: 3px 8px;
-    border-radius: 4px;
+    padding: 5px 10px;
+    border-radius: 6px;
 }
 
 /* Animations */
@@ -699,14 +698,42 @@
     .ADM-EVN-content-grid {
         grid-template-columns: 1fr;
     }
+
+    .ADM-EVN-modal-content {
+        max-width: 90%;
+        padding: 20px;
+    }
 }
 
 @media (max-width: 576px) {
     .ADM-EVN-button-group {
         flex-direction: column;
+        gap: 15px;
+    }
+
+    .ADM-EVN-event-item {
+        padding: 15px;
+    }
+
+    .ADM-EVN-event-info-h4 {
+        font-size: 1rem;
+    }
+
+    .ADM-EVN-event-info-p {
+        font-size: 0.85rem;
+    }
+
+    .ADM-EVN-event-stats-p {
+        font-size: 0.8rem;
+        padding: 5px 10px;
     }
 
     .ADM-EVN-modal-content {
-        padding: 20px;
+        max-width: 95%;
+        padding: 15px;
+    }
+
+    .ADM-EVN-modal-content-h3 {
+        font-size: 1.5rem;
     }
 }

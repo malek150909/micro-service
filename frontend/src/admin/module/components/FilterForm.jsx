@@ -11,6 +11,7 @@ const FilterForm = ({ onFilter }) => {
     specialite: '',
     section: '',
   });
+  const [error, setError] = useState(null);
 
   const [faculteOptions, setFaculteOptions] = useState([]);
   const [departementOptions, setDepartementOptions] = useState([]);
@@ -21,10 +22,12 @@ const FilterForm = ({ onFilter }) => {
   useEffect(() => {
     const fetchFacultes = async () => {
       try {
+        setError(null);
         const response = await axios.get('http://courses.localhost/modules/facultes');
         setFaculteOptions(response.data);
       } catch (error) {
         console.error('Erreur de récupération des facultés:', error);
+        setError('Impossible de charger les facultés. Veuillez réessayer.');
       }
     };
     fetchFacultes();
@@ -33,12 +36,14 @@ const FilterForm = ({ onFilter }) => {
   useEffect(() => {
     const fetchDepartements = async () => {
       try {
+        setError(null);
         const response = await axios.get('http://courses.localhost/modules/departements', {
           params: { faculte: filters.faculte },
         });
         setDepartementOptions(response.data);
       } catch (error) {
         console.error('Erreur de récupération des départements:', error);
+        setError('Impossible de charger les départements. Veuillez vérifier la sélection de la faculté.');
       }
     };
 
@@ -62,12 +67,14 @@ const FilterForm = ({ onFilter }) => {
   useEffect(() => {
     const fetchNiveaux = async () => {
       try {
+        setError(null);
         const response = await axios.get('http://courses.localhost/modules/niveaux', {
           params: { departement: filters.departement },
         });
         setNiveauOptions(response.data);
       } catch (error) {
         console.error('Erreur de récupération des niveaux:', error);
+        setError('Impossible de charger les niveaux. Veuillez vérifier la sélection du département.');
       }
     };
 
@@ -89,12 +96,14 @@ const FilterForm = ({ onFilter }) => {
   useEffect(() => {
     const fetchSpecialites = async () => {
       try {
+        setError(null);
         const response = await axios.get('http://courses.localhost/modules/specialites', {
           params: { departement: filters.departement, niveau: filters.niveau },
         });
         setSpecialiteOptions(response.data);
       } catch (error) {
         console.error('Erreur de récupération des spécialités:', error);
+        setError('Impossible de charger les spécialités. Veuillez vérifier les sélections.');
       }
     };
 
@@ -114,6 +123,7 @@ const FilterForm = ({ onFilter }) => {
   useEffect(() => {
     const fetchSections = async () => {
       try {
+        setError(null);
         const response = await axios.get('http://courses.localhost/modules/sections', {
           params: {
             specialite: filters.specialite,
@@ -123,6 +133,7 @@ const FilterForm = ({ onFilter }) => {
         setSectionOptions(response.data);
       } catch (error) {
         console.error('Erreur de récupération des sections:', error);
+        setError('Impossible de charger les sections. Veuillez vérifier les sélections.');
       }
     };
 
@@ -138,13 +149,15 @@ const FilterForm = ({ onFilter }) => {
   }, [filters.specialite, filters.niveau]);
 
   const handleChange = (e) => {
-    setFilters({ ...filters, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFilters({ ...filters, [name]: value });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setError(null);
     if (filters.section) {
-      onFilter(filters);
+      onFilter({ ...filters, section: filters.section });
     } else {
       onFilter({ ...filters, section: '' });
     }
@@ -158,6 +171,7 @@ const FilterForm = ({ onFilter }) => {
         transition={{ duration: 0.5 }}
       >
         <h3>Chercher les modules d'une Section</h3>
+        {error && <p style={{ color: 'red', marginBottom: '10px' }}>{error}</p>}
         <form className={styles['ADM-MDL-form']} onSubmit={handleSubmit} style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
           <select name="faculte" value={filters.faculte} onChange={handleChange} className={styles['ADM-MDL-select']}>
             <option value="">Sélectionner une Faculté</option>
@@ -195,7 +209,12 @@ const FilterForm = ({ onFilter }) => {
             ))}
           </select>
 
-          <select name="section" value={filters.section} onChange={handleChange} className={styles['ADM-MDL-select']}>
+          <select
+            name="section"
+            value={filters.section}
+            onChange={handleChange}
+            className={styles['ADM-MDL-select']}
+          >
             <option value="">Sélectionner une Section</option>
             {sectionOptions.map((option) => (
               <option key={option.ID_section} value={option.ID_section}>

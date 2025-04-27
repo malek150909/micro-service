@@ -234,7 +234,12 @@ router.get('/sections/:id/etudiants', async (req, res) => {
   const { id } = req.params;
   try {
     const [students] = await db.query(`
-      SELECT e.*, u.nom, u.prenom, u.email, g.num_groupe
+      SELECT e.*, 
+             u.nom, 
+             u.prenom, 
+             u.email, 
+             u.motdepasse AS generatedPassword, 
+             g.num_groupe
       FROM Etudiant e
       JOIN User u ON e.Matricule = u.Matricule
       JOIN Etudiant_Section es ON e.Matricule = es.Matricule
@@ -250,12 +255,13 @@ router.get('/sections/:id/etudiants', async (req, res) => {
       const formattedDate = convertDate(anneeInscription);
       return {
         ...student,
-        annee_inscription: formattedDate || (anneeInscription ? anneeInscription.toString() : null)
+        annee_inscription: formattedDate || (anneeInscription ? anneeInscription.toString() : null),
       };
     });
 
     res.json(formattedStudents);
   } catch (err) {
+    console.error('Erreur lors de la récupération des étudiants :', err);
     res.status(500).json({ error: 'Une erreur s’est produite. Veuillez réessayer.' });
   }
 });

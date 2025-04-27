@@ -7,7 +7,7 @@ const router = express.Router();
 router.get('/', moduleController.getModules);
 router.post('/', moduleController.addModule);
 router.delete('/:id', moduleController.deleteModule);
-router.put('/:id', moduleController.updateModule); // Nouvelle route pour la mise à jour
+router.put('/:id', moduleController.updateModule); // Nouvelle route pour la mise Ã  jour
 
 router.get('/facultes', moduleController.getFacultes);
 router.get('/departements', moduleController.getDepartements);

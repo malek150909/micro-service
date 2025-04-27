@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import FilterForm from '../components/FilterForm';
 import ModuleForm from '../components/ModuleForm';
 import ModuleList from '../components/ModuleList';
@@ -23,11 +23,36 @@ const Home = () => {
     section: '',
   });
   const [alertMessage, setAlertMessage] = useState(null);
+  const [sectionOptions, setSectionOptions] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchSections = async () => {
+      try {
+        const response = await axios.get('http://courses.localhost/modules/sections', {
+          params: {
+            specialite: filters.specialite,
+            niveau: filters.niveau,
+          },
+        });
+        setSectionOptions(response.data);
+      } catch (error) {
+        console.error('Erreur de récupération des sections:', error);
+        setSectionOptions([]);
+      }
+    };
+
+    if (filters.specialite && filters.niveau) {
+      fetchSections();
+    } else {
+      setSectionOptions([]);
+    }
+  }, [filters.specialite, filters.niveau]);
 
   const fetchModules = async (currentFilters) => {
     try {
       const response = await axios.get(API_URL, { params: currentFilters });
+      console.log('Fetched modules:', response.data); // Debug log
       setModules(response.data);
     } catch (err) {
       console.error('Erreur de récupération des modules:', err);
@@ -43,19 +68,18 @@ const Home = () => {
   };
 
   const handleAddModule = async (moduleData) => {
-    if (!filters.section) {
-      setAlertMessage('Veuillez sélectionner une section avant d\'ajouter un module.');
+    if (!moduleData.sections.length) {
+      setAlertMessage('Veuillez sélectionner au moins une section.');
       return;
     }
-  
+
     try {
       const addData = {
         ...moduleData,
         ID_specialite: filters.specialite || '1',
-        section: filters.section,
         niveau: filters.niveau,
       };
-  
+
       console.log('Sending addData to backend:', addData);
       await axios.post(API_URL, addData);
       fetchModules(filters);
@@ -67,9 +91,11 @@ const Home = () => {
     }
   };
 
-  const handleDeleteModule = async (id) => {
+  const handleDeleteModule = async (id, sectionId) => {
     try {
-      await axios.delete(`${API_URL}/${id}`);
+      await axios.delete(`${API_URL}/${id}`, {
+        params: { sectionId },
+      });
       fetchModules(filters);
     } catch (err) {
       console.error('Erreur de suppression du module:', err);
@@ -136,7 +162,7 @@ const Home = () => {
         {modules.length > 0 ? (
           <ModuleList
             modules={modules}
-            onDelete={handleDeleteModule}
+            onDelete={(id) => handleDeleteModule(id, filters.section)}
             onUpdate={handleUpdateModule}
             niveau={filters.niveau}
           />
@@ -145,12 +171,14 @@ const Home = () => {
             {filters.section && isFilterApplied ? 'Aucun module trouvé.' : 'Veuillez sélectionner une section pour filtrer ou ajouter un nouveau module.'}
           </p>
         )}
-        {filters.section && (
+        {filters.specialite && filters.niveau && filters.section && (
           <div className={styles['ADM-MDL-form-section']}>
             <ModuleForm
               onAdd={handleAddModule}
-              disabled={!filters.section || !filters.specialite}
+              disabled={!filters.specialite || !filters.niveau || !filters.section}
               niveau={filters.niveau}
+              specialite={filters.specialite}
+              sectionOptions={sectionOptions}
             />
           </div>
         )}

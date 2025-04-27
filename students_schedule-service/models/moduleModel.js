@@ -5,7 +5,7 @@ const Module = {
     const { faculte, departement, niveau, specialite, section } = filters;
     let sql;
     const params = [];
-  
+
     let semesters;
     if (niveau === 'L1') {
       semesters = ['1', '2'];
@@ -14,22 +14,23 @@ const Module = {
     } else if (niveau === 'L3') {
       semesters = ['5', '6'];
     } else {
-      semesters = ['1', '2', '3', '4', '5', '6'];
+      semesters = ['1', '2', '3', '4', "5", "6"];
     }
-  
+
     if (section) {
       sql = `
-        SELECT DISTINCT m.*, ms.semestre, sec.nom_section
+        SELECT m.*, ms.semestre, sec.nom_section
         FROM Module m
         JOIN Module_Section ms ON m.ID_module = ms.ID_module
         JOIN Section sec ON ms.ID_section = sec.ID_section
         LEFT JOIN Specialite s ON m.ID_specialite = s.ID_specialite
         LEFT JOIN Departement d ON s.ID_departement = d.ID_departement
         LEFT JOIN Faculte f ON d.ID_faculte = f.ID_faculte
-        WHERE ms.ID_section = ? AND ms.semestre IN (${semesters.map(() => '?').join(',')})
+        WHERE ms.ID_section = ? 
+        AND ms.semestre IN (${semesters.map(() => '?').join(',')})
       `;
       params.push(section, ...semesters);
-  
+
       if (faculte) {
         sql += ' AND f.ID_faculte = ?';
         params.push(faculte);
@@ -49,54 +50,66 @@ const Module = {
     } else {
       sql = `SELECT * FROM Module WHERE 1=0`;
     }
-  
+
     const [rows] = await pool.query(sql, params);
     return rows;
   },
 
   async addModule(moduleData) {
-    const { nom_module, description_module, credit, coefficient, ID_specialite, section, semestre, seances } = moduleData;
-  
+    const { nom_module, description_module, credit, coefficient, ID_specialite, sections, semestre, seances } = moduleData;
+
     if (!nom_module.trim() || credit === '' || coefficient === '' || 
-        ID_specialite === '' || ID_specialite == null || !semestre || !section || !seances) {
-      throw new Error('Missing required fields');
+        ID_specialite === '' || ID_specialite == null || !semestre || !sections || !seances || !Array.isArray(sections) || sections.length === 0) {
+      throw new Error('Missing or invalid required fields');
     }
-  
-    // Validation du semestre
+
     if (!['1', '2', '3', '4', '5', '6'].includes(semestre.toString())) {
       throw new Error('Semestre must be between 1 and 6');
     }
-  
-    // Validation des séances (inclure 'En ligne')
-    if (!['Cour', 'Cour/TD', 'Cour/TP', 'Cour/TD/TP', 'En ligne'].includes(seances)) {
-      throw new Error('Séances must be one of "Cour", "Cour/TD", "Cour/TP", "Cour/TD/TP", or "En ligne"');
+
+    if (!['Cour', 'Cour/TD', 'Cour/TP', 'Cour/TD/TP', 'En Ligne'].includes(seances)) {
+      throw new Error('Séances must be one of "Cours", "Cour/TD", "Cour/TP", "Cour/TD/TP", or "En Ligne"');
     }
-  
+
     const creditNum = parseFloat(credit);
     const coefficientNum = parseFloat(coefficient);
     const specialiteNum = parseInt(ID_specialite);
     if (isNaN(creditNum) || isNaN(coefficientNum) || isNaN(specialiteNum)) {
       throw new Error('Invalid number format');
     }
-  
+
     const connection = await pool.getConnection();
     try {
       await connection.beginTransaction();
-  
+
+      for (const sectionId of sections) {
+        const [existing] = await connection.query(
+          `SELECT 1 FROM Module m
+           JOIN Module_Section ms ON m.ID_module = ms.ID_module
+           WHERE m.nom_module = ? AND ms.ID_section = ?`,
+          [nom_module, sectionId]
+        );
+        if (existing.length > 0) {
+          throw new Error(`Un module avec le nom "${nom_module}" existe déjà dans la section ${sectionId}.`);
+        }
+      }
+
       const [moduleResult] = await connection.query(
         `INSERT INTO Module (nom_module, description_module, credit, coefficient, ID_specialite, seances)
          VALUES (?, ?, ?, ?, ?, ?)`,
         [nom_module, description_module || null, creditNum, coefficientNum, specialiteNum, seances]
       );
-  
+
       const moduleId = moduleResult.insertId;
-  
-      await connection.query(
-        `INSERT INTO Module_Section (ID_module, ID_section, semestre)
-         VALUES (?, ?, ?)`,
-        [moduleId, section, semestre]
-      );
-  
+
+      for (const sectionId of sections) {
+        await connection.query(
+          `INSERT INTO Module_Section (ID_module, ID_section, semestre)
+           VALUES (?, ?, ?)`,
+          [moduleId, sectionId, semestre]
+        );
+      }
+
       await connection.commit();
       return { moduleId };
     } catch (error) {
@@ -109,61 +122,93 @@ const Module = {
 
   async updateModule(id, moduleData) {
     const { nom_module, description_module, credit, coefficient, seances } = moduleData;
-  
+
     if (!nom_module.trim() || credit === '' || coefficient === '' || !seances) {
       throw new Error('Missing required fields');
     }
-  
-    // Validation des séances (inclure 'En ligne')
-    if (!['Cour', 'Cour/TD', 'Cour/TP', 'Cour/TD/TP', 'En ligne'].includes(seances)) {
-      throw new Error('Séances must be one of "Cour", "Cour/TD", "Cour/TP", "Cour/TD/TP", or "En ligne"');
+
+    if (!['Cour', 'Cour/TD', 'Cour/TP', 'Cour/TD/TP', 'En Ligne'].includes(seances)) {
+      throw new Error('Séances must be one of "Cours", "Cour/TD", "Cour/TP", "Cour/TD/TP", or "En Ligne"');
     }
-  
+
     const creditNum = parseFloat(credit);
     const coefficientNum = parseFloat(coefficient);
     if (isNaN(creditNum) || isNaN(coefficientNum)) {
       throw new Error('Invalid number format');
     }
-  
+
     const sql = `
       UPDATE Module 
       SET nom_module = ?, description_module = ?, credit = ?, coefficient = ?, seances = ?
       WHERE ID_module = ?
     `;
     const params = [nom_module, description_module || null, creditNum, coefficientNum, seances, id];
-  
-    console.log('Requête SQL de mise à jour :', sql, 'Params :', params);
-  
+
     const [result] = await pool.query(sql, params);
     if (result.affectedRows === 0) {
       throw new Error('Module not found');
     }
   },
 
-  async deleteModule(id) {
-    await pool.query(`DELETE FROM Module_Section WHERE ID_module = ?`, [id]);
-    const [result] = await pool.query(`DELETE FROM Module WHERE ID_module = ?`, [id]);
+  async deleteModule(id, sectionId) {
+    const [deleteResult] = await pool.query(
+      `DELETE FROM Module_Section WHERE ID_module = ? AND ID_section = ?`,
+      [id, sectionId]
+    );
 
-    if (result.affectedRows === 0) {
-      throw new Error('Module not found');
+    if (deleteResult.affectedRows === 0) {
+      throw new Error('Module not found in the specified section');
     }
-    return result;
+
+    const [remainingSections] = await pool.query(
+      `SELECT COUNT(*) as count FROM Module_Section WHERE ID_module = ?`,
+      [id]
+    );
+
+    if (remainingSections[0].count === 0) {
+      const [moduleDeleteResult] = await pool.query(
+        `DELETE FROM Module WHERE ID_module = ?`,
+        [id]
+      );
+
+      if (moduleDeleteResult.affectedRows === 0) {
+        throw new Error('Module not found');
+      }
+    }
+
+    return deleteResult;
   },
 
   async getFacultes() {
-    const [rows] = await pool.query(`SELECT ID_faculte, nom_faculte FROM Faculte`);
-    return rows;
+    try {
+      const [rows] = await pool.query(`SELECT ID_faculte, nom_faculte FROM Faculte`);
+      return rows;
+    } catch (error) {
+      console.error('Error fetching faculties:', error);
+      throw new Error(`Failed to fetch faculties: ${error.message}`);
+    }
   },
 
   async getDepartements(filters) {
-    let sql = `SELECT ID_departement, Nom_departement FROM Departement`;
-    const params = [];
-    if (filters && filters.faculte) {
-      sql += ' WHERE ID_faculte = ?';
-      params.push(filters.faculte);
+    try {
+      let sql = `SELECT ID_departement, Nom_departement FROM Departement`;
+      const params = [];
+      if (filters && filters.faculte) {
+        sql += ' WHERE ID_faculte = ?';
+        params.push(filters.faculte);
+      }
+      const [rows] = await pool.query(sql, params);
+      return rows;
+    } catch (error) {
+      console.error('Error fetching departments:', {
+        message: error.message,
+        sqlMessage: error.sqlMessage,
+        sqlState: error.sqlState,
+        errno: error.errno,
+        query: error.sql,
+      });
+      throw new Error(`Failed to fetch departments: ${error.message}`);
     }
-    const [rows] = await pool.query(sql, params);
-    return rows;
   },
 
   async getNiveaux(filters) {
@@ -202,7 +247,7 @@ const Module = {
   },
 
   async getSections(filters) {
-    let sql = `SELECT ID_section , nom_section FROM Section`;
+    let sql = `SELECT ID_section, nom_section FROM Section`;
     const params = [];
     if (filters) {
       const conditions = [];
@@ -222,10 +267,25 @@ const Module = {
     return rows;
   },
 
-  async getSemestres() {
-    const [rows] = await pool.query(`SELECT '1' AS semestre UNION SELECT '2'`);
+  async getSemestres(filters) {
+    let semesters;
+    if (filters && filters.niveau) {
+      if (filters.niveau === 'L1') {
+        semesters = ['1', '2'];
+      } else if (filters.niveau === 'L2') {
+        semesters = ['3', '4'];
+      } else if (filters.niveau === 'L3') {
+        semesters = ['5', '6'];
+      } else {
+        semesters = ['1', '2', '3', '4', '5', '6'];
+      }
+    } else {
+      semesters = ['1', '2', '3', '4', '5', '6'];
+    }
+    const query = semesters.map(semestre => `SELECT '${semestre}' AS semestre`).join(' UNION ');
+    const [rows] = await pool.query(query);
     return rows;
   }
 };
 
-export default Module; // ✅ Utilisation d'export ES6
+export default Module;

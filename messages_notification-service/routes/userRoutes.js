@@ -1,8 +1,9 @@
-const express = require("express");
-const router = express.Router();
-const userController = require("../controllers/userController");
-const authMiddleware = require("../middleware/auth");
+const express = require("express")
+const router = express.Router()
+const userController = require("../controllers/userController")
+const authMiddleware = require("../middleware/auth")
 
-router.get("/search", authMiddleware, userController.searchUser);
+// Route pour rechercher un utilisateur par email
+router.get("/search", authMiddleware, userController.searchUser)
 
-module.exports = router;
+module.exports = router

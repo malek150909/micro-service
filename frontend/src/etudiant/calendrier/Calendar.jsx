@@ -22,7 +22,8 @@ function Calendar() {
   const navigate = useNavigate()
 
   const token = localStorage.getItem("token")
-  const role = localStorage.getItem("role")
+  const user = JSON.parse(localStorage.getItem("user") || "{}")
+  const role = user.role
 
   const timeSlots = [
     "08:00 - 09:30",

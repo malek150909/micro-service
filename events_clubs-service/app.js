@@ -1,4 +1,5 @@
 const express = require('express');
+require('dotenv').config();
 const cors = require('cors');
 const path = require('path');
 const authMiddleware = require('./middleware/auth'); // Assurez-vous que ce middleware est correctement configuré
@@ -17,7 +18,10 @@ const demandeADMRoutes = require('./routes/demandeADMRoutes');
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: 'http://plateform.universitaire', // Remplacez par l'URL de votre frontend
+    credentials: true,
+  }));
 app.use(express.json());
 
 app.use('/evenement', evenementRoutes); 
