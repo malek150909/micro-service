@@ -23,6 +23,7 @@ const Etudiant = () => {
     const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
     const [notifications, setNotifications] = useState([]);
     const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
+    const [isLoadingCounts, setIsLoadingCounts] = useState(true);
 
     const API_URL = "http://courses.localhost/notes";
     const CALENDAR_API_URL = "http://courses.localhost/calendar";
@@ -31,29 +32,38 @@ const Etudiant = () => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
         if (!storedUser || storedUser.role !== "etudiant") {
             navigate("/");
-        } else {
-            setUser(storedUser);
-            console.log("Utilisateur chargé:", storedUser);
-            const hasSeenWelcome = sessionStorage.getItem("hasSeenWelcome");
-           
-
-            if (!hasSeenWelcome) {
-                setShowWelcome(true);
-                sessionStorage.setItem("hasSeenWelcome", "true");
-            }
-            setTimeout(() => setIsLoaded(true), 100);
-            fetchRecentNotes(storedUser.Matricule);
-            fetchUpcomingEvents();
-            fetchNotifications();
-            const fetchCount = () => {
-                fetchUnreadMessagesCount(storedUser.Matricule).then((count) => {
-                    console.log("Nombre de messages non lus:", count);
-                    setUnreadMessagesCount(count);
-                });
-            };
-            fetchCount();
-            setTimeout(fetchCount, 5000);
+            return;
         }
+    
+        setUser(storedUser);
+        console.log("Utilisateur chargé:", storedUser);
+    
+        const hasSeenWelcome = sessionStorage.getItem("hasSeenWelcome");
+        if (!hasSeenWelcome) {
+            setShowWelcome(true);
+            sessionStorage.setItem("hasSeenWelcome", "true");
+        }
+    
+        setTimeout(() => setIsLoaded(true), 100);
+        fetchRecentNotes(storedUser.Matricule);
+        fetchUpcomingEvents();
+        setIsLoadingCounts(true);
+        Promise.all([
+            fetchNotifications().then(() => console.log("Notifications chargées")),
+            fetchUnreadMessagesCount(storedUser.Matricule).then((count) => {
+                console.log("Messages non lus chargés:", count);
+                setUnreadMessagesCount(Number(count));
+            }),
+        ]).finally(() => setIsLoadingCounts(false));
+    
+        const interval = setInterval(() => {
+            fetchNotifications();
+            fetchUnreadMessagesCount(storedUser.Matricule).then((count) => {
+                setUnreadMessagesCount(Number(count));
+            });
+        }, 30000);
+    
+        return () => clearInterval(interval);
     }, [navigate]);
 
     useEffect(() => {
@@ -323,8 +333,18 @@ const Etudiant = () => {
         },
     ];
 
+
     return (
         <div className={`${styles['MAIN-mainContainer']} ${isLoaded ? styles['MAIN-mainContainerLoaded'] : ''}`}>
+            {/* Top Bar */}
+            <div className={styles['MAIN-topBar']}>
+                <div className={styles['MAIN-userInfo']}>
+                    <span className={styles['MAIN-userName']}>{user ? `${user.nom} ${user.prenom}` : "Utilisateur"}</span>
+                    <div className={styles['MAIN-userAvatar']}></div>
+                </div>
+            </div>
+
+            {/* Sidebar */}
             <div className={styles['MAIN-sidebar']}>
                 <div className={styles['MAIN-sidebarMenu']}>
                     <button onClick={handleEditProfile} className={styles['MAIN-sidebarItem']}>
@@ -337,16 +357,24 @@ const Etudiant = () => {
                     >
                         <div className={styles['MAIN-iconWrapper']}>
                             <FaEnvelope className={styles['MAIN-sidebarIcon']} />
-                            {unreadMessagesCount > 0 && (
-                                <span className={styles['MAIN-unreadBadge']}>{unreadMessagesCount}</span>
+                            {isLoadingCounts ? (
+                                <span className={styles['MAIN-unreadBadge']}>...</span>
+                            ) : (
+                                unreadMessagesCount > 0 && (
+                                    <span className={styles['MAIN-unreadBadge']}>{unreadMessagesCount}</span>
+                                )
                             )}
                         </div>
                     </button>
                     <button onClick={handleNotificationClick} className={styles['MAIN-sidebarItem']}>
                         <div className={styles['MAIN-iconWrapper']}>
                             <FaBell className={styles['MAIN-sidebarIcon']} />
-                            {unreadNotificationsCount > 0 && (
-                                <span className={styles['MAIN-unreadBadge']}>{unreadNotificationsCount}</span>
+                            {isLoadingCounts ? (
+                                <span className={styles['MAIN-unreadBadge']}>...</span>
+                            ) : (
+                                unreadNotificationsCount > 0 && (
+                                    <span className={styles['MAIN-unreadBadge']}>{unreadNotificationsCount}</span>
+                                )
                             )}
                         </div>
                     </button>
@@ -356,7 +384,9 @@ const Etudiant = () => {
                 </div>
             </div>
 
+            {/* Main Content */}
             <div className={styles['MAIN-mainContent']}>
+                {/* Welcome Message */}
                 {showWelcome && user && (
                     <div className={`${styles['MAIN-welcomeMessage']} ${isLoaded ? styles['MAIN-welcomeMessageSlideIn'] : ''}`}>
                         <h1>Bienvenue, {user.nom} {user.prenom} !</h1>
@@ -364,6 +394,7 @@ const Etudiant = () => {
                     </div>
                 )}
 
+                {/* Notification Modal */}
                 {showNotificationModal && (
                     <div className={`${styles['MAIN-notificationModal']} ${showNotificationModal ? styles['MAIN-notificationModalActive'] : ''}`}>
                         <div className={`${styles['MAIN-notificationModalContent']} ${showNotificationModal ? styles['MAIN-notificationModalContentActive'] : ''}`}>
@@ -374,17 +405,13 @@ const Etudiant = () => {
                                 X
                             </button>
                             <div className={styles['MAIN-notificationListWrapper']}>
-                                <NotificationBell
-                                    showModal={true}
-                                    notifications={notifications}
-                                    setNotifications={setNotifications}
-                                    fetchNotifications={fetchNotifications}
-                                />
+                                <NotificationBell showModal={true} />
                             </div>
                         </div>
                     </div>
                 )}
 
+                {/* Add Note Modal */}
                 {showAddNoteModal && (
                     <div className={`${styles['MAIN-modalOverlay']} ${showAddNoteModal ? styles['MAIN-modalOverlayActive'] : ''}`} data-modal="add">
                         <div className={`${styles['MAIN-modalContent']} ${styles['MAIN-addNoteModal']} ${styles['MAIN-stickyNote']}`}>
@@ -418,6 +445,7 @@ const Etudiant = () => {
                     </div>
                 )}
 
+                {/* Note Details Modal */}
                 {showDetailsModal && selectedNote && (
                     <div className={`${styles['MAIN-modalOverlay']} ${showDetailsModal ? styles['MAIN-modalOverlayActive'] : ''}`} data-modal="details">
                         <div className={`${styles['MAIN-modalContent']} ${styles['MAIN-stickyNote']}`}>
@@ -450,6 +478,7 @@ const Etudiant = () => {
                     </div>
                 )}
 
+                {/* Event Details Modal */}
                 {showEventDetailsModal && selectedEvent && (
                     <div className={`${styles['MAIN-modalOverlay']} ${showEventDetailsModal ? styles['MAIN-modalOverlayActive'] : ''}`} data-modal="event-details">
                         <div className={`${styles['MAIN-modalContent']} ${styles['MAIN-eventModal']}`}>
@@ -497,6 +526,7 @@ const Etudiant = () => {
                     </div>
                 )}
 
+                {/* Upcoming Events Section */}
                 <div className={styles['MAIN-eventsSection']}>
                     <h3>Événements à venir</h3>
                     <div className={styles['MAIN-eventsHorizontal']}>
@@ -547,11 +577,17 @@ const Etudiant = () => {
                     </button>
                 </div>
 
+                {/* Main Layout */}
                 <div className={styles['MAIN-mainLayout']}>
+                    {/* Cards Section */}
                     <div className={styles['MAIN-cardsSection']}>
                         <div className={styles['MAIN-cardsGrid']}>
                             {items.map((item, index) => (
-                                <div key={index} onClick={() => navigate(item.route)} className={styles['MAIN-card']}>
+                                <div 
+                                    key={index} 
+                                    onClick={() => navigate(item.route)} 
+                                    className={styles['MAIN-card']}
+                                >
                                     <div className={styles['MAIN-cardIcon']}>{item.icon}</div>
                                     <div className={styles['MAIN-cardContent']}>
                                         <h3 className={styles['MAIN-cardTitle']}>{item.title}</h3>
@@ -563,7 +599,9 @@ const Etudiant = () => {
                         </div>
                     </div>
 
+                    {/* Right Column: Notes */}
                     <div className={styles['MAIN-rightColumn']}>
+                        {/* Notes Section */}
                         <div className={styles['MAIN-notesSection']}>
                             <h3>Dernières Notes</h3>
                             <div className={styles['MAIN-notesGrid']}>

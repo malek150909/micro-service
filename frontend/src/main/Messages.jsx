@@ -1,3 +1,5 @@
+"use client"
+
 import { useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import { FaHome, FaSearch, FaPaperPlane, FaTimes, FaUser, FaPaperclip, FaEnvelope } from "react-icons/fa"
@@ -21,25 +23,25 @@ const Messages = () => {
   const wsRef = useRef(null)
 
   const fetchUnreadMessagesCount = async (matricule) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token")
     try {
       const response = await fetch("http://messaging.localhost/api/messages/unread", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      });
-      const data = await response.json();
+      })
+      const data = await response.json()
       if (response.ok) {
-        return data.unreadCount || 0;
+        return data.unreadCount || 0
       } else {
-        console.error("Erreur lors de la récupération des messages non lus :", data.message);
-        return 0;
+        console.error("Erreur lors de la récupération des messages non lus :", data.message)
+        return 0
       }
     } catch (err) {
-      console.error("Erreur réseau lors de la récupération des messages non lus :", err);
-      return 0;
+      console.error("Erreur réseau lors de la récupération des messages non lus :", err)
+      return 0
     }
-  };
+  }
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user") || "{}")
@@ -59,7 +61,7 @@ const Messages = () => {
     fetchReceivedMessages(user.Matricule)
 
     wsRef.current = new WebSocket(`ws://messaging.localhost?matricule=${user.Matricule}`)
-    
+
     wsRef.current.onopen = () => {
       console.log(`WebSocket connected for ${user.Matricule}`)
     }
@@ -77,11 +79,9 @@ const Messages = () => {
           lastMessageDate: message.date_envoi,
         })
         fetchUnreadMessagesCount(user.Matricule).then((count) => {
-          localStorage.setItem(`unreadMessagesCount_${user.Matricule}`, count);
-          window.dispatchEvent(
-            new CustomEvent("unreadMessagesCountUpdated", { detail: { count } })
-          );
-        });
+          localStorage.setItem(`unreadMessagesCount_${user.Matricule}`, count)
+          window.dispatchEvent(new CustomEvent("unreadMessagesCountUpdated", { detail: { count } }))
+        })
       }
     }
 
@@ -212,11 +212,9 @@ const Messages = () => {
         console.error("Erreur lors du marquage des messages comme lus.")
       } else {
         fetchUnreadMessagesCount(user.Matricule).then((count) => {
-          localStorage.setItem(`unreadMessagesCount_${user.Matricule}`, count);
-          window.dispatchEvent(
-            new CustomEvent("unreadMessagesCountUpdated", { detail: { count } })
-          );
-        });
+          localStorage.setItem(`unreadMessagesCount_${user.Matricule}`, count)
+          window.dispatchEvent(new CustomEvent("unreadMessagesCountUpdated", { detail: { count } }))
+        })
       }
     } catch (err) {
       console.error("Erreur réseau lors du marquage des messages comme lus:", err)
@@ -272,7 +270,7 @@ const Messages = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       )
       const data = await response.json()
       if (response.ok) {
@@ -331,8 +329,6 @@ const Messages = () => {
           lastMessageDate: new Date().toISOString(),
         })
 
-       _.
-
         setTimeout(() => {
           setSuccess("")
         }, 5000)
@@ -374,7 +370,7 @@ const Messages = () => {
   }
 
   const allMessages = [...sentMessages, ...receivedMessages].sort(
-    (a, b) => new Date(a.date_envoi) - new Date(b.date_envoi)
+    (a, b) => new Date(a.date_envoi) - new Date(b.date_envoi),
   )
 
   return (
@@ -405,9 +401,9 @@ const Messages = () => {
                   <div className={styles["MSG-contact-info"]} onClick={() => handleContactClick(contact)}>
                     <h4>
                       {contact.nom} {contact.prenom}
-                      {receivedMessages.some(
-                        (msg) => msg.expediteur === contact.Matricule && msg.isRead === 0
-                      ) && <span className={styles["MSG-unread-dot"]} />}
+                      {receivedMessages.some((msg) => msg.expediteur === contact.Matricule && msg.isRead === 0) && (
+                        <span className={styles["MSG-unread-dot"]} />
+                      )}
                     </h4>
                     <p>{contact.email}</p>
                     <span>{new Date(contact.lastMessageDate).toLocaleDateString()}</span>
@@ -460,7 +456,11 @@ const Messages = () => {
                         {msg.filePath && (
                           <div className={styles["MSG-file-attachment"]}>
                             <span>Fichier : </span>
-                            <a href={`http://messaging.localhost/Uploads/${msg.filePath}`} target="_blank" rel="noopener noreferrer">
+                            <a
+                              href={`http://messaging.localhost/Uploads/${msg.filePath}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
                               {msg.fileName || "Fichier sans nom"}
                             </a>
                           </div>

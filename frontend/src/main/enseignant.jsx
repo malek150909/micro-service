@@ -310,6 +310,15 @@ const Enseignant = () => {
 
     return (
         <div className={`${styles['MAIN-mainContainer']} ${isLoaded ? styles['MAIN-mainContainerLoaded'] : ''}`}>
+            {/* Top Bar */}
+            <div className={styles['MAIN-topBar']}>
+                <div className={styles['MAIN-userInfo']}>
+                    <span className={styles['MAIN-userName']}>{user ? `${user.nom} ${user.prenom}` : "Utilisateur"}</span>
+                    <div className={styles['MAIN-userAvatar']}>🟣</div>
+                </div>
+            </div>
+
+            {/* Sidebar */}
             <div className={styles['MAIN-sidebar']}>
                 <div className={styles['MAIN-sidebarMenu']}>
                     <button onClick={handleEditProfile} className={styles['MAIN-sidebarItem']}>
@@ -341,7 +350,9 @@ const Enseignant = () => {
                 </div>
             </div>
 
+            {/* Main Content */}
             <div className={styles['MAIN-mainContent']}>
+                {/* Welcome Message */}
                 {showWelcome && user && (
                     <div className={`${styles['MAIN-welcomeMessage']} ${isLoaded ? styles['MAIN-welcomeMessageSlideIn'] : ''}`}>
                         <h1>Bienvenue, {user.nom} {user.prenom} !</h1>
@@ -349,6 +360,7 @@ const Enseignant = () => {
                     </div>
                 )}
 
+                {/* Notification Modal */}
                 {showNotificationModal && (
                     <div className={`${styles['MAIN-notificationModal']} ${showNotificationModal ? styles['MAIN-notificationModalActive'] : ''}`}>
                         <div className={`${styles['MAIN-notificationModalContent']} ${showNotificationModal ? styles['MAIN-notificationModalContentActive'] : ''}`}>
@@ -359,17 +371,13 @@ const Enseignant = () => {
                                 X
                             </button>
                             <div className={styles['MAIN-notificationListWrapper']}>
-                                <NotificationBell
-                                    showModal={true}
-                                    notifications={notifications}
-                                    setNotifications={setNotifications}
-                                    fetchNotifications={fetchNotifications}
-                                />
+                                <NotificationBell showModal={true} />
                             </div>
                         </div>
                     </div>
                 )}
 
+                {/* Add Note Modal */}
                 {showAddNoteModal && (
                     <div className={`${styles['MAIN-modalOverlay']} ${showAddNoteModal ? styles['MAIN-modalOverlayActive'] : ''}`} data-modal="add">
                         <div className={`${styles['MAIN-modalContent']} ${styles['MAIN-addNoteModal']} ${styles['MAIN-stickyNote']}`}>
@@ -403,6 +411,7 @@ const Enseignant = () => {
                     </div>
                 )}
 
+                {/* Note Details Modal */}
                 {showDetailsModal && selectedNote && (
                     <div className={`${styles['MAIN-modalOverlay']} ${showDetailsModal ? styles['MAIN-modalOverlayActive'] : ''}`} data-modal="details">
                         <div className={`${styles['MAIN-modalContent']} ${styles['MAIN-stickyNote']}`}>
@@ -435,6 +444,7 @@ const Enseignant = () => {
                     </div>
                 )}
 
+                {/* Event Details Modal */}
                 {showEventDetailsModal && selectedEvent && (
                     <div className={`${styles['MAIN-modalOverlay']} ${showEventDetailsModal ? styles['MAIN-modalOverlayActive'] : ''}`} data-modal="event-details">
                         <div className={`${styles['MAIN-modalContent']} ${styles['MAIN-eventModal']}`}>
@@ -480,6 +490,7 @@ const Enseignant = () => {
                     </div>
                 )}
 
+                {/* Upcoming Events Section */}
                 <div className={styles['MAIN-eventsSection']}>
                     <h3>Événements à venir</h3>
                     <div className={styles['MAIN-eventsHorizontal']}>
@@ -528,11 +539,17 @@ const Enseignant = () => {
                     </button>
                 </div>
 
+                {/* Main Layout */}
                 <div className={styles['MAIN-mainLayout']}>
+                    {/* Cards Section */}
                     <div className={styles['MAIN-cardsSection']}>
                         <div className={styles['MAIN-cardsGrid']}>
                             {items.map((item, index) => (
-                                <div key={index} onClick={() => navigate(item.route)} className={styles['MAIN-card']}>
+                                <div 
+                                    key={index} 
+                                    onClick={() => navigate(item.route)} 
+                                    className={styles['MAIN-card']}
+                                >
                                     <div className={styles['MAIN-cardIcon']}>{item.icon}</div>
                                     <div className={styles['MAIN-cardContent']}>
                                         <h3 className={styles['MAIN-cardTitle']}>{item.title}</h3>
@@ -544,7 +561,9 @@ const Enseignant = () => {
                         </div>
                     </div>
 
+                    {/* Right Column: Notes */}
                     <div className={styles['MAIN-rightColumn']}>
+                        {/* Notes Section */}
                         <div className={styles['MAIN-notesSection']}>
                             <h3>Dernières Notes</h3>
                             <div className={styles['MAIN-notesGrid']}>
