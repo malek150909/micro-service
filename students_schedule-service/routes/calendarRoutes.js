@@ -5,8 +5,7 @@ import {
     addPersonalEvent,
     updatePersonalEvent,
     deletePersonalEvent,
-    deleteSupplementarySession,
-    deleteClubEvent,
+    
 } from '../controllers/calendarController.js';
 
 const router = express.Router();
@@ -39,7 +38,6 @@ router.get('/:startDate/:endDate', authMiddleware, getCalendarEvents); // Récup
 router.post('/event', authMiddleware, addPersonalEvent);
 router.put('/event/:id', authMiddleware, updatePersonalEvent);
 router.delete('/event/:id', authMiddleware, deletePersonalEvent);
-router.delete('/supp-session/:id', authMiddleware, deleteSupplementarySession);
-router.delete('/club-event/:id', authMiddleware, deleteClubEvent);
+
 
 export default router;

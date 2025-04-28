@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaHeart, FaComment, FaComments, FaChevronLeft, FaChevronRight, FaTimesCircle } from 'react-icons/fa';
 import styles from './club.module.css';
+import { io } from 'socket.io-client';
 
 const MesClubsMembre = ({ clubsMembre, setClubsMembre, setError }) => {
   const [selectedClub, setSelectedClub] = useState(null);
@@ -21,6 +22,7 @@ const MesClubsMembre = ({ clubsMembre, setClubsMembre, setError }) => {
   const matricule = storedUser?.Matricule;
 
   const API_URL = 'http://events.localhost';
+  const socket = io('http://events.localhost'); // adresse de ton backend
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -48,6 +50,20 @@ const MesClubsMembre = ({ clubsMembre, setClubsMembre, setError }) => {
     });
   };
 
+  const handleApiError = async (response, defaultMessage) => {
+    const contentType = response.headers.get('content-type');
+    let errorMessage = defaultMessage;
+    if (contentType && contentType.includes('application/json')) {
+      const errorData = await response.json();
+      errorMessage = errorData.error || defaultMessage;
+    } else {
+      const text = await response.text();
+      console.error('Réponse non-JSON reçue:', text);
+      errorMessage = `Réponse inattendue du serveur: ${text || 'Erreur inconnue'}`;
+    }
+    throw new Error(errorMessage);
+  };
+
   const fetchMessages = async () => {
     if (!selectedClub || !selectedClub.ID_club || isFetchingMessages) {
       return;
@@ -58,16 +74,7 @@ const MesClubsMembre = ({ clubsMembre, setClubsMembre, setError }) => {
       setIsLoadingMessages(true);
       const response = await fetch(`${API_URL}/messagesCLUB/club/${selectedClub.ID_club}/user/${matricule}`);
       if (!response.ok) {
-        const contentType = response.headers.get('content-type');
-        let errorData = {};
-        if (contentType && contentType.includes('application/json')) {
-          errorData = await response.json();
-        } else {
-          const text = await response.text();
-          console.error('Réponse non-JSON reçue:', text);
-          throw new Error('Réponse inattendue du serveur (non-JSON)');
-        }
-        throw new Error(errorData.error || 'Erreur lors de la récupération des messages');
+        await handleApiError(response, 'Erreur lors de la récupération des messages');
       }
       const messagesData = await response.json();
       console.log('Messages reçus de l\'API:', messagesData);
@@ -88,9 +95,19 @@ const MesClubsMembre = ({ clubsMembre, setClubsMembre, setError }) => {
       interval = setInterval(() => {
         fetchMessages();
       }, 10000);
+      if (selectedClub) {
+        socket.emit('joinClub', selectedClub.ID_club);
+      
+        socket.on('newMessage', (newMessages) => {
+          setMessages(prev => [...prev, ...newMessages]);
+          scrollToBottom(); // si disponible
+        });
+      }
+      
     }
     return () => {
       if (interval) clearInterval(interval);
+      socket.off('newMessage'); // nettoyage
     };
   }, [showMessagerie, selectedClub, matricule]);
 
@@ -107,21 +124,30 @@ const MesClubsMembre = ({ clubsMembre, setClubsMembre, setError }) => {
     }
 
     try {
-      const response = await fetch(`${API_URL}/publicationsCLUB/club/${club.ID_club}`);
-      if (!response.ok) {
-        const contentType = response.headers.get('content-type');
-        let errorData = {};
-        if (contentType && contentType.includes('application/json')) {
-          errorData = await response.json();
-        } else {
-          const text = await response.text();
-          console.error('Réponse non-JSON reçue:', text);
-          throw new Error('Réponse inattendue du serveur (non-JSON)');
-        }
-        throw new Error(errorData.error || 'Erreur lors de la récupération des publications');
+      // Récupérer les publications du club sélectionné
+      const clubResponse = await fetch(`${API_URL}/publicationsCLUB/club/${club.ID_club}`);
+      let clubPublications = [];
+      if (!clubResponse.ok) {
+        await handleApiError(clubResponse, 'Erreur lors de la récupération des publications du club');
       }
-      const data = await response.json();
-      setPublications(data || []);
+      clubPublications = await clubResponse.json();
+
+      // Récupérer les publications des événements publics
+      const publicResponse = await fetch(`${API_URL}/publicationsCLUB/public-events`);
+      let publicPublications = [];
+      if (!publicResponse.ok) {
+        await handleApiError(publicResponse, 'Erreur lors de la récupération des publications des événements publics');
+      }
+      publicPublications = await publicResponse.json();
+
+      // Fusionner les publications
+      const uniquePublications = [
+        ...clubPublications,
+        ...publicPublications.filter(pub => pub.ID_club !== club.ID_club),
+      ];
+      uniquePublications.sort((a, b) => new Date(b.date_publication) - new Date(a.date_publication));
+
+      setPublications(uniquePublications || []);
     } catch (err) {
       showErrorAlert(err.message);
       setPublications([]);
@@ -157,16 +183,7 @@ const MesClubsMembre = ({ clubsMembre, setClubsMembre, setError }) => {
       });
 
       if (!response.ok) {
-        const contentType = response.headers.get('content-type');
-        let errorData = {};
-        if (contentType && contentType.includes('application/json')) {
-          errorData = await response.json();
-        } else {
-          const text = await response.text();
-          console.error('Réponse non-JSON reçue:', text);
-          throw new Error('Réponse inattendue du serveur (non-JSON)');
-        }
-        throw new Error(errorData.error || 'Erreur lors de l’envoi du message');
+        await handleApiError(response, 'Erreur lors de l’envoi du message');
       }
 
       setNewMessage('');
@@ -192,16 +209,7 @@ const MesClubsMembre = ({ clubsMembre, setClubsMembre, setError }) => {
       });
 
       if (!response.ok) {
-        const contentType = response.headers.get('content-type');
-        let errorData = {};
-        if (contentType && contentType.includes('application/json')) {
-          errorData = await response.json();
-        } else {
-          const text = await response.text();
-          console.error('Réponse non-JSON reçue:', text);
-          throw new Error('Réponse inattendue du serveur (non-JSON)');
-        }
-        throw new Error(errorData.error || 'Erreur lors du like');
+        await handleApiError(response, 'Erreur lors du like');
       }
 
       const updatedPublication = await response.json();
@@ -238,33 +246,29 @@ const MesClubsMembre = ({ clubsMembre, setClubsMembre, setError }) => {
       });
 
       if (!response.ok) {
-        const contentType = response.headers.get('content-type');
-        let errorData = {};
-        if (contentType && contentType.includes('application/json')) {
-          errorData = await response.json();
-        } else {
-          const text = await response.text();
-          console.error('Réponse non-JSON reçue:', text);
-          throw new Error('Réponse inattendue du serveur (non-JSON)');
-        }
-        throw new Error(errorData.error || 'Erreur lors de l’ajout du commentaire');
+        await handleApiError(response, 'Erreur lors de l’ajout du commentaire');
       }
 
-      const updatedPublications = await fetch(`${API_URL}/publicationsCLUB/club/${selectedClub.ID_club}`);
-      if (!updatedPublications.ok) {
-        const contentType = updatedPublications.headers.get('content-type');
-        let errorData = {};
-        if (contentType && contentType.includes('application/json')) {
-          errorData = await updatedPublications.json();
-        } else {
-          const text = await updatedPublications.text();
-          console.error('Réponse non-JSON reçue:', text);
-          throw new Error('Réponse inattendue du serveur (non-JSON)');
-        }
-        throw new Error(errorData.error || 'Erreur lors de la récupération des publications mises à jour');
+      // Rafraîchir toutes les publications
+      const clubResponse = await fetch(`${API_URL}/publicationsCLUB/club/${selectedClub.ID_club}`);
+      if (!clubResponse.ok) {
+        await handleApiError(clubResponse, 'Erreur lors de la récupération des publications mises à jour');
       }
-      const data = await updatedPublications.json();
-      setPublications(data || []);
+      const clubPublications = await clubResponse.json();
+
+      const publicResponse = await fetch(`${API_URL}/publicationsCLUB/public-events`);
+      if (!publicResponse.ok) {
+        await handleApiError(publicResponse, 'Erreur lors de la récupération des publications publiques mises à jour');
+      }
+      const publicPublications = await publicResponse.json();
+
+      const uniquePublications = [
+        ...clubPublications,
+        ...publicPublications.filter(pub => pub.ID_club !== selectedClub.ID_club),
+      ];
+      uniquePublications.sort((a, b) => new Date(b.date_publication) - new Date(a.date_publication));
+
+      setPublications(uniquePublications || []);
       setNewComment(prev => ({ ...prev, [publicationId]: '' }));
     } catch (err) {
       showErrorAlert(err.message);
@@ -422,9 +426,13 @@ const MesClubsMembre = ({ clubsMembre, setClubsMembre, setError }) => {
                     </div>
                   ) : (
                     <div className={styles['CLUB-ETD-publications-section']}>
-                      <h4 className={styles['CLUB-ETD-section-title']}>Publications de {selectedClub.nom}</h4>
+                      <h4 className={styles['CLUB-ETD-section-title']}>
+                        Publications de {selectedClub.nom} 
+                      </h4>
                       {publications.length === 0 ? (
-                        <p className={styles['CLUB-ETD-no-data']}>Aucune publication pour ce club.</p>
+                        <p className={styles['CLUB-ETD-no-data']}>
+                          Aucune publication pour ce club .
+                        </p>
                       ) : (
                         <ul className={styles['CLUB-ETD-social-posts']}>
                           {publications.map(pub => (
@@ -432,10 +440,10 @@ const MesClubsMembre = ({ clubsMembre, setClubsMembre, setError }) => {
                               <div className={styles['CLUB-ETD-post-header']}>
                                 <div className={styles['CLUB-ETD-post-club-info']}>
                                   <div className={styles['CLUB-ETD-club-image-container']}>
-                                    {selectedClub.image_url ? (
+                                    {(pub.club_image_url || selectedClub.image_url) ? (
                                       <img
-                                        src={`${API_URL}${selectedClub.image_url}`}
-                                        alt={selectedClub.nom}
+                                        src={`${API_URL}${pub.club_image_url || selectedClub.image_url}`}
+                                        alt={pub.club_nom || selectedClub.nom}
                                         className={styles['CLUB-ETD-club-image']}
                                         onError={(e) => {
                                           e.target.src = 'https://via.placeholder.com/40x40?text=Club';
@@ -446,7 +454,7 @@ const MesClubsMembre = ({ clubsMembre, setClubsMembre, setError }) => {
                                     )}
                                   </div>
                                   <div>
-                                    <h5>{selectedClub.nom}</h5>
+                                    <h5>{pub.club_nom || selectedClub.nom}</h5>
                                     <p className={styles['CLUB-ETD-post-date']}>
                                       {new Date(pub.date_publication).toLocaleDateString()}
                                     </p>

@@ -34,9 +34,9 @@ const upload = multer({
 });
 
 // Créer un événement dans la table ClubEvenement
-const createEvenement = async (nom_evenement, description_evenement, date_evenement, lieu, capacite, image_url, gerant_matricule, clubId, time_slots) => {
+const createEvenement = async (nom_evenement, description_evenement, date_evenement, lieu, capacite, image_url, gerant_matricule, clubId, time_slots, is_public) => {
   try {
-    console.log('Appel de createEvenement avec:', { nom_evenement, description_evenement, date_evenement, lieu, capacite, image_url, gerant_matricule, clubId, time_slots });
+    console.log('Appel de createEvenement avec:', { nom_evenement, description_evenement, date_evenement, lieu, capacite, image_url, gerant_matricule, clubId, time_slots, is_public });
 
     // Vérifier si la date de l'événement est dans le futur
     const currentDate = new Date();
@@ -56,10 +56,10 @@ const createEvenement = async (nom_evenement, description_evenement, date_evenem
     const nomClub = club[0].nom;
     console.log('Nom du club récupéré:', nomClub);
 
-    // Insérer l’événement dans la table ClubEvenement avec time_slot
+    // Insérer l’événement dans la table ClubEvenement avec time_slot et is_public
     const [result] = await pool.query(
-      'INSERT INTO ClubEvenement (nom_evenement, description_evenement, date_evenement, lieu, capacite, image_url, organisateur_admin, ID_club, time_slots) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-      [nom_evenement, description_evenement || null, date_evenement, lieu, capacite, image_url || null, gerant_matricule, clubId, time_slots || null]
+      'INSERT INTO ClubEvenement (nom_evenement, description_evenement, date_evenement, lieu, capacite, image_url, organisateur_admin, ID_club, time_slots, is_public) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [nom_evenement, description_evenement || null, date_evenement, lieu, capacite, image_url || null, gerant_matricule, clubId, time_slots || null, is_public ? 1 : 0]
     );
     const evenementId = result.insertId;
     console.log('Événement créé avec ID:', evenementId);
@@ -79,10 +79,10 @@ const createEvenement = async (nom_evenement, description_evenement, date_evenem
       console.warn('Aucun membre trouvé pour le club ID:', clubId);
     }
 
-    // Envoyer une notification à chaque membre
+    // Envoyer une notification à chaque membre du club
     const notificationIds = [];
     const message = `Nouveau événement du club "${nomClub}": "${nom_evenement}" est là !`;
-    console.log('Message de notification:', message);
+    console.log('Message de notification pour les membres:', message);
     for (const membre of membres) {
       console.log('Envoi de la notification au membre:', membre.matricule_etudiant);
       const notificationId = await createNotification(membre.matricule_etudiant, message, gerant_matricule);
@@ -95,6 +95,37 @@ const createEvenement = async (nom_evenement, description_evenement, date_evenem
         [notificationId]
       );
       console.log('Notification insérée:', notification[0]);
+    }
+
+    // Si l'événement est public, envoyer une notification à tous les étudiants
+    if (is_public) {
+      const [etudiants] = await pool.query(
+        'SELECT Matricule FROM Etudiant'
+      );
+      console.log('Étudiants trouvés pour l’événement public:', etudiants);
+
+      if (etudiants.length === 0) {
+        console.warn('Aucun étudiant trouvé dans la table Etudiant');
+      }
+
+      const publicMessage = `Événement public du club "${nomClub}": "${nom_evenement}" est ouvert à tous !`;
+      console.log('Message de notification pour les étudiants:', publicMessage);
+      for (const etudiant of etudiants) {
+        // Éviter d'envoyer une double notification aux membres du club
+        if (!membres.some(membre => membre.matricule_etudiant === etudiant.Matricule)) {
+          console.log('Envoi de la notification à l’étudiant:', etudiant.Matricule);
+          const notificationId = await createNotification(etudiant.Matricule, publicMessage, gerant_matricule);
+          console.log('Notification créée pour l’étudiant:', etudiant.Matricule, 'avec ID:', notificationId);
+          notificationIds.push(notificationId);
+
+          // Vérifier que la notification a été insérée
+          const [notification] = await pool.query(
+            'SELECT * FROM Notification WHERE ID_notification = ?',
+            [notificationId]
+          );
+          console.log('Notification insérée:', notification[0]);
+        }
+      }
     }
 
     return { evenementId, notificationIds, nomClub };
@@ -122,6 +153,85 @@ const getEvenementsByGerant = async (req, res) => {
   } catch (error) {
     console.error('Erreur lors de la récupération des événements:', error);
     res.status(500).json({ error: 'Erreur lors de la récupération des événements' });
+  }
+};
+
+// Nouvelle fonction pour récupérer les événements publics
+const getPublicEvenements = async (req, res) => {
+  try {
+    const [evenements] = await pool.query(
+      `
+      SELECT ce.*, c.nom AS nom_club
+      FROM ClubEvenement ce
+      JOIN Club c ON ce.ID_club = c.ID_club
+      WHERE ce.is_public = 1
+      ORDER BY ce.date_evenement ASC
+      `
+    );
+    console.log('Événements publics renvoyés:', evenements);
+    res.json(evenements);
+  } catch (error) {
+    console.error('Erreur lors de la récupération des événements publics:', error);
+    res.status(500).json({ error: 'Erreur lors de la récupération des événements publics' });
+  }
+};
+
+const addEventToCalendar = async (req, res) => {
+  const { evenementId, matricule } = req.body;
+
+  // Validation
+  if (!evenementId || isNaN(evenementId)) {
+    return res.status(400).json({ error: 'ID de l’événement invalide' });
+  }
+  if (!matricule) {
+    return res.status(400).json({ error: 'Matricule invalide' });
+  }
+
+  try {
+    // Récupérer les détails de l'événement
+    const [evenement] = await pool.query(
+      `
+      SELECT ce.*, c.nom AS nom_club
+      FROM ClubEvenement ce
+      JOIN Club c ON ce.ID_club = c.ID_club
+      WHERE ce.ID_club_evenement = ?
+      `,
+      [evenementId]
+    );
+
+    if (evenement.length === 0) {
+      return res.status(404).json({ error: 'Événement non trouvé' });
+    }
+
+    const eventDetails = evenement[0];
+    const nomClub = eventDetails.nom_club;
+
+    // Construire le titre et le contenu selon les spécifications
+    const titre = `Événement du club ${nomClub}`;
+    const contenu = `Votre événement ${eventDetails.nom_evenement} du club ${nomClub} aura lieu ce jour-là !`;
+
+    // Insérer l'événement dans la table CalendarEvent
+    const [result] = await pool.query(
+      `
+      INSERT INTO CalendarEvent (title, content, event_date, time_slot, matricule)
+      VALUES (?, ?, ?, ?, ?)
+      `,
+      [
+        titre,
+        contenu,
+        eventDetails.date_evenement,
+        eventDetails.time_slots || '08:00 - 09:30',
+        matricule
+      ]
+    );
+
+    const newEventId = result.insertId;
+    console.log('Événement ajouté au calendrier avec ID:', newEventId);
+
+    res.json({ message: 'Événement ajouté à votre calendrier avec succès', eventId: newEventId });
+  } catch (error) {
+    console.error('Erreur lors de l’ajout de l’événement au calendrier:', error);
+    res.status(500).json({ error: 'Erreur lors de l’ajout de l’événement au calendrier' });
   }
 };
 
@@ -401,4 +511,6 @@ module.exports = {
   getEvenementsByGerant,
   updateEvenement: [upload.single('image'), updateEvenement],
   deleteEvenement,
+  addEventToCalendar,
+  getPublicEvenements, // Ajout de la nouvelle fonction aux exportations
 };

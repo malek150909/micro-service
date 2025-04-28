@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, subDays, addDays } from "date-fns"
 import axios from "axios"
-import { Calendar, ChevronLeft, ChevronRight } from "lucide-react"
+import { Calendar } from "lucide-react"
 import styles from "./calendar.module.css"
 
 function SmallCalendar({ currentDate, onDateClick, onMonthChange }) {
@@ -37,7 +37,6 @@ function SmallCalendar({ currentDate, onDateClick, onMonthChange }) {
           .map((event) => {
             let eventDate = null
 
-            // Événements personnels et administratifs (tous deux dans CalendarEvent)
             if ((event.type === "personal" || event.type === "administratif") && event.event_date) {
               if (typeof event.event_date === "string") {
                 eventDate = event.event_date.includes(" ")
@@ -50,7 +49,6 @@ function SmallCalendar({ currentDate, onDateClick, onMonthChange }) {
               return eventDate
             }
 
-            // Séances supplémentaires
             if (event.type === "supp_session" && event.date_seance) {
               if (typeof event.date_seance === "string") {
                 eventDate = event.date_seance.includes(" ")
@@ -63,7 +61,6 @@ function SmallCalendar({ currentDate, onDateClick, onMonthChange }) {
               return eventDate
             }
 
-            // Événements de club
             if (event.type === "club_event" && event.date_evenement) {
               eventDate = format(new Date(event.date_evenement), "yyyy-MM-dd")
               console.log(`Événement de club détecté: ${eventDate} (brut: ${event.date_evenement})`)
@@ -85,6 +82,11 @@ function SmallCalendar({ currentDate, onDateClick, onMonthChange }) {
 
     fetchEventsForMonth()
   }, [currentDate])
+
+  const handleDateClick = (day) => {
+    console.log("SmallCalendar date clicked:", day, "Type:", typeof day)
+    onDateClick(day)
+  }
 
   return (
     <div className={styles['CLD-small-calendar']}>
@@ -122,7 +124,7 @@ function SmallCalendar({ currentDate, onDateClick, onMonthChange }) {
             <div
               key={index}
               className={`${styles['CLD-day']} ${!isCurrentMonth ? styles['CLD-empty-day'] : ""} ${isToday ? styles['CLD-today'] : ""} ${hasEvent ? styles['CLD-has-event'] : ""}`}
-              onClick={() => isCurrentMonth && onDateClick(day)}
+              onClick={() => isCurrentMonth && handleDateClick(day)}
             >
               {day.getDate()}
             </div>

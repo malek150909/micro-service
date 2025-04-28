@@ -1,8 +1,10 @@
 const User = require("../models/userModel")
+const db = require("../config/db")
 const Message = require("../models/messageModel")
 const emailService = require("../services/emailService")
 const path = require("path")
 const fs = require("fs")
+const { broadcastMessage } = require("../websocket") // Adjust path if websocket.js is elsewhere
 
 // Créer un répertoire pour les fichiers si nécessaire
 const uploadsDir = path.join(__dirname, "../Uploads")
@@ -22,6 +24,20 @@ const messageController = {
       res.status(500).json({ message: "Erreur serveur" })
     }
   },
+
+  getUnreadMessagesCount: async (req, res) => {
+    const destinataire = req.user.matricule;
+    try {
+        const [rows] = await db.query(
+            "SELECT COUNT(*) as unreadCount FROM Message WHERE destinataire = ? AND isRead = 0",
+            [destinataire]
+        );
+        res.json({ unreadCount: rows[0].unreadCount });
+    } catch (error) {
+        console.error("Erreur lors de la récupération du nombre de messages non lus:", error);
+        res.status(500).json({ message: "Erreur serveur" });
+    }
+},
 
   // Récupérer les messages reçus par un utilisateur
   getReceivedMessages: async (req, res) => {
@@ -81,6 +97,21 @@ const messageController = {
       }
 
       const newMessage = await Message.create(messageData)
+
+      // Broadcast message via WebSocket
+      broadcastMessage({
+        type: "new_message",
+        ID_message: newMessage.ID_message,
+        expediteur,
+        destinataire,
+        contenu,
+        date_envoi: newMessage.date_envoi,
+        filePath: newMessage.filePath,
+        fileName: newMessage.fileName,
+        nom: expediteurInfo.nom,
+        prenom: expediteurInfo.prenom,
+        email: expediteurInfo.email,
+      })
 
       const attachments = []
       if (file) {

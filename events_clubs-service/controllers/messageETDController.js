@@ -116,6 +116,30 @@ const sendMessage = async (req, res) => {
     }
 
     const insertedMessages = [];
+
+    // 🔥 Correction ici : si aucun destinataire (ex: premier message par gérant)
+    if (destinataires.length === 0) {
+      const [result] = await pool.query(
+        'INSERT INTO MessageClub (contenu, expediteur, destinataire, filePath, fileName) VALUES (?, ?, NULL, ?, ?)',
+        [prefixedContenu, expediteur, filePath, fileName]
+      );
+
+      const [newMessage] = await pool.query(
+        `
+        SELECT m.*, 
+               sender.nom AS expediteur_nom, sender.prenom AS expediteur_prenom
+        FROM MessageClub m
+        JOIN User sender ON m.expediteur = sender.Matricule
+        WHERE m.ID_message = ?
+        `,
+        [result.insertId]
+      );
+
+      newMessage[0].contenu = newMessage[0].contenu.replace(`[CLUB_${clubId}] `, '');
+      insertedMessages.push(newMessage[0]);
+    }
+
+    // 🔥 Continuer normalement si des membres existent
     for (const destinataire of destinataires) {
       const [result] = await pool.query(
         'INSERT INTO MessageClub (contenu, expediteur, destinataire, filePath, fileName) VALUES (?, ?, ?, ?, ?)',
@@ -148,6 +172,10 @@ const sendMessage = async (req, res) => {
         console.log('Notification déjà existante pour:', { destinataire, contenu: notificationContent, expediteur });
       }
     }
+
+    // 🔥 Émettre en temps réel via WebSocket
+    const io = req.app.get('io');
+    io.to(`club_${clubId}`).emit('newMessage', insertedMessages);
 
     res.status(201).json(insertedMessages);
   } catch (error) {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaSearch, FaUsers, FaList, FaEnvelope, FaTrash, FaComment, FaEye, FaCamera, FaEdit, FaCalendarAlt, FaComments, FaCheckCircle, FaTimesCircle, FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import styles from './club.module.css';
+import { io } from 'socket.io-client';
 
 const GererMesClubs = ({ clubsGerant, setClubsGerant, setError }) => {
   const [selectedClub, setSelectedClub] = useState(null);
@@ -31,6 +32,7 @@ const GererMesClubs = ({ clubsGerant, setClubsGerant, setError }) => {
   const [lieu, setLieu] = useState('');
   const [capacite, setCapacite] = useState('');
   const [timeSlots, setTimeSlots] = useState('');
+  const [isPublic, setIsPublic] = useState(false); // Nouvel état pour gérer la visibilité de l'événement
   const [showMessagerie, setShowMessagerie] = useState(false);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
@@ -42,6 +44,7 @@ const GererMesClubs = ({ clubsGerant, setClubsGerant, setError }) => {
   const messagesEndRef = useRef(null);
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const matricule = storedUser?.Matricule;
+  const socket = io('http://localhost:8084'); // adresse de ton backend
 
   const timeSlotsOptions = [
     "08:00 - 09:30",
@@ -52,7 +55,7 @@ const GererMesClubs = ({ clubsGerant, setClubsGerant, setError }) => {
     "16:20 - 17:50"
   ];
 
-  const API_URL = 'http://events.localhost';
+  const API_URL = 'http://localhost:8084';
 
   useEffect(() => {
     const initialIndexes = {};
@@ -107,8 +110,18 @@ const GererMesClubs = ({ clubsGerant, setClubsGerant, setError }) => {
     if (showMessagerie && selectedClub) {
       fetchMessages();
       interval = setInterval(fetchMessages, 10000);
+      if (selectedClub) {
+        socket.emit('joinClub', selectedClub.ID_club);
+      
+        socket.on('newMessage', (newMessages) => {
+          setMessages(prev => [...prev, ...newMessages]);
+          scrollToBottom(); // si disponible
+        });
+      }
+      
     }
     return () => clearInterval(interval);
+    socket.off('newMessage'); // nettoyage
   }, [showMessagerie, selectedClub, matricule]);
 
   useEffect(() => {
@@ -117,7 +130,7 @@ const GererMesClubs = ({ clubsGerant, setClubsGerant, setError }) => {
     } else {
       const query = searchQuery.toLowerCase().trim();
       const filtered = membres.filter(membre =>
-        `${membre.nom} ${membre.prenom}`.toLowerCase().includes(query)
+        (membre.nom + ' ' + membre.prenom).toLowerCase().includes(query)
       );
       setFilteredMembres(filtered);
     }
@@ -269,7 +282,7 @@ const GererMesClubs = ({ clubsGerant, setClubsGerant, setError }) => {
   };
 
   const handleEditImageChange = (e) => {
-    const files = Array.from(e.target.files).slice(0, 5);
+    const files = Array.from(e.target.files).slice(0, typePublication === 'publication' ? 5 : 1);
     setEditImages(files);
   };
 
@@ -280,7 +293,7 @@ const GererMesClubs = ({ clubsGerant, setClubsGerant, setError }) => {
       return;
     }
 
-    if (typePublication === 'evenement' && (!nomEvenement || !dateEvenement || !lieu || !capacite || !timeSlots)) {
+    if ((typePublication === 'evenement' || typePublication === 'evenement_public') && (!nomEvenement || !dateEvenement || !lieu || !capacite || !timeSlots)) {
       handleError('Tous les champs de l’événement sont requis');
       return;
     }
@@ -301,8 +314,9 @@ const GererMesClubs = ({ clubsGerant, setClubsGerant, setError }) => {
       formData.append('contenu', publicationContenu);
       formData.append('matricule', matricule);
       formData.append('type', typePublication);
+      formData.append('is_public', typePublication === 'evenement_public' ? 'true' : 'false'); // Ajouter is_public
 
-      if (typePublication === 'evenement') {
+      if (typePublication === 'evenement' || typePublication === 'evenement_public') {
         formData.append('nom_evenement', nomEvenement);
         formData.append('description_evenement', descriptionEvenement);
         formData.append('date_evenement', dateEvenement);
@@ -342,6 +356,7 @@ const GererMesClubs = ({ clubsGerant, setClubsGerant, setError }) => {
       setLieu('');
       setCapacite('');
       setTimeSlots('');
+      setIsPublic(false); // Réinitialiser isPublic
       setShowPublicationForm(false);
 
       const updatedPublications = await fetch(`${API_URL}/publicationsCLUB/club/${selectedClub.ID_club}`).then(res => res.json());
@@ -349,7 +364,7 @@ const GererMesClubs = ({ clubsGerant, setClubsGerant, setError }) => {
       const updatedEvenements = updatedEvenementsData.filter(e => Number(e.ID_club) === Number(selectedClub.ID_club));
       setPublications(updatedPublications);
       setEvenements(updatedEvenements);
-      setSuccess(typePublication === 'evenement' ? 'Événement créé avec succès !' : 'Publication créée avec succès !');
+      setSuccess(typePublication === 'evenement' || typePublication === 'evenement_public' ? 'Événement créé avec succès !' : 'Publication créée avec succès !');
     } catch (err) {
       handleError(err.message);
     }
@@ -506,6 +521,7 @@ const GererMesClubs = ({ clubsGerant, setClubsGerant, setError }) => {
     setLieu(evenement.lieu);
     setCapacite(evenement.capacite);
     setTimeSlots(evenement.time_slots || '');
+    setIsPublic(evenement.is_public || false); // Initialiser isPublic
     setEditImages([]);
   };
 
@@ -526,6 +542,7 @@ const GererMesClubs = ({ clubsGerant, setClubsGerant, setError }) => {
       formData.append('capacite', capacite);
       formData.append('gerant_matricule', matricule);
       formData.append('time_slots', timeSlots);
+      formData.append('is_public', isPublic); // Ajouter is_public
       if (editImages.length > 0) {
         formData.append('image', editImages[0]);
       } else {
@@ -590,6 +607,7 @@ const GererMesClubs = ({ clubsGerant, setClubsGerant, setError }) => {
       setLieu('');
       setCapacite('');
       setTimeSlots('');
+      setIsPublic(false); // Réinitialiser isPublic
       setEditImages([]);
 
       const updatedEvenementsData = await fetch(`${API_URL}/api/club-events/gerant/${matricule}`).then(res => res.json());
@@ -599,6 +617,44 @@ const GererMesClubs = ({ clubsGerant, setClubsGerant, setError }) => {
       setEvenements(updatedEvenements);
       setSuccess('Événement et publication modifiés avec succès !');
     } catch (err) {
+      handleError(err.message);
+    }
+  };
+
+  const handleAddToCalendar = async (evenementId) => {
+    console.log("handleAddToCalendar appelée avec evenementId:", evenementId);
+    console.log("Matricule:", matricule);
+  
+    if (!matricule) {
+      handleError('Matricule non défini. Veuillez vous reconnecter.');
+      return;
+    }
+  
+    try {
+      const response = await fetch(`${API_URL}/api/club-events/add-to-calendar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ evenementId, matricule }),
+      });
+  
+      if (!response.ok) {
+        const contentType = response.headers.get('content-type');
+        let errorData = {};
+        if (contentType && contentType.includes('application/json')) {
+          errorData = await response.json();
+          console.log("Erreur JSON:", errorData);
+        } else {
+          const text = await response.text();
+          console.error('Réponse non-JSON reçue:', text);
+          throw new Error(`Réponse inattendue du serveur (non-JSON): ${text}`);
+        }
+        throw new Error(errorData.error || 'Erreur lors de l’ajout au calendrier');
+      }
+  
+      const result = await response.json();
+      setSuccess(result.message || 'Événement ajouté au calendrier avec succès !');
+    } catch (err) {
+      console.error("Erreur dans handleAddToCalendar:", err.message);
       handleError(err.message);
     }
   };
@@ -760,7 +816,6 @@ const GererMesClubs = ({ clubsGerant, setClubsGerant, setError }) => {
       [`${type}-${id}`]: (prev[`${type}-${id}`] + 1) % length,
     }));
   };
-
   return (
     <>
       <div className={styles['CLUB-ETD-header']}>
@@ -929,7 +984,8 @@ const GererMesClubs = ({ clubsGerant, setClubsGerant, setError }) => {
                             onChange={(e) => setTypePublication(e.target.value)}
                           >
                             <option value="publication">Simple Publication</option>
-                            <option value="evenement">Annonce d’un Événement</option>
+                            <option value="evenement">Annonce d’un Événement (Privé)</option>
+                            <option value="evenement_public">Annonce d’un Événement (Public)</option>
                           </select>
                         </div>
                         <div className={styles['CLUB-ETD-input-group']}>
@@ -942,7 +998,7 @@ const GererMesClubs = ({ clubsGerant, setClubsGerant, setError }) => {
                             placeholder="Écrivez votre message ici..."
                           />
                         </div>
-                        {typePublication === 'evenement' && (
+                        {(typePublication === 'evenement' || typePublication === 'evenement_public') && (
                           <div className={styles['CLUB-ETD-event-details-form']}>
                             <h5>Détails de l’Événement</h5>
                             <div className={styles['CLUB-ETD-input-group']}>
@@ -1016,7 +1072,7 @@ const GererMesClubs = ({ clubsGerant, setClubsGerant, setError }) => {
                         )}
                         <div className={styles['CLUB-ETD-input-group']}>
                           <label>
-                            {typePublication === 'evenement' ? 'Image de l’Événement (optionnel)' : 'Photos (jusqu’à 5)'}
+                            {typePublication === 'evenement' || typePublication === 'evenement_public' ? 'Image de l’Événement (optionnel)' : 'Photos (jusqu’à 5)'}
                           </label>
                           <input
                             type="file"
@@ -1376,6 +1432,17 @@ const GererMesClubs = ({ clubsGerant, setClubsGerant, setError }) => {
                                   />
                                 </div>
                                 <div className={styles['CLUB-ETD-input-group']}>
+                                  <label>Visibilité</label>
+                                  <select
+                                    className={styles['CLUB-ETD-select']}
+                                    value={isPublic}
+                                    onChange={(e) => setIsPublic(e.target.value === 'true')}
+                                  >
+                                    <option value={false}>Privé (Membres du club uniquement)</option>
+                                    <option value={true}>Public (Tous les étudiants)</option>
+                                  </select>
+                                </div>
+                                <div className={styles['CLUB-ETD-input-group']}>
                                   <label>
                                     Nouvelle Image (optionnel, laissez vide pour garder l’ancienne)
                                   </label>
@@ -1408,6 +1475,7 @@ const GererMesClubs = ({ clubsGerant, setClubsGerant, setError }) => {
                                     </div>
                                   )}
                                 </div>
+                                
                                 <button className={styles['CLUB-ETD-button']} type="submit">Mettre à Jour</button>
                                 <button
                                   className={styles['CLUB-ETD-close-button']}
@@ -1484,6 +1552,7 @@ const GererMesClubs = ({ clubsGerant, setClubsGerant, setError }) => {
                                       <p><strong>Lieu :</strong> {evenement.lieu}</p>
                                       <p><strong>Capacité :</strong> {evenement.capacite} participants</p>
                                       <p><strong>Heure :</strong> {evenement.time_slots || 'Non spécifié'}</p>
+                                      <p><strong>Visibilité :</strong> {evenement.is_public ? 'Public (Tous les étudiants)' : 'Privé (Membres du club uniquement)'}</p>
                                       <p><strong>Description :</strong> {evenement.description_evenement || 'Aucune description'}</p>
                                     </div>
                                     <div className={styles['CLUB-ETD-event-actions']}>
@@ -1492,6 +1561,12 @@ const GererMesClubs = ({ clubsGerant, setClubsGerant, setError }) => {
                                         onClick={() => handleEditEvenement(evenement)}
                                       >
                                         <FaEdit /> Modifier
+                                      </button>
+                                      <button
+                                        className={styles['CLUB-ETD-button']}
+                                        onClick={() => handleAddToCalendar(evenement.ID_club_evenement)}
+                                      >
+                                        <FaCalendarAlt /> Ajouter à mon Calendrier
                                       </button>
                                       <button
                                         className={styles['CLUB-ETD-delete-button']}
@@ -1508,7 +1583,6 @@ const GererMesClubs = ({ clubsGerant, setClubsGerant, setError }) => {
                       )}
                     </div>
                   )}
-
                   {showMessagerie && (
                     <div className={styles['CLUB-ETD-messagerie-section']}>
                       <h4 className={styles['CLUB-ETD-section-title']}>Messagerie de groupe - {selectedClub.nom}</h4>

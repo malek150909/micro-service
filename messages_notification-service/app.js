@@ -3,6 +3,8 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const bodyParser = require('body-parser');
+const http = require("http");
+const { setupWebSocketServer } = require("./websocket"); // Adjust path if needed
 const authMiddleware = require('./middleware/auth'); // Middleware d'authentification (si nécessaire)
 const annonceRoutes = require('./routes/annonceRoutes');
 const userRoutes = require('./routes/userRoutes');
@@ -15,6 +17,10 @@ const sondageRoutes = require('./routes/sondageRoutes');
 const notificationRoutes = require('./routes/notifications');
 
 const app = express();
+const server = http.createServer(app);
+
+// WebSocket setup
+setupWebSocketServer(server);
 
 require("dotenv").config();
 
@@ -27,7 +33,7 @@ app.use(express.urlencoded({ extended: true }));
 // Routes (après les middlewares qui consomment le flux)
 app.use('/annonces',authMiddleware ,annonceRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/", messageRoutes);
+app.use("/api/",authMiddleware ,messageRoutes);
 app.use('/ressources', resourceRoutes);
 app.use('/annoncesENS', annonceENSroutes); // Routes maintenant après le parsing
 app.use('/authENSannonce', authENSroutes);

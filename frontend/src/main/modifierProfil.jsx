@@ -21,10 +21,13 @@ const EditProfile = () => {
         etat: "",
     });
     const [passwordData, setPasswordData] = useState({
+        oldPassword: "",
         newPassword: "",
         confirmPassword: "",
     });
-    const [error, setError] = useState("");
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [modalMessage, setModalMessage] = useState("");
+    const [isError, setIsError] = useState(false);
 
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -32,20 +35,19 @@ const EditProfile = () => {
             navigate("/");
         } else {
             setUser(storedUser);
-            setUser(storedUser);
             setFormData({
                 nom: storedUser.nom || "",
                 prenom: storedUser.prenom || "",
                 email: storedUser.email || "",
                 Matricule: storedUser.Matricule || "",
-                poste: storedUser.role === "admin" ? storedUser.poste || "" : "", // Ajouté pour l'admin
-                annee_inscription: storedUser.role === "enseignant" || storedUser.role === "etudiant" 
-                    ? storedUser.annee_inscription 
-                        ? new Date(storedUser.annee_inscription).toLocaleDateString("fr-FR") 
-                        : "" 
+                poste: storedUser.role === "admin" ? storedUser.poste || "" : "",
+                annee_inscription: storedUser.role === "enseignant" || storedUser.role === "etudiant"
+                    ? storedUser.annee_inscription
+                        ? new Date(storedUser.annee_inscription).toLocaleDateString("fr-FR")
+                        : ""
                     : "",
-                nom_faculte: storedUser.role === "enseignant" ? storedUser.nom_faculte || "" : "", // Ajouté pour l'enseignant
-                Nom_departement: storedUser.role === "enseignant" ? storedUser.Nom_departement || "" : "", // Ajouté pour l'enseignant
+                nom_faculte: storedUser.role === "enseignant" ? storedUser.nom_faculte || "" : "",
+                Nom_departement: storedUser.role === "enseignant" ? storedUser.Nom_departement || "" : "",
                 niveau: storedUser.role === "etudiant" ? storedUser.niveau || "" : "",
                 nom_specialite: storedUser.role === "etudiant" ? storedUser.nom_specialite || "" : "",
                 etat: storedUser.role === "etudiant" ? storedUser.etat || "" : "",
@@ -62,12 +64,16 @@ const EditProfile = () => {
     const handlePasswordSubmit = async (e) => {
         e.preventDefault();
         if (passwordData.newPassword !== passwordData.confirmPassword) {
-            setError("Les mots de passe ne correspondent pas.");
+            setModalMessage("Les mots de passe ne correspondent pas.");
+            setIsError(true);
+            setShowSuccessModal(true);
             return;
         }
 
+        const token = localStorage.getItem("token");
         const payload = {
             matricule: user.Matricule,
+            oldPassword: passwordData.oldPassword,
             newPassword: passwordData.newPassword,
         };
         console.log("Données envoyées au backend :", payload);
@@ -77,6 +83,7 @@ const EditProfile = () => {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify(payload),
             });
@@ -88,24 +95,32 @@ const EditProfile = () => {
                 throw new Error(data.error || "Erreur lors de la mise à jour du mot de passe");
             }
 
-            setError("");
-            alert("Mot de passe mis à jour avec succès !");
+            setModalMessage("Mot de passe mis à jour avec succès !");
+            setIsError(false);
+            setShowSuccessModal(true);
             setIsEditingPassword(false);
-            setPasswordData({ newPassword: "", confirmPassword: "" });
+            setPasswordData({ oldPassword: "", newPassword: "", confirmPassword: "" });
         } catch (error) {
-            setError(error.message);
+            setModalMessage(error.message);
+            setIsError(true);
+            setShowSuccessModal(true);
         }
     };
 
     const toggleEditPassword = () => {
         setIsEditingPassword(!isEditingPassword);
-        setError("");
+    };
+
+    const handleCloseModal = () => {
+        setShowSuccessModal(false);
+        setModalMessage("");
+        setIsError(false);
     };
 
     const handleBack = () => {
         navigate(
-            user.role === "admin" ? "/Admin" : 
-            user.role === "enseignant" ? "/enseignant" : 
+            user.role === "admin" ? "/Admin" :
+            user.role === "enseignant" ? "/enseignant" :
             "/etudiant"
         );
     };
@@ -152,12 +167,14 @@ const EditProfile = () => {
                                 <input type="text" name="poste" value={formData.poste} readOnly />
                             </div>
                         )}
+                        {(user.role === "enseignant" || user.role === "etudiant") && (
+                            <div className="form-field">
+                                <label>Année d'inscription</label>
+                                <input type="text" name="annee_inscription" value={formData.annee_inscription} readOnly />
+                            </div>
+                        )}
                         {user.role === "enseignant" && (
                             <>
-                                <div className="form-field">
-                                    <label>Année d'inscription</label>
-                                    <input type="text" name="annee_inscription" value={formData.annee_inscription} readOnly />
-                                </div>
                                 <div className="form-field">
                                     <label>Faculté</label>
                                     <input type="text" name="nom_faculte" value={formData.nom_faculte} readOnly />
@@ -170,10 +187,6 @@ const EditProfile = () => {
                         )}
                         {user.role === "etudiant" && (
                             <>
-                                <div className="form-field">
-                                    <label>Année d'inscription</label>
-                                    <input type="text" name="annee_inscription" value={formData.annee_inscription} readOnly />
-                                </div>
                                 <div className="form-field">
                                     <label>Niveau</label>
                                     <input type="text" name="niveau" value={formData.niveau} readOnly />
@@ -198,8 +211,19 @@ const EditProfile = () => {
 
             {isEditingPassword && (
                 <div className="password-modal">
-                    <form onSubmit={handlePasswordSubmit} className="password-form">
+                    <form onSubmit={handlePasswordSubmit} className="password-form" autoComplete="off">
                         <h3>Modifier le mot de passe</h3>
+                        <div className="form-field">
+                            <label>Ancien mot de passe</label>
+                            <input
+                                type="password"
+                                name="oldPassword"
+                                value={passwordData.oldPassword}
+                                onChange={handlePasswordChange}
+                                autoComplete="current-password"
+                                required
+                            />
+                        </div>
                         <div className="form-field">
                             <label>Nouveau mot de passe</label>
                             <input
@@ -207,6 +231,7 @@ const EditProfile = () => {
                                 name="newPassword"
                                 value={passwordData.newPassword}
                                 onChange={handlePasswordChange}
+                                autoComplete="new-password"
                                 required
                             />
                         </div>
@@ -217,10 +242,10 @@ const EditProfile = () => {
                                 name="confirmPassword"
                                 value={passwordData.confirmPassword}
                                 onChange={handlePasswordChange}
+                                autoComplete="new-password"
                                 required
                             />
                         </div>
-                        {error && <p className="error-message">{error}</p>}
                         <div className="modal-actions">
                             <button type="submit" className="submit-button">
                                 Valider
@@ -234,6 +259,18 @@ const EditProfile = () => {
                             </button>
                         </div>
                     </form>
+                </div>
+            )}
+
+            {showSuccessModal && (
+                <div className="success-modal">
+                    <div className="success-modal-content">
+                        <h3>{isError ? "Erreur" : "Succès"}</h3>
+                        <p>{modalMessage}</p>
+                        <button onClick={handleCloseModal} className={isError ? "error-close-button" : "success-close-button"}>
+                            Fermer
+                        </button>
+                    </div>
                 </div>
             )}
         </div>

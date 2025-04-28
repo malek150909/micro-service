@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import { FaHome, FaSearch, FaPaperPlane, FaTimes, FaUser, FaPaperclip, FaEnvelope } from "react-icons/fa"
@@ -11,7 +9,7 @@ const Messages = () => {
   const [emailInput, setEmailInput] = useState("")
   const [recipient, setRecipient] = useState(null)
   const [sentMessages, setSentMessages] = useState([])
-  const [receivedMessages, setReceivedMessages] = useState([]) // Nouvel état pour les messages reçus
+  const [receivedMessages, setReceivedMessages] = useState([])
   const [newMessage, setNewMessage] = useState("")
   const [selectedFile, setSelectedFile] = useState(null)
   const [error, setError] = useState("")
@@ -20,27 +18,102 @@ const Messages = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [searchResults, setSearchResults] = useState(null)
   const [recentContacts, setRecentContacts] = useState([])
+  const wsRef = useRef(null)
+
+  const fetchUnreadMessagesCount = async (matricule) => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch("http://messaging.localhost/api/messages/unread", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      if (response.ok) {
+        return data.unreadCount || 0;
+      } else {
+        console.error("Erreur lors de la récupération des messages non lus :", data.message);
+        return 0;
+      }
+    } catch (err) {
+      console.error("Erreur réseau lors de la récupération des messages non lus :", err);
+      return 0;
+    }
+  };
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user") || "{}")
     if (!storedUser || !storedUser.Matricule) {
       navigate("/")
     } else {
+      console.log("Setting user:", storedUser)
       setUser(storedUser)
-      loadRecentContacts()
-      // Charger les messages reçus au démarrage
-      fetchReceivedMessages(storedUser.Matricule)
+      loadRecentContacts(storedUser.Matricule)
     }
   }, [navigate])
+
+  useEffect(() => {
+    if (!user || !user.Matricule) return
+
+    console.log(`Initializing WebSocket and polling for ${user.Matricule}`)
+    fetchReceivedMessages(user.Matricule)
+
+    wsRef.current = new WebSocket(`ws://messaging.localhost?matricule=${user.Matricule}`)
+    
+    wsRef.current.onopen = () => {
+      console.log(`WebSocket connected for ${user.Matricule}`)
+    }
+
+    wsRef.current.onmessage = (event) => {
+      const message = JSON.parse(event.data)
+      console.log(`Received WebSocket message for ${user.Matricule}:`, message)
+      if (message.type === "new_message" && message.destinataire === user.Matricule) {
+        setReceivedMessages((prev) => [...prev, message])
+        saveRecentContact({
+          Matricule: message.expediteur,
+          nom: message.nom,
+          prenom: message.prenom,
+          email: message.email,
+          lastMessageDate: message.date_envoi,
+        })
+        fetchUnreadMessagesCount(user.Matricule).then((count) => {
+          localStorage.setItem(`unreadMessagesCount_${user.Matricule}`, count);
+          window.dispatchEvent(
+            new CustomEvent("unreadMessagesCountUpdated", { detail: { count } })
+          );
+        });
+      }
+    }
+
+    wsRef.current.onclose = () => {
+      console.log(`WebSocket disconnected for ${user.Matricule}`)
+    }
+
+    wsRef.current.onerror = (err) => {
+      console.error(`WebSocket error for ${user.Matricule}:`, err)
+    }
+
+    const intervalId = setInterval(() => {
+      console.log(`Fallback polling for ${user.Matricule} at ${new Date().toISOString()}`)
+      fetchReceivedMessages(user.Matricule)
+    }, 30000)
+
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.close()
+      }
+      clearInterval(intervalId)
+    }
+  }, [user])
 
   useEffect(() => {
     scrollToBottom()
   }, [sentMessages, receivedMessages])
 
-  // Charger les contacts récents
-  const loadRecentContacts = () => {
+  const loadRecentContacts = (matricule) => {
     try {
-      const contacts = JSON.parse(localStorage.getItem("recentContacts")) || []
+      const contacts = JSON.parse(localStorage.getItem(`recentContacts_${matricule}`) || "[]") || []
+      console.log(`Loaded contacts for ${matricule}:`, contacts)
       setRecentContacts(contacts)
     } catch (err) {
       console.error("Erreur lors du chargement des contacts récents:", err)
@@ -48,10 +121,14 @@ const Messages = () => {
     }
   }
 
-  // Sauvegarder un contact récent
   const saveRecentContact = (contact) => {
+    if (!user || !user.Matricule) {
+      console.warn("Cannot save recent contact: user is null")
+      return
+    }
     try {
-      let contacts = JSON.parse(localStorage.getItem("recentContacts")) || []
+      let contacts = JSON.parse(localStorage.getItem(`recentContacts_${user.Matricule}`) || "[]") || []
+      console.log(`Saving contact for ${user.Matricule}:`, contact)
       const existingIndex = contacts.findIndex((c) => c.Matricule === contact.Matricule)
       if (existingIndex !== -1) {
         contacts.splice(existingIndex, 1)
@@ -61,15 +138,34 @@ const Messages = () => {
         lastMessageDate: new Date().toISOString(),
       })
       contacts = contacts.slice(0, 10)
-      localStorage.setItem("recentContacts", JSON.stringify(contacts))
-      setRecentContacts(contacts)
+      localStorage.setItem(`recentContacts_${user.Matricule}`, JSON.stringify(contacts))
+      setRecentContacts([...contacts])
+      console.log(`Updated contacts for ${user.Matricule}:`, contacts)
+      loadRecentContacts(user.Matricule)
     } catch (err) {
       console.error("Erreur lors de la sauvegarde du contact récent:", err)
     }
   }
 
-  // Récupérer les messages reçus
+  const handleDeleteContact = (contactMatricule) => {
+    try {
+      let contacts = JSON.parse(localStorage.getItem(`recentContacts_${user.Matricule}`) || "[]") || []
+      console.log(`Deleting contact ${contactMatricule} for ${user.Matricule}`)
+      contacts = contacts.filter((c) => c.Matricule !== contactMatricule)
+      localStorage.setItem(`recentContacts_${user.Matricule}`, JSON.stringify(contacts))
+      setRecentContacts([...contacts])
+      console.log(`Contacts after deletion for ${user.Matricule}:`, contacts)
+    } catch (err) {
+      console.error("Erreur lors de la suppression du contact:", err)
+      setError("Erreur lors de la suppression du contact.")
+    }
+  }
+
   const fetchReceivedMessages = async (matricule) => {
+    if (!user || !user.Matricule) {
+      console.warn("Cannot fetch messages: user is null")
+      return
+    }
     const token = localStorage.getItem("token")
     try {
       const response = await fetch("http://messaging.localhost/api/messages/received", {
@@ -77,11 +173,13 @@ const Messages = () => {
           Authorization: `Bearer ${token}`,
         },
       })
+      console.log(`Fetch response for ${matricule}:`, response.status, response.statusText)
       const data = await response.json()
+      console.log(`Received messages for ${matricule}:`, data)
       if (response.ok) {
         setReceivedMessages(data)
-        // Mettre à jour les contacts récents avec les expéditeurs des messages reçus
         data.forEach((msg) => {
+          console.log(`Processing message from ${msg.expediteur}:`, msg)
           saveRecentContact({
             Matricule: msg.expediteur,
             nom: msg.nom,
@@ -94,11 +192,11 @@ const Messages = () => {
         setError("Erreur lors de la récupération des messages reçus.")
       }
     } catch (err) {
+      console.error("Erreur réseau lors de la récupération des messages reçus:", err)
       setError("Erreur réseau lors de la récupération des messages reçus.")
     }
   }
 
-  // Marquer les messages comme lus
   const markMessagesAsRead = async (expediteur, destinataire) => {
     const token = localStorage.getItem("token")
     try {
@@ -112,6 +210,13 @@ const Messages = () => {
       })
       if (!response.ok) {
         console.error("Erreur lors du marquage des messages comme lus.")
+      } else {
+        fetchUnreadMessagesCount(user.Matricule).then((count) => {
+          localStorage.setItem(`unreadMessagesCount_${user.Matricule}`, count);
+          window.dispatchEvent(
+            new CustomEvent("unreadMessagesCountUpdated", { detail: { count } })
+          );
+        });
       }
     } catch (err) {
       console.error("Erreur réseau lors du marquage des messages comme lus:", err)
@@ -128,7 +233,7 @@ const Messages = () => {
       })
       const data = await response.json()
       if (response.ok && data && data.Matricule) {
-        data.role = user.role
+        data.role = user?.role
         setSearchResults(data)
         setError("")
       } else {
@@ -147,26 +252,22 @@ const Messages = () => {
     setEmailInput("")
     setSearchResults(null)
     setSentMessages([])
-    // Charger les messages envoyés et reçus pour ce destinataire
     fetchMessagesForRecipient(selectedRecipient.Matricule)
-    // Marquer les messages comme lus
-    markMessagesAsRead(selectedRecipient.Matricule, user.Matricule)
+    markMessagesAsRead(selectedRecipient.Matricule, user?.Matricule)
     saveRecentContact(selectedRecipient)
   }
 
   const handleContactClick = (contact) => {
     setRecipient(contact)
     fetchMessagesForRecipient(contact.Matricule)
-    // Marquer les messages comme lus
-    markMessagesAsRead(contact.Matricule, user.Matricule)
+    markMessagesAsRead(contact.Matricule, user?.Matricule)
   }
 
-  // Récupérer les messages envoyés et reçus pour un destinataire spécifique
   const fetchMessagesForRecipient = async (recipientMatricule) => {
     const token = localStorage.getItem("token")
     try {
       const response = await fetch(
-        `http://messaging.localhost/api/messages?expediteur=${user.Matricule}&destinataire=${recipientMatricule}`,
+        `http://messaging.localhost/api/messages?expediteur=${user?.Matricule}&destinataire=${recipientMatricule}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -175,8 +276,8 @@ const Messages = () => {
       )
       const data = await response.json()
       if (response.ok) {
-        setSentMessages(data.filter((msg) => msg.expediteur === user.Matricule))
-        setReceivedMessages(data.filter((msg) => msg.destinataire === user.Matricule))
+        setSentMessages(data.filter((msg) => msg.expediteur === user?.Matricule))
+        setReceivedMessages(data.filter((msg) => msg.destinataire === user?.Matricule))
       } else {
         setError("Erreur lors de la récupération des messages.")
       }
@@ -187,19 +288,19 @@ const Messages = () => {
 
   const handleSendMessage = async () => {
     if (!newMessage.trim() && !selectedFile) return
-  
+
     setError("")
     setSuccess("")
-  
+
     const token = localStorage.getItem("token")
     const formData = new FormData()
-    formData.append("expediteur", user.Matricule)
+    formData.append("expediteur", user?.Matricule)
     formData.append("destinataire", recipient.Matricule)
     formData.append("contenu", newMessage || "")
     if (selectedFile) {
       formData.append("file", selectedFile)
     }
-  
+
     try {
       const response = await fetch("http://messaging.localhost/api/messages", {
         method: "POST",
@@ -209,18 +310,18 @@ const Messages = () => {
         body: formData,
       })
       const data = await response.json()
-  
+
       if (response.ok) {
         const newMessageData = {
           ID_message: data.ID_message || Date.now(),
-          expediteur: user.Matricule,
+          expediteur: user?.Matricule,
           destinataire: recipient.Matricule,
           contenu: newMessage || "",
-          date_envoi: new Date().toISOString(), // Utilisé localement pour l'affichage
+          date_envoi: new Date().toISOString(),
           filePath: data.filePath || null,
           fileName: selectedFile ? selectedFile.name : null,
         }
-  
+
         setSentMessages([...sentMessages, newMessageData])
         setNewMessage("")
         setSelectedFile(null)
@@ -229,7 +330,9 @@ const Messages = () => {
           ...recipient,
           lastMessageDate: new Date().toISOString(),
         })
-  
+
+       _.
+
         setTimeout(() => {
           setSuccess("")
         }, 5000)
@@ -270,7 +373,6 @@ const Messages = () => {
     else if (storedUser.role === "etudiant") navigate("/etudiant")
   }
 
-  // Fusionner et trier les messages envoyés et reçus
   const allMessages = [...sentMessages, ...receivedMessages].sort(
     (a, b) => new Date(a.date_envoi) - new Date(b.date_envoi)
   )
@@ -299,18 +401,23 @@ const Messages = () => {
             </h3>
             {recentContacts.length > 0 ? (
               recentContacts.map((contact, index) => (
-                <div key={index} className={styles["MSG-contact-item"]} onClick={() => handleContactClick(contact)}>
-                  <div className={styles["MSG-contact-info"]}>
+                <div key={index} className={styles["MSG-contact-item"]}>
+                  <div className={styles["MSG-contact-info"]} onClick={() => handleContactClick(contact)}>
                     <h4>
                       {contact.nom} {contact.prenom}
-                      {/* Afficher un indicateur pour les messages non lus */}
                       {receivedMessages.some(
                         (msg) => msg.expediteur === contact.Matricule && msg.isRead === 0
                       ) && <span className={styles["MSG-unread-dot"]} />}
                     </h4>
                     <p>{contact.email}</p>
+                    <span>{new Date(contact.lastMessageDate).toLocaleDateString()}</span>
                   </div>
-                  <span>{new Date(contact.lastMessageDate).toLocaleDateString()}</span>
+                  <button
+                    className={styles["MSG-delete-contact-btn"]}
+                    onClick={() => handleDeleteContact(contact.Matricule)}
+                  >
+                    <FaTimes />
+                  </button>
                 </div>
               ))
             ) : (
@@ -346,7 +453,7 @@ const Messages = () => {
                       <div
                         key={index}
                         className={`${styles["MSG-message-item"]} ${
-                          msg.expediteur === user.Matricule ? styles["MSG-sent"] : styles["MSG-received"]
+                          msg.expediteur === user?.Matricule ? styles["MSG-sent"] : styles["MSG-received"]
                         }`}
                       >
                         <p>{msg.contenu}</p>

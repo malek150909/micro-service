@@ -3,8 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { motion } from 'framer-motion';
-import { FaList, FaDownload, FaHome, FaUsers } from 'react-icons/fa';
-import styles from './listetudiant.module.css'; // Updated import
+import { FaList, FaDownload, FaHome, FaUsers, FaFileExport } from 'react-icons/fa';
+import * as XLSX from 'xlsx';
+import styles from './listetudiant.module.css';
 
 const TeacherDashboard = () => {
   const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -12,6 +13,7 @@ const TeacherDashboard = () => {
   const navigate = useNavigate();
   const [sections, setSections] = useState([]);
   const [selectedSection, setSelectedSection] = useState('');
+  const [selectedSectionDetails, setSelectedSectionDetails] = useState(null);
   const [students, setStudents] = useState([]);
   const [updateNotification, setUpdateNotification] = useState(null);
   const iconColor = '#021A3F';
@@ -21,9 +23,11 @@ const TeacherDashboard = () => {
     const fetchSections = async () => {
       try {
         const res = await axios.get(`http://users.localhost/ENSlisteETD/${matricule}/sections`);
-        setSections(res.data);
-        if (res.data.length > 0) {
-          setSelectedSection(res.data[0].ID_section);
+        const fetchedSections = res.data;
+        setSections(fetchedSections);
+        if (fetchedSections.length > 0) {
+          setSelectedSection(fetchedSections[0].ID_section.toString()); // Convert to string to match <select> value
+          setSelectedSectionDetails(fetchedSections[0]);
         }
       } catch (err) {
         const errorMessage = err.response?.data?.error || 'Erreur lors de la récupération des sections.';
@@ -79,6 +83,21 @@ const TeacherDashboard = () => {
     fetchStudentsAndNotifications();
   }, [selectedSection, matricule]);
 
+  // Handle section change
+  const handleSectionChange = (e) => {
+    const newSectionId = e.target.value;
+    setSelectedSection(newSectionId);
+
+    // Find the section details for the selected section
+    const sectionDetails = sections.find((s) => s.ID_section.toString() === newSectionId);
+    if (sectionDetails) {
+      setSelectedSectionDetails(sectionDetails);
+    } else {
+      console.error(`Section with ID ${newSectionId} not found in sections:`, sections);
+      setSelectedSectionDetails(null);
+    }
+  };
+
   const handleDownloadPDF = async () => {
     if (!selectedSection) return;
 
@@ -106,6 +125,40 @@ const TeacherDashboard = () => {
       });
     } catch (err) {
       toast.error('Erreur lors du téléchargement du PDF.', {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        className: styles['ENS-ETD-custom-toast-error'],
+        icon: '❌',
+      });
+    }
+  };
+
+  const handleDownloadExcel = async () => {
+    if (!selectedSection) return;
+
+    try {
+      const res = await axios.get(`http://users.localhost/ENSlisteETD/${matricule}/section/${selectedSection}/excel`);
+      const exportData = res.data;
+
+      const worksheet = XLSX.utils.json_to_sheet(exportData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Étudiants');
+      XLSX.writeFile(workbook, `liste_etudiants_section_${selectedSection}.xlsx`);
+
+      toast.success('Liste exportée en Excel avec succès !', {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        className: styles['ENS-ETD-custom-toast-success'],
+        icon: '✅',
+      });
+    } catch (err) {
+      toast.error('Erreur lors de l’exportation en Excel.', {
         position: 'top-right',
         autoClose: 3000,
         hideProgressBar: true,
@@ -150,15 +203,15 @@ const TeacherDashboard = () => {
   };
 
   return (
-    <div >
+    <div>
       <div className={styles['ENS-ETD-sidebar']}>
         <div className={styles['ENS-ETD-logo']}>
           <h1 className={styles['ENS-ETD-h1']}>
-             Liste des etudiants
+            Liste des etudiants
           </h1>
         </div>
         <button
-          className={`${styles['ENS-ETD-sidebar-button']} `}
+          className={`${styles['ENS-ETD-sidebar-button']}`}
           onClick={handleLogout}
         >
           <FaHome className={styles['ENS-ETD-sidebar-icon']} /> Retour a l'accueil
@@ -204,12 +257,12 @@ const TeacherDashboard = () => {
                   <select
                     id="section-select"
                     value={selectedSection}
-                    onChange={(e) => setSelectedSection(e.target.value)}
+                    onChange={handleSectionChange}
                     className={styles['ENS-ETD-input']}
                   >
                     {sections.map((section) => (
-                      <option key={section.ID_section} value={section.ID_section}>
-                        {section.niveau} - {section.nom_specialite} ({section.Nom_departement}, {section.nom_faculte})
+                      <option key={section.ID_section} value={section.ID_section.toString()}>
+                        {section.niveau} - {section.nom_specialite} - {section.nom_section}
                       </option>
                     ))}
                   </select>
@@ -246,42 +299,51 @@ const TeacherDashboard = () => {
                       </button>
                     </div>
                   )}
-                  <h3 className={styles['ENS-ETD-h3']}>
-                    {sections.find((s) => s.ID_section === selectedSection)?.niveau} -{' '}
-                    {sections.find((s) => s.ID_section === selectedSection)?.nom_specialite} (
-                    {sections.find((s) => s.ID_section === selectedSection)?.Nom_departement},{' '}
-                    {sections.find((s) => s.ID_section === selectedSection)?.nom_faculte})
-                  </h3>
-                  <table className={styles['ENS-ETD-table']}>
-                    <thead>
-                      <tr>
-                        <th>Matricule</th>
-                        <th>Nom</th>
-                        <th>Prénom</th>
-                        <th>État</th>
-                        <th>Groupe</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {students.map((student) => (
-                        <tr key={student.Matricule}>
-                          <td>{student.Matricule}</td>
-                          <td>{student.nom}</td>
-                          <td>{student.prenom}</td>
-                          <td>{student.etat || 'Non défini'}</td>
-                          <td>
-                            {student.num_groupe ? `Groupe ${student.num_groupe}` : 'Non assigné'}
-                          </td>
+                  {selectedSectionDetails && (
+                    <h3 className={styles['ENS-ETD-h3']}>
+                      {selectedSectionDetails.niveau} - {selectedSectionDetails.nom_specialite} - {selectedSectionDetails.nom_section}
+                    </h3>
+                  )}
+                  <div className={styles['table-wrapper']}>
+                    <table className={styles['ENS-ETD-table']}>
+                      <thead>
+                        <tr>
+                          <th className={styles['ENS-ETD-th-matricule']}>Matricule</th>
+                          <th className={styles['ENS-ETD-th-nom']}>Nom</th>
+                          <th className={styles['ENS-ETD-th-prenom']}>Prénom</th>
+                          <th className={styles['ENS-ETD-th-etat']}>État</th>
+                          <th className={styles['ENS-ETD-th-groupe']}>Groupe</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  <button
-                    className={`${styles['ENS-ETD-edit-btn']} ${styles['ENS-ETD-button']}`}
-                    onClick={handleDownloadPDF}
-                  >
-                    <FaDownload /> Télécharger en PDF
-                  </button>
+                      </thead>
+                      <tbody>
+                        {students.map((student) => (
+                          <tr key={student.Matricule}>
+                            <td className={styles['ENS-ETD-td-matricule']}>{student.Matricule}</td>
+                            <td className={styles['ENS-ETD-td-nom']}>{student.nom}</td>
+                            <td className={styles['ENS-ETD-td-prenom']}>{student.prenom}</td>
+                            <td className={styles['ENS-ETD-td-etat']}>{student.etat || 'Non défini'}</td>
+                            <td className={styles['ENS-ETD-td-groupe']}>
+                              {student.num_groupe ? `Groupe ${student.num_groupe}` : 'Non assigné'}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+                    <button
+                      className={`${styles['ENS-ETD-edit-btn']} ${styles['ENS-ETD-button']}`}
+                      onClick={handleDownloadPDF}
+                    >
+                      <FaDownload /> Télécharger en PDF
+                    </button>
+                    <button
+                      className={`${styles['ENS-ETD-edit-btn']} ${styles['ENS-ETD-button']}`}
+                      onClick={handleDownloadExcel}
+                    >
+                      <FaFileExport /> Télécharger en Excel
+                    </button>
+                  </div>
                 </motion.div>
               )}
             </>

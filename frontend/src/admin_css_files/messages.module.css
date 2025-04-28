@@ -129,6 +129,9 @@
   transition: background-color 0.2s;
   border-radius: 10px;
   position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .MSG-contact-item:hover {
@@ -159,6 +162,22 @@
 .MSG-unread-indicator {
   color: #e74c3c;
   font-size: 1rem;
+}
+
+/* Bouton de suppression du contact */
+.MSG-delete-contact-btn {
+  background: none;
+  border: none;
+  color: #e74c3c;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  transition: color 0.3s ease;
+}
+
+.MSG-delete-contact-btn:hover {
+  color: #c0392b;
 }
 
 /* Contenu principal */
@@ -286,10 +305,25 @@
 
 .MSG-message-item span {
   font-size: 0.75rem;
-  color: #999;
   display: block;
   margin-top: 5px;
-  opacity: 0.8;
+  font-weight: 500;
+}
+
+.MSG-message-item.MSG-sent span {
+  color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.MSG-message-item.MSG-received span {
+  color: #555;
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
 }
 
 .MSG-no-messages,
@@ -555,26 +589,61 @@
 
 /* Style pour l'affichage des fichiers joints */
 .MSG-file-attachment {
-  margin-top: 5px;
+  margin-top: 10px;
   display: flex;
   align-items: center;
   gap: 10px;
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 8px 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.MSG-message-item.MSG-received .MSG-file-attachment {
+  background-color: rgba(84, 131, 179, 0.1);
+  border: 1px solid rgba(84, 131, 179, 0.2);
+}
+
+.MSG-file-attachment:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .MSG-file-attachment span {
   font-size: 0.9rem;
-  color: #052659;
-  font-style: italic;
+  color: inherit;
+  font-weight: 500;
 }
 
 .MSG-file-attachment a {
-  color: #5483b3;
-  text-decoration: underline;
+  color: inherit;
+  text-decoration: none;
   font-size: 0.9rem;
+  font-weight: 600;
+  background-color: rgba(255, 255, 255, 0.3);
+  padding: 4px 10px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  display: inline-block;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.MSG-message-item.MSG-received .MSG-file-attachment a {
+  background-color: rgba(84, 131, 179, 0.2);
+  color: #052659;
 }
 
 .MSG-file-attachment a:hover {
-  color: #041e42;
+  background-color: rgba(255, 255, 255, 0.5);
+  transform: scale(1.05);
+}
+
+.MSG-message-item.MSG-received .MSG-file-attachment a:hover {
+  background-color: rgba(84, 131, 179, 0.3);
 }
 
 @keyframes slideIn {

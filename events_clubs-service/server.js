@@ -1,8 +1,9 @@
 // backend/server.js
-const app = require('./app');
-require('dotenv').config();
+const { app, server } = require('./app'); // << récupérer server
+require('./cronCleaner');
+
 const PORT = 8084;
 
-app.listen(PORT, () => {
-    console.log(`Server running on http://events.localhost:`);
+server.listen(PORT, () => {
+    console.log(`🚀 Server + WebSocket écoutant sur http://events.localhost`);
 });

@@ -453,10 +453,54 @@ router.delete('/etudiants/:matricule', async (req, res) => {
     `, [matricule]);
     const sectionId = section.length > 0 ? section[0].ID_section : null;
 
+    // Supprimer les dépendances liées aux clubs et autres tables
     await db.query('START TRANSACTION');
 
-    await db.query('DELETE FROM Etudiant_Section WHERE Matricule = ?', [matricule]);
-    await db.query('DELETE FROM Etudiant WHERE Matricule = ?', [matricule]);
+    // Récupérer les clubs gérés par l'étudiant
+    const [clubs] = await db.query('SELECT ID_club FROM Club WHERE gerant_matricule = ?', [matricule]);
+    const clubIds = clubs.map(club => club.ID_club);
+
+    // Supprimer les publications associées aux clubs gérés (solution temporaire)
+    if (clubIds.length > 0) {
+      await db.query('DELETE FROM Publication WHERE ID_club IN (?)', [clubIds]);
+    }
+
+    // Supprimer les clubs gérés par l'étudiant
+    await db.query('DELETE FROM Club WHERE gerant_matricule = ?', [matricule]);
+
+    // Supprimer les messages associés dans MessageClub
+    await db.query('DELETE FROM MessageClub WHERE expediteur = ? OR destinataire = ?', [matricule, matricule]);
+
+    // Supprimer les réactions et commentaires associés
+    await db.query('DELETE FROM Reaction WHERE matricule_etudiant = ?', [matricule]);
+    await db.query('DELETE FROM Commentaire WHERE matricule_etudiant = ?', [matricule]);
+
+    // Supprimer les demandes de création de club
+    await db.query('DELETE FROM DemandeCreationClub WHERE matricule_etudiant = ?', [matricule]);
+
+    // Supprimer les notifications associées
+    await db.query('DELETE FROM Notification WHERE expediteur = ? OR destinataire = ?', [matricule, matricule]);
+    await db.query('DELETE FROM Notification_seen WHERE matricule = ?', [matricule]);
+
+    // Supprimer les événements du calendrier associés
+    await db.query('DELETE FROM CalendarEvent WHERE matricule = ?', [matricule]);
+
+    // Supprimer les notes associées
+    await db.query('DELETE FROM notes WHERE Matricule = ?', [matricule]);
+
+    // Supprimer les participations à des événements
+    await db.query('DELETE FROM Participant WHERE Matricule = ?', [matricule]);
+
+    // Supprimer les réponses aux sondages
+    await db.query('DELETE FROM reponse_sondage WHERE matricule_etudiant = ?', [matricule]);
+
+    // Supprimer les réclamations associées
+    await db.query('DELETE FROM reclamation WHERE Matricule_etudiant = ?', [matricule]);
+
+    // Supprimer les commentaires sur les annonces
+    await db.query('DELETE FROM commentaire_annonce WHERE matricule_etudiant = ?', [matricule]);
+
+    // Supprimer l'utilisateur de la table User (ce qui déclenchera les suppressions en cascade)
     await db.query('DELETE FROM User WHERE Matricule = ?', [matricule]);
 
     await db.query('COMMIT');
@@ -471,6 +515,7 @@ router.delete('/etudiants/:matricule', async (req, res) => {
     res.json({ message: 'Étudiant supprimé avec succès !' });
   } catch (err) {
     await db.query('ROLLBACK');
+    console.error('Erreur lors de la suppression de l’étudiant :', err);
     res.status(500).json({ error: 'Une erreur s’est produite. Veuillez réessayer.' });
   }
 });

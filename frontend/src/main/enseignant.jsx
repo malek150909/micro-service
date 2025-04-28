@@ -20,6 +20,9 @@ const Enseignant = () => {
     const [showAddNoteModal, setShowAddNoteModal] = useState(false);
     const [showDetailsModal, setShowDetailsModal] = useState(false);
     const [selectedNote, setSelectedNote] = useState(null);
+    const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
+    const [notifications, setNotifications] = useState([]);
+    const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
 
     const CALENDAR_API_URL = "http://courses.localhost/calendar";
     const API_URL = "http://courses.localhost/notes";
@@ -30,19 +33,86 @@ const Enseignant = () => {
             navigate("/");
         } else {
             setUser(storedUser);
+            console.log("Utilisateur chargé dans Enseignant :", storedUser);
             const hasSeenWelcome = sessionStorage.getItem("hasSeenWelcome");
             if (!hasSeenWelcome) {
                 setShowWelcome(true);
                 sessionStorage.setItem("hasSeenWelcome", "true");
             }
             setTimeout(() => setIsLoaded(true), 100);
-            console.log("Utilisateur chargé dans Enseignant :", storedUser);
             fetchRecentNotes(storedUser.Matricule);
             fetchUpcomingEvents();
+            fetchNotifications();
+            fetchUnreadMessagesCount(storedUser.Matricule).then((count) => {
+                setUnreadMessagesCount(count);
+            });
         }
     }, [navigate]);
 
-    // Fetch the 3 most recent notes
+    useEffect(() => {
+        const handleUnreadMessagesUpdate = (event) => {
+            setUnreadMessagesCount(event.detail.count);
+        };
+
+        window.addEventListener("unreadMessagesCountUpdated", handleUnreadMessagesUpdate);
+
+        return () => {
+            window.removeEventListener("unreadMessagesCountUpdated", handleUnreadMessagesUpdate);
+        };
+    }, []);
+
+    const fetchNotifications = async () => {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            console.error("Enseignant: No token found, cannot fetch notifications");
+            setNotifications([]);
+            setUnreadNotificationsCount(0);
+            return;
+        }
+
+        console.log("Enseignant: Fetching notifications");
+        try {
+            const response = await fetch("http://messaging.localhost/notifications", {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Erreur ${response.status}: ${errorText || "Erreur lors de la récupération des notifications"}`);
+            }
+            const data = await response.json();
+            console.log("Enseignant: Notifications fetched, count:", data.length);
+            setNotifications(Array.isArray(data) ? data : []);
+            setUnreadNotificationsCount(data.filter((n) => !n.is_seen).length);
+        } catch (err) {
+            console.error("Enseignant: Fetch notifications error:", err.message);
+            setNotifications([]);
+            setUnreadNotificationsCount(0);
+        }
+    };
+
+    const fetchUnreadMessagesCount = async (matricule) => {
+        const token = localStorage.getItem("token");
+        try {
+            const response = await fetch("http://messaging.localhost/api/messages/unread", {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            const data = await response.json();
+            if (response.ok) {
+                return data.unreadCount || 0;
+            } else {
+                console.error("Erreur lors de la récupération des messages non lus :", data.message);
+                return 0;
+            }
+        } catch (err) {
+            console.error("Erreur réseau lors de la récupération des messages non lus :", err);
+            return 0;
+        }
+    };
+
     const fetchRecentNotes = async (matricule) => {
         try {
             const response = await fetch(`${API_URL}/notes/${matricule}`);
@@ -57,7 +127,6 @@ const Enseignant = () => {
         }
     };
 
-    // Fetch upcoming events for the next 30 days
     const fetchUpcomingEvents = async () => {
         try {
             const token = localStorage.getItem("token");
@@ -99,7 +168,6 @@ const Enseignant = () => {
         }
     };
 
-    // Helper function to format date as YYYY-MM-DD
     const formatDate = (date) => {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -107,7 +175,6 @@ const Enseignant = () => {
         return `${year}-${month}-${day}`;
     };
 
-    // Add a new note
     const addNote = async () => {
         if (!newNoteTitle.trim() || !newNoteContent.trim()) return;
         try {
@@ -161,7 +228,7 @@ const Enseignant = () => {
     };
 
     const closeDetailsModal = (e) => {
-       if (e) e.stopPropagation();
+        if (e) e.stopPropagation();
         setShowDetailsModal(false);
         setSelectedNote(null);
     };
@@ -243,17 +310,30 @@ const Enseignant = () => {
 
     return (
         <div className={`${styles['MAIN-mainContainer']} ${isLoaded ? styles['MAIN-mainContainerLoaded'] : ''}`}>
-            {/* Sidebar */}
             <div className={styles['MAIN-sidebar']}>
                 <div className={styles['MAIN-sidebarMenu']}>
                     <button onClick={handleEditProfile} className={styles['MAIN-sidebarItem']}>
                         <FaUser className={styles['MAIN-sidebarIcon']} />
                     </button>
-                    <button onClick={handleMessages} className={styles['MAIN-sidebarItem']}>
-                        <FaEnvelope className={styles['MAIN-sidebarIcon']} />
+                    <button 
+                        onClick={handleMessages} 
+                        className={styles['MAIN-sidebarItem']} 
+                        aria-label={`Messagerie avec ${unreadMessagesCount} messages non lus`}
+                    >
+                        <div className={styles['MAIN-iconWrapper']}>
+                            <FaEnvelope className={styles['MAIN-sidebarIcon']} />
+                            {unreadMessagesCount > 0 && (
+                                <span className={styles['MAIN-unreadBadge']}>{unreadMessagesCount}</span>
+                            )}
+                        </div>
                     </button>
                     <button onClick={handleNotificationClick} className={styles['MAIN-sidebarItem']}>
-                        <FaBell className={styles['MAIN-sidebarIcon']} />
+                        <div className={styles['MAIN-iconWrapper']}>
+                            <FaBell className={styles['MAIN-sidebarIcon']} />
+                            {unreadNotificationsCount > 0 && (
+                                <span className={styles['MAIN-unreadBadge']}>{unreadNotificationsCount}</span>
+                            )}
+                        </div>
                     </button>
                     <button onClick={handleLogout} className={styles['MAIN-sidebarItem']}>
                         <FaSignOutAlt className={styles['MAIN-sidebarIcon']} />
@@ -261,9 +341,7 @@ const Enseignant = () => {
                 </div>
             </div>
 
-            {/* Main Content */}
             <div className={styles['MAIN-mainContent']}>
-                {/* Welcome Message */}
                 {showWelcome && user && (
                     <div className={`${styles['MAIN-welcomeMessage']} ${isLoaded ? styles['MAIN-welcomeMessageSlideIn'] : ''}`}>
                         <h1>Bienvenue, {user.nom} {user.prenom} !</h1>
@@ -271,7 +349,6 @@ const Enseignant = () => {
                     </div>
                 )}
 
-                {/* Notification Modal */}
                 {showNotificationModal && (
                     <div className={`${styles['MAIN-notificationModal']} ${showNotificationModal ? styles['MAIN-notificationModalActive'] : ''}`}>
                         <div className={`${styles['MAIN-notificationModalContent']} ${showNotificationModal ? styles['MAIN-notificationModalContentActive'] : ''}`}>
@@ -282,13 +359,17 @@ const Enseignant = () => {
                                 X
                             </button>
                             <div className={styles['MAIN-notificationListWrapper']}>
-                                <NotificationBell showModal={true} />
+                                <NotificationBell
+                                    showModal={true}
+                                    notifications={notifications}
+                                    setNotifications={setNotifications}
+                                    fetchNotifications={fetchNotifications}
+                                />
                             </div>
                         </div>
                     </div>
                 )}
 
-                {/* Add Note Modal */}
                 {showAddNoteModal && (
                     <div className={`${styles['MAIN-modalOverlay']} ${showAddNoteModal ? styles['MAIN-modalOverlayActive'] : ''}`} data-modal="add">
                         <div className={`${styles['MAIN-modalContent']} ${styles['MAIN-addNoteModal']} ${styles['MAIN-stickyNote']}`}>
@@ -322,7 +403,6 @@ const Enseignant = () => {
                     </div>
                 )}
 
-                {/* Note Details Modal */}
                 {showDetailsModal && selectedNote && (
                     <div className={`${styles['MAIN-modalOverlay']} ${showDetailsModal ? styles['MAIN-modalOverlayActive'] : ''}`} data-modal="details">
                         <div className={`${styles['MAIN-modalContent']} ${styles['MAIN-stickyNote']}`}>
@@ -355,7 +435,6 @@ const Enseignant = () => {
                     </div>
                 )}
 
-                {/* Event Details Modal */}
                 {showEventDetailsModal && selectedEvent && (
                     <div className={`${styles['MAIN-modalOverlay']} ${showEventDetailsModal ? styles['MAIN-modalOverlayActive'] : ''}`} data-modal="event-details">
                         <div className={`${styles['MAIN-modalContent']} ${styles['MAIN-eventModal']}`}>
@@ -401,7 +480,6 @@ const Enseignant = () => {
                     </div>
                 )}
 
-                {/* Upcoming Events Section */}
                 <div className={styles['MAIN-eventsSection']}>
                     <h3>Événements à venir</h3>
                     <div className={styles['MAIN-eventsHorizontal']}>
@@ -450,9 +528,7 @@ const Enseignant = () => {
                     </button>
                 </div>
 
-                {/* Main Layout */}
                 <div className={styles['MAIN-mainLayout']}>
-                    {/* Cards Section */}
                     <div className={styles['MAIN-cardsSection']}>
                         <div className={styles['MAIN-cardsGrid']}>
                             {items.map((item, index) => (
@@ -468,9 +544,7 @@ const Enseignant = () => {
                         </div>
                     </div>
 
-                    {/* Right Column: Notes */}
                     <div className={styles['MAIN-rightColumn']}>
-                        {/* Notes Section */}
                         <div className={styles['MAIN-notesSection']}>
                             <h3>Dernières Notes</h3>
                             <div className={styles['MAIN-notesGrid']}>

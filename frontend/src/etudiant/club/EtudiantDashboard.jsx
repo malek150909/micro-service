@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { FaUsers, FaList, FaEnvelope, FaHome } from 'react-icons/fa';
+import { FaUsers, FaList, FaEnvelope, FaHome, FaCalendarAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import GererMesClubs from './GererMesClubs';
 import ListeClubsDisponibles from './ListeClubsDisponibles';
 import MesClubsMembre from './MesClubsMembre';
 import DemandeCreationClub from './DemandeCreationClub';
+import ConsulterEvenementsPublics from './ConsulterEvenementsPublics'; // Importation du nouveau composant
 import styles from './club.module.css';
 
 const EtudiantDashboard = () => {
@@ -83,6 +84,12 @@ const EtudiantDashboard = () => {
           <FaUsers /> Mes Clubs (Membre)
         </button>
         <button
+          className={`${styles['CLUB-ETD-sidebar-button']} ${activeTab === 'evenements-publics' ? styles['CLUB-ETD-active'] : ''}`}
+          onClick={() => setActiveTab('evenements-publics')}
+        >
+          <FaCalendarAlt /> Consulter les Événements Publics
+        </button>
+        <button
           className={`${styles['CLUB-ETD-sidebar-button']} ${activeTab === 'demande' ? styles['CLUB-ETD-active'] : ''}`}
           onClick={() => setActiveTab('demande')}
         >
@@ -115,6 +122,9 @@ const EtudiantDashboard = () => {
               setClubsMembre={setClubsMembre}
               setError={setError}
             />
+          )}
+          {activeTab === 'evenements-publics' && (
+            <ConsulterEvenementsPublics />
           )}
           {activeTab === 'demande' && (
             <DemandeCreationClub

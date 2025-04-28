@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaUser, FaEnvelope, FaSignOutAlt, FaBell, FaChevronRight, FaCalendar, FaBook, FaUsers, FaClipboardList, FaBullhorn } from "react-icons/fa";
 import NotificationBell from "./NotificationBell";
-import styles from "../admin_css_files/main.module.css"; // Import du CSS Module
+import styles from "../admin_css_files/main.module.css";
 
 const Admin = () => {
     const navigate = useNavigate();
@@ -10,6 +10,7 @@ const Admin = () => {
     const [showWelcome, setShowWelcome] = useState(false);
     const [isLoaded, setIsLoaded] = useState(false);
     const [showNotificationModal, setShowNotificationModal] = useState(false);
+    const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
 
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -23,8 +24,42 @@ const Admin = () => {
                 sessionStorage.setItem("hasSeenWelcome", "true");
             }
             setTimeout(() => setIsLoaded(true), 100);
+            fetchUnreadMessagesCount(storedUser.Matricule).then((count) => {
+                setUnreadMessagesCount(count);
+            });
         }
     }, [navigate]);
+
+    useEffect(() => {
+        const handleUnreadMessagesUpdate = (event) => {
+            setUnreadMessagesCount(event.detail.count);
+        };
+        window.addEventListener("unreadMessagesCountUpdated", handleUnreadMessagesUpdate);
+        return () => {
+            window.removeEventListener("unreadMessagesCountUpdated", handleUnreadMessagesUpdate);
+        };
+    }, []);
+
+    const fetchUnreadMessagesCount = async (matricule) => {
+        const token = localStorage.getItem("token");
+        try {
+            const response = await fetch("http://messaging.localhost/api/messages/unread", {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            const data = await response.json();
+            if (response.ok) {
+                return data.unreadCount || 0;
+            } else {
+                console.error("Erreur lors de la récupération des messages non lus :", data.message);
+                return 0;
+            }
+        } catch (err) {
+            console.error("Erreur réseau lors de la récupération des messages non lus :", err);
+            return 0;
+        }
+    };
 
     const handleLogout = () => {
         localStorage.removeItem("user");
@@ -35,78 +70,36 @@ const Admin = () => {
 
     const handleEditProfile = () => navigate("/modifierProfil");
     const handleMessages = () => navigate("/messagerie");
-
     const handleNotificationClick = () => {
         setShowNotificationModal(true);
     };
 
     const items = [
-        { 
-          title: "Événements", 
-          description: "Gérez et créez des événements institutionnels.", 
-          route: "/gestionEvenements", 
-          icon: <FaCalendar /> 
-        },
-        { 
-          title: "Exams Planning", 
-          description: "Planifiez et consultez les calendriers d'examens.", 
-          route: "/consult", 
-          icon: <FaBook /> 
-        },
-        { 
-          title: "Modules", 
-          description: "Accédez et gérez les modules pédagogiques.", 
-          route: "/modules", 
-          icon: <FaBook /> 
-        },
-        { 
-          title: "Annonces", 
-          description: "Créez et consultez les annonces officielles.", 
-          route: "/annonces", 
-          icon: <FaBullhorn /> 
-        },
-        { 
-          title: "Étudiants", 
-          description: "Consultez et gérez la liste des étudiants.", 
-          route: "/etudiants", 
-          icon: <FaUsers /> 
-        },
-        { 
-          title: "Profs", 
-          description: "Consultez et gérez la liste des enseignants.", 
-          route: "/enseignants", 
-          icon: <FaUsers /> 
-        },
-        { 
-          title: "Emploi du temps", 
-          description: "Créez et visualisez les emplois du temps.", 
-          route: "/emploidutemps", 
-          icon: <FaCalendar /> 
-        },
-        { 
-          title: "Documents", 
-          description: "Gérez et consultez les documents administratifs.", 
-          route: "/docsAdmin", 
-          icon: <FaClipboardList /> 
-        },
-        { 
-          title: "Clubs", 
-          description: "Supervisez et consultez les clubs étudiants.", 
-          route: "/clubsADM", 
-          icon: <FaUsers /> 
-        }
-      ];
+        { title: "Événements", description: "Gérez et créez des événements institutionnels.", route: "/gestionEvenements", icon: <FaCalendar /> },
+        { title: "Exams Planning", description: "Planifiez et consultez les calendriers d'examens.", route: "/consult", icon: <FaBook /> },
+        { title: "Modules", description: "Accédez et gérez les modules pédagogiques.", route: "/modules", icon: <FaBook /> },
+        { title: "Annonces", description: "Créez et consultez les annonces officielles.", route: "/annonces", icon: <FaBullhorn /> },
+        { title: "Étudiants", description: "Consultez et gérez la liste des étudiants.", route: "/etudiants", icon: <FaUsers /> },
+        { title: "Profs", description: "Consultez et gérez la liste des enseignants.", route: "/enseignants", icon: <FaUsers /> },
+        { title: "Emploi du temps", description: "Créez et visualisez les emplois du temps.", route: "/emploidutemps", icon: <FaCalendar /> },
+        { title: "Documents", description: "Gérez et consultez les documents administratifs.", route: "/docsAdmin", icon: <FaClipboardList /> },
+        { title: "Clubs", description: "Supervisez et consultez les clubs étudiants.", route: "/clubsADM", icon: <FaUsers /> }
+    ];
 
     return (
         <div className={`${styles['MAIN-mainContainer']} ${isLoaded ? styles['MAIN-mainContainerLoaded'] : ''}`}>
-            {/* Sidebar */}
             <div className={styles['MAIN-sidebar']}>
                 <div className={styles['MAIN-sidebarMenu']}>
                     <button onClick={handleEditProfile} className={styles['MAIN-sidebarItem']}>
                         <FaUser className={styles['MAIN-sidebarIcon']} />
                     </button>
-                    <button onClick={handleMessages} className={styles['MAIN-sidebarItem']}>
-                        <FaEnvelope className={styles['MAIN-sidebarIcon']} />
+                    <button onClick={handleMessages} className={styles['MAIN-sidebarItem']} aria-label={`Messagerie avec ${unreadMessagesCount} messages non lus`}>
+                        <div className={styles['MAIN-iconWrapper']}>
+                            <FaEnvelope className={styles['MAIN-sidebarIcon']} />
+                            {unreadMessagesCount > 0 && (
+                                <span className={styles['MAIN-unreadBadge']}>{unreadMessagesCount}</span>
+                            )}
+                        </div>
                     </button>
                     <button onClick={handleNotificationClick} className={styles['MAIN-sidebarItem']}>
                         <FaBell className={styles['MAIN-sidebarIcon']} />
@@ -116,35 +109,24 @@ const Admin = () => {
                     </button>
                 </div>
             </div>
-
-            {/* Main Content */}
             <div className={styles['MAIN-mainContent']}>
-                {/* Welcome Message */}
                 {showWelcome && user && (
                     <div className={`${styles['MAIN-welcomeMessage']} ${isLoaded ? styles['MAIN-welcomeMessageSlideIn'] : ''}`}>
                         <h1>Bienvenue, {user.nom} {user.prenom} !</h1>
                         <p>Que souhaitez-vous faire aujourd&apos;hui ?</p>
                     </div>
                 )}
-
-                {/* Notification Modal */}
                 {showNotificationModal && (
                     <div className={`${styles['MAIN-notificationModal']} ${showNotificationModal ? styles['MAIN-notificationModalActive'] : ''}`}>
                         <div className={`${styles['MAIN-notificationModalContent']} ${showNotificationModal ? styles['MAIN-notificationModalContentActive'] : ''}`}>
-                            <button
-                                className={styles['MAIN-closeModalBtn']}
-                                onClick={() => setShowNotificationModal(false)}
-                            >
+                            <button className={styles['MAIN-closeModalBtn']} onClick={() => setShowNotificationModal(false)}>
                                 X
                             </button>
                             <NotificationBell showModal={true} />
                         </div>
                     </div>
                 )}
-
-                {/* Main Layout */}
                 <div className={styles['MAIN-mainLayout']}>
-                    {/* Cards Section */}
                     <div className={styles['MAIN-cardsSection']}>
                         <div className={styles['MAIN-cardsGrid']}>
                             {items.map((item, index) => (

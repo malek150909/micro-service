@@ -10,5 +10,6 @@ router.get("/messages/received", authMiddleware, messageController.getReceivedMe
 router.get("/messages/contacts", authMiddleware, messageController.getLastMessagesByContact)
 router.post("/messages", authMiddleware, upload.single("file"), messageController.createMessage)
 router.put("/messages/mark-as-read", authMiddleware, messageController.markMessagesAsRead)
+router.get("/messages/unread", authMiddleware, messageController.getUnreadMessagesCount);
 
 module.exports = router

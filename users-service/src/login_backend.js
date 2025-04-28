@@ -2,6 +2,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
 const cors = require('cors');
+const authMiddleware = require('../middleware/auth'); // Middleware d'authentification (si nécessaire)
 const enseignantRoutes = require('../routes/enseignantRoute');
 const etudiantRoutes = require('../routes/etudiantRoute');
 const teacherRoutes = require('../routes/etudiantENSRoute');
@@ -123,14 +124,23 @@ app.post('/login', async (req, res) => {
     }
 });
 
-app.post('/update-password', async (req, res) => {
-    const { matricule, newPassword } = req.body;
+app.post('/update-password', authMiddleware, async (req, res) => {
+    const { matricule, oldPassword, newPassword } = req.body;
 
-    if (!matricule || !newPassword) {
-        return res.status(400).json({ error: "Matricule et nouveau mot de passe requis" });
+    if (!matricule || !oldPassword || !newPassword) {
+        return res.status(400).json({ error: "Matricule, ancien mot de passe et nouveau mot de passe requis" });
     }
 
     try {
+        const user = await getUserWithRole(matricule);
+        if (!user) {
+            return res.status(404).json({ error: "Utilisateur non trouvé" });
+        }
+
+        if (user.motdepasse !== oldPassword) {
+            return res.status(401).json({ error: "Ancien mot de passe incorrect" });
+        }
+
         const [result] = await db.query(
             'UPDATE user SET motdepasse = ? WHERE Matricule = ?',
             [newPassword, matricule]

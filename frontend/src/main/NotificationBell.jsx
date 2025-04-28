@@ -1,45 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { FaBell } from 'react-icons/fa';
-import '../admin_css_files/NotificationBell.css';
+import styles from '../admin_css_files/NotificationBell.module.css';
 
-const NotificationBell = ({ onNotificationClick, showModal }) => {
-  const [notifications, setNotifications] = useState([]);
+const NotificationBell = ({ onNotificationClick, showModal, notifications, setNotifications, fetchNotifications }) => {
   const [expandedNotifications, setExpandedNotifications] = useState({});
   const [error, setError] = useState(null);
 
   const token = localStorage.getItem('token');
-  console.log('Token utilisé :', token);
-
-  useEffect(() => {
-    if (token) {
-      fetchNotifications();
-    } else {
-      setError('Aucun token trouvé. Veuillez vous connecter.');
-    }
-  }, [token]);
-
-  const fetchNotifications = async () => {
-    try {
-      const response = await fetch(`http://messaging.localhost/notifications`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Erreur ${response.status}: ${errorText || 'Erreur lors de la récupération des notifications'}`);
-      }
-      const data = await response.json();
-      setNotifications(data || []);
-      setError(null);
-    } catch (err) {
-      console.error('Erreur fetchNotifications:', err);
-      setError(err.message);
-      setNotifications([]);
-    }
-  };
 
   const deleteNotification = async (id) => {
+    console.log('NotificationBell: Deleting notification:', id);
     try {
       const response = await fetch(`http://messaging.localhost/notifications/${id}`, {
         method: 'DELETE',
@@ -48,13 +18,16 @@ const NotificationBell = ({ onNotificationClick, showModal }) => {
         },
       });
       if (!response.ok) throw new Error('Erreur lors de la suppression');
+      console.log('NotificationBell: Notification deleted successfully:', id);
       setNotifications(notifications.filter((notif) => notif.ID_notification !== id));
     } catch (err) {
+      console.error('NotificationBell: Delete error:', err.message);
       setError(err.message);
     }
   };
 
   const deleteAllNotifications = async () => {
+    console.log('NotificationBell: Deleting all notifications');
     try {
       const response = await fetch(`http://messaging.localhost/notifications/all`, {
         method: 'DELETE',
@@ -63,13 +36,16 @@ const NotificationBell = ({ onNotificationClick, showModal }) => {
         },
       });
       if (!response.ok) throw new Error('Erreur lors de la suppression');
+      console.log('NotificationBell: All notifications deleted successfully');
       setNotifications([]);
     } catch (err) {
+      console.error('NotificationBell: Delete all error:', err.message);
       setError(err.message);
     }
   };
 
   const markAsSeen = async (id) => {
+    console.log('NotificationBell: Marking notification as seen:', id);
     try {
       const response = await fetch(`http://messaging.localhost/notifications/seen/${id}`, {
         method: 'POST',
@@ -79,13 +55,16 @@ const NotificationBell = ({ onNotificationClick, showModal }) => {
         },
       });
       if (!response.ok) throw new Error('Erreur lors du marquage');
-      fetchNotifications();
+      console.log('NotificationBell: Notification marked as seen successfully:', id);
+      await fetchNotifications(); // Rafraîchir les notifications depuis l'API
     } catch (err) {
+      console.error('NotificationBell: Mark as seen error:', err.message);
       setError(err.message);
     }
   };
 
   const toggleExpandNotification = (id) => {
+    console.log('NotificationBell: Toggling expand for notification:', id);
     setExpandedNotifications((prev) => ({
       ...prev,
       [id]: !prev[id],
@@ -95,41 +74,41 @@ const NotificationBell = ({ onNotificationClick, showModal }) => {
   const unreadCount = notifications.filter((n) => !n.is_seen).length;
 
   return (
-    <div id="notifications">
+    <div>
       {!showModal ? (
-        <div className="notification-container">
+        <div className={styles['NOTIF-notification-container']}>
           <div
-            className="bell-icon"
+            className={styles['NOTIF-bell-icon']}
             onClick={onNotificationClick}
             title={`Nouvelles notifications: ${unreadCount}`}
           >
             <FaBell />
-            {unreadCount > 0 && <span className="notification-count">{unreadCount}</span>}
+            {unreadCount > 0 && <span className={styles['NOTIF-notification-count']}>{unreadCount}</span>}
           </div>
         </div>
       ) : (
-        <div className="notification-modal-inner">
-          <div className="notification-header">
+        <div className={styles['NOTIF-notification-modal-inner']}>
+          <div className={styles['NOTIF-notification-header']}>
             <h3>Notifications</h3>
             <button onClick={deleteAllNotifications}>Tout supprimer</button>
           </div>
           {error ? (
-            <p className="no-notifications">{error}</p>
+            <p className={styles['NOTIF-no-notifications']}>{error}</p>
           ) : notifications.length === 0 ? (
-            <p className="no-notifications">Aucune notification</p>
+            <p className={styles['NOTIF-no-notifications']}>Aucune notification</p>
           ) : (
             notifications.map((notif) => (
               <div
                 key={notif.ID_notification}
-                className={`notification-item ${!notif.is_seen ? 'unread' : ''}`}
+                className={`${styles['NOTIF-notification-item']} ${!notif.is_seen ? styles['NOTIF-unread'] : ''}`}
                 onClick={() => !notif.is_seen && markAsSeen(notif.ID_notification)}
               >
-                <div className="notification-content">
+                <div className={styles['NOTIF-notification-content']}>
                   {notif.contenu.length > 50 && !expandedNotifications[notif.ID_notification] ? (
                     <>
                       {notif.contenu.substring(0, 50)}...
                       <span
-                        className="read-more"
+                        className={styles['NOTIF-read-more']}
                         onClick={(e) => {
                           e.stopPropagation();
                           toggleExpandNotification(notif.ID_notification);
@@ -143,7 +122,7 @@ const NotificationBell = ({ onNotificationClick, showModal }) => {
                       {notif.contenu}
                       {notif.contenu.length > 50 && (
                         <span
-                          className="read-less"
+                          className={styles['NOTIF-read-less']}
                           onClick={(e) => {
                             e.stopPropagation();
                             toggleExpandNotification(notif.ID_notification);
@@ -156,7 +135,7 @@ const NotificationBell = ({ onNotificationClick, showModal }) => {
                   )}
                 </div>
                 <button
-                  className="delete-btn"
+                  className={styles['NOTIF-delete-btn']}
                   onClick={(e) => {
                     e.stopPropagation();
                     deleteNotification(notif.ID_notification);

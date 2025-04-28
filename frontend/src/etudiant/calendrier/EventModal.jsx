@@ -12,7 +12,7 @@ function EventModal({ time, date, onClose, onSave, role, event, timeSlots }) {
   const token = localStorage.getItem("token")
 
   useEffect(() => {
-    console.log("EventModal ouvert, event:", event, "time:", time, "timeSlot initial:", timeSlot);
+    console.log("EventModal ouvert, event:", event, "time:", time, "timeSlot initial:", timeSlot)
     if (event) {
       setTitle(event.title || "")
       setContent(event.content || "")
@@ -22,10 +22,15 @@ function EventModal({ time, date, onClose, onSave, role, event, timeSlots }) {
       setContent("")
       setTimeSlot(time || timeSlots[0] || "")
     }
+    // Override window.confirm to prevent default dialog
+    window.confirm = () => {
+      console.log("window.confirm was called but overridden to prevent the default dialog.")
+      return false
+    }
   }, [event, time, timeSlots])
 
   const handleSave = async () => {
-    console.log("Enregistrement, mode:", event ? "Modification" : "Ajout", "ID_event:", event?.ID_event);
+    console.log("Enregistrement, mode:", event ? "Modification" : "Ajout", "ID_event:", event?.ID_event)
     try {
       if (!title || !content || !timeSlot) {
         alert("Veuillez remplir tous les champs (titre, contenu, plage horaire).")

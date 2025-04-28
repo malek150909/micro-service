@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { FaEnvelope } from 'react-icons/fa';
+import { FaEnvelope, FaSearch } from 'react-icons/fa';
 import styles from './club.module.css';
 
 const ListeClubsDisponibles = ({ clubsDisponibles, setClubsDisponibles, setError }) => {
-
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const matricule = storedUser?.Matricule;
 
   const API_URL = 'http://events.localhost';
   const [selectedClubId, setSelectedClubId] = useState(null);
   const [confirmationMessages, setConfirmationMessages] = useState({});
+  const [searchQuery, setSearchQuery] = useState('');
 
   const handleToggleClubDetails = (clubId) => {
     setSelectedClubId(selectedClubId === clubId ? null : clubId);
@@ -42,6 +42,10 @@ const ListeClubsDisponibles = ({ clubsDisponibles, setClubsDisponibles, setError
     }
   };
 
+  const filteredClubs = clubsDisponibles.filter((club) =>
+    club.nom.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <>
       <div className={styles['CLUB-ETD-header']}>
@@ -50,38 +54,60 @@ const ListeClubsDisponibles = ({ clubsDisponibles, setClubsDisponibles, setError
       </div>
 
       <div className={styles['CLUB-ETD-content-grid']}>
-        <div className={styles['CLUB-ETD-event-list']}>
-          <ul id="clubs-list" className={styles['CLUB-ETD-clubs-list']}>
-            {clubsDisponibles.length === 0 ? (
-              <li className={styles['CLUB-ETD-no-results']}>Aucun club disponible pour rejoindre</li>
-            ) : (
-              clubsDisponibles.map((club) => (
-                <li key={club.ID_club} className={styles['CLUB-ETD-club-item']}>
+        <div className={styles['CLUB-ETD-search-bar']}>
+          <div className={styles['CLUB-ETD-search-container']}>
+            <FaSearch className={styles['CLUB-ETD-search-icon']} />
+            <input
+              type="text"
+              placeholder="Rechercher un club"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className={styles['CLUB-ETD-search-input']}
+            />
+          </div>
+        </div>
+
+        <div className={styles['CLUB-ETD-available-clubs-list']}>
+          <h3>Clubs Disponibles</h3>
+          {filteredClubs.length === 0 ? (
+            <div className={styles['CLUB-ETD-no-data']}>
+              {searchQuery
+                ? 'Aucun club trouvé pour cette recherche'
+                : 'Aucun club disponible pour rejoindre'}
+            </div>
+          ) : (
+            <ul id="CLUB-ETD-available-clubs">
+              {filteredClubs.map((club) => (
+                <li key={club.ID_club} className={styles['CLUB-ETD-available-club-item']}>
                   {confirmationMessages[club.ID_club] ? (
                     <div className={styles['CLUB-ETD-confirmation-message']}>
                       {confirmationMessages[club.ID_club]}
                     </div>
                   ) : (
                     <div
-                      className={`${styles['CLUB-ETD-club-card']} ${selectedClubId === club.ID_club ? styles['CLUB-ETD-expanded'] : ''}`}
+                      className={`${styles['CLUB-ETD-available-club-preview']} ${
+                        selectedClubId === club.ID_club ? styles['CLUB-ETD-expanded'] : ''
+                      }`}
                       onClick={() => handleToggleClubDetails(club.ID_club)}
                     >
-                      <div className={styles['CLUB-ETD-club-preview']}>
+                      <div className={styles['CLUB-ETD-available-club-image-container']}>
                         {club.image_url ? (
                           <img
                             src={`${API_URL}${club.image_url}`}
                             alt={club.nom}
-                            className={styles['CLUB-ETD-club-image']}
+                            className={styles['CLUB-ETD-available-club-image']}
                             onError={(e) => {
                               console.error('Erreur chargement image club:', `${API_URL}${club.image_url}`);
                               e.target.src = 'https://via.placeholder.com/80x80?text=Image+Indisponible';
                             }}
                           />
                         ) : (
-                          <div className={styles['CLUB-ETD-club-placeholder']}>Aucune image</div>
+                          <div className={styles['CLUB-ETD-available-club-placeholder']}>
+                            {club.nom.charAt(0)}
+                          </div>
                         )}
-                        <h4 className={styles['CLUB-ETD-club-name']}>{club.nom}</h4>
                       </div>
+                      <h4 className={styles['CLUB-ETD-available-club-name']}>{club.nom}</h4>
 
                       {selectedClubId === club.ID_club && (
                         <div className={styles['CLUB-ETD-club-details']}>
@@ -105,9 +131,9 @@ const ListeClubsDisponibles = ({ clubsDisponibles, setClubsDisponibles, setError
                     </div>
                   )}
                 </li>
-              ))
-            )}
-          </ul>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
     </>
