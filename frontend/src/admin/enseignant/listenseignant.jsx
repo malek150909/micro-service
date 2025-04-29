@@ -155,14 +155,14 @@ const ListEnseignant = () => {
       return;
     }
 
-    axios.post('http://localhost:3000/api/enseignants', newTeacherForm)
+    axios.post('http://users.localhost/api/enseignants', newTeacherForm)
       .then(res => {
         toast.success('Enseignant ajouté avec succès!', { autoClose: 3000 });
         setNewTeacherForm({ nom: '', prenom: '', email: '', idFaculte: '', idDepartement: '', modules: [] });
         setFilters({ idFaculte: '', idDepartement: '', idSpecialite: '', niveau: '', idSection: '' });
         setShowNewTeacherForm(false);
         if (filters.idFaculte && filters.idDepartement) {
-          axios.post('http://localhost:3000/api/enseignants/filtrer', {
+          axios.post('http://users.localhost/api/enseignants/filtrer', {
             idFaculte: filters.idFaculte,
             idDepartement: filters.idDepartement
           })

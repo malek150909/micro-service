@@ -13,8 +13,8 @@ const db = mysql.createPool({
 
 // Connect to the database
 db.getConnection()
-    .then(() => console.log("Connected to the MySQL database"))
-    .catch(err => console.error("Database connection error:", err));
+    .then(() => console.log('✅ Connexion réussie à la base de données'))
+    .catch(err => console.error('❌ Erreur de connexion à la base de données:', err.message));
 
 // Export the database connection
 module.exports = db;

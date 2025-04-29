@@ -1,15 +1,19 @@
 // backend/config/db.js
 const mysql = require('mysql2/promise');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 const pool = mysql.createPool({
-    host: 'localhost',           // Replace with your MySQL host
-    user: 'root',               // Replace with your MySQL username
-    password: '15092003Malek@', // Replace with your MySQL password
-    database: 'uni_db',         // Replace with your database name
-    waitForConnections: true,   // Si toutes les connexions sont utilisées, attendre au lieu de rejeter
-    connectionLimit: 10,        // Nombre maximum de connexions dans le pool
-    queueLimit: 0 
-});
+    host: process.env.DB_HOST ,
+    user: process.env.DB_USER ,
+    password: process.env.DB_PASSWORD ,
+    database: process.env.DB_NAME ,
+    port: process.env.DB_PORT, // Utilise le port 3306 par défaut si DB_PORT n'est pas défini
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+  });
 
 // Vérifier la connexion immédiatement après la création du pool
 (async () => {

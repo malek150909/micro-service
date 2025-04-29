@@ -1,6 +1,8 @@
+
 /* App Container */
 .ADM-EXM-app-container {
   position: relative;
+  min-height: 100vh;
 }
 
 /* Background Shapes */
@@ -19,7 +21,7 @@
   position: absolute;
   border-radius: 50%;
   opacity: 0.15;
-  animation: ADM-EXM-pulseShape 10s infinite ease-in-out;
+  animation: pulseShape 10s infinite ease-in-out;
 }
 
 .ADM-EXM-shape1 {
@@ -42,7 +44,7 @@
   animation-delay: 3s;
 }
 
-@keyframes ADM-EXM-pulseShape {
+@keyframes pulseShape {
   0% { transform: scale(1) translateY(0); }
   50% { transform: scale(1.05) translateY(-15px); }
   100% { transform: scale(1) translateY(0); }
@@ -50,8 +52,7 @@
 
 /* Sidebar */
 .ADM-EXM-sidebar {
-  background: linear-gradient(135deg,  #3a6a9e 30%, #082e54 100%);
-  border-radius: 0;
+  background: linear-gradient(135deg, rgba(91, 135, 179, 0.95) 0%, rgba(17, 69, 148, 0.95) 100%);
   padding: 25px;
   color: #ffffff;
   display: flex;
@@ -60,18 +61,16 @@
   position: fixed;
   top: 0;
   left: 30px;
-  width: 200px; /* Increased from 150px to 200px */
+  width: 180px;
   height: 100vh;
   box-shadow: 0 15px 40px rgba(37, 100, 194, 0.35);
   border: 1px solid rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(10px);
   z-index: 1000;
-  animation: ADM-EXM-slideIn 0.5s ease-out;
-  overflow-y: auto;
-  padding-bottom: 40px;
+  animation: slideIn 0.5s ease-out;
 }
 
-@keyframes ADM-EXM-slideIn {
+@keyframes slideIn {
   from { transform: translateX(-100%); }
   to { transform: translateX(0); }
 }
@@ -79,29 +78,29 @@
 .ADM-EXM-sidebar .ADM-EXM-logo {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 15px;
+  justify-content: center;
+  padding: 20px;
 }
 
 .ADM-EXM-sidebar .ADM-EXM-logo h2 {
-  font-size: 1.5rem;
-  font-weight: 600;
+  display: flex;
+  align-items: center;
   margin: 0;
-  color: #ffffff;
-  letter-spacing: 0.5px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-size: 1.5rem;
+  color: #fff;
+  gap: 8px;
 }
 
 .ADM-EXM-sidebar-button {
   background: rgba(255, 255, 255, 0.1);
   color: #ffffff;
   text-decoration: none;
-  font-size: 0.9rem; /* Reduced from 1rem to 0.9rem for better fit */
+  font-size: 1rem;
   display: flex;
   align-items: center;
   justify-content: flex-start;
   gap: 12px;
-  padding: 10px 15px; /* Adjusted padding from 12px 20px to 10px 15px */
+  padding: 12px 20px;
   border: none;
   border-radius: 12px;
   cursor: pointer;
@@ -110,10 +109,6 @@
   box-sizing: border-box;
   position: relative;
   overflow: hidden;
-  margin: 0;
-  white-space: normal; /* Allow text to wrap */
-  word-wrap: break-word; /* Ensure long words break to the next line */
-  line-height: 1.2; /* Improve readability with better line spacing */
 }
 
 .ADM-EXM-sidebar-button:hover {
@@ -203,6 +198,7 @@
   backdrop-filter: blur(10px);
   position: relative;
   overflow: visible;
+  z-index: 10;
 }
 
 .ADM-EXM-form-container h3 {
@@ -243,7 +239,7 @@
 }
 
 /* Form Styles */
-.ADM-EXM-form {
+.ADM-EXM-form-container form {
   display: flex;
   flex-direction: column;
   gap: 15px;
@@ -261,6 +257,8 @@
   box-shadow: 0 4px 15px rgba(5, 38, 89, 0.05);
   transition: all 0.3s ease;
   box-sizing: border-box;
+  position: relative;
+  z-index: 100; /* Ensure select elements are above other elements */
 }
 
 .ADM-EXM-input:focus,
@@ -268,6 +266,7 @@
   border-color: #5483b3;
   box-shadow: 0 0 15px rgba(84, 131, 179, 0.2);
   outline: none;
+  z-index: 200; /* Higher z-index on focus to ensure dropdown appears above other elements */
 }
 
 .ADM-EXM-input::placeholder {
@@ -284,21 +283,34 @@
   font-size: 0.95rem;
   color: #052659;
   transition: all 0.3s ease;
-}
-
-.ADM-EXM-select[multiple] option {
-  padding: 5px;
-}
-
-.ADM-EXM-select[multiple] option:disabled {
-  color: #999;
-  background-color: #f0f0f0;
+  position: relative;
+  z-index: 100;
 }
 
 .ADM-EXM-select[multiple]:focus {
   border-color: #5483b3;
   box-shadow: 0 0 15px rgba(84, 131, 179, 0.2);
   outline: none;
+  z-index: 200;
+}
+
+.ADM-EXM-select[multiple] option {
+  padding: 5px;
+  background: #ffffff !important; /* Solid white background for options */
+  color: #052659 !important; /* Ensure text is visible */
+  font-size: 0.95rem;
+  opacity: 1 !important; /* Ensure options are fully opaque */
+}
+
+.ADM-EXM-select[multiple] option:hover,
+.ADM-EXM-select[multiple] option:focus {
+  background: #e6f0fa !important; /* Highlight on hover/focus */
+  color: #052659 !important;
+}
+
+.ADM-EXM-select[multiple] option:disabled {
+  color: #999 !important;
+  background-color: #f0f0f0 !important;
 }
 
 /* Exam List Container */
@@ -406,7 +418,7 @@
   text-align: center;
 }
 
-.ADM-EXM-message-container .ADM-EXM-no-results {
+.ADM-EXM-no-results {
   color: #5483b3;
   font-size: 1rem;
   margin: 0;
@@ -478,10 +490,33 @@
   box-shadow: 0 4px 15px rgba(5, 38, 89, 0.05);
   transition: all 0.3s ease;
   box-sizing: border-box;
+  position: relative;
+  z-index: 1002; /* Ensure modal select elements are above modal content */
 }
 
 .ADM-EXM-modal-field select[multiple] {
   height: 100px;
+  z-index: 1002;
+}
+
+.ADM-EXM-modal-field select[multiple]:focus {
+  border-color: #5483b3;
+  box-shadow: 0 0 15px rgba(84, 131, 179, 0.2);
+  outline: none;
+  z-index: 1003;
+}
+
+.ADM-EXM-modal-field select[multiple] option {
+  background: #ffffff !important; /* Solid background for modal options */
+  color: #052659 !important; /* Visible text color */
+  font-size: 0.9rem;
+  opacity: 1 !important;
+}
+
+.ADM-EXM-modal-field select[multiple] option:hover,
+.ADM-EXM-modal-field select[multiple] option:focus {
+  background: #e6f0fa !important;
+  color: #052659 !important;
 }
 
 .ADM-EXM-modal-field input:focus,
@@ -489,6 +524,7 @@
   border-color: #5483b3;
   box-shadow: 0 0 15px rgba(84, 131, 179, 0.2);
   outline: none;
+  z-index: 1003;
 }
 
 /* Modal Actions */
@@ -547,6 +583,8 @@
   margin: 20px 0;
   display: flex;
   gap: 15px;
+  position: relative;
+  z-index: 5;
 }
 
 .ADM-EXM-export-buttons button {
@@ -692,6 +730,213 @@
   margin: 0;
 }
 
+/* Success Message in ExamPlanning */
+.ADM-EXM-success-message {
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 20px;
+  padding: 15px 30px;
+  box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15), 0 0 20px rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  text-align: center;
+}
+
+.ADM-EXM-success-message p {
+  color: #2ecc71;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* Error List in Messages */
+.ADM-EXM-error-list {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0;
+  text-align: left;
+}
+
+.ADM-EXM-error-list li {
+  font-size: 0.9rem;
+  color: #ff4d4f;
+  margin-bottom: 5px;
+}
+
+/* Upload Section */
+.ADM-EXM-upload-section {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  z-index: 5;
+}
+
+.ADM-EXM-upload-input {
+  padding: 12px;
+  border: 1px solid rgba(84, 131, 179, 0.2);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: #f0f7ff;
+  color: #052659;
+  width: 100%;
+  max-width: 300px;
+  box-shadow: 0 4px 15px rgba(5, 38, 89, 0.05);
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.ADM-EXM-upload-input:focus {
+  border-color: #5483b3;
+  box-shadow: 0 0 15px rgba(84, 131, 179, 0.2);
+  outline: none;
+}
+
+.ADM-EXM-upload-button {
+  background: linear-gradient(135deg, #5483b3 0%, #052659 100%);
+  color: #ffffff;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 8px 20px rgba(5, 38, 89, 0.1);
+  transition: all 0.3s ease;
+  letter-spacing: 0.3px;
+  position: relative;
+  overflow: hidden;
+}
+
+.ADM-EXM-upload-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(5, 38, 89, 0.15), 0 0 15px rgba(125, 160, 202, 0.4);
+}
+
+.ADM-EXM-upload-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: all 0.5s ease;
+}
+
+.ADM-EXM-upload-button:hover::before {
+  left: 100%;
+}
+
+.ADM-EXM-upload-button:disabled {
+  background: linear-gradient(135deg, #7da0ca 0%, #5483b3 100%);
+  color: #d3d3d3;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Delete Modal Styles */
+.ADM-EXM-delete-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #052659;
+  margin-bottom: 15px;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 3px rgba(5, 38, 89, 0.1);
+}
+
+.ADM-EXM-delete-modal-text {
+  font-size: 0.95rem;
+  color: #052659;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.ADM-EXM-delete-confirm-button {
+  background: linear-gradient(135deg, #ff4d4f 0%, #c0392b 100%);
+  color: #ffffff;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 8px 20px rgba(5, 38, 89, 0.1);
+  transition: all 0.3s ease;
+  letter-spacing: 0.3px;
+  position: relative;
+  overflow: hidden;
+}
+
+.ADM-EXM-delete-confirm-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(5, 38, 89, 0.15), 0 0 15px rgba(255, 77, 79, 0.4);
+}
+
+.ADM-EXM-delete-confirm-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: all 0.5s ease;
+}
+
+.ADM-EXM-delete-confirm-button:hover::before {
+  left: 100%;
+}
+
+.ADM-EXM-delete-cancel-button {
+  background: linear-gradient(135deg, #7da0ca 0%, #5483b3 100%);
+  color: #ffffff;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 8px 20px rgba(5, 38, 89, 0.1);
+  transition: all 0.3s ease;
+  letter-spacing: 0.3px;
+  position: relative;
+  overflow: hidden;
+}
+
+.ADM-EXM-delete-cancel-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(5, 38, 89, 0.15), 0 0 15px rgba(125, 160, 202, 0.4);
+}
+
+.ADM-EXM-delete-cancel-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: all 0.5s ease;
+}
+
+.ADM-EXM-delete-cancel-button:hover::before {
+  left: 100%;
+}
+
 /* Error Messages in Modal */
 .ADM-EXM-modal-content p[style*="color"] {
   color: #ff4d4f;
@@ -700,18 +945,142 @@
   text-align: center;
 }
 
-/* No Results Message */
-.ADM-EXM-no-results {
-  text-align: center;
-  color: #5483b3;
-  font-size: 1rem;
-  padding: 25px;
-}
-
 /* Error Modal Specific Styles */
 .ADM-EXM-error-modal {
   max-width: 300px;
   text-align: center;
+}
+
+/* Custom Dropdown Styles */
+.ADM-EXM-custom-dropdown {
+  position: relative;
+  width: 100%;
+  margin-bottom: 15px;
+  z-index: 10; /* Ensure dropdown container has a base z-index */
+}
+
+.ADM-EXM-dropdown-header {
+  padding: 12px 16px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  background: linear-gradient(135deg, #f0f7ff 0%, #e6f0fa 100%);
+  color: #052659;
+  width: 100%;
+  box-shadow: 0 4px 15px rgba(5, 38, 89, 0.1);
+  transition: all 0.3s ease-in-out;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  overflow: visible; /* Prevent clipping of child elements */
+}
+
+.ADM-EXM-dropdown-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 10px;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(84, 131, 179, 0.3), rgba(125, 160, 202, 0.5));
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+.ADM-EXM-dropdown-header:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 20px rgba(5, 38, 89, 0.15);
+  background: linear-gradient(135deg, #e6f0fa 0%, #d9e8ff 100%);
+}
+
+.ADM-EXM-dropdown-header:focus {
+  box-shadow: 0 0 15px rgba(84, 131, 179, 0.3);
+  outline: none;
+}
+
+.ADM-EXM-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #f0f7ff 0%, #e6f0fa 100%);
+  border: 1px solid rgba(84, 131, 179, 0.2);
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(5, 38, 89, 0.15);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000; /* High z-index to ensure visibility */
+  padding: 8px 0;
+  visibility: hidden; /* Initially hidden */
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: visibility 0s linear 0.3s, opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.ADM-EXM-dropdown-menu.ADM-EXM-dropdown-visible {
+  visibility: visible; /* Show when visible class is applied */
+  opacity: 1;
+  transform: translateY(0);
+  transition: visibility 0s linear 0s, opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.ADM-EXM-checkbox-label {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: #052659;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.ADM-EXM-checkbox-label input[type="checkbox"] {
+  margin-right: 10px;
+  accent-color: #5483b3;
+}
+
+.ADM-EXM-checkbox-label input[type="checkbox"]:disabled + span {
+  color: #999;
+  cursor: not-allowed;
+}
+
+.ADM-EXM-checkbox-label:hover {
+  background: linear-gradient(135deg, rgba(84, 131, 179, 0.1), rgba(125, 160, 202, 0.05));
+  transform: translateX(2px);
+}
+
+/* Disabled Dropdown */
+.ADM-EXM-custom-dropdown.ADM-EXM-disabled .ADM-EXM-dropdown-header {
+  background: #f7f6f6;
+  color: #353046;
+  border-color: rgba(84, 131, 179, 0.1);
+  cursor: not-allowed;
+  pointer-events: none;
+  transform: none;
+  box-shadow: none;
+}
+
+.ADM-EXM-custom-dropdown.ADM-EXM-disabled .ADM-EXM-dropdown-header::before {
+  background: none;
+}
+
+.ADM-EXM-custom-dropdown.ADM-EXM-disabled .ADM-EXM-dropdown-header:hover {
+  transform: none;
+  box-shadow: none;
+  background: #f7f6f6;
 }
 
 /* Responsive Design */
@@ -743,6 +1112,10 @@
   .ADM-EXM-exam-table td:nth-child(4) {
     min-width: 150px;
   }
+
+  .ADM-EXM-upload-section {
+    align-items: center;
+  }
 }
 
 @media (max-width: 576px) {
@@ -769,197 +1142,4 @@
   .ADM-EXM-exam-table td:nth-child(4) {
     min-width: 120px;
   }
-}
-
-/* Welcome Page Styles */
-.ADM-EXM-welcome-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #ffffff 0%, #86b4ec 50%, #082e54 100%);
-  padding: 20px;
-}
-
-.ADM-EXM-welcome-content {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 20px;
-  padding: 40px;
-  text-align: center;
-  box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15);
-  max-width: 600px;
-  width: 100%;
-}
-
-.ADM-EXM-welcome-content h1 {
-  font-size: 2.5rem;
-  font-weight: 600;
-  color: #052659;
-  margin-bottom: 20px;
-}
-
-.ADM-EXM-welcome-content p {
-  font-size: 1.1rem;
-  color: #5483b3;
-  margin-bottom: 30px;
-}
-
-.ADM-EXM-welcome-content button {
-  background: linear-gradient(135deg, #5483b3 0%, #052659 100%);
-  color: #ffffff;
-  padding: 12px 30px;
-  border: none;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.ADM-EXM-welcome-content button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 25px rgba(5, 38, 89, 0.15);
-}
-
-/* Custom Dropdown Styles */
-.ADM-EXM-custom-dropdown {
-  position: relative;
-  width: 100%;
-  margin-bottom: 15px;
-}
-
-.ADM-EXM-dropdown-header {
-  padding: 12px 16px;
-  border: 1px solid transparent;
-  border-radius: 10px;
-  font-size: 0.95rem;
-  font-weight: 500;
-  background: linear-gradient(135deg, #f0f7ff 0%, #e6f0fa 100%);
-  color: #052659;
-  width: 100%;
-  box-shadow: 0 4px 15px rgba(5, 38, 89, 0.1);
-  transition: all 0.3s ease-in-out;
-  box-sizing: border-box;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-}
-
-.ADM-EXM-dropdown-header::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  border-radius: 10px;
-  padding: 1px;
-  background: linear-gradient(135deg, rgba(84, 131, 179, 0.3), rgba(125, 160, 202, 0.5));
-  -webkit-mask: 
-    linear-gradient(#fff 0 0) content-box, 
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-}
-
-.ADM-EXM-dropdown-header:hover {
-  transform: scale(1.02);
-  box-shadow: 0 6px 20px rgba(5, 38, 89, 0.15);
-  background: linear-gradient(135deg, #e6f0fa 0%, #d9e8ff 100%);
-}
-
-.ADM-EXM-dropdown-header:focus {
-  box-shadow: 0 0 15px rgba(84, 131, 179, 0.3);
-  outline: none;
-}
-
-.ADM-EXM-dropdown-menu {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: linear-gradient(135deg, #f0f7ff 0%, #e6f0fa 100%);
-  border: 1px solid rgba(84, 131, 179, 0.2);
-  border-radius: 10px;
-  box-shadow: 0 6px 20px rgba(5, 38, 89, 0.15);
-  max-height: 200px;
-  overflow-y: auto;
-  z-index: 1000;
-  padding: 8px 0;
-  opacity: 0;
-  transform: translateY(-10px);
-  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-  scroll-behavior: smooth;
-}
-
-.ADM-EXM-custom-dropdown.ADM-EXM-open .ADM-EXM-dropdown-menu {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.ADM-EXM-checkbox-label {
-  display: flex;
-  align-items: center;
-  padding: 10px 16px;
-  font-size: 0.95rem;
-  font-weight: 400;
-  color: #052659;
-  cursor: pointer;
-  transition: background 0.2s ease-in-out, transform 0.2s ease-in-out;
-}
-
-.ADM-EXM-checkbox-label input[type="checkbox"] {
-  margin-right: 10px;
-  accent-color: #5483b3;
-}
-
-.ADM-EXM-checkbox-label input[type="checkbox"]:disabled + span {
-  color: #999;
-  cursor: not-allowed;
-}
-
-.ADM-EXM-checkbox-label:hover {
-  background: linear-gradient(135deg, rgba(84, 131, 179, 0.1), rgba(125, 160, 202, 0.05));
-  transform: translateX(2px);
-}
-
-/* Disabled Form Container */
-.ADM-EXM-form-container.ADM-EXM-disabled {
-  opacity: 0.5;
-  pointer-events: none;
-  cursor: not-allowed;
-}
-
-/* Disabled Form Inputs */
-.ADM-EXM-form-container.ADM-EXM-disabled .ADM-EXM-input,
-.ADM-EXM-form-container.ADM-EXM-disabled .ADM-EXM-select,
-.ADM-EXM-form-container.ADM-EXM-disabled button {
-  background: #f1efef;
-  color: #353046;
-  border-color: rgba(84, 131, 179, 0.1);
-  cursor: not-allowed;
-}
-
-/* Disabled Dropdown */
-.ADM-EXM-custom-dropdown.ADM-EXM-disabled .ADM-EXM-dropdown-header {
-  background: #f7f6f6;
-  color: #353046;
-  border-color: rgba(84, 131, 179, 0.1);
-  cursor: not-allowed;
-  pointer-events: none;
-  transform: none;
-  box-shadow: none;
-}
-
-.ADM-EXM-custom-dropdown.ADM-EXM-disabled .ADM-EXM-dropdown-header::before {
-  background: none;
-}
-
-.ADM-EXM-custom-dropdown.ADM-EXM-disabled .ADM-EXM-dropdown-header:hover {
-  transform: none;
-  box-shadow: none;
-  background: #353046;
 }

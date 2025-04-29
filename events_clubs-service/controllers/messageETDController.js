@@ -1,5 +1,5 @@
 const pool = require('../config/db');
-const { createNotification } = require('./notificationETDController');
+const { createNotification } = require('./notificationETDcontroller');
 const path = require('path');
 const fs = require('fs');
 

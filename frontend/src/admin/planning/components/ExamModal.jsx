@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import axios from 'axios';
 import { createPortal } from 'react-dom';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
-import styles from "../exam.module.css";
+import "../exam.css";
 
 const ExamModal = ({ exam, onClose, onSave, modules, salles: initialSalles, semestres }) => {
   const [formData, setFormData] = useState({
@@ -108,127 +108,126 @@ const ExamModal = ({ exam, onClose, onSave, modules, salles: initialSalles, seme
   };
 
   return createPortal(
+    <motion.div
+      className="ADM-EXM-modal-overlay"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
       <motion.div
-        className={styles['ADM-EXM-modal-overlay']}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+        className="ADM-EXM-modal-content"
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.8, opacity: 0 }}
+        transition={{ duration: 0.3 }}
       >
-        <motion.div
-          className={styles['ADM-EXM-modal-content']}
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.8, opacity: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          <h3>Détails de l'Examen</h3>
-          {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
-          <div className={styles['ADM-EXM-modal-field']}>
-            <label>Module :</label>
-            <select
-              className={styles['ADM-EXM-select']}
-              name="ID_module"
-              value={formData.ID_module}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Sélectionner un Module</option>
-              {modules.map((module, index) => (
-                <option key={`${module.ID_module}-${index}`} value={module.ID_module}>
-                  {`${module.nom_module} (${module.seances})`}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className={styles['ADM-EXM-modal-field']}>
-            <label>Date :</label>
-            <input
-              className={styles['ADM-EXM-input']}
-              type="date"
-              name="exam_date"
-              value={formData.exam_date}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className={styles['ADM-EXM-modal-field']}>
-            <label>Horaire :</label>
-            <select
-              className={styles['ADM-EXM-select']}
-              name="time_slot"
-              value={formData.time_slot}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Sélectionner un Horaire</option>
-              {[
-                '08:00 - 09:30',
-                '09:40 - 11:10',
-                '11:20 - 12:50',
-                '13:00 - 14:30',
-                '14:40 - 16:10',
-                '16:20 - 17:50',
-              ].map((slot) => (
-                <option key={slot} value={slot}>
-                  {slot}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className={styles['ADM-EXM-modal-field']}>
-            <label>Mode :</label>
-            <select
-              className={styles['ADM-EXM-select']}
-              name="mode"
-              value={formData.mode}
-              onChange={handleChange}
-              required
-            >
-              <option value="presentiel">Présentiel</option>
-              <option value="en ligne">En Ligne</option>
-            </select>
-          </div>
-          <div className={styles['ADM-EXM-modal-field']}>
-            <label>Salle(s) :</label>
-            <div className={`${styles['ADM-EXM-custom-dropdown']} ${isSalleDropdownOpen ? styles['ADM-EXM-open'] : ''}`}>
-              <div className={styles['ADM-EXM-dropdown-header']} onClick={toggleSalleDropdown}>
-                <span>
-                  {formData.ID_salles.length > 0
-                    ? `${formData.ID_salles.length} salle(s) sélectionnée(s)`
-                    : 'Sélectionner des Salles'}
-                </span>
-                {isSalleDropdownOpen ? <FaChevronUp /> : <FaChevronDown />}
-              </div>
-              {isSalleDropdownOpen && formData.mode === 'presentiel' && (
-                <div className={styles['ADM-EXM-dropdown-menu']}>
-                  {salles.map((salle, index) => (
-                    <label
-                      key={`${salle.ID_salle}-${index}`}
-                      className={styles['ADM-EXM-checkbox-label']}
-                    >
-                      <input
-                        type="checkbox"
-                        value={salle.ID_salle}
-                        checked={formData.ID_salles.includes(String(salle.ID_salle))}
-                        onChange={() => handleSalleChange(String(salle.ID_salle))}
-                        disabled={!salle.available}
-                      />
-                      {salle.nom_salle} (Capacité: {salle.capacite || 'N/A'}) {salle.available ? '' : '- Indisponible'}
-                    </label>
-                  ))}
-                </div>
-              )}
+        <h3>Détails de l'Examen</h3>
+        {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+        <div className="ADM-EXM-modal-field">
+          <label>Module :</label>
+          <select
+            name="ID_module"
+            value={formData.ID_module}
+            onChange={handleChange}
+            required
+            className="ADM-EXM-select"
+          >
+            <option value="">Sélectionner un Module</option>
+            {modules.map((module, index) => (
+              <option key={`${module.ID_module}-${index}`} value={module.ID_module}>
+                {`${module.nom_module} (${module.seances})`}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="ADM-EXM-modal-field">
+          <label>Date :</label>
+          <input
+            type="date"
+            name="exam_date"
+            value={formData.exam_date}
+            onChange={handleChange}
+            required
+            className="ADM-EXM-input"
+          />
+        </div>
+        <div className="ADM-EXM-modal-field">
+          <label>Horaire :</label>
+          <select
+            name="time_slot"
+            value={formData.time_slot}
+            onChange={handleChange}
+            required
+            className="ADM-EXM-select"
+          >
+            <option value="">Sélectionner un Horaire</option>
+            {[
+              '08:00 - 09:30',
+              '09:40 - 11:10',
+              '11:20 - 12:50',
+              '13:00 - 14:30',
+              '14:40 - 16:10',
+              '16:20 - 17:50',
+            ].map((slot) => (
+              <option key={slot} value={slot}>
+                {slot}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="ADM-EXM-modal-field">
+          <label>Mode :</label>
+          <select
+            name="mode"
+            value={formData.mode}
+            onChange={handleChange}
+            required
+            className="ADM-EXM-select"
+          >
+            <option value="presentiel">Présentiel</option>
+            <option value="en ligne">En Ligne</option>
+          </select>
+        </div>
+        <div className="ADM-EXM-modal-field">
+          <label>Salle(s) :</label>
+          <div className={`ADM-EXM-custom-dropdown ${isSalleDropdownOpen ? 'ADM-EXM-open' : ''}`}>
+            <div className="ADM-EXM-dropdown-header" onClick={toggleSalleDropdown}>
+              <span>
+                {formData.ID_salles.length > 0
+                  ? `${formData.ID_salles.length} salle(s) sélectionnée(s)`
+                  : 'Sélectionner des Salles'}
+              </span>
+              {isSalleDropdownOpen ? <FaChevronUp /> : <FaChevronDown />}
             </div>
+            {isSalleDropdownOpen && formData.mode === 'presentiel' && (
+              <div className="ADM-EXM-dropdown-menu">
+                {salles.map((salle, index) => (
+                  <label
+                    key={`${salle.ID_salle}-${index}`}
+                    className="ADM-EXM-checkbox-label"
+                  >
+                    <input
+                      type="checkbox"
+                      value={salle.ID_salle}
+                      checked={formData.ID_salles.includes(String(salle.ID_salle))}
+                      onChange={() => handleSalleChange(String(salle.ID_salle))}
+                      disabled={!salle.available}
+                    />
+                    {salle.nom_salle} (Capacité: {salle.capacite || 'N/A'}) {salle.available ? '' : '- Indisponible'}
+                  </label>
+                ))}
+              </div>
+            )}
           </div>
-          <div className={styles['ADM-EXM-modal-actions']}>
-            <button onClick={handleSave} disabled={!isValid}>
-              Sauvegarder
-            </button>
-            <button onClick={onClose}>Annuler</button>
-          </div>
-        </motion.div>
+        </div>
+        <div className="ADM-EXM-modal-actions">
+          <button onClick={handleSave} disabled={!isValid}>
+            Sauvegarder
+          </button>
+          <button onClick={onClose}>Annuler</button>
+        </div>
       </motion.div>
-    ,
+    </motion.div>,
     document.body
   );
 };

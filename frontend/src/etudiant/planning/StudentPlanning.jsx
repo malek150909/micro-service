@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FaHome, FaUser, FaTable, FaPen, FaCalendarAlt, FaClock } from 'react-icons/fa';
-import styles from './StudentPlanning.module.css';
+import styles from './studentPlanning.module.css';
 
 function StudentPlanning() {
   const [exams, setExams] = useState([]);

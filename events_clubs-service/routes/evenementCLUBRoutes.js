@@ -6,7 +6,7 @@ const {
   deleteEvenement,
   addEventToCalendar,
   getPublicEvenements,
-} = require('../controllers/evenementETDCLUBController');
+} = require('../controllers/evenementETDCLUBcontroller');
 
 // Routes pour les événements
 router.get('/gerant/:gerant_matricule', getEvenementsByGerant); // Récupérer les événements d'un gérant

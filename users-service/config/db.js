@@ -20,9 +20,9 @@ const promisePool = pool.promise();
 // verification de la connexion de BDD
 pool.getConnection((err, connection) => {
     if (err) {
-        console.error("❌ Erreur de connexion à MySQL :", err.message);
+        console.error('❌ Erreur de connexion à la base de données:', err.message);
     } else {
-        console.log("✅ Connecté à MySQL !");
+        console.log('✅ Connexion réussie à la base de données');
         connection.release(); // Libérer la connexion
     }
 });

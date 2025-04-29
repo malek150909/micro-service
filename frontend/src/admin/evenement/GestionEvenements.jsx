@@ -59,7 +59,7 @@ function GestionEvenements() {
 
   const fetchEvenements = async () => {
     try {
-      const response = await axios.get('http://localhost:8084/evenement/evenements');
+      const response = await axios.get('http://events.localhost/evenement/evenements');
       console.log('Événements reçus :', response.data.map(e => ({
         ID_evenement: e.ID_evenement,
         nom_evenement: e.nom_evenement,
@@ -75,7 +75,7 @@ function GestionEvenements() {
 
   const fetchFacultes = async () => {
     try {
-      const response = await axios.get('http://localhost:8082/annonces/facultes');
+      const response = await axios.get('http://messaging.localhost/annonces/facultes');
       setFacultes(response.data);
     } catch (error) {
       console.error('Erreur lors de la récupération des facultés :', error);
@@ -90,7 +90,7 @@ function GestionEvenements() {
       return;
     }
     try {
-      const response = await axios.get(`http://localhost:8082/annonces/departements?faculteId=${faculteId}`);
+      const response = await axios.get(`http://messaging.localhost/annonces/departements?faculteId=${faculteId}`);
       setDepartements(response.data);
       setSpecialites([]);
     } catch (error) {
@@ -106,7 +106,7 @@ function GestionEvenements() {
       return;
     }
     try {
-      const response = await axios.get(`http://localhost:8082/annonces/specialites?departementId=${departementId}`);
+      const response = await axios.get(`http://messaging.localhost/annonces/specialites?departementId=${departementId}`);
       setSpecialites(response.data);
     } catch (error) {
       console.error('Erreur lors de la récupération des spécialités :', error);
@@ -235,12 +235,12 @@ function GestionEvenements() {
           throw new Error('ID_evenement manquant pour la modification');
         }
         console.log('Modification d’un événement avec ID :', editingEvent.ID_evenement);
-        response = await axios.put(`http://localhost:8084/evenement/evenements/${editingEvent.ID_evenement}`, formDataToSend, {
+        response = await axios.put(`http://events.localhost/evenement/evenements/${editingEvent.ID_evenement}`, formDataToSend, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
       } else {
         console.log('Ajout d’un nouvel événement');
-        response = await axios.post(`http://localhost:8084/evenement/evenements`, formDataToSend, {
+        response = await axios.post(`http://events.localhost/evenement/evenements`, formDataToSend, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
       }
@@ -270,7 +270,7 @@ function GestionEvenements() {
   const handleDelete = async (id) => {
     console.log('Suppression de l’événement avec ID :', id);
     try {
-      const response = await axios.delete(`http://localhost:8084/evenement/evenements/${id}`);
+      const response = await axios.delete(`http://events.localhost/evenement/evenements/${id}`);
       console.log('Réponse suppression :', response.data);
 
       await fetchEvenements();

@@ -3,7 +3,8 @@ import { motion } from 'framer-motion';
 import axios from 'axios';
 import debounce from 'lodash/debounce';
 import { FaFilter } from 'react-icons/fa';
-import styles from '../exam.module.css';
+import "../exam.css";
+
 
 const FilterForm = ({ onFilter, onChange }) => {
   const [filters, setFilters] = useState({
@@ -237,70 +238,70 @@ const FilterForm = ({ onFilter, onChange }) => {
   };
 
   return (
-      <motion.div
-        className={styles['ADM-EXM-form-container']}
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-      >
-        <h3>
-          <FaFilter style={{ marginRight: '8px' }} /> Filtrer les Examens
-        </h3>
-        {error && <p style={{ color: '#ff4d4f' }}>{error}</p>}
-        <form className={styles['ADM-EXM-form']} onSubmit={handleSubmit}>
-          <select className={styles['ADM-EXM-select']} name="faculte" value={filters.faculte} onChange={handleChange}>
-            <option value="">Sélectionner une Faculté</option>
-            {faculteOptions.map((option) => (
-              <option key={option.ID_faculte} value={option.ID_faculte}>
-                {option.nom_faculte}
-              </option>
-            ))}
-          </select>
-          <select className={styles['ADM-EXM-select']} name="departement" value={filters.departement} onChange={handleChange}>
-            <option value="">Sélectionner un Département</option>
-            {departementOptions.map((option) => (
-              <option key={option.ID_departement} value={option.ID_departement}>
-                {option.Nom_departement}
-              </option>
-            ))}
-          </select>
-          <select className={styles['ADM-EXM-select']} name="niveau" value={filters.niveau} onChange={handleChange}>
-            <option value="">Sélectionner un Niveau</option>
-            {niveauOptions.map((option) => (
-              <option key={option.id} value={option.id}>
-                {option.name}
-              </option>
-            ))}
-          </select>
-          <select className={styles['ADM-EXM-select']} name="specialite" value={filters.specialite} onChange={handleChange}>
-            <option value="">Sélectionner une Spécialité</option>
-            {specialiteOptions.map((option) => (
-              <option key={option.ID_specialite} value={option.ID_specialite}>
-                {option.nom_specialite}
-              </option>
-            ))}
-          </select>
-          <select className={styles['ADM-EXM-select']} name="section" value={filters.section} onChange={handleChange} required>
-            <option value="">Sélectionner une Section</option>
-            {sectionOptions.map((option) => (
-              <option key={option.ID_section} value={option.ID_section}>
-                {`${option.nom_section} (Étudiants: ${option.num_etudiant})`}
-              </option>
-            ))}
-          </select>
-          <select className={styles['ADM-EXM-select']} name="ID_semestre" value={filters.ID_semestre} onChange={handleChange} required>
-            <option value="">Sélectionner un Semestre</option>
-            {semestreOptions.map((semestre) => (
-              <option key={semestre.ID_semestre} value={semestre.ID_semestre}>
-                {`Semestre ${semestre.ID_semestre} (${semestre.date_debut} - ${semestre.date_fin})`}
-              </option>
-            ))}
-          </select>
-          <button type="submit">
-            <FaFilter style={{ marginRight: '8px' }} /> Filtrer
-          </button>
-        </form>
-      </motion.div>
+    <motion.div
+      className="ADM-EXM-form-container"
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+    >
+      <h3>
+        <FaFilter style={{ marginRight: '8px' }} /> Filtrer les Examens
+      </h3>
+      {error && <p style={{ color: '#ff4d4f' }}>{error}</p>}
+      <form onSubmit={handleSubmit}>
+        <select name="faculte" value={filters.faculte} onChange={handleChange} className="ADM-EXM-select">
+          <option value="">Sélectionner une Faculté</option>
+          {faculteOptions.map((option) => (
+            <option key={option.ID_faculte} value={option.ID_faculte}>
+              {option.nom_faculte}
+            </option>
+          ))}
+        </select>
+        <select name="departement" value={filters.departement} onChange={handleChange} className="ADM-EXM-select">
+          <option value="">Sélectionner un Département</option>
+          {departementOptions.map((option) => (
+            <option key={option.ID_departement} value={option.ID_departement}>
+              {option.Nom_departement}
+            </option>
+          ))}
+        </select>
+        <select name="niveau" value={filters.niveau} onChange={handleChange} className="ADM-EXM-select">
+          <option value="">Sélectionner un Niveau</option>
+          {niveauOptions.map((option) => (
+            <option key={option.id} value={option.id}>
+              {option.name}
+            </option>
+          ))}
+        </select>
+        <select name="specialite" value={filters.specialite} onChange={handleChange} className="ADM-EXM-select">
+          <option value="">Sélectionner une Spécialité</option>
+          {specialiteOptions.map((option) => (
+            <option key={option.ID_specialite} value={option.ID_specialite}>
+              {option.nom_specialite}
+            </option>
+          ))}
+        </select>
+        <select name="section" value={filters.section} onChange={handleChange} required className="ADM-EXM-select">
+          <option value="">Sélectionner une Section</option>
+          {sectionOptions.map((option) => (
+            <option key={option.ID_section} value={option.ID_section}>
+              {`${option.nom_section} (Étudiants: ${option.num_etudiant})`}
+            </option>
+          ))}
+        </select>
+        <select name="ID_semestre" value={filters.ID_semestre} onChange={handleChange} required className="ADM-EXM-select">
+          <option value="">Sélectionner un Semestre</option>
+          {semestreOptions.map((semestre) => (
+            <option key={semestre.ID_semestre} value={semestre.ID_semestre}>
+              {`Semestre ${semestre.ID_semestre} (${semestre.date_debut} - ${semestre.date_fin})`}
+            </option>
+          ))}
+        </select>
+        <button type="submit">
+          <FaFilter style={{ marginRight: '8px' }} /> Filtrer
+        </button>
+      </form>
+    </motion.div>
   );
 };
 

@@ -2,7 +2,7 @@ const pool = require('../config/db');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const { createEvenement } = require('./evenementETDCLUBController');
+const { createEvenement } = require('./evenementETDCLUBcontroller');
 
 // Configuration de Multer pour gérer plusieurs fichiers
 const storage = multer.diskStorage({

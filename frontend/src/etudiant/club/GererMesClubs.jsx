@@ -44,7 +44,7 @@ const GererMesClubs = ({ clubsGerant, setClubsGerant, setError }) => {
   const messagesEndRef = useRef(null);
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const matricule = storedUser?.Matricule;
-  const socket = io('http://localhost:8084'); // adresse de ton backend
+  const socket = io('http://events.localhost'); // adresse de ton backend
 
   const timeSlotsOptions = [
     "08:00 - 09:30",
@@ -55,7 +55,7 @@ const GererMesClubs = ({ clubsGerant, setClubsGerant, setError }) => {
     "16:20 - 17:50"
   ];
 
-  const API_URL = 'http://localhost:8084';
+  const API_URL = 'http://events.localhost';
 
   useEffect(() => {
     const initialIndexes = {};

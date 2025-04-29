@@ -1,6 +1,6 @@
 // club-evenement-service/backend/controllers/demandeController.js
 const pool = require('../config/db');
-const { createNotification } = require('./notificationETDController'); // Importer la fonction de création de notification
+const { createNotification } = require('./notificationETDcontroller'); // Importer la fonction de création de notification
 
 // Créer une demande de création de club
 const createDemandeCreation = async (req, res) => {

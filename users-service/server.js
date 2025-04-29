@@ -1,11 +1,11 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const db = require('../config/db');
+const db = require('./config/db');
 const cors = require('cors');
-const authMiddleware = require('../middleware/auth'); // Middleware d'authentification (si nécessaire)
-const enseignantRoutes = require('../routes/enseignantRoute');
-const etudiantRoutes = require('../routes/etudiantRoute');
-const teacherRoutes = require('../routes/etudiantENSRoute');
+const authMiddleware = require('./middleware/auth'); // Middleware d'authentification (si nécessaire)
+const enseignantRoutes = require('./routes/enseignantRoute');
+const etudiantRoutes = require('./routes/etudiantRoute');
+const teacherRoutes = require('./routes/etudiantENSRoute');
 
 const app = express();
 app.use(cors());

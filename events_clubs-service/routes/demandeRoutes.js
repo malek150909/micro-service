@@ -1,7 +1,7 @@
 // club-evenement-service/backend/routes/demandeRoutes.js
 const express = require('express');
 const router = express.Router();
-const demandeController = require('../Controllers/demandeETDController');
+const demandeController = require('../controllers/demandeETDController');
 
 router.post('/creation', demandeController.createDemandeCreation);
 router.post('/rejoindre', demandeController.createDemandeRejoindre);

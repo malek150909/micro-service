@@ -16,5 +16,6 @@ router.get('/departements', examController.getDepartements);
 router.get('/niveaux', examController.getNiveaux);
 router.get('/specialites', examController.getSpecialites);
 router.get('/sections', examController.getSections);
+router.post('/upload-excel', examController.uploadExcel);
 
 export default router;

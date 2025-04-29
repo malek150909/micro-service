@@ -8,8 +8,8 @@ import { saveAs } from "file-saver";
 import FilterForm from "../components/FilterForm";
 import ExamForm from "../components/ExamForm";
 import ExamList from "../components/ExamList";
-import { FaFilePdf, FaFileExcel, FaArrowLeft, FaUser, FaHome } from 'react-icons/fa';
-import styles from "../exam.module.css";
+import { FaHome, FaFilePdf, FaFileExcel, FaArrowLeft, FaUser, FaFileImport } from 'react-icons/fa';
+import "../exam.css";
 
 const MemoizedFilterForm = memo(FilterForm);
 const MemoizedExamForm = memo(ExamForm);
@@ -40,10 +40,13 @@ const ExamPlanning = () => {
     departement: {},
     specialite: {},
   });
+  const [uploadStatus, setUploadStatus] = useState(null);
+  const [showErrorModal, setShowErrorModal] = useState(false);
 
   const examListRef = useRef(null);
+  const fileInputRef = useRef(null);
 
-  const API_URL = import.meta.env.VITE_API_URL || "http://courses.localhost";
+  const API_URL = "http://courses.localhost";
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -57,13 +60,11 @@ const ExamPlanning = () => {
       const response = await axios.get(`${API_URL}/exams`, {
         params: currentFilters,
       });
-      const normalizedExams = response.data.map((exam) => {
-        return {
-          ...exam,
-          exam_date: exam.exam_date,
-          ID_exam: exam.ID_exam,
-        };
-      });
+      const normalizedExams = response.data.map((exam) => ({
+        ...exam,
+        exam_date: exam.exam_date,
+        ID_exam: exam.ID_exam,
+      }));
       setExams(normalizedExams);
       return response;
     } catch (err) {
@@ -108,13 +109,11 @@ const ExamPlanning = () => {
 
   const fetchName = useCallback(async (url, id, field, cacheKey) => {
     if (!id) return "";
-    if (nameCache[cacheKey][id]) {
-      return nameCache[cacheKey][id];
-    }
+    if (nameCache[cacheKey][id]) return nameCache[cacheKey][id];
     try {
       const response = await axios.get(url);
       const item = response.data.find((item) => String(item[field]) === String(id));
-      let name = item ? (item[field.replace("ID_", "nom_")] || item["Nom_departement"] || "N/A") : "N/A";
+      const name = item ? (item[field.replace("ID_", "nom_")] || item["Nom_departement"] || "N/A") : "N/A";
       setNameCache((prev) => ({
         ...prev,
         [cacheKey]: { ...prev[cacheKey], [id]: name },
@@ -127,7 +126,6 @@ const ExamPlanning = () => {
   }, [nameCache]);
 
   const handleFilterChange = useCallback((newFilters) => {
-    // Reset state whenever a filter attribute changes
     setIsFilterApplied(false);
     setExams([]);
     setModules([]);
@@ -172,7 +170,6 @@ const ExamPlanning = () => {
     };
     setFilters(updatedFilters);
 
-    // Section is selected, apply filter and fetch modules/exams
     setIsFilterApplied(true);
     await fetchModulesBySection(newFilters.section, newFilters.ID_semestre);
     await fetchExams(updatedFilters);
@@ -195,7 +192,7 @@ const ExamPlanning = () => {
     });
     setModules([]);
     setExams([]);
-    setIsFilterApplied(false); // Reset filter applied state
+    setIsFilterApplied(false);
   }, []);
 
   const handleAddExam = async (examData) => {
@@ -218,39 +215,26 @@ const ExamPlanning = () => {
   };
 
   const handleUpdateExam = async (id, examData) => {
-    if (!id) {
-      throw new Error("ID de l'examen manquant.");
-    }
-
+    if (!id) throw new Error("ID de l'examen manquant.");
     const selectedModuleId = parseInt(examData.ID_module);
-
     if (!modules.some((m) => m.ID_module === selectedModuleId)) {
       throw new Error("Le module sélectionné n'est pas valide ou n'appartient pas à la section sélectionnée.");
     }
-
     const response = await axios.get(`${API_URL}/exams`, {
-      params: {
-        ID_section: examData.ID_section,
-        ID_semestre: examData.ID_semestre,
-      },
+      params: { ID_section: examData.ID_section, ID_semestre: examData.ID_semestre },
     });
-
     const existingExams = response.data.filter((exam) => exam.ID_exam !== id);
-
-    const hasDuplicate = existingExams.some((exam) => {
-      return (
+    const hasDuplicate = existingExams.some(
+      (exam) =>
         exam.exam_date === examData.exam_date &&
         exam.time_slot === examData.time_slot &&
         exam.ID_module === selectedModuleId
-      );
-    });
-
+    );
     if (hasDuplicate) {
       throw new Error(
-        'Un examen avec le même module, la même date et le même horaire existe déjà.'
+        "Un examen avec le même module, la même date et le même horaire existe déjà."
       );
     }
-
     try {
       const updatedExamData = {
         ...examData,
@@ -258,7 +242,7 @@ const ExamPlanning = () => {
         exam_date: examData.exam_date,
         time_slot: examData.time_slot,
         mode: examData.mode,
-        ID_salles: examData.mode === 'en ligne' ? [] : examData.ID_salles,
+        ID_salles: examData.mode === "en ligne" ? [] : examData.ID_salles,
         ID_module: selectedModuleId,
       };
       await axios.put(`${API_URL}/exams/${id}`, updatedExamData);
@@ -285,6 +269,68 @@ const ExamPlanning = () => {
         err.response?.data?.message || `Erreur de suppression de l'examen: ${err.message}`
       );
     }
+  };
+
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) {
+      setUploadStatus({ type: "error", message: "Aucun fichier sélectionné." });
+      setShowErrorModal(true);
+      return;
+    }
+    if (!filters.section || !filters.ID_semestre) {
+      setUploadStatus({
+        type: "error",
+        message: "Veuillez sélectionner une section et un semestre avant de téléverser.",
+      });
+      setShowErrorModal(true);
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("sectionId", filters.section);
+    formData.append("semestreId", filters.ID_semestre);
+
+    try {
+      const response = await axios.post(`${API_URL}/exams/upload-excel`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      await fetchExams(filters);
+      if (response.data.errors && response.data.errors.length > 0) {
+        setUploadStatus({
+          type: "error",
+          message: response.data.message,
+          errors: response.data.errors,
+        });
+        setShowErrorModal(true);
+      } else {
+        setUploadStatus({
+          type: "success",
+          message: response.data.message,
+        });
+        setTimeout(() => setUploadStatus(null), 5000);
+      }
+      fileInputRef.current.value = "";
+      if (examListRef.current) {
+        examListRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || "Erreur lors du téléversement du fichier.";
+      const errorDetails = err.response?.data?.errors || [];
+      setUploadStatus({
+        type: "error",
+        message: errorMessage,
+        errors: errorDetails,
+      });
+      setShowErrorModal(true);
+      await fetchExams(filters);
+    }
+  };
+
+  const closeErrorModal = () => {
+    setShowErrorModal(false);
+    setUploadStatus(null);
   };
 
   const exportToPDF = () => {
@@ -367,7 +413,7 @@ const ExamPlanning = () => {
       formatDate(exam.exam_date),
       exam.time_slot,
       exam.nom_module,
-      exam.mode === 'en ligne' ? 'En Ligne' : exam.nom_salle || 'N/A',
+      exam.mode === "en ligne" ? "En Ligne" : exam.nom_salle || "N/A",
     ]);
 
     autoTable(doc, {
@@ -404,9 +450,7 @@ const ExamPlanning = () => {
         lineColor: secondaryColor,
         overflow: "linebreak",
       },
-      didDrawPage: (data) => {
-        addHeader();
-      },
+      didDrawPage: () => addHeader(),
     });
 
     addFooter();
@@ -440,7 +484,7 @@ const ExamPlanning = () => {
       Date: formatDate(exam.exam_date),
       Horaire: exam.time_slot,
       Module: exam.nom_module,
-      "Salle(s)": exam.mode === 'en ligne' ? 'En Ligne' : exam.nom_salle || 'N/A',
+      "Salle(s)": exam.mode === "en ligne" ? "En Ligne" : exam.nom_salle || "N/A",
     }));
 
     const ws = XLSX.utils.json_to_sheet(examData, {
@@ -458,40 +502,26 @@ const ExamPlanning = () => {
       { wch: 15 },
     ];
 
-    ws["!merges"] = [
-      { s: { r: 0, c: 0 }, e: { r: 0, c: 3 } },
-    ];
+    ws["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }];
 
     Object.keys(ws).forEach((cell) => {
       if (cell === "!ref" || cell === "!cols" || cell === "!merges") return;
-
       const row = parseInt(cell.match(/\d+/)[0], 10);
-      if (row === 1) {
-        ws[cell].s = {
-          font: { sz: 16, bold: true },
-          alignment: { horizontal: "center" },
-          fill: { fgColor: { rgb: "2c3e50" } },
-        };
-      } else if (row >= 3 && row <= 7) {
-        ws[cell].s = {
-          font: { sz: 12 },
-          fill: { fgColor: { rgb: "f9f9f9" } },
-          border: { top: { style: "thin", color: { rgb: "dcdcdc" } } },
-        };
-      } else if (row === 9) {
-        ws[cell].s = {
-          font: { sz: 12, bold: true },
-          fill: { fgColor: { rgb: "34495e" } },
-          alignment: { horizontal: "center" },
-          color: { rgb: "FFFFFF" },
-        };
-      } else if (row > 9) {
-        ws[cell].s = {
-          font: { sz: 10 },
-          alignment: { horizontal: "center" },
-          border: { bottom: { style: "thin", color: { rgb: "dcdcdc" } } },
-        };
-      }
+      ws[cell].s = {
+        font: { sz: row === 1 ? 16 : row >= 3 && row <= 7 ? 12 : row === 9 ? 12 : 10, bold: row === 1 || row === 9 },
+        alignment: { horizontal: row >= 9 ? "center" : "left" },
+        fill: {
+          fgColor: {
+            rgb:
+              row === 1 ? "2c3e50" : row === 9 ? "34495e" : row > 9 && row % 2 === 0 ? "f9f9f9" : undefined,
+          },
+        },
+        color: { rgb: row === 9 ? "FFFFFF" : undefined },
+        border: {
+          bottom: { style: row > 9 || row >= 3 && row <= 7 ? "thin" : undefined, color: { rgb: "dcdcdc" } },
+          top: { style: row >= 3 && row <= 7 ? "thin" : undefined, color: { rgb: "dcdcdc" } },
+        },
+      };
     });
 
     const wb = XLSX.utils.book_new();
@@ -512,86 +542,132 @@ const ExamPlanning = () => {
   };
 
   return (
-      <div className={styles['ADM-EXM-app-container']}>
-        <div className={styles['ADM-EXM-background-shapes']}>
-          <div className={styles['ADM-EXM-shape']} ></div>
+    <div className="ADM-EXM-app-container">
+      <div className="ADM-EXM-background-shapes">
+        <div className="ADM-EXM-shape ADM-EXM-shape1"></div>
+        <div className="ADM-EXM-shape ADM-EXM-shape2"></div>
+      </div>
+      <div className="ADM-EXM-sidebar">
+        <div className="ADM-EXM-logo">
+          <h2>
+            <FaUser style={{ marginRight: "8px", verticalAlign: "middle" }} /> Planning
+          </h2>
         </div>
-        <div className={styles['ADM-EXM-sidebar']}>
-          <div className={styles['ADM-EXM-logo']}>
-            <h2>
-              Planning Des Examens 
-            </h2>
-          </div>
-          <button className={styles['ADM-EXM-sidebar-button']} onClick={() => navigate('/admin')}>
-            <FaHome /> Retour à l'accueil
-          </button>
+        <button className="ADM-EXM-sidebar-button" onClick={() => navigate("/admin")}>
+          <FaHome /> Retour à l'accueil
+        </button>
+      </div>
+      <div className="ADM-EXM-main-content">
+        <div className="ADM-EXM-header">
+          <h1>Planning des Examens{filters.ID_semestre ? ` - Semestre ${filters.ID_semestre}` : ""}</h1>
+          <p>Gérer les plannings des examens des facultés</p>
         </div>
-        <div className={styles['ADM-EXM-main-content']}>
-          <div className={styles['ADM-EXM-header']}>
-            <h1>Planning des Examens{filters.ID_semestre ? ` - Semestre ${filters.ID_semestre}` : ""}</h1>
-            <p>Gérer les plannings des examens des facultés</p>
+        {error && (
+          <div className="ADM-EXM-error-message">
+            <p>{error}</p>
           </div>
-          {error && (
-            <div className={styles['ADM-EXM-error-message']}>
-              <p>{error}</p>
+        )}
+        <div className="ADM-EXM-form-row">
+          <div className="ADM-EXM-filter-section">
+            <MemoizedFilterForm
+              onFilter={handleFilter}
+              onChange={handleFilterChange}
+              onReset={handleResetFilters}
+            />
+          </div>
+          <div className="ADM-EXM-exam-form-section">
+            <MemoizedExamForm
+              onAdd={handleAddExam}
+              disabled={false}
+              modules={modules}
+              salles={salles}
+              semestres={semestres}
+              sectionId={filters.section}
+              selectedSemestre={filters.ID_semestre}
+              onFilterReset={handleResetFilters}
+              isFilterApplied={isFilterApplied}
+            />
+            <div className="ADM-EXM-upload-section">
+              <input
+                type="file"
+                accept=".xlsx, .xls"
+                ref={fileInputRef}
+                onChange={handleFileUpload}
+                disabled={!isFilterApplied}
+                style={{ display: "none" }} // Hide the file input
+              />
+              <button
+                onClick={() => fileInputRef.current.click()}
+                disabled={!isFilterApplied}
+                className="ADM-EXM-upload-button"
+              >
+                <FaFileImport style={{ marginRight: "8px" }} /> Importer Excel
+              </button>
+            </div>
+          </div>
+        </div>
+        <div className="ADM-EXM-list-section" ref={examListRef}>
+          {exams.length > 0 ? (
+            <>
+              {isLoadingModules ? (
+                <div className="ADM-EXM-message-container">
+                  <p className="ADM-EXM-no-results">Chargement des modules...</p>
+                </div>
+              ) : (
+                <MemoizedExamList
+                  exams={exams}
+                  onDelete={handleDeleteExam}
+                  onUpdate={handleUpdateExam}
+                  salles={salles}
+                  semestres={semestres}
+                  modules={modules}
+                />
+              )}
+              <div className="ADM-EXM-export-buttons">
+                <button onClick={exportToPDF}>
+                  <FaFilePdf style={{ marginRight: "8px" }} /> Exporter en PDF
+                </button>
+                <button onClick={exportToExcel}>
+                  <FaFileExcel style={{ marginRight: "8px" }} /> Exporter en Excel
+                </button>
+              </div>
+              {uploadStatus && uploadStatus.type === "success" && (
+                <div className="ADM-EXM-message-container ADM-EXM-success-message">
+                  <p>{uploadStatus.message}</p>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="ADM-EXM-message-container">
+              <p className="ADM-EXM-no-results">
+                {filters.section && isFilterApplied
+                  ? "Aucun examen trouvé."
+                  : "Sélectionnez une section et appliquez le filtre pour afficher ou créer un planning."}
+              </p>
             </div>
           )}
-          <div className={styles['ADM-EXM-form-row']}>
-            <div className={styles['ADM-EXM-filter-section']}>
-              <MemoizedFilterForm onFilter={handleFilter} onChange={handleFilterChange} onReset={handleResetFilters} />
-            </div>
-            <div className={styles['ADM-EXM-exam-form-section']}>
-              <MemoizedExamForm
-                onAdd={handleAddExam}
-                disabled={false}
-                modules={modules}
-                salles={salles}
-                semestres={semestres}
-                sectionId={filters.section}
-                selectedSemestre={filters.ID_semestre}
-                onFilterReset={handleResetFilters}
-                isFilterApplied={isFilterApplied}
-              />
-            </div>
-          </div>
-          <div className={styles['ADM-EXM-list-section']} ref={examListRef}>
-            {exams.length > 0 ? (
-              <>
-                {isLoadingModules ? (
-                  <div className={styles['ADM-EXM-message-container']}>
-                    <p className={styles['ADM-EXM-no-results']}>Chargement des modules...</p>
-                  </div>
-                ) : (
-                  <MemoizedExamList
-                    exams={exams}
-                    onDelete={handleDeleteExam}
-                    onUpdate={handleUpdateExam}
-                    salles={salles}
-                    semestres={semestres}
-                    modules={modules}
-                  />
-                )}
-                <div className={styles['ADM-EXM-export-buttons']}>
-                  <button onClick={exportToPDF}>
-                    <FaFilePdf style={{ marginRight: '8px' }} /> Exporter en PDF
-                  </button>
-                  <button onClick={exportToExcel}>
-                    <FaFileExcel style={{ marginRight: '8px' }} /> Exporter en Excel
-                  </button>
-                </div>
-              </>
-            ) : (
-              <div className={styles['ADM-EXM-message-container']}>
-                <p className={styles['ADM-EXM-no-results']}>
-                  {filters.section && isFilterApplied
-                    ? "Aucun examen trouvé."
-                    : "Sélectionnez une section et appliquez le filtre pour afficher ou créer un planning."}
-                </p>
-              </div>
-            )}
-          </div>
         </div>
       </div>
+
+      {showErrorModal && uploadStatus && uploadStatus.type === "error" && (
+        <div className="ADM-EXM-modal-overlay">
+          <div className="ADM-EXM-modal-content ADM-EXM-error-modal">
+            <h3>Erreur lors de l'importation</h3>
+            <p style={{ color: '#ff4d4f' }}>{uploadStatus.message}</p>
+            {uploadStatus.errors && uploadStatus.errors.length > 0 && (
+              <ul className="ADM-EXM-error-list">
+                {uploadStatus.errors.map((err, index) => (
+                  <li key={index}>{err}</li>
+                ))}
+              </ul>
+            )}
+            <div className="ADM-EXM-modal-actions">
+              <button onClick={closeErrorModal}>Fermer</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

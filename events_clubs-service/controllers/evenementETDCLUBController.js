@@ -2,7 +2,7 @@ const pool = require('../config/db');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const { createNotification } = require('./notificationETDController');
+const { createNotification } = require('./notificationETDcontroller');
 
 // Configuration de Multer pour gérer un fichier unique
 const storage = multer.diskStorage({

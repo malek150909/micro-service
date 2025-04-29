@@ -30,12 +30,12 @@ import ProfessorReclamations from "./enseignant/notes/pages/ProfessorReclamation
 import StudentGrades from "./etudiant/notes/pages/StudentGrades";
 import ENSlistetudiant from "./enseignant/listetudiant/TeacherDashboard";
 import ETDressources from "./etudiant/ressource/StudentDashboard";
-import ETDNotesFeed from "./etudiant/note/notes";
-import ENSNotesFeed from "./enseignant/note/notes";
+import ETDNotesFeed from "./etudiant/note/ETDnotes";
+import ENSNotesFeed from "./enseignant/note/ENSnotes";
 import SeanceSupp from "./enseignant/seance_supp/pages/seance_supp";
 import StudentPlanning from "./etudiant/planning/StudentPlanning";
-import ETDCalendar from "./etudiant/calendrier/calendar";
-import ENSCalendar from "./enseignant/calendrier/Calendar";
+import ETDCalendar from "./etudiant/calendrier/ETDCalendar";
+import ENSCalendar from "./enseignant/calendrier/ENSCalendar";
 
 const PrivateRoute = ({ element }) => {
     const user = JSON.parse(localStorage.getItem("user"));
