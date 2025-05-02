@@ -1,0 +1,141 @@
+
+services:
+  traefik:
+    image: traefik:v2.10
+    ports:
+      - "80:80"
+    volumes:
+      - ./traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./traefik_dynamic.yml:/traefik_dynamic.yml:ro
+    networks:
+      - microservices-net
+    depends_on:
+      - users-service
+      - courses-service
+      - messaging-service
+      - events-service
+      - frontend
+
+  users-service:
+    image: users-service:latest
+    build:
+      context: ./users-service
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    networks:
+      - microservices-net
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+
+  courses-service:
+    image: courses-service:latest
+    build:
+      context: ./students_schedule-service
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8083"
+    networks:
+      - microservices-net
+    depends_on:
+       mysql:
+        condition: service_healthy
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+
+  messaging-service:
+    image: messaging-service:latest
+    build:
+      context: ./messages_notification-service
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    networks:
+      - microservices-net
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+
+  events-service:
+    image: events-service:latest
+    build:
+      context: ./events_clubs-service
+      dockerfile: Dockerfile
+    ports:
+      - "8084:8084"
+    networks:
+      - microservices-net
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+
+  frontend:
+    image: frontend:latest
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8085:80"
+    networks:
+      - microservices-net
+    depends_on:
+      - users-service
+      - courses-service
+      - messaging-service
+      - events-service
+    environment:
+      - API_USERS_URL=http://users.localhost
+      - API_COURSES_URL=http://courses.localhost
+      - API_MESSAGING_URL=http://messaging.localhost
+      - API_EVENTS_URL=http://events.localhost
+
+  mysql:
+    image: mysql:latest
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+      - MYSQL_DATABASE=${DB_NAME}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      microservices-net:
+        aliases:
+          - mysql
+    healthcheck:
+      test: ["CMD", "mysql", "-h", "localhost", "-uroot", "-p${DB_PASSWORD}", "-e", "SELECT 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    command: ["mysqld", "--bind-address=0.0.0.0", "--lower_case_table_names=1"]
+
+volumes:
+  mysql-data:
+
+networks:
+  microservices-net:
+    driver: bridge

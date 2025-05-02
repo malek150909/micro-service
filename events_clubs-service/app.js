@@ -27,7 +27,14 @@ const io = new Server(server, {
   }
 });
 
-app.use(cors());
+app.use(cors({
+  origin: ['http://plateform.universitaire', 'http://localhost:8085'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+app.options('*', cors());
+
 app.use(express.json());
 // 🎯 Ajouter ça pour avoir Socket.IO dans tes controllers
 app.set('io', io);

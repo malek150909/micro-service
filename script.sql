@@ -29,7 +29,7 @@ CREATE TABLE Departement (
 );
 
 -- Create Specialite Table
-CREATE TABLE Specialite (
+CREATE TABLE specialite (
     ID_specialite INT PRIMARY KEY AUTO_INCREMENT,
     nom_specialite VARCHAR(100) NOT NULL,
     ID_departement INT,
@@ -39,7 +39,7 @@ CREATE TABLE Specialite (
 );
 
 -- Create Etudiant Table
-CREATE TABLE Etudiant (
+CREATE TABLE etudiant (
     Matricule BIGINT PRIMARY KEY,
     ID_specialite INT NOT NULL,
     annee_inscription DATE NOT NULL,
@@ -52,7 +52,7 @@ CREATE TABLE Etudiant (
 );
 
 -- Create Enseignant Table with Faculty and Department
-CREATE TABLE Enseignant (
+CREATE TABLE enseignant (
     Matricule BIGINT PRIMARY KEY,
     annee_inscription DATE NOT NULL,
     ID_faculte INT,
@@ -69,9 +69,9 @@ CREATE TABLE section (
   ID_specialite int DEFAULT NULL,
   nom_section varchar(50) NOT NULL,
   num_etudiant int DEFAULT '0',
-  PRIMARY KEY (ID_sectio),
+  PRIMARY KEY (ID_section),
   KEY ID_specialite (ID_specialite),
-  CONSTRAINT section_ibfk_2 FOREIGN KEY (ID_specialite) REFERENCES specialite (ID_specialite) ON DELETE CASCADE
+  CONSTRAINT section_ibfk_2 FOREIGN KEY (ID_specialite) REFERENCES Specialite (ID_specialite) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci |
 
 --initialiser les valeurs basées sur la table etudiant_section
@@ -145,11 +145,11 @@ CREATE TABLE Etudiant_Section (
 );
 
 -- Create Groupe Table
-CREATE TABLE Groupe (
+CREATE TABLE groupe (
     ID_groupe INT PRIMARY KEY AUTO_INCREMENT,
     num_groupe INT NOT NULL,
     ID_section INT,
-    FOREIGN KEY (ID_section) REFERENCES Section(ID_section) ON DELETE CASCADE
+    FOREIGN KEY (ID_section) REFERENCES section(ID_section) ON DELETE CASCADE
 );
 
 -- Create Salle Table

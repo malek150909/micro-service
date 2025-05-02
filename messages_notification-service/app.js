@@ -25,7 +25,14 @@ setupWebSocketServer(server);
 require("dotenv").config();
 
 // Middleware globaux (avant les routes)
-app.use(cors());
+app.use(cors({
+  origin: ['http://plateform.universitaire', 'http://localhost:8085'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+app.options('*', cors());
+
 app.use(express.json()); // Parsing JSON avant les routes
 app.use(bodyParser.json()); // Parsing JSON avant les routes (optionnel si vous utilisez express.json())
 app.use(express.urlencoded({ extended: true }));

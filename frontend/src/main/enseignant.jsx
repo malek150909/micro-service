@@ -64,33 +64,61 @@ const Enseignant = () => {
     const fetchNotifications = async () => {
         const token = localStorage.getItem("token");
         if (!token) {
-            console.error("Enseignant: No token found, cannot fetch notifications");
-            setNotifications([]);
-            setUnreadNotificationsCount(0);
-            return;
+          console.error("Etudiant: Aucun token trouvé, impossible de récupérer les notifications");
+          setNotifications([]);
+          setUnreadNotificationsCount(0);
+          return;
         }
-
-        console.log("Enseignant: Fetching notifications");
+      
+        console.log("Etudiant: Récupération des notifications");
         try {
-            const response = await fetch("http://messaging.localhost/notifications", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Erreur ${response.status}: ${errorText || "Erreur lors de la récupération des notifications"}`);
-            }
-            const data = await response.json();
-            console.log("Enseignant: Notifications fetched, count:", data.length);
-            setNotifications(Array.isArray(data) ? data : []);
-            setUnreadNotificationsCount(data.filter((n) => !n.is_seen).length);
+          const response = await fetch("http://messaging.localhost/notifications", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Erreur ${response.status}: ${errorText || "Erreur lors de la récupération des notifications"}`);
+          }
+          const data = await response.json();
+          console.log("Etudiant: Réponse brute de l'API:", JSON.stringify(data, null, 2));
+      
+          // Valider et normaliser les notifications
+          const validNotifications = Array.isArray(data)
+            ? data
+                .filter((notif) => {
+                  const isValid =
+                    notif &&
+                    typeof notif === 'object' &&
+                    notif.ID_notification != null &&
+                    typeof notif.contenu === 'string' &&
+                    notif.contenu.trim() !== '' &&
+                    (typeof notif.is_seen === 'boolean' || typeof notif.is_seen === 'number');
+                  if (!isValid) {
+                    console.warn("Etudiant: Notification invalide filtrée:", notif);
+                  }
+                  return isValid;
+                })
+                .map((notif) => ({
+                  ID_notification: notif.ID_notification,
+                  contenu: notif.contenu,
+                  is_seen: Boolean(notif.is_seen), // Convertir 0/1 en true/false
+                  expediteur: notif.expediteur || null,
+                  destinataire: notif.destinataire || null,
+                  date_envoi: notif.date_envoi || null,
+                }))
+            : [];
+      
+          console.log("Etudiant: Notifications valides:", validNotifications);
+          setNotifications(validNotifications);
+          setUnreadNotificationsCount(validNotifications.filter((n) => !n.is_seen).length);
         } catch (err) {
-            console.error("Enseignant: Fetch notifications error:", err.message);
-            setNotifications([]);
-            setUnreadNotificationsCount(0);
+          console.error("Etudiant: Erreur lors de la récupération des notifications:", err.message);
+          setNotifications([]);
+          setUnreadNotificationsCount(0);
         }
-    };
+      };
 
     const fetchUnreadMessagesCount = async (matricule) => {
         const token = localStorage.getItem("token");
@@ -371,7 +399,13 @@ const Enseignant = () => {
                                 X
                             </button>
                             <div className={styles['MAIN-notificationListWrapper']}>
-                                <NotificationBell showModal={true} />
+                            <NotificationBell
+                            onNotificationClick={handleNotificationClick}
+                            showModal={showNotificationModal}
+                            notifications={notifications}
+                            setNotifications={setNotifications}
+                            fetchNotifications={fetchNotifications}
+                            />
                             </div>
                         </div>
                     </div>

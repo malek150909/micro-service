@@ -8,7 +8,15 @@ const etudiantRoutes = require('./routes/etudiantRoute');
 const teacherRoutes = require('./routes/etudiantENSRoute');
 
 const app = express();
-app.use(cors());
+
+app.use(cors({
+  origin: ['http://plateform.universitaire', 'http://localhost:8085'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+app.options('*', cors());
+
 app.use(express.json());
 app.use('/api', enseignantRoutes);
 app.use('/listeETD', etudiantRoutes);
@@ -156,6 +164,41 @@ app.post('/update-password', authMiddleware, async (req, res) => {
         res.status(500).json({ error: "Erreur serveur" });
     }
 });
+
+app.get('/api/statistics', async (req, res) => {
+    try {
+      // Récupérer le nombre total d'événements
+      const [eventsCount] = await db.query(`
+        SELECT COUNT(*) as count 
+        FROM Evenement
+      `);
+      const events = eventsCount[0].count;
+  
+      // Récupérer le nombre total d'étudiants
+      const [studentsCount] = await db.query(`
+        SELECT COUNT(*) as count 
+        FROM Etudiant
+      `);
+      const students = studentsCount[0].count;
+  
+      // Récupérer le nombre total d'enseignants
+      const [teachersCount] = await db.query(`
+        SELECT COUNT(*) as count 
+        FROM Enseignant
+      `);
+      const teachers = teachersCount[0].count;
+  
+      // Retourner les statistiques sous forme de JSON
+      res.json({
+        events,
+        students,
+        teachers
+      });
+    } catch (error) {
+      console.error("Erreur lors de la récupération des statistiques:", error);
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
 
 app.listen(PORT, () => {
     console.log(`🚀 Server running on http://users.localhost`);

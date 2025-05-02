@@ -9,7 +9,7 @@ router.use(authMiddleware);
 // Récupérer les notifications d'un utilisateur
 router.get('/', async (req, res) => {
   try {
-    const matricule = req.user.matricule; // Extraire le matricule du token via authMiddleware
+    const matricule = req.user.matricule;
     const [notifications] = await db.query(`
       SELECT n.*, 
              IFNULL(seen.status, 0) as is_seen
@@ -22,8 +22,29 @@ router.get('/', async (req, res) => {
       WHERE n.destinataire = ?
       ORDER BY n.date_envoi DESC
     `, [matricule, matricule]);
-    res.json(notifications);
+
+    // Normaliser les notifications
+    const validNotifications = Array.isArray(notifications)
+      ? notifications
+          .filter((notif) => 
+            notif.ID_notification != null && 
+            typeof notif.contenu === 'string' && 
+            notif.contenu.trim() !== ''
+          )
+          .map((notif) => ({
+            ID_notification: notif.ID_notification,
+            date_envoi: notif.date_envoi,
+            contenu: notif.contenu,
+            expediteur: notif.expediteur || null,
+            destinataire: notif.destinataire,
+            is_seen: Boolean(notif.is_seen), // Convertir 0/1 en true/false
+          }))
+      : [];
+
+    console.log('Backend: Notifications envoyées:', validNotifications);
+    res.json(validNotifications);
   } catch (error) {
+    console.error('Backend: Erreur lors de la récupération des notifications:', error);
     res.status(500).json({ error: error.message });
   }
 });

@@ -84,21 +84,34 @@ const sendUpdateNotification = async (sectionId) => {
       return;
     }
 
-    // Insérer une notification pour chaque enseignant
-    for (const teacher of teachers) {
-      console.log(`Envoi de la notification à l'enseignant ${teacher.Matricule} pour la section ${sectionId}`);
-      await db.query(`
-        INSERT INTO Notification (contenu, expediteur, destinataire, date_envoi)
-        VALUES (?, NULL, ?, NOW())
-      `, [notificationContent, teacher.Matricule]);
+    // Tenter de récupérer le matricule de l'admin le plus récemment connecté
+    const [admin] = await db.query(`
+      SELECT u.Matricule  -- Spécifier u.Matricule pour éviter l'ambiguïté
+      FROM admin a
+      JOIN User u ON a.Matricule = u.Matricule
+      ORDER BY u.Created_at DESC
+      LIMIT 1
+    `);
+
+    const expediteurMatricule = admin.length > 0 ? admin[0].Matricule : null;
+    if (!expediteurMatricule) {
+      console.log('Aucun admin trouvé pour définir comme expéditeur, utilisation de NULL');
     }
 
-    console.log(`Notifications envoyées pour la section ${sectionId}`);
+    // Insérer une notification pour chaque enseignant avec l'expéditeur (ou NULL si non trouvé)
+    for (const teacher of teachers) {
+      console.log(`Envoi de la notification à l'enseignant ${teacher.Matricule} pour la section ${sectionId} par ${expediteurMatricule || 'NULL'}`);
+      await db.query(`
+        INSERT INTO Notification (contenu, expediteur, destinataire, date_envoi)
+        VALUES (?, ?, ?, NOW())
+      `, [notificationContent, expediteurMatricule, teacher.Matricule]);
+    }
+
+    console.log(`Notifications envoyées pour la section ${sectionId} par ${expediteurMatricule || 'NULL'}`);
   } catch (err) {
     console.error('Erreur lors de l\'envoi de la notification:', err.message || err);
   }
 };
-
 // Route pour récupérer une spécialité par ID
 router.get('/specialites/:id', async (req, res) => {
   const { id } = req.params;

@@ -24,7 +24,7 @@ exports.createEvenement = async (req, res) => {
     console.log('date_evenement extrait :', date_evenement);
 
     // Extraire l'image
-    const image_url = req.file ? `/Uploads/${req.file.filename}` : req.body.image_url || null;
+    const image_url = req.file ? `/uploads/${req.file.filename}` : req.body.image_url || null;
 
     // Validation des champs obligatoires
     if (!nom_evenement || !date_evenement || !lieu || !capacite || !organisateur_admin) {
@@ -67,7 +67,7 @@ exports.createEvenement = async (req, res) => {
     const heure_evenement = timePart;
 
     // Vérification de l'image
-    if (image_url && image_url.startsWith('/Uploads/')) {
+    if (image_url && image_url.startsWith('/uploads/')) {
       const sourcePath = path.join(__dirname, '..', image_url);
       try {
         await fs.access(sourcePath);
@@ -241,7 +241,7 @@ exports.updateEvenement = async (req, res) => {
 
   console.log('date_evenement extrait :', date_evenement);
 
-  const image_url = req.file ? `/Uploads/${req.file.filename}` : req.body.image_url || null;
+  const image_url = req.file ? `/uploads/${req.file.filename}` : req.body.image_url || null;
 
   // Validation des champs obligatoires
   if (!nom_evenement || !date_evenement || !lieu || !capacite || !organisateur_admin) {
@@ -284,7 +284,7 @@ exports.updateEvenement = async (req, res) => {
   const heure_evenement = timePart;
 
   // Vérification de l'image
-  if (image_url && image_url.startsWith('/Uploads/')) {
+  if (image_url && image_url.startsWith('/uploads/')) {
     const sourcePath = path.join(__dirname, '..', image_url);
     try {
       await fs.access(sourcePath);

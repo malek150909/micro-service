@@ -22,8 +22,13 @@ process.env.TZ = 'UTC';
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: ['http://plateform.universitaire', 'http://localhost:8085'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
+app.options('*', cors());
 
 app.use('/modules', moduleRoutes);
 app.use('/exams', examRoutes);

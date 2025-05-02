@@ -12,6 +12,8 @@ const Admin = () => {
     const [showNotificationModal, setShowNotificationModal] = useState(false);
     const [currentDate, setCurrentDate] = useState(new Date());
     const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
+    const [stats, setStats] = useState([]); // Initialisé comme tableau vide
+
 
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -29,6 +31,40 @@ const Admin = () => {
                 setUnreadMessagesCount(count);
             });
         }
+
+        // Récupérer les statistiques réelles
+        const fetchStatistics = async () => {
+            try {
+                const token = localStorage.getItem("token");
+                const response = await fetch("http://localhost:8081/api/statistics", {
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error("Erreur lors de la récupération des statistiques");
+                }
+
+                const data = await response.json();
+                setStats([
+                    { label: "Événements", value: data.events, icon: <FaCalendar /> },
+                    { label: "Étudiants", value: data.students, icon: <FaUsers /> },
+                    { label: "Enseignants", value: data.teachers, icon: <FaUsers /> },
+                ]);
+            } catch (error) {
+                console.error("Erreur lors de la récupération des statistiques:", error);
+                setStats([
+                    { label: "Événements", value: 0, icon: <FaCalendar /> },
+                    { label: "Étudiants", value: 0, icon: <FaUsers /> },
+                    { label: "Enseignants", value: 0, icon: <FaUsers /> },
+                ]);
+            }
+        };
+
+        fetchStatistics();
+
     }, [navigate]);
 
     const handleLogout = () => {
@@ -100,13 +136,6 @@ const Admin = () => {
 
         return days;
     };
-
-    // Mock statistics data (replace with real data as needed)
-    const stats = [
-        { label: "Événements", value: 12, icon: <FaCalendar /> },
-        { label: "Étudiants", value: 250, icon: <FaUsers /> },
-        { label: "Enseignants", value: 30, icon: <FaUsers /> },
-    ];
 
     const items = [
         { 
@@ -261,13 +290,17 @@ const Admin = () => {
                         <div className={styles['MAIN-statisticsSection']}>
                             <h3>Statistiques</h3>
                             <div className={styles['MAIN-statsGrid']}>
-                                {stats.map((stat, index) => (
-                                    <div key={index} className={styles['MAIN-statCard']}>
-                                        <div className={styles['MAIN-statIcon']}>{stat.icon}</div>
-                                        <div className={styles['MAIN-statValue']}>{stat.value}</div>
-                                        <div className={styles['MAIN-statLabel']}>{stat.label}</div>
-                                    </div>
-                                ))}
+                                {stats.length > 0 ? (
+                                    stats.map((stat, index) => (
+                                        <div key={index} className={styles['MAIN-statCard']}>
+                                            <div className={styles['MAIN-statIcon']}>{stat.icon}</div>
+                                            <div className={styles['MAIN-statValue']}>{stat.value}</div>
+                                            <div className={styles['MAIN-statLabel']}>{stat.label}</div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p>Chargement des statistiques...</p>
+                                )}
                             </div>
                         </div>
                     </div>
