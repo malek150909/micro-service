@@ -1,434 +1,376 @@
-/* Main Container */
-.ProfContainer {
-  max-width: 1100px;
-  width: 90%;
-  margin: 20px auto;
-  padding: 25px;
-  background: linear-gradient(135deg, #f5f5f5, #d6eaff);
-  border-radius: 20px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-  position: relative;
-  overflow: hidden;
-  animation: containerGlow 5s ease infinite;
-  text-align: center;
+ADM-ENS-select[multiple] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: #f0f7ff url('data:image/svg+xml;utf8,<svg fill="%235483b3" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 10px center;
+  padding-right: 30px;
+  min-height: 120px;
+  overflow-y: auto;
 }
 
-/* Titles */
-.ProfTitleH1,
-.ProfTitleH2,
-.ProfTitleH3,
-.ProfTitleH4 {
-  font-weight: 800;
-  background: linear-gradient(135deg, #1565c0, #5e35b1);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-align: center;
-  padding: 15px 25px;
-  border: 2px solid rgba(21, 101, 192, 0.6);
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(175, 146, 146, 0.2);
-  letter-spacing: 1px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+ADM-ENS-select[multiple] option {
+  padding: 5px;
+  background: #f0f7ff;
 }
 
-.ProfTitleH1 {
-  text-align: center;
-  color: #1a237e;
-  font-size: 2.5em;
-  margin-bottom: 20px;
-}
-
-/* Buttons */
-.ProfButton {
-  background: linear-gradient(135deg, #5483b3, #052659);
+ADM-ENS-select[multiple] option:checked {
+  background: #5483b3;
   color: #ffffff;
-  padding: 12px 25px;
-  border: none;
-  border-radius: 12px;
-  font-size: 0.95rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 8px 20px rgba(5, 38, 89, 0.1);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  position: relative;
-  overflow: hidden;
-}
-
-.ProfButton:hover {
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25), 0 0 10px rgba(21, 101, 192, 0.4);
-  transform: translateY(-2px);
-}
-
-.ProfEditButton {
-  background: linear-gradient(135deg, #7da0ca, #5483b3);
-}
-
-.ProfDeleteButton,
-.ProfDeleteSectionButton {
-  background: linear-gradient(135deg, #052659, #021024);
-}
-
-.ProfBackButton {
-  background: linear-gradient(135deg, #5483b3, #7da0ca);
-}
-
-/* Forms */
-.ProfForm,
-.ProfAddStudentForm {
-  background: linear-gradient(135deg, #e8f0fe, #b0bec5);
-  padding: 20px;
-  border-radius: 15px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  animation: formPop 0.8s ease-out;
-}
-
-.ProfInputGroup {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.ProfInput,
-.ProfSelect {
-  padding: 15px;
-  border: 1px solid rgba(84, 131, 179, 0.2);
-  border-radius: 12px;
-  font-size: 0.95rem;
-  background: #f0f7ff;
-  color: #052659;
-  width: 100%;
-  box-sizing: border-box;
-  margin-bottom: 15px;
-}
-
-.ProfInput:focus,
-.ProfSelect:focus {
-  border-color: #5483b3;
-  box-shadow: 0 0 15px rgba(84, 131, 179, 0.2);
-  outline: none;
-}
-
-/* Tables */
-.ProfTable {
-  width: 100%;
-  border-collapse: collapse;
-  background: linear-gradient(135deg, #e8f0fe, #b0bec5);
-  border-radius: 15px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-}
-
-.ProfTableHeader,
-.ProfTableCell {
-  padding: 12px;
-  text-align: left;
-  border-bottom: 1px solid rgba(189, 189, 189, 0.5);
-}
-
-.ProfTableHeader {
-  background: linear-gradient(135deg, #1565c0, #42a5f5);
-  color: #fff;
-  font-weight: 600;
-}
-
-/* Teacher List */
-.ProfTeachersList {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  margin-top: 20px;
-  align-items: center;
-}
-
-.ProfTeacherCard {
-  background: rgba(255, 255, 255, 0.85);
-  padding: 15px;
-  border-radius: 15px;
-  box-shadow: 0 6px 15px rgba(5, 38, 89, 0.1);
-  transition: all 0.4s ease;
-  cursor: pointer;
-  width: 100%;
-  max-width: 300px;
-  text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(10px);
-}
-
-.ProfTeacherCard:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 10px 25px rgba(5, 38, 89, 0.2);
-}
-
-/* Teacher Details Section */
-.ProfTeacherSection {
-  margin-top: 20px;
-  padding: 20px;
-  background: rgba(255, 255, 255, 0.85);
-  border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(10px);
-  max-width: 400px;
-  margin: 20px auto;
-}
-
-.ProfTeacherSection .ProfTitleH2 {
-  margin-bottom: 15px;
-}
-
-.ProfTeacherSection p {
-  margin: 5px 0;
-}
-
-.ProfTeacherSection ul {
-  list-style: none;
-  padding: 0;
-}
-
-.ProfTeacherSection ul li {
-  background: #f0f7ff;
-  padding: 5px 10px;
-  margin: 5px 0;
-  border-radius: 5px;
-}
-
-.ProfTeacherSection .ProfButton {
-  margin: 5px;
-  padding: 8px 15px;
-  background: linear-gradient(135deg, #5483b3, #052659);
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.ProfTeacherSection .ProfDeleteButton {
-  background: linear-gradient(135deg, #052659, #021024);
-}
-
-.ProfTeacherSection .ProfBackButton {
-  background: linear-gradient(135deg, #5483b3, #7da0ca);
-}
-
-.ProfSelect[multiple] {
-  height: auto !important;
-  overflow-y: auto !important;
-}
-
-/* No Teachers Message */
-.ProfNoTeachers {
-  text-align: center;
-  color: #0d47a1;
-  font-size: 1.1rem;
-  padding: 15px;
-  animation: fadeIn 1s ease-out;
-}
-
-/* Section Card */
-.ProfSectionCard {
-  background: rgba(255, 255, 255, 0.85);
-  border-radius: 20px;
-  padding: 25px;
-  box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(10px);
-  margin-top: 20px;
 }
 
 /* Background Shapes */
-.ProfBackgroundShapes {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -1;
-  overflow: hidden;
-  pointer-events: none;
+.ADM-ENS-background-shapes {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+z-index: -1;
+overflow: hidden;
+pointer-events: none;
 }
 
-.ProfShape {
-  position: absolute;
-  border-radius: 50%;
-  opacity: 0.15;
-  animation: pulseShape 10s infinite ease-in-out;
+.ADM-ENS-shape {
+position: absolute;
+border-radius: 50%;
+opacity: 0.15;
+animation: ADM-ENS-pulseShape 10s infinite ease-in-out;
 }
 
-.ProfShape1 {
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, #ffffff 0%, #c1e8ff 100%);
-  top: -250px;
-  left: -100px;
-  filter: blur(50px);
-  animation-delay: 0s;
+.ADM-ENS-shape1 {
+width: 500px;
+height: 500px;
+background: radial-gradient(circle, #ffffff 0%, #c1e8ff 100%);
+top: -250px;
+left: -100px;
+filter: blur(50px);
+animation-delay: 0s;
 }
 
-.ProfShape2 {
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, #ffffff 0%, #7da0ca 100%);
-  bottom: -200px;
-  right: -100px;
-  filter: blur(40px);
-  animation-delay: 3s;
+.ADM-ENS-shape2 {
+width: 400px;
+height: 400px;
+background: radial-gradient(circle, #ffffff 0%, #7da0ca 100%);
+bottom: -200px;
+right: -100px;
+filter: blur(40px);
+animation-delay: 3s;
+}
+
+@keyframes ADM-ENS-pulseShape {
+0% { transform: scale(1) translateY(0); }
+50% { transform: scale(1.05) translateY(-15px); }
+100% { transform: scale(1) translateY(0); }
+}
+
+@keyframes ADM-ENS-slideIn {
+from { transform: translateX(-100%); }
+to { transform: translateX(0); }
 }
 
 /* Sidebar */
-.ProfSidebar {
-  background: linear-gradient(135deg,  #3a6a9e 30%, #082e54 100%);
-  padding: 25px;
-  color: #ffffff;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  position: fixed;
-  top: 0;
-  left: 30px;
-  width: 180px;
-  height: 100vh;
-  box-shadow: 0 15px 40px rgba(37, 100, 194, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  z-index: 1000;
-  animation: slideIn 0.5s ease-out;
+.ADM-ENS-sidebar {
+background: linear-gradient(135deg, rgba(91, 135, 179, 0.95) 0%, rgba(17, 69, 148, 0.95) 100%);
+padding: 25px;
+color: #ffffff;
+display: flex;
+flex-direction: column;
+gap: 15px;
+position: fixed;
+top: 0;
+left: 30px;
+width: 180px;
+height: 100vh;
+box-shadow: 0 15px 40px rgba(37, 100, 194, 0.35);
+border: 1px solid rgba(255, 255, 255, 0.2);
+backdrop-filter: blur(10px);
+z-index: 1000;
+animation: ADM-ENS-slideIn 0.5s ease-out;
 }
 
-.ProfLogo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 15px;
+.ADM-ENS-logo {
+display: flex;
+align-items: center;
+gap: 10px;
+margin-bottom: 15px;
 }
 
-.ProfSidebarButton {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 12px;
-  padding: 12px 20px;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  width: 100%;
-  box-sizing: border-box;
+.ADM-ENS-logo h2 {
+font-size: 1.5rem;
+font-weight: 600;
+margin: 0;
+color: #ffffff;
 }
 
-.ProfSidebarButton:hover {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(125, 160, 202, 0.5));
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  transform: translateY(-2px);
+.ADM-ENS-sidebar-button {
+background: rgba(255, 255, 255, 0.1);
+color: #ffffff;
+font-size: 1rem;
+display: flex;
+align-items: center;
+justify-content: flex-start;
+gap: 12px;
+padding: 12px 20px;
+border: none;
+border-radius: 12px;
+cursor: pointer;
+transition: all 0.3s ease;
+width: 100%;
+box-sizing: border-box;
 }
 
-/* Filters */
-.ProfFilters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  margin-bottom: 20px;
+.ADM-ENS-sidebar-button:hover {
+background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(125, 160, 202, 0.5));
+box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+transform: translateY(-2px);
+}
+
+/* Container */
+.ADM-ENS-container {
+max-width: 1400px;
+margin: 30px auto;
+padding: 0;
+position: relative;
 }
 
 /* Main Content */
-.ProfMainContent {
-  margin-left: 310px;
-  margin-right: 30px;
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
+.ADM-ENS-main-content {
+margin-left: 310px;
+margin-right: 30px;
+display: flex;
+flex-direction: column;
+gap: 30px;
+align-items: center; /* Center the content */
+}
+
+/* Title with White Square */
+.ADM-ENS-title-with-square {
+font-size: 3rem;
+font-weight: 700;
+color: #052659;
+margin-bottom: 20px;
+display: flex;
+align-items: center;
+gap: 10px;
+letter-spacing: 1px;
+position: relative;
+background: linear-gradient(90deg, #0d3155, #7DA0CA);
+-webkit-background-clip: text;
+background-clip: text;
+-webkit-text-fill-color: transparent;
+}
+
+.ADM-ENS-title-with-square::before {
+content: '';
+position: absolute;
+width: 400px;
+height: 80px;
+background: rgba(255, 255, 255, 0.85);
+z-index: -1;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+border-radius: 15px;
+box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15);
+}
+
+/* Section Card */
+.ADM-ENS-section-card {
+background: rgba(255, 255, 255, 0.85);
+border-radius: 20px;
+padding: 25px;
+box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15);
+border: 1px solid rgba(255, 255, 255, 0.5);
+backdrop-filter: blur(10px);
+width: 500px; /* Wider form width based on images */
+margin: 0 auto; /* Center the form */
+}
+
+/* Enlarged Form */
+.ADM-ENS-enlarged-form {
+width: 500px; /* Consistent width with section-card */
+padding: 40px;
+}
+
+/* Filtering Page Layout */
+.ADM-ENS-filtering-page {
+display: flex;
+flex-direction: row;
+flex-wrap: nowrap;
+gap: 24px;
+width: 100%;
+justify-content: center; /* Center the filtering page */
+}
+
+/* Adjust Filter Panel Size Here */
+.ADM-ENS-filter-panel-container {
+flex: 1;
+min-width: 350px;
+max-width: 800px;
+min-height: 400px;
+}
+
+/* Adjust Teacher List Panel Size Here */
+.ADM-ENS-teacher-list-container {
+flex: 2;
+min-width: 600px;
+min-height: 450px;
+}
+
+/* Empty List Message */
+.ADM-ENS-empty-list-message {
+font-size: 1.5rem;
+color: #052659;
+text-align: center;
+}
+
+/* Filters */
+.ADM-ENS-filters {
+display: flex;
+flex-wrap: wrap;
+gap: 15px;
+margin-bottom: 20px;
+}
+
+.ADM-ENS-filters select {
+padding: 12px;
+border: 1px solid rgba(84, 131, 179, 0.2);
+border-radius: 12px;
+font-size: 0.95rem;
+background: #f0f7ff;
+color: #052659;
+flex: 1;
+min-width: 200px;
+box-shadow: 0 4px 15px rgba(5, 38, 89, 0.05);
+transition: all 0.3s ease;
+}
+
+.ADM-ENS-filters select:focus {
+border-color: #5483b3;
+box-shadow: 0 0 15px rgba(84, 131, 179, 0.2);
+outline: none;
+}
+
+/* Teacher List */
+.ADM-ENS-teachers-list {
+display: flex;
+flex-direction: column;
+gap: 15px;
+margin-top: 20px;
+align-items: center;
+}
+
+.ADM-ENS-teacher-card {
+background: rgba(255, 255, 255, 0.85);
+padding: 15px;
+border-radius: 15px;
+box-shadow: 0 6px 15px rgba(5, 38, 89, 0.1);
+transition: all 0.4s ease;
+cursor: pointer;
+width: 130%;
+max-width: 300px;
+text-align: center;
+border: 1px solid rgba(255, 255, 255, 0.5);
+backdrop-filter: blur(10px);
+}
+
+.ADM-ENS-teacher-card:hover {
+transform: translateY(-8px);
+box-shadow: 0 10px 25px rgba(5, 38, 89, 0.2);
+}
+
+/* Teacher Section */
+.ADM-ENS-teacher-section {
+margin-top: 20px;
+padding: 20px;
+background: rgba(255, 255, 255, 0.85);
+border-radius: 15px;
+box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15);
+border: 1px solid rgba(255, 255, 255, 0.5);
+backdrop-filter: blur(10px);
+max-width: 400px;
+margin: 0 auto; /* Center the teacher section */
+}
+
+.ADM-ENS-teacher-section p {
+margin: 5px 0;
+}
+
+.ADM-ENS-teacher-section ul {
+list-style: none;
+padding: 0;
+}
+
+.ADM-ENS-teacher-section ul li {
+background: #f0f7ff;
+padding: 5px 10px;
+margin: 30px 6;
+border-radius: 5px;
+}
+
+/* Button Group for Centering */
+.ADM-ENS-button-group {
+display: flex;
+justify-content: center;
+gap: 15px;
+margin-top: 20px;
+}
+
+/* Buttons */
+button, .ADM-ENS-submit-btn, .ADM-ENS-edit-btn, .ADM-ENS-delete-btn, .ADM-ENS-back-btn, .ADM-ENS-reset-btn {
+background: linear-gradient(135deg, #5483b3 0%, #052659 100%);
+color: #ffffff;
+padding: 12px 25px;
+border: none;
+border-radius: 12px;
+font-size: 0.95rem;
+font-weight: 500;
+cursor: pointer;
+transition: all 0.3s ease;
+box-shadow: 0 8px 20px rgba(5, 38, 89, 0.1);
+}
+
+button:hover, .ADM-ENS-submit-btn:hover, .ADM-ENS-edit-btn:hover, .ADM-ENS-delete-btn:hover, .ADM-ENS-back-btn:hover, .ADM-ENS-reset-btn:hover {
+transform: translateY(-3px);
+box-shadow: 0 12px 25px rgba(5, 38, 89, 0.15);
+}
+
+.ADM-ENS-edit-btn {
+background: linear-gradient(135deg, #7da0ca 0%, #5483b3 100%);
+}
+
+.ADM-ENS-delete-btn {
+background: linear-gradient(135deg, #052659 0%, #021024 100%);
+}
+
+.ADM-ENS-back-btn {
+background: linear-gradient(135deg, #5483b3 0%, #7da0ca 100%);
+}
+
+.ADM-ENS-reset-btn {
+background: linear-gradient(135deg, #7da0ca 0%, #b0c4de 100%);
+}
+
+/* Inputs */
+input, select {
+padding: 18px;
+border: 1px solid rgba(84, 131, 179, 0.2);
+border-radius: 15px;
+font-size: 1rem;
+background: #f0f7ff;
+color: #052659;
+width: 100%;
+box-sizing: border-box;
+margin-bottom: 20px;
+}
+
+input:focus, select:focus {
+border-color: #5483b3;
+box-shadow: 0 0 15px rgba(84, 131, 179, 0.2);
+outline: none;
 }
 
 /* Toast Container */
-.Toastify__toast {
-  font-family: 'Poppins', sans-serif;
-}
-
-ProfBackgroundShapes {
-  position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    overflow: hidden;
-    pointer-events: none;
-}
-
-/* Responsive */
-@media (max-width: 992px) {
-  .ProfSidebar {
-    position: relative;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: auto;
-    margin-bottom: 30px;
-  }
-  .ProfMainContent {
-    margin-left: 0;
-    margin-right: 0;
-  }
-  .ProfFilters {
-    flex-direction: column;
-  }
-}
-
-/* Animations */
-@keyframes pulseShape {
-  0% { transform: scale(1) translateY(0); }
-  50% { transform: scale(1.05) translateY(-15px); }
-  100% { transform: scale(1) translateY(0); }
-}
-
-@keyframes slideIn {
-  from { transform: translateX(-100%); }
-  to { transform: translateX(0); }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes waveMove {
-  0% { background-position: 0 100%; }
-  100% { background-position: -1440px 100%; }
-}
-
-@keyframes containerGlow {
-  0%, 100% { box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); }
-  50% { box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15), 0 0 20px rgba(21, 101, 192, 0.3); }
-}
-
-@keyframes formPop {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-@keyframes cardFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+.ADM-ENS-Toastify__toast {
+font-family: 'Poppins', sans-serif;
 }

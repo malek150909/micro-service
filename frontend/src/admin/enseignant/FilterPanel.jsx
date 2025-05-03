@@ -1,81 +1,72 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import styles from './prof.module.css';
 
-const FilterPanel = ({ onFilter }) => {
-  const [filters, setFilters] = useState({ idFaculte: '', idDepartement: '' });
-  const [facultes, setFacultes] = useState([]);
-  const [departements, setDepartements] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+const FilterPanel = ({ onFilter, onReset }) => {
+    const [facultes, setFacultes] = useState([]);
+    const [filters, setFilters] = useState({
+        idFaculte: ''
+    });
 
-  useEffect(() => {
-    setLoading(true);
-    axios.get('http://users.localhost/api/filters')
-      .then(res => {
-        setFacultes(res.data.facultes || []);
-        setLoading(false);
-      })
-      .catch(err => {
-        setError('Impossible de charger les données');
-        setLoading(false);
-      });
-  }, []);
+    useEffect(() => {
+        axios.get('http://users.localhost/api/facultes')
+            .then(res => setFacultes(res.data || []))
+            .catch(err => {
+                toast.error('Erreur lors de la récupération des facultés: ' + err.message, { autoClose: 3000 });
+                setFacultes([]);
+            });
+    }, []);
 
-  useEffect(() => {
-    if (filters.idFaculte) {
-      axios.get(`http://users.localhost/api/departements/${filters.idFaculte}`)
-        .then(res => {
-          setDepartements(res.data || []);
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFilters(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleFilter = () => {
+        if (!filters.idFaculte) {
+            toast.error('Veuillez sélectionner une faculté.', { autoClose: 3000 });
+            return;
+        }
+
+        axios.get('http://users.localhost/api/enseignants', {
+            params: {
+                idFaculte: filters.idFaculte || undefined
+            }
         })
-        .catch(err => {
-          setError('Impossible de charger les départements');
+            .then(res => onFilter(res.data || []))
+            .catch(err => {
+                toast.error('Erreur lors du filtrage des enseignants: ' + err.message, { autoClose: 3000 });
+                onFilter([]);
+            });
+    };
+
+    const handleReset = () => {
+        setFilters({
+            idFaculte: ''
         });
-    }
-  }, [filters.idFaculte]);
+        onReset();
+    };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFilters(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleFilter = () => {
-    if (!filters.idFaculte || !filters.idDepartement) {
-      alert('Veuillez remplir tous les champs');
-      return;
-    }
-    axios.post('http://users.localhost/api/enseignants/filtrer', filters)
-      .then(res => {
-        onFilter(res.data);
-      })
-      .catch(err => {
-        alert('Erreur lors du filtrage');
-      });
-  };
-
-  if (loading) return <div>Chargement des données...</div>;
-  if (error) return <div>{error}</div>;
-
-  return (
-    <div  className={styles.ProfFilterPanel}>
-      <h2 className={styles.ProfTitleH2}>Panneau de filtrage</h2>
-      <div className={styles.ProfFilters}>
-        <select name="idFaculte" value={filters.idFaculte} onChange={handleChange} className={styles.ProfSelect}>
-          <option value="">Sélectionner une faculté</option>
-          {facultes.map(f => (
-            <option key={f.ID_faculte} value={f.ID_faculte}>{f.nom_faculte}</option>
-          ))}
-        </select>
-        <select name="idDepartement" value={filters.idDepartement} onChange={handleChange} className={styles.ProfSelect}>
-          <option value="">Sélectionner un département</option>
-          {departements.map(d => (
-            <option key={d.ID_departement} value={d.ID_departement}>{d.Nom_departement}</option>
-          ))}
-        </select>
-        <button className={styles.ProfButton} onClick={handleFilter}>Filtrer</button>
-      </div>
-    </div>
-  );
+    return (
+        <div className={styles['ADM-ENS-filter-panel-container']}>
+            <h2>Filtrer les enseignants</h2>
+            <select name="idFaculte" value={filters.idFaculte} onChange={handleChange}>
+                <option value="">Sélectionner une faculté</option>
+                {facultes.map(f => (
+                    <option key={f.ID_faculte} value={f.ID_faculte}>
+                        {f.nom_faculte}
+                    </option>
+                ))}
+            </select>
+            <div className={styles['ADM-ENS-button-group']}>
+                <button onClick={handleFilter} className={styles['ADM-ENS-submit-btn']}>Filtrer</button>
+                <button onClick={handleReset} className={styles['ADM-ENS-reset-btn']}>Réinitialiser</button>
+            </div>
+            <ToastContainer className={styles['ADM-ENS-Toastify__toast']} />
+        </div>
+    );
 };
 
 export default FilterPanel;

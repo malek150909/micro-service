@@ -97,22 +97,21 @@ const TeacherList = () => {
   };
 
   return (
-    <div className={styles.ProfContainer}>
-      <h1 className={styles.ProfTitleH1}>Gestion des Enseignants</h1>
-      <button className={styles.ProfButton} onClick={() => setShowAddForm(true)}>Ajouter un nouvel enseignant</button>
+    <div className={styles['ADM-ENS-container']}>
+      <h1 className={styles['ADM-ENS-title-with-square']}>Gestion des Enseignants</h1>
+      <button className={styles['ADM-ENS-submit-btn']} onClick={() => setShowAddForm(true)}>Ajouter un nouvel enseignant</button>
       {selectedTeacher ? (
         <TeacherSection teacher={selectedTeacher} onBack={handleBack} />
       ) : (
         <>
           {showAddForm && (
-            <form onSubmit={handleAddTeacher} className={styles.ProfSectionCard}>
+            <form onSubmit={handleAddTeacher} className={styles['ADM-ENS-section-card']}>
               <input
                 type="text"
                 placeholder="Nom"
                 value={newTeacher.nom}
                 onChange={(e) => setNewTeacher({ ...newTeacher, nom: e.target.value })}
                 required
-                className={styles.ProfInput}
               />
               <input
                 type="text"
@@ -120,7 +119,6 @@ const TeacherList = () => {
                 value={newTeacher.prenom}
                 onChange={(e) => setNewTeacher({ ...newTeacher, prenom: e.target.value })}
                 required
-                className={styles.ProfInput}
               />
               <input
                 type="email"
@@ -128,13 +126,11 @@ const TeacherList = () => {
                 value={newTeacher.email}
                 onChange={(e) => setNewTeacher({ ...newTeacher, email: e.target.value })}
                 required
-                className={styles.ProfInput}
               />
               <select
                 value={newTeacher.idFaculte}
                 onChange={(e) => setNewTeacher({ ...newTeacher, idFaculte: e.target.value })}
                 required
-                className={styles.ProfSelect}
               >
                 <option value="">Sélectionner une faculté</option>
                 {facultes.map((f) => (
@@ -146,7 +142,6 @@ const TeacherList = () => {
                 onChange={(e) => setNewTeacher({ ...newTeacher, idDepartement: e.target.value })}
                 disabled={!newTeacher.idFaculte}
                 required
-                className={styles.ProfSelect}
               >
                 <option value="">Sélectionner un département</option>
                 {departements.map((d) => (
@@ -158,22 +153,20 @@ const TeacherList = () => {
                 value={newTeacher.modules}
                 onChange={(e) => setNewTeacher({ ...newTeacher, modules: Array.from(e.target.selectedOptions, option => option.value) })}
                 disabled={!newTeacher.idDepartement}
-                className={styles.ProfSelect}
               >
                 {specialites.map((s) => (
                   <option key={s.ID_specialite} value={s.ID_specialite}>{s.nom_specialite}</option>
                 ))}
               </select>
-              <button type="submit" className={styles.ProfButton}>Ajouter</button>
-              <button type="button" className={styles.ProfBackButton} onClick={() => setShowAddForm(false)}>Annuler</button>
+              <button type="submit" className={styles['ADM-ENS-submit-btn']}>Ajouter</button>
+              <button type="button" className={styles['ADM-ENS-back-btn']} onClick={() => setShowAddForm(false)}>Annuler</button>
             </form>
           )}
-          <div className={styles.ProfFilters}>
+          <div className={styles['ADM-ENS-filters']}>
             <select
               name="idFaculte"
               value={filters.idFaculte}
               onChange={(e) => setFilters({ ...filters, idFaculte: e.target.value })}
-              className={styles.ProfSelect}
             >
               <option value="">Sélectionner une faculté</option>
               {facultes.map((f) => (
@@ -185,7 +178,6 @@ const TeacherList = () => {
               value={filters.idDepartement}
               onChange={(e) => setFilters({ ...filters, idDepartement: e.target.value })}
               disabled={!filters.idFaculte}
-              className={styles.ProfSelect}
             >
               <option value="">Sélectionner un département</option>
               {departements.map((d) => (
@@ -197,29 +189,28 @@ const TeacherList = () => {
               value={filters.idSpecialite}
               onChange={(e) => setFilters({ ...filters, idSpecialite: e.target.value })}
               disabled={!filters.idDepartement}
-              className={styles.ProfSelect}
             >
               <option value="">Sélectionner une spécialité</option>
               {specialites.map((s) => (
                 <option key={s.ID_specialite} value={s.ID_specialite}>{s.nom_specialite}</option>
               ))}
             </select>
-            <button onClick={handleFilterSubmit} className={styles.ProfButton}>Filtrer</button>
+            <button onClick={handleFilterSubmit} className={styles['ADM-ENS-submit-btn']}>Filtrer</button>
           </div>
           {showTeachers && (
-            <div className={styles.ProfTeachersList}>
+            <div className={styles['ADM-ENS-teachers-list']}>
               {teachers.length > 0 ? (
                 teachers.map((teacher) => (
                   <div
                     key={teacher.Matricule}
-                    className={styles.ProfTeacherCard}
+                    className={styles['ADM-ENS-teacher-card']}
                     onClick={() => handleTeacherClick(teacher)}
                   >
                     {teacher.nom} {teacher.prenom}
                   </div>
                 ))
               ) : (
-                <p className={styles.ProfNoTeachers}>Aucun enseignant trouvé.</p>
+                <p className={styles['ADM-ENS-empty-list-message']}>Aucun enseignant trouvé.</p>
               )}
             </div>
           )}

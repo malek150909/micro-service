@@ -7,389 +7,446 @@ import axios from 'axios';
 import styles from './prof.module.css';
 
 const ListEnseignant = () => {
-  const [teachers, setTeachers] = useState([]);
-  const [selectedTeacher, setSelectedTeacher] = useState(null);
-  const [showNewTeacherForm, setShowNewTeacherForm] = useState(false);
-  const [newTeacherForm, setNewTeacherForm] = useState({
-    nom: '',
-    prenom: '',
-    email: '',
-    idFaculte: '',
-    idDepartement: '',
-    modules: []
-  });
-  const [availableModules, setAvailableModules] = useState([]);
-  const [facultes, setFacultes] = useState([]);
-  const [departements, setDepartements] = useState([]);
-  const [specialites, setSpecialites] = useState([]);
-  const [sections, setSections] = useState([]);
-  const [niveaux] = useState(['L1', 'L2', 'L3', 'M1', 'M2']);
-  const [filters, setFilters] = useState({
-    idFaculte: '',
-    idDepartement: '',
-    idSpecialite: '',
-    niveau: '',
-    idSection: ''
-  });
-
-  // Fetch faculties on mount
-  useEffect(() => {
-    axios.get('http://users.localhost/api/facultes')
-      .then(res => setFacultes(res.data || []))
-      .catch(err => {
-        toast.error('Erreur lors de la récupération des facultés: ' + err.message, { autoClose: 3000 });
-        setFacultes([]);
-      });
-  }, []);
-
-  // Fetch departments when faculty changes
-  useEffect(() => {
-    if (newTeacherForm.idFaculte || filters.idFaculte) {
-      const activeIdFaculte = newTeacherForm.idFaculte || filters.idFaculte;
-      axios.get(`http://users.localhost/api/departements/${activeIdFaculte}`)
-        .then(res => setDepartements(res.data || []))
-        .catch(err => {
-          toast.error('Erreur lors de la récupération des départements: ' + err.message, { autoClose: 3000 });
-          setDepartements([]);
-        });
-    } else {
-      setDepartements([]);
-      setSpecialites([]);
-      setSections([]);
-      setAvailableModules([]);
-      setFilters(prev => ({ ...prev, idDepartement: '', idSpecialite: '', niveau: '', idSection: '' }));
-      setNewTeacherForm(prev => ({ ...prev, idDepartement: '' }));
-    }
-  }, [newTeacherForm.idFaculte, filters.idFaculte]);
-
-  // Fetch specialties when department changes
-  useEffect(() => {
-    if (newTeacherForm.idDepartement || filters.idDepartement) {
-      const activeIdDepartement = newTeacherForm.idDepartement || filters.idDepartement;
-      axios.get(`http://users.localhost/api/specialites/${activeIdDepartement}`)
-        .then(res => setSpecialites(res.data || []))
-        .catch(err => {
-          toast.error('Erreur lors de la récupération des spécialités: ' + err.message, { autoClose: 3000 });
-          setSpecialites([]);
-        });
-    } else {
-      setSpecialites([]);
-      setSections([]);
-      setAvailableModules([]);
-      setFilters(prev => ({ ...prev, idSpecialite: '', niveau: '', idSection: '' }));
-    }
-  }, [newTeacherForm.idDepartement, filters.idDepartement]);
-
-  // Fetch sections when specialty changes
-  useEffect(() => {
-    if (filters.idSpecialite) {
-      axios.get(`http://users.localhost/api/sections/${filters.idSpecialite}`)
-        .then(res => setSections(res.data || []))
-        .catch(err => {
-          toast.error('Erreur lors de la récupération des sections: ' + err.message, { autoClose: 3000 });
-          setSections([]);
-        });
-    } else {
-      setSections([]);
-      setAvailableModules([]);
-      setFilters(prev => ({ ...prev, niveau: '', idSection: '' }));
-    }
-  }, [filters.idSpecialite]);
-
-  // Fetch available modules based on filters
-  useEffect(() => {
-    if (filters.idSpecialite) {
-      axios.get('http://users.localhost/api/modules/filtered', {
-        params: {
-          idFaculte: newTeacherForm.idFaculte || filters.idFaculte || '',
-          idDepartement: newTeacherForm.idDepartement || filters.idDepartement || '',
-          idSpecialite: filters.idSpecialite,
-          niveau: filters.niveau || '',
-          idSection: filters.idSection || ''
-        }
-      })
-        .then(res => setAvailableModules(res.data || []))
-        .catch(err => {
-          toast.error('Erreur lors de la récupération des modules: ' + err.message, { autoClose: 3000 });
-          setAvailableModules([]);
-        });
-    } else {
-      setAvailableModules([]);
-    }
-  }, [filters.idFaculte, filters.idDepartement, filters.idSpecialite, filters.niveau, filters.idSection]);
-
-  const handleFilter = (filteredTeachers) => {
-    setTeachers(filteredTeachers || []);
-    setSelectedTeacher(null);
-    setShowNewTeacherForm(false);
-  };
-
-  const handleBack = () => {
-    setSelectedTeacher(null);
-    setTeachers([]);
-    setShowNewTeacherForm(false);
-  };
-
-  const handleNewTeacherChange = (e) => {
-    const { name, value } = e.target;
-    setNewTeacherForm(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilters(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleModuleToggle = (moduleId) => {
-    setNewTeacherForm(prev => {
-      const updatedModules = prev.modules.includes(moduleId)
-        ? prev.modules.filter(id => id !== moduleId)
-        : [...prev.modules, moduleId];
-      return { ...prev, modules: updatedModules };
+    const [teachers, setTeachers] = useState([]);
+    const [selectedTeacher, setSelectedTeacher] = useState(null);
+    const [showNewTeacherForm, setShowNewTeacherForm] = useState(false);
+    const [showBulkUploadForm, setShowBulkUploadForm] = useState(false);
+    const [showModuleAssignForm, setShowModuleAssignForm] = useState(false);
+    const [newTeacherForm, setNewTeacherForm] = useState({
+        nom: '',
+        prenom: '',
+        email: '',
+        idFaculte: '',
+        idSection: '',
+        modules: []
     });
-  };
+    const [bulkUploadForm, setBulkUploadForm] = useState({
+        idFaculte: '',
+        file: null
+    });
+    const [moduleAssignFile, setModuleAssignFile] = useState(null);
+    const [facultes, setFacultes] = useState([]);
+    const [sections, setSections] = useState([]);
+    const [filteredModules, setFilteredModules] = useState([]);
 
-  const handleAddTeacher = () => {
-    if (!newTeacherForm.nom || !newTeacherForm.prenom || !newTeacherForm.email || !newTeacherForm.idFaculte || !newTeacherForm.idDepartement || newTeacherForm.modules.length === 0) {
-      toast.error('Veuillez remplir tous les champs et sélectionner au moins un module.', { autoClose: 3000 });
-      return;
-    }
+    useEffect(() => {
+        axios.get('http://users.localhost/api/facultes')
+            .then(res => setFacultes(res.data || []))
+            .catch(err => {
+                toast.error('Erreur lors de la récupération des facultés: ' + err.message, { autoClose: 3000 });
+                setFacultes([]);
+            });
+    }, []);
 
-    axios.post('http://users.localhost/api/enseignants', newTeacherForm)
-      .then(res => {
-        toast.success('Enseignant ajouté avec succès!', { autoClose: 3000 });
-        setNewTeacherForm({ nom: '', prenom: '', email: '', idFaculte: '', idDepartement: '', modules: [] });
-        setFilters({ idFaculte: '', idDepartement: '', idSpecialite: '', niveau: '', idSection: '' });
-        setShowNewTeacherForm(false);
-        if (filters.idFaculte && filters.idDepartement) {
-          axios.post('http://users.localhost/api/enseignants/filtrer', {
-            idFaculte: filters.idFaculte,
-            idDepartement: filters.idDepartement
-          })
-            .then(res => setTeachers(res.data))
-            .catch(err => toast.error('Erreur lors du rechargement des enseignants: ' + err.message, { autoClose: 3000 }));
+    useEffect(() => {
+        if (newTeacherForm.idFaculte) {
+            axios.get(`http://users.localhost/api/sections/${newTeacherForm.idFaculte}`)
+                .then(res => setSections(res.data || []))
+                .catch(err => {
+                    toast.error('Erreur lors de la récupération des sections: ' + err.message, { autoClose: 3000 });
+                    setSections([]);
+                });
+        } else {
+            setSections([]);
+            setFilteredModules([]);
+            setNewTeacherForm(prev => ({ ...prev, idSection: '', modules: [] }));
+            setBulkUploadForm(prev => ({ ...prev, idFaculte: '' }));
         }
-      })
-      .catch(err => {
-        toast.error('Erreur lors de l\'ajout de l\'enseignant: ' + (err.response?.data?.error || err.message), { autoClose: 3000 });
-      });
-  };
+    }, [newTeacherForm.idFaculte]);
 
-  return (
-    <>
-      <div  className={styles.ProfBackgroundShapes}>
-        <div className={`${styles.ProfShape} ${styles.ProfShape1}`}></div>
-        <div className={`${styles.ProfShape} ${styles.ProfShape2}`}></div>
-      </div>
-      <div className={styles.ProfSidebar}>
-        <div className={styles.ProfLogo}>
-          <h2 className={styles.ProfTitleH2}>Gestion</h2>
-        </div>
-        <button className={styles.ProfSidebarButton} onClick={() => setShowNewTeacherForm(true)}>
-          Ajouter Enseignant
-        </button>
-        <button className={styles.ProfSidebarButton} onClick={() => setSelectedTeacher(null)}>
-          Liste Enseignants
-        </button>
-      </div>
-      <div className={styles.ProfContainer}>
-        <div className={styles.ProfMainContent}>
-          <h1 className={styles.ProfTitleH1}>Gestion des Enseignants</h1>
-          {showNewTeacherForm ? (
-            <div className={`${styles.ProfSectionCard} ${styles.ProfTeacherSection}`}>
-              <h2 className={styles.ProfTitleH2}>Ajouter un nouvel enseignant</h2>
-              <input
-                type="text"
-                name="nom"
-                value={newTeacherForm.nom}
-                onChange={handleNewTeacherChange}
-                placeholder="Nom"
-                className={styles.ProfInput}
-              />
-              <input
-                type="text"
-                name="prenom"
-                value={newTeacherForm.prenom}
-                onChange={handleNewTeacherChange}
-                placeholder="Prénom"
-                className={styles.ProfInput}
-              />
-              <input
-                type="email"
-                name="email"
-                value={newTeacherForm.email}
-                onChange={handleNewTeacherChange}
-                placeholder="Email"
-                className={styles.ProfInput}
-              />
-              <h3 className={styles.ProfTitleH3}>Filtrer les modules</h3>
-              <select
-                name="idFaculte"
-                value={newTeacherForm.idFaculte}
-                onChange={(e) => {
-                  handleNewTeacherChange(e);
-                  handleFilterChange(e);
-                }}
-                className={styles.ProfSelect}
-              >
-                <option value="">Sélectionner une faculté</option>
-                {facultes.map(f => (
-                  <option key={f.ID_faculte} value={f.ID_faculte}>
-                    {f.nom_faculte}
-                  </option>
-                ))}
-              </select>
-              <select
-                name="idDepartement"
-                value={newTeacherForm.idDepartement}
-                onChange={(e) => {
-                  handleNewTeacherChange(e);
-                  handleFilterChange(e);
-                }}
-                disabled={!newTeacherForm.idFaculte}
-                className={styles.ProfSelect}
-              >
-                <option value="">Sélectionner un département</option>
-                {departements.map(d => (
-                  <option key={d.ID_departement} value={d.ID_departement}>
-                    {d.Nom_departement}
-                  </option>
-                ))}
-              </select>
-              <select
-                name="idSpecialite"
-                value={filters.idSpecialite}
-                onChange={handleFilterChange}
-                disabled={!newTeacherForm.idDepartement}
-                className={styles.ProfSelect}
-              >
-                <option value="">Sélectionner une spécialité</option>
-                {specialites.map(s => (
-                  <option key={s.ID_specialite} value={s.ID_specialite}>
-                    {s.nom_specialite}
-                  </option>
-                ))}
-              </select>
-              <select
-                name="niveau"
-                value={filters.niveau}
-                onChange={handleFilterChange}
-                className={styles.ProfSelect}
-              >
-                <option value="">Sélectionner un niveau</option>
-                {niveaux.map(n => (
-                  <option key={n} value={n}>
-                    {n}
-                  </option>
-                ))}
-              </select>
-              <select
-                name="idSection"
-                value={filters.idSection}
-                onChange={handleFilterChange}
-                className={styles.ProfSelect}
-              >
-                <option value="">Sélectionner une section</option>
-                {sections.map(s => (
-                  <option key={s.ID_section} value={s.ID_section}>
-                    {s.nom_section || s.niveau}
-                  </option>
-                ))}
-              </select>
-              <h3 className={styles.ProfTitleH3}>Modules</h3>
-              <div
-                style={{
-                  maxHeight: '200px',
-                  overflowY: 'auto',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  padding: '10px',
-                  backgroundColor: '#fff',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                }}
-              >
-                {availableModules.length > 0 ? (
-                  availableModules.map(module => (
-                    <div
-                      key={module.ID_module}
-                      onClick={() => handleModuleToggle(module.ID_module)}
-                      style={{
-                        padding: '8px 12px',
-                        margin: '5px 0',
-                        border: '1px solid #ddd',
-                        borderRadius: '4px',
-                        backgroundColor: newTeacherForm.modules.includes(module.ID_module) ? '#e0f7fa' : '#fff',
-                        cursor: 'pointer',
-                        transition: 'background-color 0.3s',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center'
-                      }}
-                      onMouseEnter={e => (e.target.style.backgroundColor = newTeacherForm.modules.includes(module.ID_module) ? '#b2ebf2' : '#f5f5f5')}
-                      onMouseLeave={e => (e.target.style.backgroundColor = newTeacherForm.modules.includes(module.ID_module) ? '#e0f7fa' : '#fff')}
-                    >
-                      <span>
-                        {module.nom_module} (Crédits: {module.credit}, Coefficient: {module.coefficient})
-                      </span>
-                      {newTeacherForm.modules.includes(module.ID_module) && (
-                        <span style={{ color: '#2196f3', fontSize: '12px' }}>Sélectionné</span>
-                      )}
-                    </div>
-                  ))
-                ) : (
-                  <p style={{ color: '#888', padding: '5px' }}>Aucun module disponible</p>
-                )}
-              </div>
-              <p style={{ marginTop: '10px', fontSize: '14px' }}>
-                Modules sélectionnés :{' '}
-                {newTeacherForm.modules.length > 0
-                  ? newTeacherForm.modules
-                      .map(id => availableModules.find(m => m.ID_module === id)?.nom_module || 'Inconnu')
-                      .join(', ')
-                  : 'Aucun module sélectionné'}
-              </p>
-              <button onClick={handleAddTeacher} className={styles.ProfButton}>
-                Ajouter
-              </button>
-              <button
-                onClick={() => {
-                  setShowNewTeacherForm(false);
-                  setNewTeacherForm({ nom: '', prenom: '', email: '', idFaculte: '', idDepartement: '', modules: [] });
-                  setFilters({ idFaculte: '', idDepartement: '', idSpecialite: '', niveau: '', idSection: '' });
-                }}
-                className={styles.ProfBackButton}
-              >
-                Annuler
-              </button>
+    useEffect(() => {
+        if (newTeacherForm.idSection) {
+            axios.get(`http://users.localhost/api/modules/filtered`, {
+                params: { idSection: newTeacherForm.idSection }
+            })
+                .then(res => setFilteredModules(res.data || []))
+                .catch(err => {
+                    toast.error('Erreur lors de la récupération des modules: ' + err.message, { autoClose: 3000 });
+                    setFilteredModules([]);
+                });
+        } else {
+            setFilteredModules([]);
+            setNewTeacherForm(prev => ({ ...prev, modules: [] }));
+        }
+    }, [newTeacherForm.idSection]);
+
+    const handleFilter = (filteredTeachers) => {
+        setTeachers(filteredTeachers || []);
+        setSelectedTeacher(null);
+        setShowNewTeacherForm(false);
+        setShowBulkUploadForm(false);
+        setShowModuleAssignForm(false);
+    };
+
+    const handleReset = () => {
+        setTeachers([]);
+    };
+
+    const handleBack = () => {
+        setSelectedTeacher(null);
+        setShowNewTeacherForm(false);
+        setShowBulkUploadForm(false);
+        setShowModuleAssignForm(false);
+    };
+
+    const handleNewTeacherChange = (e) => {
+        const { name, value } = e.target;
+        setNewTeacherForm(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleModuleChange = (e) => {
+        const selectedOptions = Array.from(e.target.selectedOptions).map(option => Number(option.value));
+        console.log('Selected modules:', selectedOptions); // Debug log
+        setNewTeacherForm(prev => ({ ...prev, modules: selectedOptions }));
+    };
+
+    const handleBulkUploadChange = (e) => {
+        const { name, value, files } = e.target;
+        if (name === 'file') {
+            setBulkUploadForm(prev => ({ ...prev, file: files[0] }));
+        } else {
+            setBulkUploadForm(prev => ({ ...prev, [name]: value }));
+        }
+    };
+
+    const handleModuleAssignFileChange = (e) => {
+        setModuleAssignFile(e.target.files[0]);
+    };
+
+    const handleAddTeacher = () => {
+        if (!newTeacherForm.nom || !newTeacherForm.prenom || !newTeacherForm.email || !newTeacherForm.idFaculte || newTeacherForm.modules.length === 0) {
+            toast.error('Veuillez remplir tous les champs obligatoires et sélectionner au moins un module.', { autoClose: 3000 });
+            return;
+        }
+
+        const payload = {
+            nom: newTeacherForm.nom,
+            prenom: newTeacherForm.prenom,
+            email: newTeacherForm.email,
+            idFaculte: newTeacherForm.idFaculte,
+            idDepartement: null,
+            idSection: newTeacherForm.idSection,
+            modules: newTeacherForm.modules
+        };
+
+        axios.post('http://users.localhost/api/enseignants', payload)
+            .then(res => {
+                toast.success('Enseignant ajouté avec succès!', { autoClose: 3000 });
+                setNewTeacherForm({
+                    nom: '',
+                    prenom: '',
+                    email: '',
+                    idFaculte: '',
+                    idSection: '',
+                    modules: []
+                });
+                setShowNewTeacherForm(false);
+                setTeachers([]);
+            })
+            .catch(err => {
+                toast.error('Erreur lors de l\'ajout de l\'enseignant: ' + (err.response?.data?.error || err.message), { autoClose: 3000 });
+            });
+    };
+
+    const handleBulkUpload = () => {
+        if (!bulkUploadForm.idFaculte || !bulkUploadForm.file) {
+            toast.error('Veuillez sélectionner une faculté et un fichier Excel.', { autoClose: 3000 });
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('idFaculte', bulkUploadForm.idFaculte);
+        formData.append('file', bulkUploadForm.file);
+
+        axios.post('http://users.localhost/api/enseignants/bulk', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        })
+            .then(res => {
+                toast.success(`Importation réussie! ${res.data.successCount} enseignants ajoutés.`, { autoClose: 3000 });
+                if (res.data.failedEntries.length > 0) {
+                    res.data.failedEntries.forEach(entry => {
+                        toast.error(`Échec pour ${entry.email}: ${entry.error}`, { autoClose: 3000 });
+                    });
+                }
+                setBulkUploadForm({ idFaculte: '', file: null });
+                setShowBulkUploadForm(false);
+                setTeachers([]);
+            })
+            .catch(err => {
+                toast.error('Erreur lors de l\'importation: ' + (err.response?.data?.error || err.message), { autoClose: 3000 });
+            });
+    };
+
+    const handleModuleAssign = () => {
+        if (!moduleAssignFile) {
+            toast.error('Veuillez sélectionner un fichier Excel.', { autoClose: 3000 });
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', moduleAssignFile);
+
+        axios.post('http://users.localhost/api/enseignants/assign-modules', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        })
+            .then(res => {
+                toast.success('Modules attribués avec succès!', { autoClose: 3000 });
+                setModuleAssignFile(null);
+                setShowModuleAssignForm(false);
+            })
+            .catch(err => {
+                toast.error('Erreur lors de l\'attribution des modules: ' + (err.response?.data?.error || err.message), { autoClose: 3000 });
+            });
+    };
+
+    return (
+        <>
+            <div className={styles['ADM-ENS-background-shapes']}>
+                <div className={`${styles['ADM-ENS-shape']} ${styles['ADM-ENS-shape1']}`}></div>
+                <div className={`${styles['ADM-ENS-shape']} ${styles['ADM-ENS-shape2']}`}></div>
             </div>
-          ) : !selectedTeacher ? (
-            <div className={styles.ProfSectionCard}>
-              <button className={styles.ProfButton} onClick={() => setShowNewTeacherForm(true)}>
-                Ajouter un nouvel enseignant
-              </button>
-              <FilterPanel onFilter={handleFilter} />
-              {teachers.length > 0 && (
-                <div className={styles.ProfTeachersList}>
-                  {teachers.map(teacher => (
-                    <div
-                      key={teacher.Matricule}
-                      className={styles.ProfTeacherCard}
-                      onClick={() => setSelectedTeacher(teacher)}
-                    >
-                      {teacher.nom} {teacher.prenom}
-                    </div>
-                  ))}
+            <div className={styles['ADM-ENS-sidebar']}>
+                <div className={styles['ADM-ENS-logo']}>
+                    <h2>Gestion</h2>
                 </div>
-              )}
+                <button
+                    className={styles['ADM-ENS-sidebar-button']}
+                    onClick={() => {
+                        setShowNewTeacherForm(true);
+                        setShowBulkUploadForm(false);
+                        setShowModuleAssignForm(false);
+                        setSelectedTeacher(null);
+                        setTeachers([]);
+                    }}
+                >
+                    Ajouter Enseignant
+                </button>
+                <button
+                    className={styles['ADM-ENS-sidebar-button']}
+                    onClick={() => {
+                        setShowBulkUploadForm(true);
+                        setShowNewTeacherForm(false);
+                        setShowModuleAssignForm(false);
+                        setSelectedTeacher(null);
+                        setTeachers([]);
+                    }}
+                >
+                    Importer Enseignants
+                </button>
+                <button
+                    className={styles['ADM-ENS-sidebar-button']}
+                    onClick={() => {
+                        setShowModuleAssignForm(true);
+                        setShowNewTeacherForm(false);
+                        setShowBulkUploadForm(false);
+                        setSelectedTeacher(null);
+                        setTeachers([]);
+                    }}
+                >
+                    Attribuer Modules
+                </button>
+                <button
+                    className={styles['ADM-ENS-sidebar-button']}
+                    onClick={() => {
+                        setSelectedTeacher(null);
+                        setShowNewTeacherForm(false);
+                        setShowBulkUploadForm(false);
+                        setShowModuleAssignForm(false);
+                        setTeachers([]);
+                    }}
+                >
+                    Liste Enseignants
+                </button>
             </div>
-          ) : (
-            <TeacherSection teacher={selectedTeacher} onBack={handleBack} />
-          )}
-          <ToastContainer />
-        </div>
-      </div>
-    </>
-  );
+            <div className={styles['ADM-ENS-container']}>
+                <div className={styles['ADM-ENS-main-content']}>
+                    <h1 className={styles['ADM-ENS-title-with-square']}>Gestion des Enseignants</h1>
+                    {showNewTeacherForm ? (
+                        <div className={`${styles['ADM-ENS-section-card']} ${styles['ADM-ENS-teacher-section']} ${styles['ADM-ENS-enlarged-form']}`}>
+                            <h2>Ajouter un nouvel enseignant</h2>
+                            <input
+                                type="text"
+                                name="nom"
+                                value={newTeacherForm.nom}
+                                onChange={handleNewTeacherChange}
+                                placeholder="Nom"
+                            />
+                            <input
+                                type="text"
+                                name="prenom"
+                                value={newTeacherForm.prenom}
+                                onChange={handleNewTeacherChange}
+                                placeholder="Prénom"
+                            />
+                            <input
+                                type="email"
+                                name="email"
+                                value={newTeacherForm.email}
+                                onChange={handleNewTeacherChange}
+                                placeholder="Email"
+                            />
+                            <select
+                                name="idFaculte"
+                                value={newTeacherForm.idFaculte}
+                                onChange={handleNewTeacherChange}
+                            >
+                                <option value="">Sélectionner une faculté</option>
+                                {facultes.map(f => (
+                                    <option key={f.ID_faculte} value={f.ID_faculte}>
+                                        {f.nom_faculte}
+                                    </option>
+                                ))}
+                            </select>
+                            <select
+                                name="idSection"
+                                value={newTeacherForm.idSection}
+                                onChange={handleNewTeacherChange}
+                                disabled={!newTeacherForm.idFaculte}
+                            >
+                                <option value="">Sélectionner une section</option>
+                                {sections.map(section => (
+                                    <option key={section.ID_section} value={section.ID_section}>
+                                        {section.nom_section} ({section.niveau})
+                                    </option>
+                                ))}
+                            </select>
+                            <select
+                                multiple
+                                name="modules"
+                                value={newTeacherForm.modules}
+                                onChange={handleModuleChange}
+                                disabled={!newTeacherForm.idSection}
+                                style={{ minHeight: '120px' }}
+                            >
+                                {filteredModules.map(module => (
+                                    <option key={module.ID_module} value={module.ID_module}>
+                                        {module.nom_module}
+                                    </option>
+                                ))}
+                            </select>
+                            <p style={{ fontSize: '0.9rem', color: '#052659', marginTop: '-10px', marginBottom: '15px' }}>
+                                Tenez Ctrl (ou Cmd sur Mac) pour sélectionner plusieurs modules.
+                            </p>
+                            <div className={styles['ADM-ENS-button-group']}>
+                                <button onClick={handleAddTeacher} className={styles['ADM-ENS-submit-btn']}>
+                                    Ajouter
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setShowNewTeacherForm(false);
+                                        setNewTeacherForm({
+                                            nom: '',
+                                            prenom: '',
+                                            email: '',
+                                            idFaculte: '',
+                                            idSection: '',
+                                            modules: []
+                                        });
+                                        setTeachers([]);
+                                    }}
+                                    className={styles['ADM-ENS-back-btn']}
+                                >
+                                    Annuler
+                                </button>
+                            </div>
+                        </div>
+                    ) : showBulkUploadForm ? (
+                        <div className={`${styles['ADM-ENS-section-card']} ${styles['ADM-ENS-teacher-section']} ${styles['ADM-ENS-enlarged-form']}`}>
+                            <h2>Importer des enseignants via Excel</h2>
+                            <select
+                                name="idFaculte"
+                                value={bulkUploadForm.idFaculte}
+                                onChange={handleBulkUploadChange}
+                            >
+                                <option value="">Sélectionner une faculté</option>
+                                {facultes.map(f => (
+                                    <option key={f.ID_faculte} value={f.ID_faculte}>
+                                        {f.nom_faculte}
+                                    </option>
+                                ))}
+                            </select>
+                            <input
+                                type="file"
+                                name="file"
+                                accept=".xlsx, .xls"
+                                onChange={handleBulkUploadChange}
+                            />
+                            <div className={styles['ADM-ENS-button-group']}>
+                                <button onClick={handleBulkUpload} className={styles['ADM-ENS-submit-btn']}>
+                                    Importer
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setShowBulkUploadForm(false);
+                                        setBulkUploadForm({ idFaculte: '', file: null });
+                                        setTeachers([]);
+                                    }}
+                                    className={styles['ADM-ENS-back-btn']}
+                                >
+                                    Annuler
+                                </button>
+                            </div>
+                        </div>
+                    ) : showModuleAssignForm ? (
+                        <div className={`${styles['ADM-ENS-section-card']} ${styles['ADM-ENS-teacher-section']} ${styles['ADM-ENS-enlarged-form']}`}>
+                            <h2>Attribuer des modules via Excel</h2>
+                            <input
+                                type="file"
+                                name="file"
+                                accept=".xlsx, .xls"
+                                onChange={handleModuleAssignFileChange}
+                            />
+                            <div className={styles['ADM-ENS-button-group']}>
+                                <button onClick={handleModuleAssign} className={styles['ADM-ENS-submit-btn']}>
+                                    Attribuer
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setShowModuleAssignForm(false);
+                                        setModuleAssignFile(null);
+                                        setTeachers([]);
+                                    }}
+                                    className={styles['ADM-ENS-back-btn']}
+                                >
+                                    Annuler
+                                </button>
+                            </div>
+                        </div>
+                    ) : selectedTeacher ? (
+                        <TeacherSection teacher={selectedTeacher} onBack={handleBack} />
+                    ) : (
+                        <div className={`${styles['ADM-ENS-filtering-page']} flex flex-row gap-6`}>
+                            <div className={styles['ADM-ENS-section-card']}>
+                                <FilterPanel onFilter={handleFilter} onReset={handleReset} />
+                            </div>
+                            <div className={`${styles['ADM-ENS-section-card']} ${styles['ADM-ENS-teacher-list-container']} flex items-center justify-center`}>
+                                {teachers.length > 0 ? (
+                                    <div className={`${styles['ADM-ENS-teachers-list']} w-full`}>
+                                        {[...teachers]
+                                            .sort((a, b) =>
+                                                `${a.nom} ${a.prenom}`.localeCompare(`${b.nom} ${b.prenom}`, 'fr', { sensitivity: 'base' })
+                                            )
+                                            .map(teacher => (
+                                                <div
+                                                    key={teacher.Matricule}
+                                                    className={styles['ADM-ENS-teacher-card']}
+                                                    onClick={() => setSelectedTeacher(teacher)}
+                                                >
+                                                    {teacher.nom} {teacher.prenom}
+                                                </div>
+                                            ))}
+                                    </div>
+                                ) : (
+                                    <p className={styles['ADM-ENS-empty-list-message']}>La liste des enseignants s'affichera ici</p>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                    <ToastContainer className={styles['ADM-ENS-Toastify__toast']} />
+                </div>
+            </div>
+        </>
+    );
 };
 
 export default ListEnseignant;
