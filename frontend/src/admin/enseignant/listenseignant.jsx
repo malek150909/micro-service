@@ -82,11 +82,16 @@ const ListEnseignant = () => {
         setTeachers([]);
     };
 
-    const handleBack = () => {
+    const handleBack = (resetList) => {
         setSelectedTeacher(null);
         setShowNewTeacherForm(false);
         setShowBulkUploadForm(false);
         setShowModuleAssignForm(false);
+        if (resetList) {
+            axios.get('http://users.localhost/api/enseignants')
+                .then(res => setTeachers(res.data || []))
+                .catch(err => toast.error('Erreur lors du rechargement des enseignants: ' + err.message, { autoClose: 3000 }));
+        }
     };
 
     const handleNewTeacherChange = (e) => {
@@ -96,7 +101,7 @@ const ListEnseignant = () => {
 
     const handleModuleChange = (e) => {
         const selectedOptions = Array.from(e.target.selectedOptions).map(option => Number(option.value));
-        console.log('Selected modules:', selectedOptions); // Debug log
+        console.log('Selected modules:', selectedOptions);
         setNewTeacherForm(prev => ({ ...prev, modules: selectedOptions }));
     };
 
@@ -270,6 +275,7 @@ const ListEnseignant = () => {
                                 value={newTeacherForm.nom}
                                 onChange={handleNewTeacherChange}
                                 placeholder="Nom"
+                                className={styles['ADM-ENS-input']}
                             />
                             <input
                                 type="text"
@@ -277,6 +283,7 @@ const ListEnseignant = () => {
                                 value={newTeacherForm.prenom}
                                 onChange={handleNewTeacherChange}
                                 placeholder="Prénom"
+                                className={styles['ADM-ENS-input']}
                             />
                             <input
                                 type="email"
@@ -284,11 +291,13 @@ const ListEnseignant = () => {
                                 value={newTeacherForm.email}
                                 onChange={handleNewTeacherChange}
                                 placeholder="Email"
+                                className={styles['ADM-ENS-input']}
                             />
                             <select
                                 name="idFaculte"
                                 value={newTeacherForm.idFaculte}
                                 onChange={handleNewTeacherChange}
+                                className={styles['ADM-ENS-select']}
                             >
                                 <option value="">Sélectionner une faculté</option>
                                 {facultes.map(f => (
@@ -302,6 +311,7 @@ const ListEnseignant = () => {
                                 value={newTeacherForm.idSection}
                                 onChange={handleNewTeacherChange}
                                 disabled={!newTeacherForm.idFaculte}
+                                className={styles['ADM-ENS-select']}
                             >
                                 <option value="">Sélectionner une section</option>
                                 {sections.map(section => (
@@ -316,7 +326,7 @@ const ListEnseignant = () => {
                                 value={newTeacherForm.modules}
                                 onChange={handleModuleChange}
                                 disabled={!newTeacherForm.idSection}
-                                style={{ minHeight: '120px' }}
+                                className={styles['ADM-ENS-select']}
                             >
                                 {filteredModules.map(module => (
                                     <option key={module.ID_module} value={module.ID_module}>
@@ -324,11 +334,14 @@ const ListEnseignant = () => {
                                     </option>
                                 ))}
                             </select>
-                            <p style={{ fontSize: '0.9rem', color: '#052659', marginTop: '-10px', marginBottom: '15px' }}>
+                            <p className={styles['ADM-ENS-help-text']}>
                                 Tenez Ctrl (ou Cmd sur Mac) pour sélectionner plusieurs modules.
                             </p>
                             <div className={styles['ADM-ENS-button-group']}>
-                                <button onClick={handleAddTeacher} className={styles['ADM-ENS-submit-btn']}>
+                                <button
+                                    onClick={handleAddTeacher}
+                                    className={styles['ADM-ENS-submit-btn']}
+                                >
                                     Ajouter
                                 </button>
                                 <button
@@ -357,6 +370,7 @@ const ListEnseignant = () => {
                                 name="idFaculte"
                                 value={bulkUploadForm.idFaculte}
                                 onChange={handleBulkUploadChange}
+                                className={styles['ADM-ENS-select']}
                             >
                                 <option value="">Sélectionner une faculté</option>
                                 {facultes.map(f => (
@@ -370,9 +384,13 @@ const ListEnseignant = () => {
                                 name="file"
                                 accept=".xlsx, .xls"
                                 onChange={handleBulkUploadChange}
+                                className={styles['ADM-ENS-input']}
                             />
                             <div className={styles['ADM-ENS-button-group']}>
-                                <button onClick={handleBulkUpload} className={styles['ADM-ENS-submit-btn']}>
+                                <button
+                                    onClick={handleBulkUpload}
+                                    className={styles['ADM-ENS-submit-btn']}
+                                >
                                     Importer
                                 </button>
                                 <button
@@ -395,9 +413,13 @@ const ListEnseignant = () => {
                                 name="file"
                                 accept=".xlsx, .xls"
                                 onChange={handleModuleAssignFileChange}
+                                className={styles['ADM-ENS-input']}
                             />
                             <div className={styles['ADM-ENS-button-group']}>
-                                <button onClick={handleModuleAssign} className={styles['ADM-ENS-submit-btn']}>
+                                <button
+                                    onClick={handleModuleAssign}
+                                    className={styles['ADM-ENS-submit-btn']}
+                                >
                                     Attribuer
                                 </button>
                                 <button

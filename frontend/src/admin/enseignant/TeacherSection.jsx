@@ -18,6 +18,7 @@ const TeacherSection = ({ teacher, onBack }) => {
     const [selectedModuleSections, setSelectedModuleSections] = useState([]);
     const [selectedModuleName, setSelectedModuleName] = useState('');
     const [showModal, setShowModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false); // Nouvel état pour le modal de suppression
 
     useEffect(() => {
         axios.get(`http://users.localhost/api/enseignants/${teacher.Matricule}`)
@@ -69,14 +70,30 @@ const TeacherSection = ({ teacher, onBack }) => {
     }, [filters.idSpecialite]);
 
     const handleDelete = () => {
-        if (window.confirm('Êtes-vous sûr de vouloir supprimer cet enseignant ?')) {
-            axios.delete(`http://users.localhost/api/enseignants/${teacher.Matricule}`)
-                .then(() => {
-                    toast.success('Enseignant supprimé avec succès', { autoClose: 3000 });
-                    onBack();
-                })
-                .catch(err => toast.error('Erreur lors de la suppression de l\'enseignant: ' + err.message, { autoClose: 3000 }));
+        if (!teacher.Matricule) {
+            toast.error('Erreur : Matricule de l\'enseignant non défini', { autoClose: 3000 });
+            return;
         }
+        setShowDeleteModal(true); // Affiche le modal de confirmation
+    };
+
+    const confirmDelete = () => {
+        const token = localStorage.getItem('token');
+        axios.delete(`http://users.localhost/api/enseignants/${teacher.Matricule}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
+            .then(() => {
+                toast.success('Enseignant supprimé avec succès', { autoClose: 3000 });
+                setShowDeleteModal(false);
+                onBack(true);
+            })
+            .catch(err => {
+                console.error('Erreur suppression:', err.response?.data || err.message);
+                toast.error(`Erreur lors de la suppression de l'enseignant: ${err.response?.data?.error || err.message}`, { autoClose: 3000 });
+                setShowDeleteModal(false);
+            });
     };
 
     const handleFilterChange = (e) => {
@@ -97,7 +114,12 @@ const TeacherSection = ({ teacher, onBack }) => {
     };
 
     const handleUpdate = () => {
-        axios.put(`http://users.localhost/api/enseignants/${teacher.Matricule}`, formData)
+        const token = localStorage.getItem('token');
+        axios.put(`http://users.localhost/api/enseignants/${teacher.Matricule}`, formData, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
             .then(() => {
                 toast.success('Enseignant mis à jour avec succès', { autoClose: 3000 });
                 axios.get(`http://users.localhost/api/enseignants/${teacher.Matricule}`)
@@ -122,10 +144,15 @@ const TeacherSection = ({ teacher, onBack }) => {
     };
 
     return (
-        <div className={styles['ADM-ENS-container']} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '10vh' }}>
-            <div className={`${styles['ADM-ENS-section-card']} ${styles['ADM-ENS-teacher-section']}`} style={{ width: '600px', maxWidth: '90%' }}>
-                <button className={styles['ADM-ENS-back-btn']} onClick={onBack}>Retour</button>
-                <h2 style={{ textAlign: 'center' }}>Détails de l'enseignant</h2>
+        <div className={styles['ADM-ENS-container']}>
+            <div className={`${styles['ADM-ENS-section-card']} ${styles['ADM-ENS-teacher-section']}`}>
+                <button
+                    className={styles['ADM-ENS-back-btn']}
+                    onClick={() => onBack()}
+                >
+                    Retour
+                </button>
+                <h2>Détails de l'enseignant</h2>
                 {teacherDetails && (
                     <div>
                         {!editMode ? (
@@ -140,7 +167,7 @@ const TeacherSection = ({ teacher, onBack }) => {
                                             <li
                                                 key={`${m.ID_module}-${m.course_type}-${m.group_number || 'none'}`}
                                                 onClick={() => handleModuleClick(m.ID_module, m.nom_module)}
-                                                style={{ cursor: 'pointer', color: '#2196f3', textDecoration: 'underline' }}
+                                                className={styles['ADM-ENS-module-link']}
                                             >
                                                 {m.nom_module} ({m.course_type}{m.group_number ? ` ${m.group_number}` : ''})
                                             </li>
@@ -149,9 +176,19 @@ const TeacherSection = ({ teacher, onBack }) => {
                                         <li>Aucun module assigné</li>
                                     )}
                                 </ul>
-                                <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
-                                    <button className={styles['ADM-ENS-edit-btn']} onClick={() => setEditMode(true)}>Modifier</button>
-                                    <button className={styles['ADM-ENS-delete-btn']} onClick={handleDelete}>Supprimer</button>
+                                <div className={styles['ADM-ENS-button-group']}>
+                                    <button
+                                        className={styles['ADM-ENS-edit-btn']}
+                                        onClick={() => setEditMode(true)}
+                                    >
+                                        Modifier
+                                    </button>
+                                    <button
+                                        className={styles['ADM-ENS-delete-btn']}
+                                        onClick={handleDelete}
+                                    >
+                                        Supprimer
+                                    </button>
                                 </div>
                             </>
                         ) : (
@@ -161,27 +198,33 @@ const TeacherSection = ({ teacher, onBack }) => {
                                     value={formData.nom}
                                     onChange={e => setFormData({ ...formData, nom: e.target.value })}
                                     placeholder="Nom"
-                                    style={{ width: '100%', marginBottom: '10px' }}
+                                    className={styles['ADM-ENS-input']}
                                 />
                                 <input
                                     type="text"
                                     value={formData.prenom}
                                     onChange={e => setFormData({ ...formData, prenom: e.target.value })}
                                     placeholder="Prénom"
-                                    style={{ width: '100%', marginBottom: '10px' }}
+                                    className={styles['ADM-ENS-input']}
                                 />
                                 <input
                                     type="email"
                                     value={formData.email}
                                     onChange={e => setFormData({ ...formData, email: e.target.value })}
                                     placeholder="Email"
-                                    style={{ width: '100%', marginBottom: '10px' }}
+                                    className={styles['ADM-ENS-input']}
                                 />
-                                <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
-                                    <button onClick={handleUpdate} className={styles['ADM-ENS-submit-btn']}>
+                                <div className={styles['ADM-ENS-button-group']}>
+                                    <button
+                                        onClick={handleUpdate}
+                                        className={styles['ADM-ENS-submit-btn']}
+                                    >
                                         Mettre à jour
                                     </button>
-                                    <button onClick={() => setEditMode(false)} className={styles['ADM-ENS-back-btn']}>
+                                    <button
+                                        onClick={() => setEditMode(false)}
+                                        className={styles['ADM-ENS-back-btn']}
+                                    >
                                         Annuler
                                     </button>
                                 </div>
@@ -190,45 +233,15 @@ const TeacherSection = ({ teacher, onBack }) => {
                     </div>
                 )}
                 {showModal && (
-                    <div
-                        style={{
-                            position: 'fixed',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                            backdropFilter: 'blur(8px)',
-                            WebkitBackdropFilter: 'blur(8px)',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            zIndex: 9999
-                        }}
-                    >
-                        <div
-                            className={styles['ADM-ENS-section-card']}
-                            style={{
-                                width: '500px',
-                                maxWidth: '90%',
-                                maxHeight: '80vh',
-                                overflowY: 'auto',
-                                padding: '20px',
-                                backgroundColor: '#fff',
-                                zIndex: 10000
-                            }}
-                        >
-                            <h3 style={{ textAlign: 'center' }}>{selectedModuleName}</h3>
+                    <div className={styles['ADM-ENS-modal']}>
+                        <div className={styles['ADM-ENS-section-card']}>
+                            <h3>{selectedModuleName}</h3>
                             {selectedModuleSections.length > 0 ? (
                                 <div>
                                     {selectedModuleSections.map(section => (
                                         <div
                                             key={`${section.ID_section}-${section.course_type}-${section.group_number || 'none'}`}
-                                            style={{
-                                                marginBottom: '15px',
-                                                padding: '10px',
-                                                borderBottom: '1px solid #ddd'
-                                            }}
+                                            className={styles['ADM-ENS-section-item']}
                                         >
                                             <p><strong>Année:</strong> {section.niveau}</p>
                                             <p><strong>Section:</strong> {section.nom_section || 'Section sans nom'}</p>
@@ -237,15 +250,36 @@ const TeacherSection = ({ teacher, onBack }) => {
                                     ))}
                                 </div>
                             ) : (
-                                <p style={{ textAlign: 'center' }}>Aucune section associée à ce module pour cet enseignant.</p>
+                                <p>Aucune section associée à ce module pour cet enseignant.</p>
                             )}
-                            <div style={{ display: 'flex', justifyContent: 'center' }}>
+                            <div className={styles['ADM-ENS-button-group']}>
                                 <button
                                     className={styles['ADM-ENS-submit-btn']}
                                     onClick={() => setShowModal(false)}
-                                    style={{ marginTop: '20px' }}
                                 >
                                     Fermer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+                {showDeleteModal && (
+                    <div className={styles['ADM-ENS-modal']}>
+                        <div className={styles['ADM-ENS-section-card']}>
+                            <h3>Confirmer la suppression</h3>
+                            <p>Êtes-vous sûr de vouloir supprimer cet enseignant ({teacherDetails?.prenom} {teacherDetails?.nom}) ?</p>
+                            <div className={styles['ADM-ENS-button-group']}>
+                                <button
+                                    className={styles['ADM-ENS-delete-btn']}
+                                    onClick={confirmDelete}
+                                >
+                                    Supprimer
+                                </button>
+                                <button
+                                    className={styles['ADM-ENS-back-btn']}
+                                    onClick={() => setShowDeleteModal(false)}
+                                >
+                                    Annuler
                                 </button>
                             </div>
                         </div>

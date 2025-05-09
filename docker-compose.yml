@@ -106,6 +106,8 @@ services:
       - courses-service
       - messaging-service
       - events-service
+    volumes:
+      - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     environment:
       - API_USERS_URL=http://users.localhost
       - API_COURSES_URL=http://courses.localhost

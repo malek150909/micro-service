@@ -52,7 +52,12 @@ const FilterPanel = ({ onFilter, onReset }) => {
     return (
         <div className={styles['ADM-ENS-filter-panel-container']}>
             <h2>Filtrer les enseignants</h2>
-            <select name="idFaculte" value={filters.idFaculte} onChange={handleChange}>
+            <select
+                name="idFaculte"
+                value={filters.idFaculte}
+                onChange={handleChange}
+                className={styles['ADM-ENS-select']}
+            >
                 <option value="">Sélectionner une faculté</option>
                 {facultes.map(f => (
                     <option key={f.ID_faculte} value={f.ID_faculte}>
@@ -61,8 +66,18 @@ const FilterPanel = ({ onFilter, onReset }) => {
                 ))}
             </select>
             <div className={styles['ADM-ENS-button-group']}>
-                <button onClick={handleFilter} className={styles['ADM-ENS-submit-btn']}>Filtrer</button>
-                <button onClick={handleReset} className={styles['ADM-ENS-reset-btn']}>Réinitialiser</button>
+                <button
+                    onClick={handleFilter}
+                    className={styles['ADM-ENS-submit-btn']}
+                >
+                    Filtrer
+                </button>
+                <button
+                    onClick={handleReset}
+                    className={styles['ADM-ENS-reset-btn']}
+                >
+                    Réinitialiser
+                </button>
             </div>
             <ToastContainer className={styles['ADM-ENS-Toastify__toast']} />
         </div>

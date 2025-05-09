@@ -25,7 +25,7 @@ app.use(express.json());
 app.use(cors({
   origin: ['http://plateform.universitaire', 'http://localhost:8085'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'matricule'] 
 }));
 
 app.options('*', cors());

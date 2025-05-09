@@ -1,4 +1,4 @@
-ADM-ENS-select[multiple] {
+.ADM-ENS-select[multiple] {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -8,369 +8,384 @@ ADM-ENS-select[multiple] {
   overflow-y: auto;
 }
 
-ADM-ENS-select[multiple] option {
+.ADM-ENS-select[multiple] option {
   padding: 5px;
   background: #f0f7ff;
 }
 
-ADM-ENS-select[multiple] option:checked {
+.ADM-ENS-select[multiple] option:checked {
   background: #5483b3;
   color: #ffffff;
 }
 
 /* Background Shapes */
 .ADM-ENS-background-shapes {
-position: fixed;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-z-index: -1;
-overflow: hidden;
-pointer-events: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
 }
 
 .ADM-ENS-shape {
-position: absolute;
-border-radius: 50%;
-opacity: 0.15;
-animation: ADM-ENS-pulseShape 10s infinite ease-in-out;
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.15;
+  animation: ADM-ENS-pulseShape 10s infinite ease-in-out;
 }
 
 .ADM-ENS-shape1 {
-width: 500px;
-height: 500px;
-background: radial-gradient(circle, #ffffff 0%, #c1e8ff 100%);
-top: -250px;
-left: -100px;
-filter: blur(50px);
-animation-delay: 0s;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, #ffffff 0%, #c1e8ff 100%);
+  top: -250px;
+  left: -100px;
+  filter: blur(50px);
+  animation-delay: 0s;
 }
 
 .ADM-ENS-shape2 {
-width: 400px;
-height: 400px;
-background: radial-gradient(circle, #ffffff 0%, #7da0ca 100%);
-bottom: -200px;
-right: -100px;
-filter: blur(40px);
-animation-delay: 3s;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, #ffffff 0%, #7da0ca 100%);
+  bottom: -200px;
+  right: -100px;
+  filter: blur(40px);
+  animation-delay: 3s;
 }
 
 @keyframes ADM-ENS-pulseShape {
-0% { transform: scale(1) translateY(0); }
-50% { transform: scale(1.05) translateY(-15px); }
-100% { transform: scale(1) translateY(0); }
+  0% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.05) translateY(-15px); }
+  100% { transform: scale(1) translateY(0); }
 }
 
 @keyframes ADM-ENS-slideIn {
-from { transform: translateX(-100%); }
-to { transform: translateX(0); }
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
 }
 
 /* Sidebar */
 .ADM-ENS-sidebar {
-background: linear-gradient(135deg, rgba(91, 135, 179, 0.95) 0%, rgba(17, 69, 148, 0.95) 100%);
-padding: 25px;
-color: #ffffff;
-display: flex;
-flex-direction: column;
-gap: 15px;
-position: fixed;
-top: 0;
-left: 30px;
-width: 180px;
-height: 100vh;
-box-shadow: 0 15px 40px rgba(37, 100, 194, 0.35);
-border: 1px solid rgba(255, 255, 255, 0.2);
-backdrop-filter: blur(10px);
-z-index: 1000;
-animation: ADM-ENS-slideIn 0.5s ease-out;
+  background: linear-gradient(135deg, rgba(91, 135, 179, 0.95) 0%, rgba(17, 69, 148, 0.95) 100%);
+  padding: 25px;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  position: fixed;
+  top: 0;
+  left: 30px;
+  width: 180px;
+  height: 100vh;
+  box-shadow: 0 15px 40px rgba(37, 100, 194, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  animation: ADM-ENS-slideIn 0.5s ease-out;
 }
 
 .ADM-ENS-logo {
-display: flex;
-align-items: center;
-gap: 10px;
-margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
 }
 
 .ADM-ENS-logo h2 {
-font-size: 1.5rem;
-font-weight: 600;
-margin: 0;
-color: #ffffff;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+  color: #ffffff;
 }
 
 .ADM-ENS-sidebar-button {
-background: rgba(255, 255, 255, 0.1);
-color: #ffffff;
-font-size: 1rem;
-display: flex;
-align-items: center;
-justify-content: flex-start;
-gap: 12px;
-padding: 12px 20px;
-border: none;
-border-radius: 12px;
-cursor: pointer;
-transition: all 0.3s ease;
-width: 100%;
-box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .ADM-ENS-sidebar-button:hover {
-background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(125, 160, 202, 0.5));
-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-transform: translateY(-2px);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(125, 160, 202, 0.5));
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
 }
 
 /* Container */
 .ADM-ENS-container {
-max-width: 1400px;
-margin: 30px auto;
-padding: 0;
-position: relative;
+  max-width: 1400px;
+  margin: 30px auto;
+  padding: 0;
+  position: relative;
 }
 
 /* Main Content */
 .ADM-ENS-main-content {
-margin-left: 310px;
-margin-right: 30px;
-display: flex;
-flex-direction: column;
-gap: 30px;
-align-items: center; /* Center the content */
+  margin-left: 310px;
+  margin-right: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  align-items: center;
 }
 
 /* Title with White Square */
 .ADM-ENS-title-with-square {
-font-size: 3rem;
-font-weight: 700;
-color: #052659;
-margin-bottom: 20px;
-display: flex;
-align-items: center;
-gap: 10px;
-letter-spacing: 1px;
-position: relative;
-background: linear-gradient(90deg, #0d3155, #7DA0CA);
--webkit-background-clip: text;
-background-clip: text;
--webkit-text-fill-color: transparent;
+  font-size: 3rem;
+  font-weight: 700;
+  color: #052659;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: 1px;
+  position: relative;
+  background: linear-gradient(90deg, #0d3155, #7DA0CA);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .ADM-ENS-title-with-square::before {
-content: '';
-position: absolute;
-width: 400px;
-height: 80px;
-background: rgba(255, 255, 255, 0.85);
-z-index: -1;
-top: 50%;
-left: 50%;
-transform: translate(-50%, -50%);
-border-radius: 15px;
-box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15);
+  content: '';
+  position: absolute;
+  width: 400px;
+  height: 80px;
+  background: rgba(255, 255, 255, 0.85);
+  z-index: -1;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15);
 }
 
 /* Section Card */
 .ADM-ENS-section-card {
-background: rgba(255, 255, 255, 0.85);
-border-radius: 20px;
-padding: 25px;
-box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15);
-border: 1px solid rgba(255, 255, 255, 0.5);
-backdrop-filter: blur(10px);
-width: 500px; /* Wider form width based on images */
-margin: 0 auto; /* Center the form */
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  width: 500px;
+  margin: 0 auto;
 }
 
 /* Enlarged Form */
 .ADM-ENS-enlarged-form {
-width: 500px; /* Consistent width with section-card */
-padding: 40px;
+  width: 500px;
+  padding: 40px;
 }
 
 /* Filtering Page Layout */
 .ADM-ENS-filtering-page {
-display: flex;
-flex-direction: row;
-flex-wrap: nowrap;
-gap: 24px;
-width: 100%;
-justify-content: center; /* Center the filtering page */
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 24px;
+  width: 100%;
+  justify-content: center;
 }
 
-/* Adjust Filter Panel Size Here */
+/* Filter Panel */
 .ADM-ENS-filter-panel-container {
-flex: 1;
-min-width: 350px;
-max-width: 800px;
-min-height: 400px;
+  flex: 1;
+  min-width: 350px;
+  max-width: 800px;
+  min-height: 400px;
 }
 
-/* Adjust Teacher List Panel Size Here */
+/* Teacher List Panel */
 .ADM-ENS-teacher-list-container {
-flex: 2;
-min-width: 600px;
-min-height: 450px;
+  flex: 2;
+  min-width: 600px;
+  min-height: 450px;
 }
 
 /* Empty List Message */
 .ADM-ENS-empty-list-message {
-font-size: 1.5rem;
-color: #052659;
-text-align: center;
+  font-size: 1.5rem;
+  color: #052659;
+  text-align: center;
 }
 
 /* Filters */
 .ADM-ENS-filters {
-display: flex;
-flex-wrap: wrap;
-gap: 15px;
-margin-bottom: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
 }
 
-.ADM-ENS-filters select {
-padding: 12px;
-border: 1px solid rgba(84, 131, 179, 0.2);
-border-radius: 12px;
-font-size: 0.95rem;
-background: #f0f7ff;
-color: #052659;
-flex: 1;
-min-width: 200px;
-box-shadow: 0 4px 15px rgba(5, 38, 89, 0.05);
-transition: all 0.3s ease;
+/* Input and Select */
+.ADM-ENS-input, .ADM-ENS-select {
+  padding: 18px;
+  border: 1px solid rgba(84, 131, 179, 0.2);
+  border-radius: 15px;
+  font-size: 1rem;
+  background: #f0f7ff;
+  color: #052659;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 20px;
 }
 
-.ADM-ENS-filters select:focus {
-border-color: #5483b3;
-box-shadow: 0 0 15px rgba(84, 131, 179, 0.2);
-outline: none;
+.ADM-ENS-input:focus, .ADM-ENS-select:focus {
+  border-color: #5483b3;
+  box-shadow: 0 0 15px rgba(84, 131, 179, 0.2);
+  outline: none;
+}
+
+.ADM-ENS-select {
+  flex: 1;
+  min-width: 200px;
+  box-shadow: 0 4px 15px rgba(5, 38, 89, 0.05);
+  transition: all 0.3s ease;
 }
 
 /* Teacher List */
 .ADM-ENS-teachers-list {
-display: flex;
-flex-direction: column;
-gap: 15px;
-margin-top: 20px;
-align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
+  align-items: center;
 }
 
 .ADM-ENS-teacher-card {
-background: rgba(255, 255, 255, 0.85);
-padding: 15px;
-border-radius: 15px;
-box-shadow: 0 6px 15px rgba(5, 38, 89, 0.1);
-transition: all 0.4s ease;
-cursor: pointer;
-width: 130%;
-max-width: 300px;
-text-align: center;
-border: 1px solid rgba(255, 255, 255, 0.5);
-backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.85);
+  padding: 15px;
+  border-radius: 15px;
+  box-shadow: 0 6px 15px rgba(5, 38, 89, 0.1);
+  transition: all 0.4s ease;
+  cursor: pointer;
+  width: 130%;
+  max-width: 300px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
 }
 
 .ADM-ENS-teacher-card:hover {
-transform: translateY(-8px);
-box-shadow: 0 10px 25px rgba(5, 38, 89, 0.2);
+  transform: translateY(-8px);
+  box-shadow: 0 10px 25px rgba(5, 38, 89, 0.2);
 }
 
 /* Teacher Section */
 .ADM-ENS-teacher-section {
-margin-top: 20px;
-padding: 20px;
-background: rgba(255, 255, 255, 0.85);
-border-radius: 15px;
-box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15);
-border: 1px solid rgba(255, 255, 255, 0.5);
-backdrop-filter: blur(10px);
-max-width: 400px;
-margin: 0 auto; /* Center the teacher section */
+  margin-top: 20px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(5, 38, 89, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  max-width: 400px;
+  margin: 0 auto;
 }
 
 .ADM-ENS-teacher-section p {
-margin: 5px 0;
+  margin: 5px 0;
 }
 
 .ADM-ENS-teacher-section ul {
-list-style: none;
-padding: 0;
+  list-style: none;
+  padding: 0;
 }
 
 .ADM-ENS-teacher-section ul li {
-background: #f0f7ff;
-padding: 5px 10px;
-margin: 30px 6;
-border-radius: 5px;
+  background: #f0f7ff;
+  padding: 5px 10px;
+  margin: 30px 6;
+  border-radius: 5px;
 }
 
-/* Button Group for Centering */
+/* Button Group */
 .ADM-ENS-button-group {
-display: flex;
-justify-content: center;
-gap: 15px;
-margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
 }
 
 /* Buttons */
-button, .ADM-ENS-submit-btn, .ADM-ENS-edit-btn, .ADM-ENS-delete-btn, .ADM-ENS-back-btn, .ADM-ENS-reset-btn {
-background: linear-gradient(135deg, #5483b3 0%, #052659 100%);
-color: #ffffff;
-padding: 12px 25px;
-border: none;
-border-radius: 12px;
-font-size: 0.95rem;
-font-weight: 500;
-cursor: pointer;
-transition: all 0.3s ease;
-box-shadow: 0 8px 20px rgba(5, 38, 89, 0.1);
+.ADM-ENS-button, .ADM-ENS-submit-btn, .ADM-ENS-edit-btn, .ADM-ENS-delete-btn, .ADM-ENS-back-btn, .ADM-ENS-reset-btn {
+  background: linear-gradient(135deg, #5483b3 0%, #052659 100%);
+  color: #ffffff;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(5, 38, 89, 0.1);
 }
 
-button:hover, .ADM-ENS-submit-btn:hover, .ADM-ENS-edit-btn:hover, .ADM-ENS-delete-btn:hover, .ADM-ENS-back-btn:hover, .ADM-ENS-reset-btn:hover {
-transform: translateY(-3px);
-box-shadow: 0 12px 25px rgba(5, 38, 89, 0.15);
+.ADM-ENS-button:hover, .ADM-ENS-submit-btn:hover, .ADM-ENS-edit-btn:hover, .ADM-ENS-delete-btn:hover, .ADM-ENS-back-btn:hover, .ADM-ENS-reset-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(5, 38, 89, 0.15);
 }
 
 .ADM-ENS-edit-btn {
-background: linear-gradient(135deg, #7da0ca 0%, #5483b3 100%);
+  background: linear-gradient(135deg, #7da0ca 0%, #5483b3 100%);
 }
 
 .ADM-ENS-delete-btn {
-background: linear-gradient(135deg, #052659 0%, #021024 100%);
+  background: linear-gradient(135deg, #052659 0%, #021024 100%);
 }
 
 .ADM-ENS-back-btn {
-background: linear-gradient(135deg, #5483b3 0%, #7da0ca 100%);
+  background: linear-gradient(135deg, #5483b3 0%, #7da0ca 100%);
 }
 
 .ADM-ENS-reset-btn {
-background: linear-gradient(135deg, #7da0ca 0%, #b0c4de 100%);
+  background: linear-gradient(135deg, #7da0ca 0%, #b0c4de 100%);
 }
 
-/* Inputs */
-input, select {
-padding: 18px;
-border: 1px solid rgba(84, 131, 179, 0.2);
-border-radius: 15px;
-font-size: 1rem;
-background: #f0f7ff;
-color: #052659;
-width: 100%;
-box-sizing: border-box;
-margin-bottom: 20px;
+/* Modal */
+.ADM-ENS-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
 }
 
-input:focus, select:focus {
-border-color: #5483b3;
-box-shadow: 0 0 15px rgba(84, 131, 179, 0.2);
-outline: none;
+.ADM-ENS-section-item {
+  margin-bottom: 15px;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.ADM-ENS-module-link {
+  cursor: pointer;
+  color: #2196f3;
+  text-decoration: underline;
 }
 
 /* Toast Container */
 .ADM-ENS-Toastify__toast {
-font-family: 'Poppins', sans-serif;
+  font-family: 'Poppins', sans-serif;
 }
