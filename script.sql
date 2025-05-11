@@ -119,11 +119,13 @@ CREATE TABLE Module (
 
 -- Create Module_Enseignant Table to Link Professors to Modules
 CREATE TABLE Module_Enseignant (
-    ID_module INT,
-    Matricule BIGINT,
+    ID_module INT NOT NULL,
+    Matricule INT NOT NULL,
+    course_type ENUM('Cour','TD','TP','Cour/TD/TP','Cour/TD','Cour/TP','enligne') NOT NULL,
+    group_number INT,
     PRIMARY KEY (ID_module, Matricule),
-    FOREIGN KEY (ID_module) REFERENCES Module(ID_module) ON DELETE CASCADE,
-    FOREIGN KEY (Matricule) REFERENCES Enseignant(Matricule) ON DELETE CASCADE
+    FOREIGN KEY (ID_module) REFERENCES Module(ID_module),
+    FOREIGN KEY (Matricule) REFERENCES User(Matricule)
 );
 
 -- Create Enseignant_Section Table to Link Professors to Sections
