@@ -1,5 +1,6 @@
 const teacherModel = require('../models/teacherModel');
-const bcrypt = require('bcrypt');
+// Removed bcrypt import
+// const bcrypt = require('bcrypt');
 
 // Get all faculties
 exports.getFaculties = async (req, res) => {
@@ -113,15 +114,14 @@ exports.createTeacher = async (req, res) => {
         return res.status(400).json({ error: 'Tous les champs obligatoires doivent être remplis' });
     }
     try {
-        const hashedPassword = await bcrypt.hash(motdepasse, 10);
-        const matricule = String(Date.now()); // Ensure matricule is a string
+        const matricule = String(Date.now());
         console.log('Creating teacher with matricule:', matricule);
         const teacher = await teacherModel.createTeacher({
             matricule,
             nom,
             prenom,
             email,
-            motdepasse: hashedPassword,
+            motdepasse, // Pass plain-text password
             annee_inscription,
             ID_faculte,
             ID_departement,
@@ -167,7 +167,7 @@ exports.updateTeacher = async (req, res) => {
         return res.status(403).json({ error: 'Accès refusé : administrateur requis' });
     }
     const { matricule } = req.params;
-    const { nom, prenom, email, ID_faculte, ID_departement, assignedModules, assignedSections } = req.body;
+    const { nom, prenom, email, ID_faculte, ID_departement, assignedModules, assignedSections, moduleSessionTypes } = req.body;
     if (!nom || !prenom || !email || !ID_faculte || !ID_departement) {
         return res.status(400).json({ error: 'Nom, prénom, email, faculté et département sont requis' });
     }
@@ -180,6 +180,7 @@ exports.updateTeacher = async (req, res) => {
             ID_departement,
             assignedModules,
             assignedSections,
+            moduleSessionTypes,
         });
         if (!teacher) {
             return res.status(404).json({ error: 'Enseignant non trouvé' });

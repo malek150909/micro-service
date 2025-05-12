@@ -36,7 +36,7 @@ const Admin = () => {
         const fetchStatistics = async () => {
             try {
                 const token = localStorage.getItem("token");
-                const response = await fetch("http://localhost:8081/api/statistics", {
+                const response = await fetch("http://users.localhost/api/statistics", {
                     headers: {
                         "Authorization": `Bearer ${token}`,
                         "Content-Type": "application/json",

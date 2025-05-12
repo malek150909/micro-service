@@ -1,5 +1,4 @@
 const promisePool = require('../config/db');
-const bcrypt = require('bcrypt');
 
 // Get all faculties
 exports.getFaculties = async () => {
@@ -43,7 +42,8 @@ exports.getModulesBySectionsAndSpecialty = async (sectionIds, specialtyId) => {
         SELECT DISTINCT 
             m.ID_module, 
             m.nom_module, 
-            m.ID_specialite
+            m.ID_specialite,
+            ms.ID_section
         FROM Module m
         JOIN module_section ms ON m.ID_module = ms.ID_module
         JOIN section s ON ms.ID_section = s.ID_section
@@ -80,81 +80,91 @@ exports.getTeachers = async () => {
     return rows;
 };
 
-// Get teacher details
 exports.getTeacherDetails = async (matricule) => {
     const connection = await promisePool.getConnection();
     try {
-        const [teacherRows] = await connection.query(`
-            SELECT 
-                u.Matricule, 
-                u.nom, 
-                u.prenom, 
-                u.email, 
-                e.annee_inscription, 
-                e.ID_faculte, 
-                e.ID_departement,
-                f.nom_faculte AS facultyName, 
-                d.Nom_departement AS departmentName
-            FROM User u
-            JOIN enseignant e ON u.Matricule = e.Matricule
-            LEFT JOIN faculte f ON e.ID_faculte = f.ID_faculte
-            LEFT JOIN Departement d ON e.ID_departement = d.ID_departement
-            WHERE u.Matricule = ?
-        `, [matricule]);
-
-        if (teacherRows.length === 0) return null;
-
-        const [moduleRows] = await connection.query(`
-            SELECT m.ID_module, m.nom_module, me.course_type, m.ID_specialite
-            FROM Module_Enseignant me
-            JOIN Module m ON me.ID_module = m.ID_module
-            WHERE me.Matricule = ?
-        `, [matricule]);
-
-        const [sectionRows] = await connection.query(`
-            SELECT s.ID_section, s.nom_section, s.niveau, s.ID_specialite
-            FROM Enseignant_Section es
-            JOIN section s ON es.ID_section = s.ID_section
-            WHERE es.Matricule = ?
-        `, [matricule]);
-
-        return {
-            matricule: teacherRows[0].Matricule,
-            nom: teacherRows[0].nom,
-            prenom: teacherRows[0].prenom,
-            email: teacherRows[0].email,
-            annee_inscription: teacherRows[0].annee_inscription,
-            ID_faculte: teacherRows[0].ID_faculte,
-            ID_departement: teacherRows[0].ID_departement,
-            facultyName: teacherRows[0].facultyName || null,
-            departmentName: teacherRows[0].departmentName || null,
-            modules: moduleRows || [],
-            sections: sectionRows || [],
-        };
+      const [teacherRows] = await connection.query(`
+        SELECT 
+          u.Matricule, 
+          u.nom, 
+          u.prenom, 
+          u.email, 
+          u.motdepasse, 
+          e.annee_inscription, 
+          e.ID_faculte, 
+          e.ID_departement,
+          f.nom_faculte AS facultyName, 
+          d.Nom_departement AS departmentName
+        FROM User u
+        JOIN enseignant e ON u.Matricule = e.Matricule
+        LEFT JOIN faculte f ON e.ID_faculte = f.ID_faculte
+        LEFT JOIN Departement d ON e.ID_departement = d.ID_departement
+        WHERE u.Matricule = ?
+      `, [matricule]);
+  
+      if (teacherRows.length === 0) return null;
+  
+      const [moduleRows] = await connection.query(`
+        SELECT 
+          m.ID_module, 
+          m.nom_module, 
+          me.course_type, 
+          m.ID_specialite,
+          s.ID_section, 
+          s.nom_section, 
+          s.niveau,
+          sp.nom_specialite
+        FROM Module_Enseignant me
+        JOIN Module m ON me.ID_module = m.ID_module
+        JOIN Enseignant_Section es ON es.Matricule = me.Matricule
+        JOIN section s ON es.ID_section = s.ID_section
+        JOIN specialite sp ON m.ID_specialite = sp.ID_specialite
+        WHERE me.Matricule = ?
+      `, [matricule]);
+  
+      const [sectionRows] = await connection.query(`
+        SELECT s.ID_section, s.nom_section, s.niveau, s.ID_specialite
+        FROM Enseignant_Section es
+        JOIN section s ON es.ID_section = s.ID_section
+        WHERE es.Matricule = ?
+      `, [matricule]);
+  
+      return {
+        matricule: teacherRows[0].Matricule,
+        nom: teacherRows[0].nom,
+        prenom: teacherRows[0].prenom,
+        email: teacherRows[0].email,
+        motdepasse: teacherRows[0].motdepasse,
+        annee_inscription: teacherRows[0].annee_inscription,
+        ID_faculte: teacherRows[0].ID_faculte,
+        ID_departement: teacherRows[0].ID_departement,
+        facultyName: teacherRows[0].facultyName || null,
+        departmentName: teacherRows[0].departmentName || null,
+        modules: moduleRows || [],
+        sections: sectionRows || [],
+      };
     } finally {
-        connection.release();
+      connection.release();
     }
-};
+  };
 
 // Create a new teacher
-exports.createTeacher = async ({ matricule, nom, prenom, email, motdepasse, annee_inscription, ID_faculte, ID_departement, assignedSections }) => {
+exports.createTeacher = async ({ matricule, nom, prenom, email, motdepasse, annee_inscription, ID_faculte, ID_departement, assignedSections, assignedModules, moduleSessionTypes }) => {
     const connection = await promisePool.getConnection();
     try {
         await connection.beginTransaction();
 
-        // Insert into User table
         await connection.query(`
             INSERT INTO User (Matricule, nom, prenom, email, motdepasse, Created_at)
             VALUES (?, ?, ?, ?, ?, NOW())
         `, [matricule, nom, prenom, email, motdepasse]);
 
-        // Insert into enseignant table
         await connection.query(`
             INSERT INTO enseignant (Matricule, annee_inscription, ID_faculte, ID_departement)
             VALUES (?, ?, ?, ?)
         `, [matricule, annee_inscription, ID_faculte, ID_departement]);
 
-        // Insert section assignments into Enseignant_Section
+        // Insert section assignments
         if (assignedSections && assignedSections.length > 0) {
             const sectionValues = assignedSections.map(sectionId => [matricule, sectionId]);
             await connection.query(`
@@ -163,15 +173,43 @@ exports.createTeacher = async ({ matricule, nom, prenom, email, motdepasse, anne
             `, [sectionValues]);
         }
 
+        // Insert module assignments
+        if (assignedModules && assignedModules.length > 0) {
+            const moduleValues = assignedModules.map(moduleId => [
+                matricule,
+                moduleId,
+                moduleSessionTypes[moduleId] || 'Cour'
+            ]);
+            await connection.query(`
+                INSERT INTO Module_Enseignant (Matricule, ID_module, course_type)
+                VALUES ?
+            `, [moduleValues]);
+
+            // Ensure sections from Module_Section are added to Enseignant_Section
+            const [moduleSections] = await connection.query(`
+                SELECT ID_section
+                FROM Module_Section
+                WHERE ID_module IN (?)
+            `, [assignedModules]);
+            const sectionIds = moduleSections.map(row => row.ID_section);
+            if (sectionIds.length > 0) {
+                const sectionValues = sectionIds.map(sectionId => [matricule, sectionId]);
+                await connection.query(`
+                    INSERT IGNORE INTO Enseignant_Section (Matricule, ID_section)
+                    VALUES ?
+                `, [sectionValues]);
+            }
+        }
+
         await connection.commit();
 
-        // Fetch created teacher details to return consistent data
         const [teacherRows] = await connection.query(`
             SELECT 
                 u.Matricule, 
                 u.nom, 
                 u.prenom, 
                 u.email, 
+                u.motdepasse, 
                 e.annee_inscription, 
                 e.ID_faculte, 
                 e.ID_departement,
@@ -192,9 +230,15 @@ exports.createTeacher = async ({ matricule, nom, prenom, email, motdepasse, anne
         `, [matricule]);
 
         const [moduleRows] = await connection.query(`
-            SELECT m.ID_module, m.nom_module, me.course_type, m.ID_specialite
+            SELECT 
+                m.ID_module, 
+                m.nom_module, 
+                me.course_type, 
+                m.ID_specialite,
+                ms.ID_section
             FROM Module_Enseignant me
             JOIN Module m ON me.ID_module = m.ID_module
+            LEFT JOIN Module_Section ms ON m.ID_module = ms.ID_module
             WHERE me.Matricule = ?
         `, [matricule]);
 
@@ -203,6 +247,7 @@ exports.createTeacher = async ({ matricule, nom, prenom, email, motdepasse, anne
             nom: teacherRows[0].nom,
             prenom: teacherRows[0].prenom,
             email: teacherRows[0].email,
+            motdepasse: teacherRows[0].motdepasse,
             annee_inscription: teacherRows[0].annee_inscription,
             ID_faculte: teacherRows[0].ID_faculte,
             ID_departement: teacherRows[0].ID_departement,
@@ -224,101 +269,116 @@ exports.bulkCreateTeachers = async (teachers) => {
     const connection = await promisePool.getConnection();
     try {
         await connection.beginTransaction();
-
         const createdTeachers = [];
-        let count = 0;
 
         for (const teacher of teachers) {
-            const { nom, prenom, email, motdepasse, annee_inscription, ID_faculte, ID_departement, assignedSections } = teacher;
-            if (!nom || !prenom || !email || !motdepasse || !annee_inscription || !ID_faculte || !ID_departement) {
-                console.warn(`Enseignant ignoré : champs manquants`, teacher);
-                continue;
+            const { nom, prenom, email, motdepasse, annee_inscription, ID_faculte, ID_departement, assignedSections, assignedModules, moduleSessionTypes } = teacher;
+            const matricule = String(Date.now() + Math.random());
+
+            await connection.query(`
+                INSERT INTO User (Matricule, nom, prenom, email, motdepasse, Created_at)
+                VALUES (?, ?, ?, ?, ?, NOW())
+            `, [matricule, nom, prenom, email, motdepasse]);
+
+            await connection.query(`
+                INSERT INTO enseignant (Matricule, annee_inscription, ID_faculte, ID_departement)
+                VALUES (?, ?, ?, ?)
+            `, [matricule, annee_inscription, ID_faculte, ID_departement]);
+
+            // Insert section assignments
+            if (assignedSections && assignedSections.length > 0) {
+                const sectionValues = assignedSections.map(sectionId => [matricule, sectionId]);
+                await connection.query(`
+                    INSERT INTO Enseignant_Section (Matricule, ID_section)
+                    VALUES ?
+                `, [sectionValues]);
             }
 
-            const matricule = Date.now() + count; // Ensure unique matricule
-            const hashedPassword = await bcrypt.hash(motdepasse, 10);
-
-            try {
-                // Insert into User table
+            // Insert module assignments
+            if (assignedModules && assignedModules.length > 0) {
+                const moduleValues = assignedModules.map(moduleId => [
+                    matricule,
+                    moduleId,
+                    moduleSessionTypes[moduleId] || 'Cour'
+                ]);
                 await connection.query(`
-                    INSERT INTO User (Matricule, nom, prenom, email, motdepasse, Created_at)
-                    VALUES (?, ?, ?, ?, ?, NOW())
-                `, [matricule, nom, prenom, email, hashedPassword]);
+                    INSERT INTO Module_Enseignant (Matricule, ID_module, course_type)
+                    VALUES ?
+                `, [moduleValues]);
 
-                // Insert into enseignant table
-                await connection.query(`
-                    INSERT INTO enseignant (Matricule, annee_inscription, ID_faculte, ID_departement)
-                    VALUES (?, ?, ?, ?)
-                `, [matricule, annee_inscription, ID_faculte, ID_departement]);
-
-                // Insert section assignments
-                if (assignedSections && assignedSections.length > 0) {
-                    const sectionValues = assignedSections.map(sectionId => [matricule, sectionId]);
+                // Ensure sections from Module_Section are added to Enseignant_Section
+                const [moduleSections] = await connection.query(`
+                    SELECT ID_section
+                    FROM Module_Section
+                    WHERE ID_module IN (?)
+                `, [assignedModules]);
+                const sectionIds = moduleSections.map(row => row.ID_section);
+                if (sectionIds.length > 0) {
+                    const sectionValues = sectionIds.map(sectionId => [matricule, sectionId]);
                     await connection.query(`
-                        INSERT INTO Enseignant_Section (Matricule, ID_section)
+                        INSERT IGNORE INTO Enseignant_Section (Matricule, ID_section)
                         VALUES ?
                     `, [sectionValues]);
                 }
-
-                // Fetch created teacher details
-                const [teacherRows] = await connection.query(`
-                    SELECT 
-                        u.Matricule, 
-                        u.nom, 
-                        u.prenom, 
-                        u.email, 
-                        e.annee_inscription, 
-                        e.ID_faculte, 
-                        e.ID_departement,
-                        f.nom_faculte AS facultyName, 
-                        d.Nom_departement AS departmentName
-                    FROM User u
-                    JOIN enseignant e ON u.Matricule = e.Matricule
-                    LEFT JOIN faculte f ON e.ID_faculte = f.ID_faculte
-                    LEFT JOIN Departement d ON e.ID_departement = d.ID_departement
-                    WHERE u.Matricule = ?
-                `, [matricule]);
-
-                const [sectionRows] = await connection.query(`
-                    SELECT s.ID_section, s.nom_section, s.niveau, s.ID_specialite
-                    FROM Enseignant_Section es
-                    JOIN section s ON es.ID_section = s.ID_section
-                    WHERE es.Matricule = ?
-                `, [matricule]);
-
-                const [moduleRows] = await connection.query(`
-                    SELECT m.ID_module, m.nom_module, me.course_type, m.ID_specialite
-                    FROM Module_Enseignant me
-                    JOIN Module m ON me.ID_module = m.ID_module
-                    WHERE me.Matricule = ?
-                `, [matricule]);
-
-                createdTeachers.push({
-                    matricule: teacherRows[0].Matricule,
-                    nom: teacherRows[0].nom,
-                    prenom: teacherRows[0].prenom,
-                    email: teacherRows[0].email,
-                    annee_inscription: teacherRows[0].annee_inscription,
-                    ID_faculte: teacherRows[0].ID_faculte,
-                    ID_departement: teacherRows[0].ID_departement,
-                    facultyName: teacherRows[0].facultyName || null,
-                    departmentName: teacherRows[0].departmentName || null,
-                    modules: moduleRows || [],
-                    sections: sectionRows || [],
-                });
-
-                count++;
-            } catch (error) {
-                if (error.code === 'ER_DUP_ENTRY') {
-                    console.warn(`Email déjà utilisé, enseignant ignoré: ${email}`);
-                    continue;
-                }
-                throw error; // Rethrow other errors
             }
+
+            const [teacherRows] = await connection.query(`
+                SELECT 
+                    u.Matricule, 
+                    u.nom, 
+                    u.prenom, 
+                    u.email, 
+                    u.motdepasse, 
+                    e.annee_inscription, 
+                    e.ID_faculte, 
+                    e.ID_departement,
+                    f.nom_faculte AS facultyName, 
+                    d.Nom_departement AS departmentName
+                FROM User u
+                JOIN enseignant e ON u.Matricule = e.Matricule
+                LEFT JOIN faculte f ON e.ID_faculte = f.ID_faculte
+                LEFT JOIN Departement d ON e.ID_departement = d.ID_departement
+                WHERE u.Matricule = ?
+            `, [matricule]);
+
+            const [sectionRows] = await connection.query(`
+                SELECT s.ID_section, s.nom_section, s.niveau, s.ID_specialite
+                FROM Enseignant_Section es
+                JOIN section s ON es.ID_section = s.ID_section
+                WHERE es.Matricule = ?
+            `, [matricule]);
+
+            const [moduleRows] = await connection.query(`
+                SELECT 
+                    m.ID_module, 
+                    m.nom_module, 
+                    me.course_type, 
+                    m.ID_specialite,
+                    ms.ID_section
+                FROM Module_Enseignant me
+                JOIN Module m ON me.ID_module = m.ID_module
+                LEFT JOIN Module_Section ms ON m.ID_module = ms.ID_module
+                WHERE me.Matricule = ?
+            `, [matricule]);
+
+            createdTeachers.push({
+                matricule: teacherRows[0].Matricule,
+                nom: teacherRows[0].nom,
+                prenom: teacherRows[0].prenom,
+                email: teacherRows[0].email,
+                motdepasse: teacherRows[0].motdepasse,
+                annee_inscription: teacherRows[0].annee_inscription,
+                ID_faculte: teacherRows[0].ID_faculte,
+                ID_departement: teacherRows[0].ID_departement,
+                facultyName: teacherRows[0].facultyName || null,
+                departmentName: teacherRows[0].departmentName || null,
+                modules: moduleRows || [],
+                sections: sectionRows || [],
+            });
         }
 
         await connection.commit();
-        return { count, teachers: createdTeachers };
+        return { count: createdTeachers.length, teachers: createdTeachers };
     } catch (error) {
         await connection.rollback();
         throw error;
@@ -327,114 +387,189 @@ exports.bulkCreateTeachers = async (teachers) => {
     }
 };
 
-// Update a teacher
-exports.updateTeacher = async (matricule, { nom, prenom, email, ID_faculte, ID_departement, assignedModules, assignedSections }) => {
+exports.updateTeacher = async (matricule, { nom, prenom, email, ID_faculte, ID_departement, assignedModules, assignedSections, moduleSessionTypes, moduleSections }) => {
+    const connection = await promisePool.getConnection();
+    try {
+      await connection.beginTransaction();
+  
+      // Update user details
+      await connection.query(`
+        UPDATE User 
+        SET nom = ?, prenom = ?, email = ?
+        WHERE Matricule = ?
+      `, [nom, prenom, email, matricule]);
+  
+      // Update teacher details
+      await connection.query(`
+        UPDATE enseignant 
+        SET ID_faculte = ?, ID_departement = ?
+        WHERE Matricule = ?
+      `, [ID_faculte, ID_departement, matricule]);
+  
+      // Clear existing assignments
+      await connection.query(`
+        DELETE FROM Module_Enseignant 
+        WHERE Matricule = ?
+      `, [matricule]);
+  
+      await connection.query(`
+        DELETE FROM Enseignant_Section 
+        WHERE Matricule = ?
+      `, [matricule]);
+  
+      // Insert module assignments
+      if (assignedModules && assignedModules.length > 0) {
+        const moduleValues = assignedModules.map(moduleId => [
+          matricule,
+          moduleId,
+          moduleSessionTypes[moduleId] || 'Cour'
+        ]);
+        await connection.query(`
+          INSERT INTO Module_Enseignant (Matricule, ID_module, course_type)
+          VALUES ?
+        `, [moduleValues]);
+      }
+  
+      // Collect all section IDs from both assignedSections and moduleSections
+      const allSectionIds = new Set();
+      if (assignedSections && assignedSections.length > 0) {
+        assignedSections.forEach(sectionId => allSectionIds.add(Number(sectionId)));
+      }
+      if (moduleSections) {
+        Object.values(moduleSections).forEach(sectionId => {
+          if (sectionId) allSectionIds.add(Number(sectionId));
+        });
+      }
+  
+      console.log(`All section IDs for Matricule ${matricule}:`, Array.from(allSectionIds)); // Debug log
+  
+      // Insert section assignments
+      if (allSectionIds.size > 0) {
+        // Validate sections exist in the section table
+        const [validSections] = await connection.query(`
+          SELECT ID_section FROM section WHERE ID_section IN (?)
+        `, [Array.from(allSectionIds)]);
+        const validSectionIds = new Set(validSections.map(row => row.ID_section));
+  
+        const sectionValues = Array.from(allSectionIds)
+          .filter(sectionId => validSectionIds.has(sectionId))
+          .map(sectionId => [matricule, sectionId]);
+  
+        console.log(`Section values to insert for Matricule ${matricule}:`, sectionValues); // Debug log
+  
+        if (sectionValues.length > 0) {
+          await connection.query(`
+            INSERT INTO Enseignant_Section (Matricule, ID_section)
+            VALUES ?
+          `, [sectionValues]);
+        } else {
+          console.log(`No valid sections to insert for Matricule ${matricule}`);
+        }
+      } else {
+        console.log(`No sections assigned for Matricule ${matricule}`);
+      }
+  
+      await connection.commit();
+  
+      // Fetch updated teacher details
+      const [teacherRows] = await connection.query(`
+        SELECT 
+          u.Matricule, 
+          u.nom, 
+          u.prenom, 
+          u.email, 
+          u.motdepasse, 
+          e.annee_inscription, 
+          e.ID_faculte, 
+          e.ID_departement,
+          f.nom_faculte AS facultyName, 
+          d.Nom_departement AS departmentName
+        FROM User u
+        JOIN enseignant e ON u.Matricule = e.Matricule
+        LEFT JOIN faculte f ON e.ID_faculte = f.ID_faculte
+        LEFT JOIN Departement d ON e.ID_departement = d.ID_departement
+        WHERE u.Matricule = ?
+      `, [matricule]);
+  
+      const [sectionRows] = await connection.query(`
+        SELECT s.ID_section, s.nom_section, s.niveau, s.ID_specialite
+        FROM Enseignant_Section es
+        JOIN section s ON es.ID_section = s.ID_section
+        WHERE es.Matricule = ?
+      `, [matricule]);
+  
+      const [moduleRows] = await connection.query(`
+        SELECT 
+          m.ID_module, 
+          m.nom_module, 
+          me.course_type, 
+          m.ID_specialite,
+          s.ID_section, 
+          s.nom_section, 
+          s.niveau,
+          sp.nom_specialite
+        FROM Module_Enseignant me
+        JOIN Module m ON me.ID_module = m.ID_module
+        JOIN Enseignant_Section es ON es.Matricule = me.Matricule
+        JOIN section s ON es.ID_section = s.ID_section
+        JOIN specialite sp ON m.ID_specialite = sp.ID_specialite
+        WHERE me.Matricule = ?
+      `, [matricule]);
+  
+      return {
+        matricule: teacherRows[0].Matricule,
+        nom: teacherRows[0].nom,
+        prenom: teacherRows[0].prenom,
+        email: teacherRows[0].email,
+        motdepasse: teacherRows[0].motdepasse,
+        annee_inscription: teacherRows[0].annee_inscription,
+        ID_faculte: teacherRows[0].ID_faculte,
+        ID_departement: teacherRows[0].ID_departement,
+        facultyName: teacherRows[0].facultyName || null,
+        departmentName: teacherRows[0].departmentName || null,
+        modules: moduleRows || [],
+        sections: sectionRows || [],
+      };
+    } catch (error) {
+      await connection.rollback();
+      console.error(`Error updating teacher ${matricule}:`, error);
+      throw error;
+    } finally {
+      connection.release();
+    }
+  };
+
+// Delete a teacher
+exports.deleteTeacher = async (matricule) => {
     const connection = await promisePool.getConnection();
     try {
         await connection.beginTransaction();
 
-        // Update User table
         await connection.query(`
-            UPDATE User
-            SET nom = ?, prenom = ?, email = ?
+            DELETE FROM Module_Enseignant 
             WHERE Matricule = ?
-        `, [nom, prenom, email, matricule]);
-
-        // Update enseignant table
-        await connection.query(`
-            UPDATE enseignant
-            SET ID_faculte = ?, ID_departement = ?
-            WHERE Matricule = ?
-        `, [ID_faculte, ID_departement, matricule]);
-
-        // Delete existing module assignments
-        await connection.query(`
-            DELETE FROM Module_Enseignant WHERE Matricule = ?
         `, [matricule]);
 
-        // Insert new module assignments
-        if (assignedModules && assignedModules.length > 0) {
-            const moduleValues = assignedModules.map(moduleId => [moduleId, matricule, 'Cour', null]);
-            await connection.query(`
-                INSERT INTO Module_Enseignant (ID_module, Matricule, course_type, group_number)
-                VALUES ?
-            `, [moduleValues]);
-        }
-
-        // Delete existing section assignments
         await connection.query(`
-            DELETE FROM Enseignant_Section WHERE Matricule = ?
+            DELETE FROM Enseignant_Section 
+            WHERE Matricule = ?
         `, [matricule]);
 
-        // Insert new section assignments
-        if (assignedSections && assignedSections.length > 0) {
-            const sectionValues = assignedSections.map(sectionId => [matricule, sectionId]);
-            await connection.query(`
-                INSERT INTO Enseignant_Section (Matricule, ID_section)
-                VALUES ?
-            `, [sectionValues]);
-        }
+        await connection.query(`
+            DELETE FROM enseignant 
+            WHERE Matricule = ?
+        `, [matricule]);
+
+        await connection.query(`
+            DELETE FROM User 
+            WHERE Matricule = ?
+        `, [matricule]);
 
         await connection.commit();
-
-        // Fetch updated teacher details
-        const [teacherRows] = await connection.query(`
-            SELECT 
-                u.Matricule, 
-                u.nom, 
-                u.prenom, 
-                u.email, 
-                e.annee_inscription, 
-                e.ID_faculte, 
-                e.ID_departement,
-                f.nom_faculte AS facultyName, 
-                d.Nom_departement AS departmentName
-            FROM User u
-            JOIN enseignant e ON u.Matricule = e.Matricule
-            LEFT JOIN faculte f ON e.ID_faculte = f.ID_faculte
-            LEFT JOIN Departement d ON e.ID_departement = d.ID_departement
-            WHERE u.Matricule = ?
-        `, [matricule]);
-
-        if (teacherRows.length === 0) return null;
-
-        const [moduleRows] = await connection.query(`
-            SELECT m.ID_module, m.nom_module, me.course_type, m.ID_specialite
-            FROM Module_Enseignant me
-            JOIN Module m ON me.ID_module = m.ID_module
-            WHERE me.Matricule = ?
-        `, [matricule]);
-
-        const [sectionRows] = await connection.query(`
-            SELECT s.ID_section, s.nom_section, s.niveau, s.ID_specialite
-            FROM Enseignant_Section es
-            JOIN section s ON es.ID_section = s.ID_section
-            WHERE es.Matricule = ?
-        `, [matricule]);
-
-        return {
-            matricule: teacherRows[0].Matricule,
-            nom: teacherRows[0].nom,
-            prenom: teacherRows[0].prenom,
-            email: teacherRows[0].email,
-            annee_inscription: teacherRows[0].annee_inscription,
-            ID_faculte: teacherRows[0].ID_faculte,
-            ID_departement: teacherRows[0].ID_departement,
-            facultyName: teacherRows[0].facultyName || null,
-            departmentName: teacherRows[0].departmentName || null,
-            modules: moduleRows || [],
-            sections: sectionRows || [],
-        };
     } catch (error) {
         await connection.rollback();
         throw error;
     } finally {
         connection.release();
     }
-};
-
-// Delete a teacher
-exports.deleteTeacher = async (matricule) => {
-    await promisePool.query('DELETE FROM User WHERE Matricule = ?', [matricule]);
-    // Foreign keys with ON DELETE CASCADE handle related records in enseignant and Module_Enseignant
 };

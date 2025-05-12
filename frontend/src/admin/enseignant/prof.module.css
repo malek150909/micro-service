@@ -1,8 +1,16 @@
+/* Prevent page-level scrolling */
+html, body {
+  overflow: auto;
+  height: 100%;
+  margin: 0;
+}
+
 /* Conteneur principal */
 .ADM-ENS-container {
   display: flex;
-  min-height: 100vh;
+  height: 100vh; /* Fix height to viewport */
   padding-left: 240px; /* Ajusté pour correspondre à la largeur de la sidebar */
+  overflow: auto; /* No scrolling */
 }
 
 /* Sidebar */
@@ -93,30 +101,36 @@
   left: 100%;
 }
 
+.ADM-ENS-sidebar-button-active {
+  background: linear-gradient(135deg, #6a99d1 0%, #143157 100%);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
 /* Contenu principal */
 .ADM-ENS-main-content {
   flex: 1;
-  padding: 40px 30px;
+  padding: 30px; /* Reduced padding to save space */
   display: flex;
   flex-direction: column;
-  gap: 25px;
+  gap: 15px; /* Reduced gap to fit content */
   background: rgba(255, 255, 255, 0.05);
-  min-height: 100vh;
+  overflow: auto; /* No scrolling */
 }
 
 /* Filter Section */
 .ADM-ENS-filter-section {
   background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(240, 245, 255, 0.8));
-  border-radius: 24px;
-  padding: 30px;
+  border-radius: 16px;
+  padding: 20px;
   box-shadow: 0 12px 35px rgba(5, 38, 89, 0.18);
   border: 1px solid rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(15px);
   transition: transform 0.3s ease;
-  margin-bottom: 25px;
+  margin: 0 auto 15px; /* Reduced bottom margin */
+  max-width: 600px; /* Smaller width */
 }
 
-.STUDENT-filter-section:hover {
+.ADM-ENS-filter-section:hover {
   transform: translateY(-2px);
 }
 
@@ -130,17 +144,27 @@
 .ADM-ENS-teacher-list {
   background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(240, 245, 255, 0.8));
   border-radius: 24px;
-  padding: 30px;
+  padding: 20px; /* Reduced padding */
   box-shadow: 0 12px 35px rgba(5, 38, 89, 0.18);
   border: 1px solid rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(15px);
   transition: transform 0.3s ease;
+  max-height: calc(100vh - 220px); /* Fit within viewport, accounting for filter and padding */
+  overflow: hidden; /* Prevent container scrolling */
 }
 
 .ADM-ENS-teacher-list:hover {
   transform: translateY(-2px);
 }
 
+/* Scrollable content within teacher list */
+.ADM-ENS-teacher-list-content {
+  max-height: calc(100% - 50px); /* Account for title height */
+  overflow-y: auto; /* Enable scrolling */
+  padding-right: 10px; /* Prevent scrollbar overlap */
+}
+
+/* Teacher List Item */
 .ADM-ENS-teacher-item {
   display: flex;
   justify-content: space-between;
@@ -152,6 +176,7 @@
   transition: all 0.3s ease;
   border: 1px solid rgba(84, 131, 179, 0.25);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  gap: 10px; /* Added gap for spacing between elements */
 }
 
 .ADM-ENS-teacher-item:hover {
@@ -171,6 +196,13 @@
 .ADM-ENS-teacher-name:hover {
   color: #143157;
   text-decoration: underline;
+}
+
+.ADM-ENS-teacher-faculty {
+  color: rgba(5, 38, 89, 0.5); /* Faint text color */
+  font-size: 0.9rem;
+  margin-left: 8px;
+  font-weight: 400;
 }
 
 /* Inputs et Selects */
@@ -194,6 +226,13 @@
   box-shadow: 0 0 12px rgba(84, 131, 179, 0.25);
   background: #ffffff;
   outline: none;
+}
+
+.ADM-ENS-select:disabled {
+  background: #f0f0f0;
+  cursor: not-allowed;
+  opacity: 0.7;
+  border: 1px solid rgba(84, 131, 179, 0.25);
 }
 
 /* Boutons */
@@ -238,6 +277,48 @@
   background: linear-gradient(135deg, #ff8a8a 0%, #e05848 100%);
 }
 
+.ADM-ENS-close-button {
+  background: linear-gradient(135deg, #d3d8e0 0%, #b0b8c5 100%);
+  color: #052659;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 12px rgba(5, 38, 89, 0.2);
+}
+
+.ADM-ENS-close-button:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(5, 38, 89, 0.25);
+  background: linear-gradient(135deg, #e3e8f0 0%, #c0c8d5 100%);
+}
+
+.ADM-ENS-details-button {
+  background: linear-gradient(135deg, #5a89c1 0%, #032147 100%);
+  color: #ffffff;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(5, 38, 89, 0.2);
+}
+
+.ADM-ENS-details-button:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(5, 38, 89, 0.25);
+  background: linear-gradient(135deg, #6a99d1 0%, #143157 100%);
+}
+
 /* Modal et Custom Alert */
 .ADM-ENS-modal-overlay {
   position: fixed;
@@ -257,10 +338,24 @@
   animation: fadeIn 0.3s ease;
 }
 
-.ADM-ENS-modal-content,
+.ADM-ENS-modal-content {
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(240, 245, 255, 0.85));
+  border-radius: 24px;
+  padding: 30px;
+  box-shadow: 0 20px 50px rgba(5, 38, 89, 0.25);
+  border: 1px solid rgba(84, 131, 179, 0.25);
+  backdrop-filter: blur(10px);
+  animation: scaleIn 0.3s ease;
+  position: relative;
+  overflow-y: auto;
+}
+
 .ADM-ENS-modal-content-compact {
   width: 100%;
-  max-width: 520px;
+  max-width: 500px;
   max-height: 85vh;
   background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(240, 245, 255, 0.85));
   border-radius: 24px;
@@ -271,10 +366,6 @@
   animation: scaleIn 0.3s ease;
   position: relative;
   overflow-y: auto;
-}
-
-.ADM-ENS-modal-content-compact {
-  max-width: 500px;
 }
 
 .ADM-ENS-custom-alert {
@@ -327,6 +418,12 @@
   display: flex;
   flex-direction: column;
   gap: 5px;
+}
+
+.ADM-ENS-form-section label {
+  color: #052659;
+  font-weight: 600;
+  font-size: 0.95rem;
 }
 
 /* Custom Section Selection */
@@ -399,6 +496,7 @@
   background: #f0f0f0;
   cursor: not-allowed;
   opacity: 0.6;
+  border: 1px solid rgba(84, 131, 179, 0.25);
 }
 
 .ADM-ENS-section-dropdown {
@@ -443,6 +541,7 @@
   display: flex;
   gap: 12px;
   justify-content: flex-end;
+  margin-top: 20px;
 }
 
 /* Details Section */
@@ -471,21 +570,39 @@
   font-weight: 600;
 }
 
-.ADM-ENS-details-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.ADM-ENS-details-section h4 {
+  color: #052659;
+  font-weight: 600;
+  margin: 10px 0;
 }
 
-.ADM-ENS-details-list li {
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(84, 131, 179, 0.1);
-  color: #34495e;
-  font-weight: 500;
+/* Assignment Table */
+.ADM-ENS-assignment-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
 }
 
-.ADM-ENS-details-list li strong {
-  font-weight: 700; /* Ensure module names are bold */
+.ADM-ENS-assignment-table th,
+.ADM-ENS-assignment-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid rgba(84, 131, 179, 0.2);
+  color: #052659;
+}
+
+.ADM-ENS-assignment-table th {
+  background: linear-gradient(145deg, #e1e8f5, #d0ddf0);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.ADM-ENS-assignment-table td {
+  font-size: 0.9rem;
+}
+
+.ADM-ENS-assignment-table tr:hover {
+  background: #f0f7ff;
 }
 
 /* No Results */
@@ -507,33 +624,6 @@
 .ADM-ENS-no-results:hover {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
   transform: translateY(-3px);
-}
-
-/* New Classes */
-.ADM-ENS-select:disabled {
-  background: #f0f0f0;
-  cursor: not-allowed;
-  opacity: 0.7;
-  border: 1px solid rgba(84, 131, 179, 0.25);
-}
-
-.ADM-ENS-close-button {
-  background: linear-gradient(135deg, #7f8c8d 0%, #6c7a89 100%);
-  color: #ffffff;
-  padding: 12px 24px;
-  border: none;
-  border-radius: 10px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.ADM-ENS-close-button:hover {
-  background: linear-gradient(135deg, #8f9c9d 0%, #7c8a99 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
 }
 
 /* Animations */
@@ -558,8 +648,12 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes scaleIn {
@@ -606,6 +700,10 @@ body.modal-open {
     padding: 20px;
   }
 
+  .ADM-ENS-filter-section {
+    max-width: 90%; /* Adjust for smaller screens */
+  }
+
   .ADM-ENS-filter-group {
     flex-direction: column;
     gap: 15px;
@@ -614,6 +712,19 @@ body.modal-open {
   .ADM-ENS-no-results {
     margin: 20px auto;
     font-size: 1.05rem;
+  }
+
+  .ADM-ENS-modal-content,
+  .ADM-ENS-modal-content-compact {
+    max-width: 90%;
+  }
+
+  .ADM-ENS-teacher-list-content {
+    max-height: 50vh; /* Slightly smaller on medium screens */
+  }
+
+  .ADM-ENS-teacher-faculty {
+    font-size: 0.85rem; /* Slightly smaller for medium screens */
   }
 }
 
@@ -626,9 +737,7 @@ body.modal-open {
   }
 
   .ADM-ENS-modal-content,
-  .ADM-ENS-modal-content-compact,
-  .ADM-ENS-custom-alert,
-  .ADM-ENS-custom-alert-success {
+  .ADM-ENS-modal-content-compact {
     max-width: 92%;
     padding: 18px;
     border-radius: 20px;
@@ -639,15 +748,36 @@ body.modal-open {
     gap: 12px;
   }
 
+  .ADM-ENS-filter-section {
+    max-width: 95%; /* Further adjust for very small screens */
+    padding: 15px;
+  }
+
   .ADM-ENS-no-results {
     padding: 15px 25px;
     font-size: 0.95rem;
   }
 
   .ADM-ENS-button,
-  .ADM-ENS-close-button {
+  .ADM-ENS-close-button,
+  .ADM-ENS-delete-button,
+  .ADM-ENS-details-button {
     padding: 10px 20px;
     font-size: 0.9rem;
   }
-}
 
+  .ADM-ENS-assignment-table th,
+  .ADM-ENS-assignment-table td {
+    padding: 8px;
+    font-size: 0.85rem;
+  }
+
+  .ADM-ENS-teacher-list-content {
+    max-height: 40vh; /* Even smaller on small screens */
+  }
+
+  .ADM-ENS-teacher-faculty {
+    font-size: 0.8rem; /* Smaller for very small screens */
+    margin-left: 6px;
+  }
+}

@@ -15,8 +15,7 @@ import ModifieProfil from "./main/modifierProfil";
 import EmploiDuTemps from "./admin/emploi/pages/TimetablePage";
 import Messagerie from "./main/Messages";
 import Ressources from "./enseignant/ressources/pages/Home";
-import Grades from "./enseignant/notes/pages/ProfessorHome";
-import GestionNotes from "./enseignant/notes/pages/GestionEnseignants";
+import GestionEnseignants from "./enseignant/moyennes/pages/GestionEnseignant";
 import AnnoncesENS from "./enseignant/annonces/annonceENS";
 import DocsAdmin from "./admin/docs/AdminDashboard";
 import DocsEtudiant from "./etudiant/docs/StudentDashboard";
@@ -25,9 +24,7 @@ import ClubsETD from "./etudiant/club/EtudiantDashboard";
 import ClubsADM from "./admin/club/ClubAdmin";
 import ENSemploi from "./enseignant/emploi/components/Timetable";
 import ETDemploi from "./etudiant/emploi/StudentTimetableFeed";
-import GestionEnseignants from "./enseignant/notes/pages/GestionEnseignants";
-import ProfessorReclamations from "./enseignant/notes/pages/ProfessorReclamations";
-import StudentGrades from "./etudiant/notes/pages/StudentGrades";
+import StudentGrades from "./etudiant/moyennes/pages/StudentGrades";
 import ENSlistetudiant from "./enseignant/listetudiant/TeacherDashboard";
 import ETDressources from "./etudiant/ressource/StudentDashboard";
 import ETDNotesFeed from "./etudiant/note/ETDnotes";
@@ -62,10 +59,9 @@ function App() {
                 <Route path="/etudiants" element={<StudentSection />} />
                 <Route path="/modifierProfil" element={<ModifieProfil />} />
                 <Route path="/emploidutemps" element={<EmploiDuTemps />} />
+                <Route path="/notes" element={<GestionEnseignants />} />
                 <Route path="/messagerie" element={<Messagerie />} />
                 <Route path="/ressources" element={<Ressources />} />
-                <Route path="/notes" element={<Grades />} />
-                <Route path="/gestionNotes" element={<GestionNotes />} />
                 <Route path="/annoncesENS" element={<AnnoncesENS />} />
                 <Route path="/docsAdmin" element={<DocsAdmin />} />
                 <Route path="/docsEtudiant" element={<DocsEtudiant />} />
@@ -74,8 +70,6 @@ function App() {
                 <Route path="/clubsADM" element={<ClubsADM />} />
                 <Route path="/ENSemploi" element={<ENSemploi />} />
                 <Route path="/ETDemploi" element={<ETDemploi />} />
-                <Route path="/GESENS" element={<GestionEnseignants />} />
-                <Route path="/PROFREC" element={<ProfessorReclamations />} />
                 <Route path="/ETDGRD" element={<StudentGrades />} />
                 <Route path="/ENSlistetudiant" element={<ENSlistetudiant />} />
                 <Route path="/ETDressources" element={<ETDressources />} />

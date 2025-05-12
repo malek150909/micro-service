@@ -29,20 +29,20 @@ http:
     users-service:
       loadBalancer:
         servers:
-          - url: "http://users-service:8081"
+          - url: "http://localhost:8081"
     courses-service:
       loadBalancer:
         servers:
-          - url: "http://courses-service:8083"
+          - url: "http://localhost:8083"
     messaging-service:
       loadBalancer:
         servers:
-          - url: "http://messaging-service:8082"
+          - url: "http://localhost:8082"
     events-service:
       loadBalancer:
         servers:
-          - url: "http://events-service:8084"
+          - url: "http://localhost:8084"
     frontend:
       loadBalancer:
         servers:
-          - url: "http://frontend:80" # Port 80 car le frontend écoute sur 80 dans le conteneur
+          - url: "http://localhost:8085" # Port 80 car le frontend écoute sur 80 dans le conteneur
