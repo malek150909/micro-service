@@ -90,12 +90,12 @@ const Message = {
     return rows
   },
 
-  // Supprimer automatiquement les messages de plus de 24 heures
+  // Supprimer automatiquement les messages de plus de 7 jours
   deleteOldMessages: async () => {
     try {
       // Récupérer les filePath des messages à supprimer
       const [messages] = await db.query(
-        "SELECT filePath FROM Message WHERE date_envoi < DATE_SUB(NOW(), INTERVAL 24 HOUR) AND filePath IS NOT NULL"
+        "SELECT filePath FROM Message WHERE date_envoi < DATE_SUB(NOW(), INTERVAL 7 DAY) AND filePath IS NOT NULL"
       );
 
       // Supprimer les fichiers joints
@@ -116,7 +116,7 @@ const Message = {
 
       // Supprimer les messages de la base de données
       const [result] = await db.query(
-        "DELETE FROM Message WHERE date_envoi < DATE_SUB(NOW(), INTERVAL 24 HOUR)"
+        "DELETE FROM Message WHERE date_envoi < DATE_SUB(NOW(), INTERVAL 7 DAY)"
       );
       return { deletedCount: result.affectedRows };
     } catch (err) {

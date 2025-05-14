@@ -351,7 +351,7 @@ const Enseignant = () => {
             <div className={styles['MAIN-topBar']}>
                 <div className={styles['MAIN-userInfo']}>
                     <span className={styles['MAIN-userName']}>{user ? `${user.nom} ${user.prenom}` : "Utilisateur"}</span>
-                    <div className={styles['MAIN-userAvatar']}>🟣</div>
+                    <div className={styles['MAIN-userAvatar']}><FaUser/></div>
                 </div>
             </div>
 

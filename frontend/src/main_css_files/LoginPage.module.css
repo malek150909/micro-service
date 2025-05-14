@@ -1,3 +1,14 @@
+:root {
+  --white: #ffffff;
+  --light-bg: #f5f7fa;
+  --text: #1a3a5f;
+  --text-light: #5e7a9b;
+  --primary: #3a6a9e;
+  --secondary: #082e54;
+  --error: #e74c3c;
+  --border-radius: 25px;
+  --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
 
 .LOG-login-page {
   display: flex;
@@ -61,7 +72,7 @@
   overflow: hidden;
   box-shadow: var(--box-shadow);
   z-index: 1;
-  animation: slideIn 0.6s ease-out forwards; /* Apply the animation */
+  animation: slideIn 0.6s ease-out forwards;
   border-radius: 25px;
 }
 
@@ -90,9 +101,9 @@
 }
 
 .LOG-login-logo {
-  width: 100px;
-  height: 100px;
-  filter: brightness(0) invert(1);
+  width: 150px;
+  height: auto;
+  object-fit: contain;
 }
 
 .LOG-login-form-section {
@@ -123,7 +134,7 @@
 
 .LOG-login-form {
   width: 80%;
-  margin: 0 auto; /* centre horizontalement */
+  margin: 0 auto;
 }
 
 .LOG-login-input-group {
@@ -138,17 +149,17 @@
 .LOG-login-input-icon {
   color: var(--text-light);
   font-size: 1.2rem;
-  margin-right: 12px; /* Légèrement augmenté pour un look moderne */
+  margin-right: 12px;
 }
 
 .LOG-login-input {
   width: 100%;
   padding: 12px 15px;
   border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 8px; /* Coins arrondis pour un style moderne */
+  border-radius: 8px;
   font-size: 1rem;
   color: var(--text);
-  background-color: rgba(255, 255, 255, 0.9); /* Fond légèrement opaque */
+  background-color: rgba(255, 255, 255, 0.9);
   outline: none;
   transition: all 0.3s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -157,7 +168,7 @@
 .LOG-login-input:focus {
   border-color: var(--primary);
   box-shadow: 0 4px 12px rgba(84, 131, 179, 0.2);
-  transform: translateY(-2px); /* Légère élévation au focus */
+  transform: translateY(-2px);
 }
 
 .LOG-login-input::placeholder {
@@ -195,7 +206,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  margin: 0 auto; /* centre horizontalement */
+  margin: 0 auto;
 }
 
 .LOG-login-button:hover {
@@ -231,8 +242,8 @@
   }
 
   .LOG-login-logo {
-    width: 80px;
-    height: 80px;
+    width: 150px;
+    height: auto;
   }
 
   .LOG-login-form-section {
@@ -254,26 +265,4 @@
   .LOG-login-subtitle {
     font-size: 1rem;
   }
-}
-
-.LOG-spinner {
-  animation: spin 1s linear infinite;
-  margin-right: 8px;
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.LOG-login-button:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
