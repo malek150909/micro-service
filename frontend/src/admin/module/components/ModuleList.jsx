@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
+import DeleteConfirmationModal from './DeleteConfirmationModal';
+import ModuleModal from './ModuleModal';
 import styles from "../module.module.css";
 
 const API_URL = 'http://courses.localhost/modules';
@@ -14,16 +16,11 @@ const ModuleList = ({ modules, onDelete, onUpdate, niveau }) => {
     coefficient: '',
     seances: '',
   });
+  const [showDeleteModal, setShowDeleteModal] = useState(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(null);
 
   const handleEditClick = (module) => {
-    setEditingModule(module.ID_module);
-    setEditFormData({
-      nom_module: module.nom_module,
-      description_module: module.description_module || '',
-      credit: module.credit,
-      coefficient: module.coefficient,
-      seances: module.seances,
-    });
+    setShowDetailsModal(module);
   };
 
   const handleEditChange = (e) => {
@@ -47,16 +44,40 @@ const ModuleList = ({ modules, onDelete, onUpdate, niveau }) => {
     setEditingModule(null);
   };
 
+  const handleDeleteClick = (moduleId) => {
+    setShowDeleteModal(moduleId);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await axios.delete(`${API_URL}/${showDeleteModal}`);
+      onDelete(showDeleteModal);
+      setShowDeleteModal(null);
+    } catch (err) {
+      console.error('Erreur de suppression du module:', err);
+      alert(`Erreur de suppression du module: ${err.response?.data?.error || err.message}`);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteModal(null);
+  };
+
+  const handleSaveModule = (updatedData) => {
+    onUpdate(showDetailsModal.ID_module, updatedData);
+    setShowDetailsModal(null);
+  };
+
   // Ensure semesters are strings for consistent grouping
   const groupedModules = modules.reduce((acc, module) => {
-    const semestre = String(module.semestre || 'Non spécifié'); // Convert to string
+    const semestre = String(module.semestre || 'Non spécifié');
     if (!acc[semestre]) {
       acc[semestre] = [];
     }
     acc[semestre].push(module);
     return acc;
   }, {});
-  console.log('Grouped modules:', groupedModules); // Debug log
+  console.log('Grouped modules:', groupedModules);
 
   // Sort semesters numerically (1, 2, 3, ..., 6)
   const sortedSemestres = Object.keys(groupedModules)
@@ -92,7 +113,7 @@ const ModuleList = ({ modules, onDelete, onUpdate, niveau }) => {
                   </span>
                   <div>
                     <button
-                      onClick={() => onDelete(module.ID_module)}
+                      onClick={() => handleDeleteClick(module.ID_module)}
                       className={`${styles['ADM-MDL-button']} ${styles['ADM-MDL-delete-button']}`}
                     >
                       Supprimer
@@ -198,6 +219,21 @@ const ModuleList = ({ modules, onDelete, onUpdate, niveau }) => {
             </form>
           </motion.div>
         </motion.div>
+      )}
+
+      {showDeleteModal && (
+        <DeleteConfirmationModal
+          onConfirm={handleConfirmDelete}
+          onCancel={handleCancelDelete}
+        />
+      )}
+
+      {showDetailsModal && (
+        <ModuleModal
+          module={showDetailsModal}
+          onClose={() => setShowDetailsModal(null)}
+          onSave={handleSaveModule}
+        />
       )}
     </div>
   );

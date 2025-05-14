@@ -885,10 +885,17 @@ body {
   transition: all 0.3s ease;
 }
 
+.MAIN-closeButtonTopRight svg {
+  display: block !important;
+  visibility: visible !important;
+  color: #1a3a5f !important; /* Couleur bien contrastée */
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
 .MAIN-closeButtonTopRight:hover {
   background: #1a3a5f;
   color: #ffffff;
-  transform: rotate(90deg);
 }
 
 /* Input and Textarea */

@@ -337,10 +337,11 @@ router.get('/section-grades', authenticate, checkRole(['enseignant', 'admin']), 
     console.log('Exécution de la requête SQL pour les notes');
     const [rows] = await db.query(`
       SELECT DISTINCT u.Matricule, u.nom, u.prenom, me.Moyenne, me.remarque, 
-             e.ID_groupe AS groupe, r.ID_reclamation, r.reclamation_text, r.prof_response
+             g.num_groupe AS groupe, r.ID_reclamation, r.reclamation_text, r.prof_response
       FROM User u
       JOIN Etudiant e ON u.Matricule = e.Matricule
       JOIN Etudiant_Section es ON u.Matricule = es.Matricule
+      LEFT JOIN groupe g ON e.ID_groupe = g.ID_groupe
       LEFT JOIN Module_Etudiant me ON u.Matricule = me.Matricule 
         AND me.ID_module = ? AND me.semestre = ?
       LEFT JOIN Reclamation r ON u.Matricule = r.Matricule_etudiant 

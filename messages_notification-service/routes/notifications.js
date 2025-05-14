@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
+const Notification = require('../models/NotificationRessources');
 const authMiddleware = require('../middleware/auth'); // Importer votre middleware
 
 // Appliquer le middleware d'authentification à toutes les routes
@@ -80,6 +81,20 @@ router.post('/seen/:id', async (req, res) => {
     );
     res.json({ message: 'Notification marquée comme lue' });
   } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post('/multiple', authMiddleware, async (req, res) => {
+  try {
+    const { senderMatricule, recipientMatricules, message } = req.body;
+    if (!senderMatricule || !recipientMatricules || !message || !Array.isArray(recipientMatricules)) {
+      return res.status(400).json({ error: 'Invalid input: senderMatricule, recipientMatricules (array), and message are required' });
+    }
+    await Notification.createForMultipleRecipients(senderMatricule, recipientMatricules, message);
+    res.status(201).json({ message: 'Notifications created successfully' });
+  } catch (error) {
+    console.error('Error creating notifications:', error);
     res.status(500).json({ error: error.message });
   }
 });

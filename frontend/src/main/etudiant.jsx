@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaUser, FaEnvelope, FaSignOutAlt, FaBell, FaChevronRight, FaCalendar, FaUsers, FaClipboardList, FaBullhorn, FaTimes, FaChartBar, FaFolderOpen, FaStickyNote, FaCalendarAlt, FaBook, FaClipboard } from "react-icons/fa";
 import NotificationBell from "./NotificationBell";
-import styles from "../admin_css_files/main.module.css";
+import styles from "../main_css_files/main.module.css";
 import axios from "axios";
 
 const Etudiant = () => {
@@ -14,6 +14,7 @@ const Etudiant = () => {
     const [newNoteContent, setNewNoteContent] = useState("");
     const [isLoaded, setIsLoaded] = useState(false);
     const [showNotificationModal, setShowNotificationModal] = useState(false);
+    const [showLogoutModal, setShowLogoutModal] = useState(false); // État pour le modal de déconnexion
     const [showAddNoteModal, setShowAddNoteModal] = useState(false);
     const [showDetailsModal, setShowDetailsModal] = useState(false);
     const [selectedNote, setSelectedNote] = useState(null);
@@ -101,7 +102,6 @@ const Etudiant = () => {
           const data = await response.json();
           console.log("Etudiant: Réponse brute de l'API:", JSON.stringify(data, null, 2));
       
-          // Valider et normaliser les notifications
           const validNotifications = Array.isArray(data)
             ? data
                 .filter((notif) => {
@@ -120,7 +120,7 @@ const Etudiant = () => {
                 .map((notif) => ({
                   ID_notification: notif.ID_notification,
                   contenu: notif.contenu,
-                  is_seen: Boolean(notif.is_seen), // Convertir 0/1 en true/false
+                  is_seen: Boolean(notif.is_seen),
                   expediteur: notif.expediteur || null,
                   destinataire: notif.destinataire || null,
                   date_envoi: notif.date_envoi || null,
@@ -135,7 +135,7 @@ const Etudiant = () => {
           setNotifications([]);
           setUnreadNotificationsCount(0);
         }
-      };
+    };
 
     const fetchUnreadMessagesCount = async (matricule) => {
         const token = localStorage.getItem("token");
@@ -243,10 +243,19 @@ const Etudiant = () => {
     };
 
     const handleLogout = () => {
+        setShowLogoutModal(true); // Afficher le modal de confirmation
+    };
+
+    const confirmLogout = () => {
         localStorage.removeItem("user");
         localStorage.removeItem("token");
         navigate("/");
         sessionStorage.removeItem("hasSeenWelcome");
+        setShowLogoutModal(false);
+    };
+
+    const cancelLogout = () => {
+        setShowLogoutModal(false); // Fermer le modal sans déconnexion
     };
 
     const handleEditProfile = () => navigate("/modifierProfil");
@@ -254,7 +263,7 @@ const Etudiant = () => {
 
     const handleNotificationClick = () => {
         setShowNotificationModal(true);
-      };
+    };
 
     const openDetailsModal = (note) => {
         setSelectedNote(note);
@@ -361,7 +370,6 @@ const Etudiant = () => {
         },
     ];
 
-
     return (
         <div className={`${styles['MAIN-mainContainer']} ${isLoaded ? styles['MAIN-mainContainerLoaded'] : ''}`}>
             {/* Top Bar */}
@@ -422,6 +430,34 @@ const Etudiant = () => {
                     </div>
                 )}
 
+                {/* Logout Confirmation Modal */}
+                {showLogoutModal && (
+                    <div className={`${styles['MAIN-modalOverlay']} ${showLogoutModal ? styles['MAIN-modalOverlayActive'] : ''}`} data-modal="logout">
+                        <div className={`${styles['MAIN-modalContent']} ${styles['MAIN-logoutModal']}`}>
+                            <button
+                                className={styles['MAIN-closeButtonTopRight']}
+                                onClick={cancelLogout}
+                            >
+                                <span style={{ fontSize: '1.2rem' }}>×</span> {/* Symbole de croix Unicode */}
+                            </button>
+                            <h3>Confirmation de déconnexion</h3>
+                            <div className={styles['MAIN-modalBody']}>
+                                <p className={styles['MAIN-logoutContentText']}>
+                                    Êtes-vous sûr de vouloir vous déconnecter ?
+                                </p>
+                            </div>
+                            <div className={styles['MAIN-buttonGroup']}>
+                                <button onClick={cancelLogout} className={styles['MAIN-cancelButton']}>
+                                    Annuler
+                                </button>
+                                <button onClick={confirmLogout}>
+                                    Confirmer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* Notification Modal */}
                 {showNotificationModal && (
                     <div className={`${styles['MAIN-notificationModal']} ${showNotificationModal ? styles['MAIN-notificationModalActive'] : ''}`}>
@@ -453,7 +489,7 @@ const Etudiant = () => {
                                 className={styles['MAIN-closeButtonTopRight']}
                                 onClick={(e) => closeAddNoteModal(e)}
                             >
-                                <FaTimes />
+                                <span style={{ fontSize: '1.2rem' }}>×</span> {/* Symbole de croix Unicode */}
                             </button>
                             <h3>Ajouter une Note</h3>
                             <div className={styles['MAIN-modalBody']}>
@@ -487,11 +523,11 @@ const Etudiant = () => {
                                 className={styles['MAIN-closeButtonTopRight']}
                                 onClick={(e) => closeDetailsModal(e)}
                             >
-                                <FaTimes />
+                                <span style={{ fontSize: '1.2rem' }}>×</span> {/* Symbole de croix Unicode */}
                             </button>
                             <h3>{selectedNote.title}</h3>
                             <div className={styles['MAIN-modalBody']}>
-                                <p className={styles['MAIN-noteContentText']}>
+                                <p className={styles['MAIN-note-FamilyContentText']}>
                                     <strong>Contenu :</strong> {selectedNote.content}
                                 </p>
                                 <p className={styles['MAIN-noteContentText']}>
@@ -520,7 +556,7 @@ const Etudiant = () => {
                                 className={styles['MAIN-closeButtonTopRight']}
                                 onClick={(e) => closeEventDetailsModal(e)}
                             >
-                                <FaTimes />
+                                <span style={{ fontSize: '1.2rem' }}>×</span> {/* Symbole de croix Unicode */}
                             </button>
                             <h3>{selectedEvent.title}</h3>
                             <div className={styles['MAIN-modalBody']}>

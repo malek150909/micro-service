@@ -297,7 +297,7 @@ function StudentDashboard() {
                           {resource.date_upload}
                         </span>
                         <a
-                          href={`http://messaging.localhost${resource.fichier_url}`}
+                          href={`http://courses.localhost${resource.fichier_url}`}
                           download
                           target="_blank"
                           rel="noopener noreferrer"

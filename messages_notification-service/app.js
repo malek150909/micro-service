@@ -9,7 +9,6 @@ const authMiddleware = require('./middleware/auth'); // Middleware d'authentific
 const annonceRoutes = require('./routes/annonceRoutes');
 const userRoutes = require('./routes/userRoutes');
 const messageRoutes = require('./routes/messageRoutes');
-const resourceRoutes = require('./routes/resourceRoutes');
 const annonceENSroutes = require('./routes/annonceENSroutes');
 const authENSroutes = require('./routes/authENSroutes');
 const annonceETDRoutes = require('./routes/annonceEtudiantRoutes');
@@ -41,7 +40,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/annonces',authMiddleware ,annonceRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/",authMiddleware ,messageRoutes);
-app.use('/ressources', resourceRoutes);
 app.use('/annoncesENS', annonceENSroutes); // Routes maintenant après le parsing
 app.use('/authENSannonce', authENSroutes);
 app.use('/annoncesETD', annonceETDRoutes);

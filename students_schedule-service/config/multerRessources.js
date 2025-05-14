@@ -1,17 +1,23 @@
-// In config/multer.js
-const multer = require('multer');
-const fs = require('fs');
+import multer from 'multer';
+import { promises as fs } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        const uploadPath = 'uploads/';
-        if (!fs.existsSync(uploadPath)) {
-            fs.mkdirSync(uploadPath);
+    destination: async function (req, file, cb) {
+        const uploadPath = path.join(__dirname, '../Uploads');
+        try {
+            await fs.access(uploadPath);
+        } catch {
+            await fs.mkdir(uploadPath, { recursive: true });
         }
         cb(null, uploadPath);
     },
     filename: function (req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname);
+        cb(null, `${Date.now()}-${file.originalname}`);
     }
 });
 
@@ -50,4 +56,4 @@ const uploadMiddleware = (req, res, next) => {
     });
 };
 
-module.exports = uploadMiddleware;
+export default uploadMiddleware;

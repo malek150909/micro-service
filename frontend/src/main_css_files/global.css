@@ -43,12 +43,4 @@ body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    pointer-events: auto !important;
-}
-
-/* S'assurer que les éléments interactifs ne sont pas bloqués */
-select,
-button {
-  pointer-events: auto !important;
-  z-index: 9999 !important;
 }

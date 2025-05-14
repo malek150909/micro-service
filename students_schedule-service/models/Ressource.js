@@ -1,9 +1,8 @@
-// models/Ressource.js
-const db = require('../config/db');
+import pool from '../config/db.js';
 
 class Ressource {
     static async findByProfessor(matricule) {
-        const [rows] = await db.execute(`
+        const [rows] = await pool.execute(`
             SELECT r.*, m.nom_module, s.niveau, sp.nom_specialite
             FROM Ressource r
             JOIN Module m ON r.ID_module = m.ID_module
@@ -40,14 +39,14 @@ class Ressource {
             id
         ];
 
-        const [result] = await db.execute(query, values);
+        const [result] = await pool.execute(query, values);
         return result.affectedRows > 0;
     }
 
     static async deleteById(id) {
-        const [result] = await db.execute('DELETE FROM Ressource WHERE ID_ressource = ?', [id]);
+        const [result] = await pool.execute('DELETE FROM Ressource WHERE ID_ressource = ?', [id]);
         return result.affectedRows > 0;
     }
 }
 
-module.exports = Ressource;
+export default Ressource;

@@ -52,7 +52,7 @@ const Home = () => {
   const fetchModules = async (currentFilters) => {
     try {
       const response = await axios.get(API_URL, { params: currentFilters });
-      console.log('Fetched modules:', response.data); // Debug log
+      console.log('Fetched modules:', response.data);
       setModules(response.data);
     } catch (err) {
       console.error('Erreur de récupération des modules:', err);
@@ -91,10 +91,10 @@ const Home = () => {
     }
   };
 
-  const handleDeleteModule = async (id, sectionId) => {
+  const handleDeleteModule = async (id) => {
     try {
       await axios.delete(`${API_URL}/${id}`, {
-        params: { sectionId },
+        params: { sectionId: filters.section },
       });
       fetchModules(filters);
     } catch (err) {
@@ -162,7 +162,7 @@ const Home = () => {
         {modules.length > 0 ? (
           <ModuleList
             modules={modules}
-            onDelete={(id) => handleDeleteModule(id, filters.section)}
+            onDelete={handleDeleteModule}
             onUpdate={handleUpdateModule}
             niveau={filters.niveau}
           />

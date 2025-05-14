@@ -15,6 +15,8 @@ import notesRoutes from './routes/notesRoute.js';
 import SUPPprofRoutes from './routes/profRoutes.js';
 import studentPlanningRoutes from './routes/studentPlanningRoutes.js';
 import calendarRoutes from "./routes/calendarRoutes.js";
+import resourceRoutes from './routes/resourceRoutes.js';
+
 
 
 dotenv.config();
@@ -44,6 +46,8 @@ app.use("/notes", notesRoutes);
 app.use('/SUPPprof', SUPPprofRoutes);
 app.use('/studentPlanning', studentPlanningRoutes);
 app.use('/calendar',authMiddleware, calendarRoutes);
+app.use('/ressources', resourceRoutes);
+
 
 const PORT = 8083;
 app.listen(PORT, () => {

@@ -1,5 +1,4 @@
-// config/conditionalUpload.js
-const uploadMiddleware = require('./multerRessources');
+import uploadMiddleware from './multerRessources.js';
 
 const conditionalUpload = (req, res, next) => {
     const contentType = req.headers['content-type'] || '';
@@ -10,9 +9,9 @@ const conditionalUpload = (req, res, next) => {
         uploadMiddleware(req, res, next);
     } else {
         // If not multipart, skip Multer and proceed
-       // console.log('Skipping Multer - not a multipart request');
+        //console.log('Skipping Multer - not a multipart request');
         next();
     }
 };
 
-module.exports = conditionalUpload;
+export default conditionalUpload;

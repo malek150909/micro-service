@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ReactDOM from 'react-dom';
-import SessionModal from './SessionModal';
 import styles from '../css/EmploiDuTemps.module.css'; // Already correct
 import { FaHome } from 'react-icons/fa';
 
@@ -100,7 +99,6 @@ const Timetable = () => {
                   return (
                     <td
                       key={`${day}-${slot}`}
-                      onClick={() => handleCellClick(day, slot)}
                       className={styles['ENS-EDT-modern-td']}
                     >
                       {session ? (

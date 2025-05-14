@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FaBell } from 'react-icons/fa';
-import styles from '../admin_css_files/NotificationBell.module.css';
+import styles from '../main_css_files/NotificationBell.module.css';
 
 const NotificationBell = ({ onNotificationClick, showModal, notifications, setNotifications, fetchNotifications }) => {
   const [expandedNotifications, setExpandedNotifications] = useState({});

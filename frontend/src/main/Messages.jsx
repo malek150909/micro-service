@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import { FaHome, FaSearch, FaPaperPlane, FaTimes, FaUser, FaPaperclip, FaEnvelope } from "react-icons/fa"
-import styles from "../admin_css_files/messages.module.css"
+import styles from "../main_css_files/messages.module.css"
 
 const Messages = () => {
   const navigate = useNavigate()

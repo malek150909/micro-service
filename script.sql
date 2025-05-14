@@ -118,15 +118,17 @@ CREATE TABLE Module (
 );
 
 -- Create Module_Enseignant Table to Link Professors to Modules
-CREATE TABLE Module_Enseignant (
-    ID_module INT NOT NULL,
-    Matricule INT NOT NULL,
-    course_type ENUM('Cour','TD','TP','Cour/TD/TP','Cour/TD','Cour/TP','enligne') NOT NULL,
-    group_number INT,
-    PRIMARY KEY (ID_module, Matricule),
-    FOREIGN KEY (ID_module) REFERENCES Module(ID_module),
-    FOREIGN KEY (Matricule) REFERENCES User(Matricule)
-);
+ CREATE TABLE `module_enseignant` (
+  `ID_module` int NOT NULL,
+  `Matricule` bigint NOT NULL,
+  `course_type` enum('Cour','Cour/TD','Cour/TP','Cour/TD/TP','TD/TP','En ligne','TD','TP','enligne') NOT NULL,
+  PRIMARY KEY (`ID_module`,`Matricule`,`course_type`),
+  KEY `fk_module_enseignant_user` (`Matricule`),
+  CONSTRAINT `fk_module_enseignant_module` FOREIGN KEY (`ID_module`) REFERENCES `module` (`ID_module`) ON DELETE CASCADE,
+  CONSTRAINT `fk_module_enseignant_user` FOREIGN KEY (`Matricule`) REFERENCES `user` (`Matricule`) ON DELETE CASCADE,
+  CONSTRAINT `module_enseignant_ibfk_1` FOREIGN KEY (`ID_module`) REFERENCES `module` (`ID_module`) ON DELETE CASCADE,
+  CONSTRAINT `module_enseignant_ibfk_2` FOREIGN KEY (`Matricule`) REFERENCES `enseignant` (`Matricule`) ON DELETE CASCADE
+) ;
 
 -- Create Enseignant_Section Table to Link Professors to Sections
 CREATE TABLE Enseignant_Section (
@@ -181,7 +183,6 @@ CREATE TABLE Module_Etudiant (
     FOREIGN KEY (ID_module) REFERENCES Module(ID_module) ON DELETE CASCADE,
     FOREIGN KEY (Matricule) REFERENCES Etudiant(Matricule) ON DELETE CASCADE,
     semestre TEXT ,
-    Moyenne float NOT NULL 
 );
 
 -- Create Module_Section Table
@@ -579,4 +580,74 @@ CREATE TABLE notes (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (Matricule) REFERENCES Etudiant(Matricule) ON DELETE CASCADE
+);
+
+CREATE TABLE `annee_academique` (
+  `ID_annee` int NOT NULL AUTO_INCREMENT,
+  `niveau` varchar(50) NOT NULL,
+  `Matricule` bigint NOT NULL,
+  `moyenne_annuelle` float DEFAULT NULL,
+  `etat` enum('Admis','Ajourné','Admis avec dettes','Réintégré') DEFAULT NULL,
+  `credits` int DEFAULT NULL,
+  `annee_scolaire` varchar(9) NOT NULL DEFAULT '2024-2025',
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`ID_annee`),
+  UNIQUE KEY `uk_niveau_matricule_annee` (`niveau`,`Matricule`,`annee_scolaire`),
+  KEY `Matricule` (`Matricule`),
+  CONSTRAINT `annee_academique_ibfk_1` FOREIGN KEY (`Matricule`) REFERENCES `etudiant` (`Matricule`) ON DELETE CASCADE
+);
+
+ CREATE TABLE `student_grades_archive` (
+  `ID_archive` int NOT NULL AUTO_INCREMENT,
+  `Matricule` bigint NOT NULL,
+  `annee_scolaire` varchar(9) NOT NULL,
+  `niveau` varchar(50) NOT NULL,
+  `ID_section` int DEFAULT NULL,
+  `nom_section` varchar(50) DEFAULT NULL,
+  `ID_specialite` int DEFAULT NULL,
+  `nom_specialite` varchar(100) DEFAULT NULL,
+  `ID_departement` int DEFAULT NULL,
+  `ID_faculte` int DEFAULT NULL,
+  `ID_module` int NOT NULL,
+  `nom_module` varchar(100) DEFAULT NULL,
+  `coefficient` int DEFAULT NULL,
+  `credit` int DEFAULT NULL,
+  `semestre` enum('S1','S2','S3','S4','S5','S6','S7','S8','S9','S10') NOT NULL,
+  `moyenne` float DEFAULT NULL,
+  `remarque` text,
+  `reclamation_text` text,
+  `prof_response` text,
+  `date_reclamation` datetime DEFAULT NULL,
+  `date_response` datetime DEFAULT NULL,
+  `moyenne_semestre` float DEFAULT NULL,
+  `moyenne_annuelle` float DEFAULT NULL,
+  `credits_obtenus` int DEFAULT NULL,
+  `etat` enum('Admis','Ajourne','Admis avec dettes','Reintegrer') DEFAULT NULL,
+  `archived_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`ID_archive`),
+  KEY `Matricule` (`Matricule`),
+  KEY `ID_section` (`ID_section`),
+  KEY `ID_specialite` (`ID_specialite`),
+  KEY `ID_departement` (`ID_departement`),
+  KEY `ID_faculte` (`ID_faculte`),
+  KEY `ID_module` (`ID_module`),
+  CONSTRAINT `student_grades_archive_ibfk_1` FOREIGN KEY (`Matricule`) REFERENCES `etudiant` (`Matricule`) ON DELETE CASCADE,
+  CONSTRAINT `student_grades_archive_ibfk_2` FOREIGN KEY (`ID_section`) REFERENCES `section` (`ID_section`) ON DELETE SET NULL,
+  CONSTRAINT `student_grades_archive_ibfk_3` FOREIGN KEY (`ID_specialite`) REFERENCES `specialite` (`ID_specialite`) ON DELETE SET NULL,
+  CONSTRAINT `student_grades_archive_ibfk_4` FOREIGN KEY (`ID_departement`) REFERENCES `departement` (`ID_departement`) ON DELETE SET NULL,
+  CONSTRAINT `student_grades_archive_ibfk_5` FOREIGN KEY (`ID_faculte`) REFERENCES `faculte` (`ID_faculte`) ON DELETE SET NULL,
+  CONSTRAINT `student_grades_archive_ibfk_6` FOREIGN KEY (`ID_module`) REFERENCES `module` (`ID_module`) ON DELETE CASCADE
+) ;
+
+CREATE TABLE `module_enseignant_groupe` (
+  `ID_module` int NOT NULL,
+  `Matricule` bigint NOT NULL,
+  `course_type` enum('TD','TP') NOT NULL,
+  `group_number` int NOT NULL,
+  PRIMARY KEY (`ID_module`,`Matricule`,`course_type`,`group_number`),
+  KEY `fk_module_enseignant_groupe_user` (`Matricule`),
+  CONSTRAINT `fk_module_enseignant_groupe_module` FOREIGN KEY (`ID_module`) REFERENCES `module` (`ID_module`) ON DELETE CASCADE,
+  CONSTRAINT `fk_module_enseignant_groupe_parent` FOREIGN KEY (`ID_module`, `Matricule`, `course_type`) REFERENCES `module_enseignant` (`ID_module`, `Matricule`, `course_type`) ON DELETE CASCADE,
+  CONSTRAINT `fk_module_enseignant_groupe_user` FOREIGN KEY (`Matricule`) REFERENCES `user` (`Matricule`) ON DELETE CASCADE,
+  CONSTRAINT `module_enseignant_groupe_ibfk_1` FOREIGN KEY (`ID_module`, `Matricule`, `course_type`) REFERENCES `module_enseignant` (`ID_module`, `Matricule`, `course_type`) ON DELETE CASCADE
 );

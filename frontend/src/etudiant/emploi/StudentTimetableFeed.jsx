@@ -113,45 +113,6 @@ const StudentTimetableFeed = () => {
     doc.save(fileName);
   };
 
-  const exportToExcel = () => {
-    const sectionDetails = seances.length > 0 ? {
-      niveau: seances[0].niveau,
-      specialty: seances[0].nom_specialite,
-      section: seances[0].nom_section,
-    } : {};
-
-    const headerData = [
-      ['Emploi du Temps'],
-      [`Niveau: ${sectionDetails.niveau || ''}`],
-      [`Spécialité: ${sectionDetails.specialty || ''}`],
-      [`Section: ${sectionDetails.section || ''}`],
-      [],
-    ];
-
-    const tableData = [['Jour', ...timeSlots]];
-    days.forEach((day) => {
-      const row = [day];
-      timeSlots.forEach((slot) => {
-        const sessions = seances.filter((s) => s.jour === day && s.time_slot === slot);
-        row.push(
-          sessions.length > 0
-            ? sessions
-                .map((s) => `${s.type_seance === 'Cour' ? 'Cours' : s.type_seance}: ${s.nom_module} (${s.nom_salle}${s.num_groupe ? `, Groupe ${s.num_groupe}` : ''})`)
-                .join('\n')
-            : '-'
-        );
-      });
-      tableData.push(row);
-    });
-
-    const worksheetData = [...headerData, ...tableData];
-    const ws = XLSX.utils.aoa_to_sheet(worksheetData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Emploi du Temps');
-    const fileName = `emploi_du_temps_${sectionDetails.niveau || 'unknown'}_${sectionDetails.specialty || 'unknown'}_${sectionDetails.section || 'unknown'}.xlsx`;
-    XLSX.writeFile(wb, fileName);
-  };
-
   const renderModal = () => {
     if (!isModalOpen || !selectedSession) return null;
 
@@ -220,9 +181,6 @@ const StudentTimetableFeed = () => {
         </button>
         <button className="sidebar-button export-pdf" onClick={exportToPDF}>
           <FaFilePdf /> Exporter en PDF
-        </button>
-        <button className="sidebar-button export-excel" onClick={exportToExcel}>
-          <FaFileExcel /> Exporter en Excel
         </button>
       </div>
       <div className="timetable-container">

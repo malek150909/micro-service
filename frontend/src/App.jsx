@@ -9,7 +9,7 @@ import Annonces from "./admin/annonce/annonces";
 import GestionEvenements from "./admin/evenement/GestionEvenements";
 import Modules from "./admin/module/pages/Home";
 import ExamPlanning from "./admin/planning/pages/ExamPlanning";
-import ListEnseignants from "./admin/enseignant/ListEnseignant";
+import ListEnseignants from "./admin/enseignant/components/ListEnseignant";
 import StudentSection from "./admin/etudiant/listetudiant";
 import ModifieProfil from "./main/modifierProfil";
 import EmploiDuTemps from "./admin/emploi/pages/TimetablePage";

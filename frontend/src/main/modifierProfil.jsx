@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaHome, FaLock, FaUser } from "react-icons/fa";
-import "../admin_css_files/edit_profil.css";
+import "../main_css_files/edit_profil.css";
 
 const EditProfile = () => {
     const navigate = useNavigate();

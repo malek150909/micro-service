@@ -144,43 +144,6 @@ function TimetableDisplay({ timetable, sectionId, semestre, onRefresh }) {
     doc.save(fileName);
   };
 
-  const exportToExcel = () => {
-    console.log('Exporting timetable to Excel with sectionDetails:', sectionDetails);
-    const { faculty, department, specialty, niveau, section } = sectionDetails;
-
-    const headerData = [
-      ['Emploi du Temps'],
-      [`Faculté: ${faculty || ''}`],
-      [`Département: ${department || ''}`],
-      [`Spécialité: ${specialty || ''}`],
-      [`Niveau: ${niveau || ''}`],
-      [`Section: ${section || ''}`],
-      [],
-    ];
-
-    const tableData = [['Jour', ...timeSlots]];
-    days.forEach(day => {
-      const row = [day];
-      timeSlots.forEach(slot => {
-        const sessions = timetable[day]?.filter(s => s.time_slot === slot) || [];
-        row.push(
-          sessions.length > 0
-            ? sessions.map(s => `${s.type_seance}: ${s.module} (${s.teacher}, ${s.room}${s.group ? `, ${s.group}` : ''})`).join('\n')
-            : '-'
-        );
-      });
-      tableData.push(row);
-    });
-
-    const worksheetData = [...headerData, ...tableData];
-    const ws = XLSX.utils.aoa_to_sheet(worksheetData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Emploi du Temps');
-    const fileName = `emploi_du_temps_${niveau || 'unknown'}_${specialty || 'unknown'}_${section || 'unknown'}.xlsx`;
-    console.log('Saving Excel as:', fileName);
-    XLSX.writeFile(wb, fileName);
-  };
-
   const fetchFilteredEnseignants = async (moduleId) => {
     if (!moduleId) {
       setOptions(prev => ({ ...prev, enseignants: [] }));
@@ -517,9 +480,6 @@ function TimetableDisplay({ timetable, sectionId, semestre, onRefresh }) {
     <div className={styles['ADM-EDT-timetable-container']}>
       <h2 className={styles['ADM-EDT-timetable-title']}>Emploi du Temps (Semestre {semestre})</h2>
       <div className={styles['ADM-EDT-export-buttons']}>
-        <button onClick={exportToExcel} className={`${styles['ADM-EDT-timetable-btn']} ${styles['ADM-EDT-export-excel']}`}>
-          <FaFileExcel /> Exporter en Excel
-        </button>
         <button onClick={exportToPDF} className={`${styles['ADM-EDT-timetable-btn']} ${styles['ADM-EDT-export-pdf']}`}>
           <FaFilePdf /> Exporter en PDF
         </button>

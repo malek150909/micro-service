@@ -1,3 +1,4 @@
+
 const express = require('express');
 const router = express.Router();
 const teacherController = require('../controllers/teacherController');
@@ -20,6 +21,9 @@ router.post('/modules/by-sections-specialty', authMiddleware, teacherController.
 
 // Get all sections
 router.get('/sections', authMiddleware, teacherController.getSections);
+
+// Get all groups
+router.get('/groups', authMiddleware, teacherController.getGroups);
 
 // Get all teachers
 router.get('/teachers', authMiddleware, teacherController.getTeachers);

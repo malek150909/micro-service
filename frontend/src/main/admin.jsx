@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaUser, FaEnvelope, FaSignOutAlt, FaBell, FaChevronRight, FaCalendar, FaBook, FaUsers, FaClipboardList, FaBullhorn } from "react-icons/fa";
+import { FaUser, FaEnvelope, FaSignOutAlt, FaBell, FaChevronRight, FaCalendar, FaBook, FaUsers, FaClipboardList, FaBullhorn, FaTimes } from "react-icons/fa";
 import NotificationBell from "./NotificationBell";
-import styles from "../admin_css_files/main.module.css";
+import styles from "../main_css_files/main.module.css";
 
 const Admin = () => {
     const navigate = useNavigate();
@@ -10,10 +10,10 @@ const Admin = () => {
     const [showWelcome, setShowWelcome] = useState(false);
     const [isLoaded, setIsLoaded] = useState(false);
     const [showNotificationModal, setShowNotificationModal] = useState(false);
+    const [showLogoutModal, setShowLogoutModal] = useState(false); // État pour le modal de déconnexion
     const [currentDate, setCurrentDate] = useState(new Date());
     const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
-    const [stats, setStats] = useState([]); // Initialisé comme tableau vide
-
+    const [stats, setStats] = useState([]);
 
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -32,7 +32,6 @@ const Admin = () => {
             });
         }
 
-        // Récupérer les statistiques réelles
         const fetchStatistics = async () => {
             try {
                 const token = localStorage.getItem("token");
@@ -64,15 +63,7 @@ const Admin = () => {
         };
 
         fetchStatistics();
-
     }, [navigate]);
-
-    const handleLogout = () => {
-        localStorage.removeItem("user");
-        localStorage.removeItem("token");
-        navigate("/");
-        sessionStorage.removeItem("hasSeenWelcome");
-    };
 
     const fetchUnreadMessagesCount = async (matricule) => {
         const token = localStorage.getItem("token");
@@ -95,6 +86,22 @@ const Admin = () => {
         }
     };
 
+    const handleLogout = () => {
+        setShowLogoutModal(true); // Afficher le modal de confirmation
+    };
+
+    const confirmLogout = () => {
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+        navigate("/");
+        sessionStorage.removeItem("hasSeenWelcome");
+        setShowLogoutModal(false);
+    };
+
+    const cancelLogout = () => {
+        setShowLogoutModal(false); // Fermer le modal sans déconnexion
+    };
+
     const handleEditProfile = () => navigate("/modifierProfil");
     const handleMessages = () => navigate("/messagerie");
 
@@ -102,7 +109,6 @@ const Admin = () => {
         setShowNotificationModal(true);
     };
 
-    // Calendar logic
     const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
     const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
     const today = new Date();
@@ -110,14 +116,12 @@ const Admin = () => {
 
     const renderCalendar = () => {
         const days = [];
-        const adjustedFirstDay = (firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1); // Adjust for Monday start
+        const adjustedFirstDay = (firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1);
 
-        // Add empty slots for days before the first day of the month
         for (let i = 0; i < adjustedFirstDay; i++) {
             days.push(<div key={`empty-${i}`} className={styles['MAIN-day']} />);
         }
 
-        // Add days of the month
         for (let day = 1; day <= daysInMonth; day++) {
             const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
             const isCurrentDay =
@@ -234,6 +238,34 @@ const Admin = () => {
                     <div className={`${styles['MAIN-welcomeMessage']} ${isLoaded ? styles['MAIN-welcomeMessageSlideIn'] : ''}`}>
                         <h1>Bienvenue, {user.nom} {user.prenom} !</h1>
                         <p>Que souhaitez-vous faire aujourd'hui ?</p>
+                    </div>
+                )}
+
+                {/* Logout Confirmation Modal */}
+                {showLogoutModal && (
+                    <div className={`${styles['MAIN-modalOverlay']} ${showLogoutModal ? styles['MAIN-modalOverlayActive'] : ''}`} data-modal="logout">
+                        <div className={`${styles['MAIN-modalContent']} ${styles['MAIN-logoutModal']}`}>
+                            <button
+                                className={styles['MAIN-closeButtonTopRight']}
+                                onClick={cancelLogout}
+                            >
+                                <span style={{ fontSize: '1.2rem' }}>×</span> 
+                            </button>
+                            <h3>Confirmation de déconnexion</h3>
+                            <div className={styles['MAIN-modalBody']}>
+                                <p className={styles['MAIN-logoutContentText']}>
+                                    Êtes-vous sûr de vouloir vous déconnecter ?
+                                </p>
+                            </div>
+                            <div className={styles['MAIN-buttonGroup']}>
+                                <button onClick={cancelLogout} className={styles['MAIN-cancelButton']}>
+                                    Annuler
+                                </button>
+                                <button onClick={confirmLogout}>
+                                    Confirmer
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 )}
 
