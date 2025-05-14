@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React,{ useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaPlus, FaEdit, FaTrash, FaEye, FaTimes, FaHome, FaUser } from "react-icons/fa";
 import styles from "./notes.module.css";

@@ -1,6 +1,4 @@
-"use client"
-
-import { useState, useEffect, useRef } from "react"
+import React,{ useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import { FaHome, FaSearch, FaPaperPlane, FaTimes, FaUser, FaPaperclip, FaEnvelope } from "react-icons/fa"
 import styles from "../main_css_files/messages.module.css"

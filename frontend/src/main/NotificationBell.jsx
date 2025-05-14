@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React,{ useState } from 'react';
 import { FaBell } from 'react-icons/fa';
 import styles from '../main_css_files/NotificationBell.module.css';
 
