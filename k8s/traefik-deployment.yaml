@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: traefik
+  name: traefik
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: traefik
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: traefik
+    spec:
+      serviceAccountName: traefik-ingress-controller
+      containers:
+        - image: traefik:v2.10
+          name: traefik
+          ports:
+            - containerPort: 80
+              protocol: TCP
+            - containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /etc/traefik/traefik.yml
+              name: traefik-cm0
+              readOnly: true
+              subPath: traefik.yml
+            - mountPath: /traefik_dynamic.yml
+              name: traefik-cm1
+              readOnly: true
+              subPath: traefik_dynamic.yml
+      restartPolicy: Always
+      volumes:
+        - configMap:
+            items:
+              - key: traefik.yml
+                path: traefik.yml
+            name: traefik-cm0
+          name: traefik-cm0
+        - configMap:
+            items:
+              - key: traefik_dynamic.yml
+                path: traefik_dynamic.yml
+            name: traefik-cm1
+          name: traefik-cm1

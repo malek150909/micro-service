@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: events-service
+  name: events-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: events-service
+  template:
+    metadata:
+      labels:
+        app: events-service
+    spec:
+      containers:
+        - env:
+            - name: DB_HOST
+              value: mysql
+            - name: DB_NAME
+              value: uni_db
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_USER
+              value: root
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secrets
+                  key: DB_PASSWORD
+          image: events-service:latest
+          name: events-service
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8084
+              protocol: TCP
+      restartPolicy: Always

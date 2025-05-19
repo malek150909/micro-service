@@ -7,7 +7,7 @@ const fs = require("fs")
 const { broadcastMessage } = require("../websocket") // Adjust path if websocket.js is elsewhere
 
 // Créer un répertoire pour les fichiers si nécessaire
-const uploadsDir = path.join(__dirname, "../Uploads")
+const uploadsDir = path.join(__dirname, "../uploads")
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true })
 }
@@ -134,7 +134,7 @@ const messageController = {
             </div>
             ${file ? `<p><strong>Pièce jointe:</strong> ${fileName}</p>` : ""}
             <p>Pour répondre à ce message, veuillez vous connecter à la plateforme universitaire.</p>
-            <p><strong>Note:</strong> Ce message sera automatiquement supprimé après 24 heures.</p>
+            <p><strong>Note:</strong> Ce message sera automatiquement supprimé après 7 jours.</p>
           </div>
           <div style="background-color: #f5f5f5; padding: 15px; text-align: center; font-size: 12px; color: #666; border-radius: 0 0 5px 5px;">
             <p>Ce message a été envoyé automatiquement par la Plateforme Universitaire.</p>

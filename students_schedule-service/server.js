@@ -1,4 +1,6 @@
 import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import authMiddleware from './middleware/auth.js'; // Importez votre middleware
@@ -17,13 +19,15 @@ import studentPlanningRoutes from './routes/studentPlanningRoutes.js';
 import calendarRoutes from "./routes/calendarRoutes.js";
 import resourceRoutes from './routes/resourceRoutes.js';
 
-
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config();
 process.env.TZ = 'UTC';
 
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cors({
   origin: ['http://plateform.universitaire', 'http://localhost:8085'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -31,6 +35,9 @@ app.use(cors({
 }));
 
 app.options('*', cors());
+
+app.use('/uploads', express.static(path.resolve(__dirname, 'uploads')));
+
 
 app.use('/modules', moduleRoutes);
 app.use('/exams', examRoutes);

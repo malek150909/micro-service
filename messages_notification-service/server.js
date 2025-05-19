@@ -1,23 +1,26 @@
-// backend/server.js
 const app = require('./app');
+const http = require('http');
+const { setupWebSocketServer } = require('./websocket');
 const Message = require('./models/messageModel');
-const path = require('path');
-const fs = require('fs');
 const PORT = 8082;
 
-// Tâche planifiée pour supprimer les messages anciens toutes les heures
-setInterval(
-  async () => {
-    try {
-      const result = await Message.deleteOldMessages();
-      console.log(`${result.deletedCount} messages anciens supprimés`);
-    } catch (error) {
-      console.error("Erreur lors du nettoyage périodique des messages:", error);
-    }
-  },
-  60 * 60 * 1000 // Exécuter toutes les heures (1 heure = 60 * 60 * 1000 ms)
-);
+// Créer le serveur HTTP
+const server = http.createServer(app);
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://messaging.localhost`);
+// Attacher le WebSocket dessus (important : pas sur Express directement)
+setupWebSocketServer(server);
+
+// Nettoyage périodique
+setInterval(async () => {
+  try {
+    const result = await Message.deleteOldMessages();
+    console.log(`${result.deletedCount} messages anciens supprimés`);
+  } catch (error) {
+    console.error("Erreur lors du nettoyage périodique des messages:", error);
+  }
+}, 60 * 60 * 1000);
+
+// Démarrer le serveur
+server.listen(PORT, () => {
+  console.log(`HTTP + WebSocket Server running on port ${PORT}`);
 });

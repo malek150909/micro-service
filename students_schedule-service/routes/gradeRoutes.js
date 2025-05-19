@@ -1329,7 +1329,9 @@ cron.schedule('0 0 * * *', async () => {
     await connection.beginTransaction();
 
     const oneMonthAgo = new Date();
+    oneMonthAgo.setDate(1); // pour éviter le piège des "31"
     oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
 
     const [records] = await connection.query(`
       SELECT DISTINCT Matricule, niveau, annee_scolaire

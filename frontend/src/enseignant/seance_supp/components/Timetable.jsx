@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { FaCalendarAlt, FaPlusCircle, FaEdit, FaTrash, FaSave, FaTimes, FaSpinner } from 'react-icons/fa';
 import styles from "../css/seance_supp.module.css";
 
@@ -47,43 +48,13 @@ function Timetable({ sectionTimetable, profTimetable, matricule, sectionId, onSe
 
   const currentDate = new Date();
 
-  const positionModal = (modalElement) => {
-    if (!modalElement) return;
-    const scrollY = window.scrollY || window.pageYOffset;
-    const viewportHeight = window.innerHeight;
-    const modalHeight = modalElement.offsetHeight;
-    const topPosition = scrollY + (viewportHeight / 2) - (modalHeight / 2);
-    modalElement.style.top = `${Math.max(topPosition, scrollY + 20)}px`;
-    modalElement.style.left = '50%';
-    modalElement.style.transform = 'translateX(-50%)';
-  };
-
   useEffect(() => {
     if (editingSession && modalRef.current) {
-      positionModal(modalRef.current);
+      modalRef.current.focus(); // Améliore l'accessibilité
     }
     if (showDeleteModal && deleteModalRef.current) {
-      positionModal(deleteModalRef.current);
+      deleteModalRef.current.focus();
     }
-  }, [editingSession, showDeleteModal]);
-
-  useEffect(() => {
-    const handleResizeOrScroll = () => {
-      if (editingSession && modalRef.current) {
-        positionModal(modalRef.current);
-      }
-      if (showDeleteModal && deleteModalRef.current) {
-        positionModal(deleteModalRef.current);
-      }
-    };
-
-    window.addEventListener('resize', handleResizeOrScroll);
-    window.addEventListener('scroll', handleResizeOrScroll);
-
-    return () => {
-      window.removeEventListener('resize', handleResizeOrScroll);
-      window.removeEventListener('scroll', handleResizeOrScroll);
-    };
   }, [editingSession, showDeleteModal]);
 
   useEffect(() => {
@@ -255,7 +226,7 @@ function Timetable({ sectionTimetable, profTimetable, matricule, sectionId, onSe
   const handleEditSession = async (session) => {
     console.log('Raw session object:', session);
     let sessionSectionId = session.ID_section;
-    
+
     if (!sessionSectionId && session.nom_section) {
       const matchingSection = sections.find(
         (section) => section.nom_section === session.nom_section
@@ -427,6 +398,260 @@ function Timetable({ sectionTimetable, profTimetable, matricule, sectionId, onSe
   const sectionSuppByDate = organizeSupplementaryByDate(sectionTimetable.supplementary, true);
   const profRegularGrid = organizeTimetable(profTimetable.regular);
   const profSuppByDate = organizeSupplementaryByDate(profTimetable.supplementary);
+
+  // Composant pour la modale d'édition
+  const EditModal = () => (
+    <div className={`${styles['ENS-SUPP-modal-overlay']} ${isModalClosing ? styles['ENS-SUPP-closing'] : ''}`}>
+      <div className={`${styles['ENS-SUPP-modal-content']} ${isModalClosing ? styles['ENS-SUPP-closing'] : ''}`} ref={modalRef}>
+        <h4>Modifier la séance</h4>
+        {sallesError && <p className={styles['ENS-SUPP-error-message']}>{sallesError}</p>}
+        {console.log('Modal editingSession:', editingSession)}
+        <form onSubmit={handleModifySubmit} className={styles['ENS-SUPP-modal-form']}>
+          <div className={styles['ENS-SUPP-form-group']}>
+            <label>Section:</label>
+            <select
+              value={editingSession.sectionId || ''}
+              onChange={(e) =>
+                setEditingSession({ ...editingSession, sectionId: e.target.value })
+              }
+              required
+            >
+              {sections.map((section) => (
+                <option key={section.ID_section} value={String(section.ID_section)}>
+                  {`${section.nom_section} - ${section.niveau} - ${section.nom_specialite}`}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className={styles['ENS-SUPP-form-row']}>
+            <div className={styles['ENS-SUPP-form-group']}>
+              <label>Module:</label>
+              <div style={{ position: 'relative' }}>
+                <select
+                  value={editingSession.ID_module || ''}
+                  onChange={(e) =>
+                    setEditingSession({
+                      ...editingSession,
+                      ID_module: e.target.value,
+                      nom_module:
+                        modules.find((m) => m.ID_module === e.target.value)?.nom_module ||
+                        editingSession.nom_module,
+                    })
+                  }
+                  required
+                  disabled={isModulesLoading}
+                >
+                  {editingSession.ID_module && editingSession.nom_module && (
+                    <option value={editingSession.ID_module}>
+                      {editingSession.nom_module}
+                    </option>
+                  )}
+                  {modules
+                    .filter((module) => module.ID_module !== editingSession.ID_module)
+                    .map((module) => (
+                      <option key={module.ID_module} value={String(module.ID_module)}>
+                        {module.nom_module}
+                      </option>
+                    ))}
+                </select>
+                {isModulesLoading && (
+                  <FaSpinner className={styles['ENS-SUPP-spinner']} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)' }} />
+                )}
+              </div>
+            </div>
+            <div className={styles['ENS-SUPP-form-group']}>
+              <label>Type de séance:</label>
+              <select
+                value={editingSession.type_seance || ''}
+                onChange={(e) => {
+                  const newType = e.target.value;
+                  setEditingSession((prev) => ({
+                    ...prev,
+                    type_seance: newType,
+                    groupeIds: newType === 'cours' ? [] : prev.groupeIds,
+                  }));
+                }}
+                required
+              >
+                <option value="">Sélectionner un type</option>
+                <option value="cours">Cours</option>
+                <option value="TD">TD</option>
+                <option value="TP">TP</option>
+              </select>
+            </div>
+          </div>
+          {(editingSession.type_seance === 'TD' || editingSession.type_seance === 'TP') && (
+            <div className={styles['ENS-SUPP-form-group']}>
+              <label>Groupes:</label>
+              {isGroupsLoading ? (
+                <p>Chargement des groupes... <FaSpinner className={styles['ENS-SUPP-spinner']} /></p>
+              ) : groups.length > 0 ? (
+                <div
+                  style={{
+                    padding: '8px',
+                    border: '1px solid #ddd',
+                    borderRadius: '5px',
+                    background: '#fff',
+                    maxHeight: '100px',
+                    overflowY: 'auto',
+                  }}
+                >
+                  {groups.map((group) => (
+                    <div
+                      key={group.ID_groupe}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        padding: '2px 0',
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={editingSession.groupeIds?.includes(String(group.ID_groupe)) || false}
+                        onChange={() => handleGroupChange(String(group.ID_groupe))}
+                        style={{ marginRight: '8px', cursor: 'pointer' }}
+                      />
+                      <span style={{ fontSize: '14px' }}>
+                        Groupe {group.num_groupe}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p>Aucun groupe disponible.</p>
+              )}
+            </div>
+          )}
+          <div className={styles['ENS-SUPP-form-row']}>
+            <div className={styles['ENS-SUPP-form-group']}>
+              <label>Date:</label>
+              <input
+                type="date"
+                value={editingSession.date_seance || ''}
+                onChange={(e) =>
+                  setEditingSession((prev) => ({
+                    ...prev,
+                    date_seance: e.target.value,
+                  }))
+                }
+                required
+              />
+            </div>
+            <div className={styles['ENS-SUPP-form-group']}>
+              <label>Créneau horaire:</label>
+              <select
+                value={editingSession.time_slot || ''}
+                onChange={(e) =>
+                  setEditingSession((prev) => ({
+                    ...prev,
+                    time_slot: e.target.value,
+                  }))
+                }
+                required
+              >
+                <option value="">Sélectionner un créneau</option>
+                {timeSlots.map((slot) => (
+                  <option key={slot} value={slot}>
+                    {slot}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className={styles['ENS-SUPP-form-row']}>
+            <div className={styles['ENS-SUPP-form-group']}>
+              <label>Mode:</label>
+              <select
+                value={editingSession.mode || 'presentiel'}
+                onChange={(e) => {
+                  const newMode = e.target.value;
+                  setEditingSession((prev) => ({
+                    ...prev,
+                    mode: newMode,
+                    ID_salle: newMode === 'en ligne' ? '' : prev.ID_salle,
+                    nom_salle: newMode === 'en ligne' ? '' : prev.nom_salle,
+                  }));
+                }}
+                required
+              >
+                <option value="presentiel">Présentiel</option>
+                <option value="en ligne">En ligne</option>
+              </select>
+            </div>
+            {editingSession.mode === 'presentiel' && (
+              <div className={styles['ENS-SUPP-form-group']}>
+                <label>Salle:</label>
+                <div style={{ position: 'relative' }}>
+                  <select
+                    value={editingSession.ID_salle || ''}
+                    onChange={(e) =>
+                      setEditingSession((prev) => ({
+                        ...prev,
+                        ID_salle: e.target.value,
+                        nom_salle:
+                          salles.find((s) => s.ID_salle === e.target.value)?.nom_salle ||
+                          prev.nom_salle,
+                      }))
+                    }
+                    required
+                    disabled={isSallesLoading}
+                  >
+                    <option value="">Sélectionner une salle</option>
+                    {salles.map((salle) => (
+                      <option key={salle.ID_salle} value={String(salle.ID_salle)}>
+                        {salle.nom_salle}
+                      </option>
+                    ))}
+                  </select>
+                  {isSallesLoading && (
+                    <FaSpinner className={styles['ENS-SUPP-spinner']} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)' }} />
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+          <div className={styles['ENS-SUPP-modal-actions']}>
+            <button type="submit" className={`${styles['ENS-SUPP-modern-btn']} ${styles['ENS-SUPP-save-btn']}`}>
+              <FaSave /> Enregistrer
+            </button>
+            <button
+              type="button"
+              className={`${styles['ENS-SUPP-modern-btn']} ${styles['ENS-SUPP-cancel-btn']}`}
+              onClick={handleCloseModal}
+            >
+              <FaTimes /> Annuler
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+
+  // Composant pour la modale de suppression
+  const DeleteModal = () => (
+    <div className={styles['ENS-SUPP-modal-overlay']}>
+      <div className={styles['ENS-SUPP-modal-content']} ref={deleteModalRef}>
+        <h4>Confirmation de suppression</h4>
+        <p>Voulez-vous vraiment supprimer cette séance ?</p>
+        <div className={styles['ENS-SUPP-modal-actions']} style={{ marginTop: '20px' }}>
+          <button
+            className={`${styles['ENS-SUPP-modern-btn']} ${styles['ENS-SUPP-delete-btn']}`}
+            onClick={confirmDeleteSession}
+            style={{ marginRight: '10px' }}
+          >
+            Oui, Supprimer
+          </button>
+          <button
+            className={`${styles['ENS-SUPP-modern-btn']} ${styles['ENS-SUPP-cancel-btn']}`}
+            onClick={cancelDeleteSession}
+          >
+            Annuler
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className={styles['ENS-SUPP-timetable-wrapper']}>
@@ -700,257 +925,8 @@ function Timetable({ sectionTimetable, profTimetable, matricule, sectionId, onSe
         </div>
       </div>
 
-      {editingSession && (
-        <div className={`${styles['ENS-SUPP-modal-overlay']} ${isModalClosing ? styles['ENS-SUPP-closing'] : ''}`}>
-          <div className={`${styles['ENS-SUPP-modal-content']} ${isModalClosing ? styles['ENS-SUPP-closing'] : ''}`} ref={modalRef}>
-            <h4>Modifier la séance</h4>
-            {sallesError && <p className={styles['ENS-SUPP-error-message']}>{sallesError}</p>}
-            {console.log('Modal editingSession:', editingSession)}
-            <form onSubmit={handleModifySubmit} className={styles['ENS-SUPP-modal-form']}>
-              <div className={styles['ENS-SUPP-form-group']}>
-                <label>Section:</label>
-                <select
-                  value={editingSession.sectionId || ''}
-                  onChange={(e) =>
-                    setEditingSession({ ...editingSession, sectionId: e.target.value })
-                  }
-                  required
-                >
-                  {sections.map((section) => (
-                    <option key={section.ID_section} value={String(section.ID_section)}>
-                      {`${section.nom_section} - ${section.niveau} - ${section.nom_specialite}`}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className={styles['ENS-SUPP-form-row']}>
-                <div className={styles['ENS-SUPP-form-group']}>
-                  <label>Module:</label>
-                  <div style={{ position: 'relative' }}>
-                    <select
-                      value={editingSession.ID_module || ''}
-                      onChange={(e) =>
-                        setEditingSession({
-                          ...editingSession,
-                          ID_module: e.target.value,
-                          nom_module:
-                            modules.find((m) => m.ID_module === e.target.value)?.nom_module ||
-                            editingSession.nom_module,
-                        })
-                      }
-                      required
-                      disabled={isModulesLoading}
-                    >
-                      {editingSession.ID_module && editingSession.nom_module && (
-                        <option value={editingSession.ID_module}>
-                          {editingSession.nom_module}
-                        </option>
-                      )}
-                      {modules
-                        .filter((module) => module.ID_module !== editingSession.ID_module)
-                        .map((module) => (
-                          <option key={module.ID_module} value={String(module.ID_module)}>
-                            {module.nom_module}
-                          </option>
-                        ))}
-                    </select>
-                    {isModulesLoading && (
-                      <FaSpinner className={styles['ENS-SUPP-spinner']} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)' }} />
-                    )}
-                  </div>
-                </div>
-                <div className={styles['ENS-SUPP-form-group']}>
-                  <label>Type de séance:</label>
-                  <select
-                    value={editingSession.type_seance || ''}
-                    onChange={(e) => {
-                      const newType = e.target.value;
-                      setEditingSession((prev) => ({
-                        ...prev,
-                        type_seance: newType,
-                        groupeIds: newType === 'cours' ? [] : prev.groupeIds,
-                      }));
-                    }}
-                    required
-                  >
-                    <option value="">Sélectionner un type</option>
-                    <option value="cours">Cours</option>
-                    <option value="TD">TD</option>
-                    <option value="TP">TP</option>
-                  </select>
-                </div>
-              </div>
-              {(editingSession.type_seance === 'TD' || editingSession.type_seance === 'TP') && (
-                <div className={styles['ENS-SUPP-form-group']}>
-                  <label>Groupes:</label>
-                  {isGroupsLoading ? (
-                    <p>Chargement des groupes... <FaSpinner className={styles['ENS-SUPP-spinner']} /></p>
-                  ) : groups.length > 0 ? (
-                    <div
-                      style={{
-                        padding: '8px',
-                        border: '1px solid #ddd',
-                        borderRadius: '5px',
-                        background: '#fff',
-                        maxHeight: '100px',
-                        overflowY: 'auto',
-                      }}
-                    >
-                      {groups.map((group) => (
-                        <div
-                          key={group.ID_groupe}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            padding: '2px 0',
-                          }}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={editingSession.groupeIds?.includes(String(group.ID_groupe)) || false}
-                            onChange={() => handleGroupChange(String(group.ID_groupe))}
-                            style={{ marginRight: '8px', cursor: 'pointer' }}
-                          />
-                          <span style={{ fontSize: '14px' }}>
-                            Groupe {group.num_groupe}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p>Aucun groupe disponible.</p>
-                  )}
-                </div>
-              )}
-              <div className={styles['ENS-SUPP-form-row']}>
-                <div className={styles['ENS-SUPP-form-group']}>
-                  <label>Date:</label>
-                  <input
-                    type="date"
-                    value={editingSession.date_seance || ''}
-                    onChange={(e) =>
-                      setEditingSession((prev) => ({
-                        ...prev,
-                        date_seance: e.target.value,
-                      }))
-                    }
-                    required
-                  />
-                </div>
-                <div className={styles['ENS-SUPP-form-group']}>
-                  <label>Créneau horaire:</label>
-                  <select
-                    value={editingSession.time_slot || ''}
-                    onChange={(e) =>
-                      setEditingSession((prev) => ({
-                        ...prev,
-                        time_slot: e.target.value,
-                      }))
-                    }
-                    required
-                  >
-                    <option value="">Sélectionner un créneau</option>
-                    {timeSlots.map((slot) => (
-                      <option key={slot} value={slot}>
-                        {slot}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div className={styles['ENS-SUPP-form-row']}>
-                <div className={styles['ENS-SUPP-form-group']}>
-                  <label>Mode:</label>
-                  <select
-                    value={editingSession.mode || 'presentiel'}
-                    onChange={(e) => {
-                      const newMode = e.target.value;
-                      setEditingSession((prev) => ({
-                        ...prev,
-                        mode: newMode,
-                        ID_salle: newMode === 'en ligne' ? '' : prev.ID_salle,
-                        nom_salle: newMode === 'en ligne' ? '' : prev.nom_salle,
-                      }));
-                    }}
-                    required
-                  >
-                    <option value="presentiel">Présentiel</option>
-                    <option value="en ligne">En ligne</option>
-                  </select>
-                </div>
-                {editingSession.mode === 'presentiel' && (
-                  <div className={styles['ENS-SUPP-form-group']}>
-                    <label>Salle:</label>
-                    <div style={{ position: 'relative' }}>
-                      <select
-                        value={editingSession.ID_salle || ''}
-                        onChange={(e) =>
-                          setEditingSession((prev) => ({
-                            ...prev,
-                            ID_salle: e.target.value,
-                            nom_salle:
-                              salles.find((s) => s.ID_salle === e.target.value)?.nom_salle ||
-                              prev.nom_salle,
-                          }))
-                        }
-                        required
-                        disabled={isSallesLoading}
-                      >
-                        <option value="">Sélectionner une salle</option>
-                        {salles.map((salle) => (
-                          <option key={salle.ID_salle} value={String(salle.ID_salle)}>
-                            {salle.nom_salle}
-                          </option>
-                        ))}
-                      </select>
-                      {isSallesLoading && (
-                        <FaSpinner className={styles['ENS-SUPP-spinner']} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)' }} />
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-              <div className={styles['ENS-SUPP-modal-actions']}>
-                <button type="submit" className={`${styles['ENS-SUPP-modern-btn']} ${styles['ENS-SUPP-save-btn']}`}>
-                  <FaSave /> Enregistrer
-                </button>
-                <button
-                  type="button"
-                  className={`${styles['ENS-SUPP-modern-btn']} ${styles['ENS-SUPP-cancel-btn']}`}
-                  onClick={handleCloseModal}
-                >
-                  <FaTimes /> Annuler
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {showDeleteModal && (
-        <div className={styles['ENS-SUPP-modal-overlay']}>
-          <div className={styles['ENS-SUPP-modal-content']} ref={deleteModalRef}>
-            <h4>Confirmation de suppression</h4>
-            <p>Voulez-vous vraiment supprimer cette séance ?</p>
-            <div className={styles['ENS-SUPP-modal-actions']} style={{ marginTop: '20px' }}>
-              <button
-                className={`${styles['ENS-SUPP-modern-btn']} ${styles['ENS-SUPP-delete-btn']}`}
-                onClick={confirmDeleteSession}
-                style={{ marginRight: '10px' }}
-              >
-                Oui, Supprimer
-              </button>
-              <button
-                className={`${styles['ENS-SUPP-modern-btn']} ${styles['ENS-SUPP-cancel-btn']}`}
-                onClick={cancelDeleteSession}
-              >
-                Annuler
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {editingSession && createPortal(<EditModal />, document.body)}
+      {showDeleteModal && createPortal(<DeleteModal />, document.body)}
     </div>
   );
 }

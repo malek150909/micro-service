@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { createPortal } from 'react-dom';
+import React from 'react';
 import styles from "../module.module.css";
 
 const DeleteConfirmationModal = ({ onConfirm, onCancel }) => {

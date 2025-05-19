@@ -1,9 +1,11 @@
 # Étape 1 : Construire l'application React
-FROM node:18 AS build
+FROM node:20 AS build
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
+ARG VITE_REACT_APP_WS_HOST
+ENV VITE_REACT_APP_WS_HOST=$VITE_REACT_APP_WS_HOST
 RUN npm run build
 
 # Étape 2 : Servir l'application avec Nginx

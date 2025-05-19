@@ -1,12 +1,13 @@
-
 services:
   traefik:
     image: traefik:v2.10
     ports:
       - "80:80"
+      - "8080:8080"  
     volumes:
       - ./traefik.yml:/etc/traefik/traefik.yml:ro
       - ./traefik_dynamic.yml:/traefik_dynamic.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock  
     networks:
       - microservices-net
     depends_on:
@@ -17,7 +18,7 @@ services:
       - frontend
 
   users-service:
-    image: users-service:latest
+    image: Micro-Service/users-service:latest
     build:
       context: ./users-service
       dockerfile: Dockerfile
@@ -36,7 +37,7 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
 
   courses-service:
-    image: courses-service:latest
+    image: Micro-Service/courses-service:latest
     build:
       context: ./students_schedule-service
       dockerfile: Dockerfile
@@ -55,7 +56,7 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
 
   messaging-service:
-    image: messaging-service:latest
+    image: Micro-Service/messaging-service:latest
     build:
       context: ./messages_notification-service
       dockerfile: Dockerfile
@@ -74,7 +75,7 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
 
   events-service:
-    image: events-service:latest
+    image: Micro-Service/events-service:latest
     build:
       context: ./events_clubs-service
       dockerfile: Dockerfile
@@ -93,10 +94,12 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
 
   frontend:
-    image: frontend:latest
+    image: Micro-Service/frontend:latest
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        VITE_REACT_APP_WS_HOST: ws://plateform.universitaire/ws
     ports:
       - "8085:80"
     networks:

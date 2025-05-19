@@ -1,0 +1,37 @@
+apiVersion: v1
+data:
+  nginx.conf: |
+    server {
+        listen 80;
+        server_name plateform.universitaire;
+
+        root /usr/share/nginx/html;
+        index index.html;
+
+        # Servir les fichiers statiques normalement
+        location /assets/ {
+            try_files $uri =404;
+            access_log off;
+            expires 1y;
+        }
+
+        location /favicon.ico {
+            try_files $uri =404;
+            access_log off;
+        }
+
+        # Rediriger toutes les autres requêtes vers index.html (SPA routing)
+        location / {
+            try_files $uri $uri/ /index.html;
+        }
+
+        # Gestion des erreurs
+        error_page 404 /index.html;
+    }
+kind: ConfigMap
+metadata:
+  annotations:
+    use-subpath: "true"
+  labels:
+    app: frontend
+  name: frontend-cm0

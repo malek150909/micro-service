@@ -1,6 +1,5 @@
-"use client"
 
-import { useState, useEffect } from "react"
+import React,{ useState, useEffect } from "react"
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, subDays, addDays } from "date-fns"
 import axios from "axios"
 import { Calendar } from "lucide-react"

@@ -1,6 +1,5 @@
-"use client"
 
-import { useState, useEffect } from "react"
+import React,{ useState, useEffect } from "react"
 import axios from "axios"
 import { format } from "date-fns"
 import { Save, X, Calendar, Clock, FileText, Edit } from "lucide-react"

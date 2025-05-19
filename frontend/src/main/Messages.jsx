@@ -1,4 +1,4 @@
-import React,{ useState, useEffect, useRef } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import { FaHome, FaSearch, FaPaperPlane, FaTimes, FaUser, FaPaperclip, FaEnvelope } from "react-icons/fa"
 import styles from "../main_css_files/messages.module.css"
@@ -19,6 +19,9 @@ const Messages = () => {
   const [searchResults, setSearchResults] = useState(null)
   const [recentContacts, setRecentContacts] = useState([])
   const wsRef = useRef(null)
+  const reconnectAttempts = useRef(0)
+  const maxReconnectAttempts = 5
+  const reconnectInterval = 5000 // 5 seconds
 
   const fetchUnreadMessagesCount = async (matricule) => {
     const token = localStorage.getItem("token")
@@ -58,38 +61,57 @@ const Messages = () => {
     console.log(`Initializing WebSocket and polling for ${user.Matricule}`)
     fetchReceivedMessages(user.Matricule)
 
-    wsRef.current = new WebSocket(`ws://messaging.localhost?matricule=${user.Matricule}`)
+    const connectWebSocket = () => {
+      const wsUrl = `${import.meta.env.VITE_REACT_APP_WS_HOST}?matricule=${user.Matricule}`
+      console.log(`Attempting WebSocket connection to ${wsUrl}`)
+      wsRef.current = new WebSocket(wsUrl)
 
-    wsRef.current.onopen = () => {
-      console.log(`WebSocket connected for ${user.Matricule}`)
-    }
+      wsRef.current.onopen = () => {
+        console.log(`WebSocket connected for ${user.Matricule}`)
+        reconnectAttempts.current = 0 // Reset attempts on successful connection
+        setError("") // Clear any previous connection error
+      }
 
-    wsRef.current.onmessage = (event) => {
-      const message = JSON.parse(event.data)
-      console.log(`Received WebSocket message for ${user.Matricule}:`, message)
-      if (message.type === "new_message" && message.destinataire === user.Matricule) {
-        setReceivedMessages((prev) => [...prev, message])
-        saveRecentContact({
-          Matricule: message.expediteur,
-          nom: message.nom,
-          prenom: message.prenom,
-          email: message.email,
-          lastMessageDate: message.date_envoi,
-        })
-        fetchUnreadMessagesCount(user.Matricule).then((count) => {
-          localStorage.setItem(`unreadMessagesCount_${user.Matricule}`, count)
-          window.dispatchEvent(new CustomEvent("unreadMessagesCountUpdated", { detail: { count } }))
-        })
+      wsRef.current.onmessage = (event) => {
+        const message = JSON.parse(event.data)
+        console.log(`Received WebSocket message for ${user.Matricule}:`, message)
+        if (message.type === "new_message" && message.destinataire === user.Matricule) {
+          setReceivedMessages((prev) => [...prev, message])
+          saveRecentContact({
+            Matricule: message.expediteur,
+            nom: message.nom,
+            prenom: message.prenom,
+            email: message.email,
+            lastMessageDate: message.date_envoi,
+          })
+          fetchUnreadMessagesCount(user.Matricule).then((count) => {
+            localStorage.setItem(`unreadMessagesCount_${user.Matricule}`, count)
+            window.dispatchEvent(new CustomEvent("unreadMessagesCountUpdated", { detail: { count } }))
+          })
+        }
+      }
+
+      wsRef.current.onclose = (event) => {
+        console.log(`WebSocket disconnected for ${user.Matricule}. Code: ${event.code}, Reason: ${event.reason}`)
+        if (reconnectAttempts.current < maxReconnectAttempts) {
+          console.log(`Reconnecting WebSocket in ${reconnectInterval / 1000} seconds... Attempt ${reconnectAttempts.current + 1}`)
+          setTimeout(() => {
+            reconnectAttempts.current += 1
+            connectWebSocket()
+          }, reconnectInterval)
+        } else {
+          console.error(`Max reconnect attempts reached for ${user.Matricule}`)
+          setError("Impossible de se connecter au service de messagerie. Veuillez réessayer plus tard.")
+        }
+      }
+
+      wsRef.current.onerror = (err) => {
+        console.error(`WebSocket error for ${user.Matricule}:`, err)
+        setError("Erreur de connexion au service de messagerie. Tentative de reconnexion en cours...")
       }
     }
 
-    wsRef.current.onclose = () => {
-      console.log(`WebSocket disconnected for ${user.Matricule}`)
-    }
-
-    wsRef.current.onerror = (err) => {
-      console.error(`WebSocket error for ${user.Matricule}:`, err)
-    }
+    connectWebSocket()
 
     const intervalId = setInterval(() => {
       console.log(`Fallback polling for ${user.Matricule} at ${new Date().toISOString()}`)
@@ -455,7 +477,7 @@ const Messages = () => {
                           <div className={styles["MSG-file-attachment"]}>
                             <span>Fichier : </span>
                             <a
-                              href={`http://messaging.localhost/Uploads/${msg.filePath}`}
+                              href={`http://messaging.localhost/uploads/${msg.filePath}`}
                               target="_blank"
                               rel="noopener noreferrer"
                             >

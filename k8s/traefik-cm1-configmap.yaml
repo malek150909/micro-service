@@ -1,0 +1,58 @@
+apiVersion: v1
+data:
+  traefik_dynamic.yml: |-
+    http:
+      routers:
+        users:
+          rule: "Host(`users.localhost`)"
+          service: "users-service"
+          entryPoints:
+            - "web"
+        courses:
+          rule: "Host(`courses.localhost`)"
+          service: "courses-service"
+          entryPoints:
+            - "web"
+        messaging:
+          rule: "Host(`messaging.localhost`)"
+          service: "messaging-service"
+          entryPoints:
+            - "web"
+        events:
+          rule: "Host(`events.localhost`)"
+          service: "events-service"
+          entryPoints:
+            - "web"
+        frontend:
+          rule: "Host(`plateform.universitaire`)"
+          service: "frontend"
+          entryPoints:
+            - "web"
+      services:
+        users-service:
+          loadBalancer:
+            servers:
+              - url: "http://users-service:8081"
+        courses-service:
+          loadBalancer:
+            servers:
+              - url: "http://courses-service:8083"
+        messaging-service:
+          loadBalancer:
+            servers:
+              - url: "http://messaging-service:8082"
+        events-service:
+          loadBalancer:
+            servers:
+              - url: "http://events-service:8084"
+        frontend:
+          loadBalancer:
+            servers:
+              - url: "http://frontend:80" # Port 80 car le frontend écoute sur 80 dans le conteneur
+kind: ConfigMap
+metadata:
+  annotations:
+    use-subpath: "true"
+  labels:
+    app: traefik
+  name: traefik-cm1

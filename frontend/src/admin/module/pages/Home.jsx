@@ -165,6 +165,7 @@ const Home = () => {
             onDelete={handleDeleteModule}
             onUpdate={handleUpdateModule}
             niveau={filters.niveau}
+            sectionId={filters.section}
           />
         ) : (
           <p className={styles['ADM-MDL-no-results']}>

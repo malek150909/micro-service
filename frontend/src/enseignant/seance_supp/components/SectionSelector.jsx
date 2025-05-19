@@ -1,3 +1,4 @@
+import React from "react"
 import styles from "../css/seance_supp.module.css";
 
 function SectionSelector({ sections, onSelect }) {

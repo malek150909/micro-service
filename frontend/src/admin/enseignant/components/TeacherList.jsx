@@ -1,6 +1,5 @@
-"use client"
 
-import { useState } from "react"
+import React,{ useState } from "react"
 import styles from "../styles/prof.module.css"
 import { FaTrash, FaFilter, FaList } from "react-icons/fa"
 import api, { normalizeTeacher } from "./api-config"

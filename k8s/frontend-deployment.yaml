@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    app: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: frontend:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          env:
+            - name: API_COURSES_URL
+              value: http://courses-service
+            - name: API_EVENTS_URL
+              value: http://events-service
+            - name: API_MESSAGING_URL
+              value: http://messaging-service
+            - name: API_USERS_URL
+              value: http://users-service
+      restartPolicy: Always

@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    use-subpath: "true"
+  labels:
+    app: traefik
+  name: traefik-cm0
+data:
+  traefik.yml: |
+    entryPoints:
+      web:
+        address: ":80"
+      traefik:
+        address: ":8080"
+
+    providers:
+      kubernetesIngress: {}
+      kubernetesCRD: {}
+      file:
+        filename: "/traefik_dynamic.yml"
+        watch: true
+
+    api:
+      dashboard: true

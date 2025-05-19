@@ -4,6 +4,7 @@ import { FaTrash, FaTimes, FaEdit } from "react-icons/fa"
 import api, { generateRandomPassword, isValidEmail, normalizeTeacher } from "./api-config"
 import * as XLSX from "xlsx"
 
+// Autres modales (AddTeacherModal, ImportTeachersModal, DeleteConfirmationModal, AssignmentsModal) restent inchangées
 export const AddTeacherModal = ({ showAddModal, setShowAddModal, formData, setFormData, faculties, filteredDepartments, handleInputChange, resetFormData, setSelectedTeacher, setShowDetailsModal, fetchTeachers, error, setError, success, setSuccess }) => {
   const handleAddSubmit = async (e) => {
     e.preventDefault();
@@ -144,85 +145,43 @@ export const AddTeacherModal = ({ showAddModal, setShowAddModal, formData, setFo
 };
 
 export const TeacherDetailsModal = ({ showDetailsModal, setShowDetailsModal, selectedTeacher, setSelectedTeacher, formData, setFormData, isEditing, setIsEditing, faculties, departments, filteredDepartments, handleInputChange, resetFormData, setTeacherToDelete, setShowDeleteModal, fetchTeachers, error, setError, success, setSuccess }) => {
-  const [sections, setSections] = React.useState([]);
-  const [modules, setModules] = React.useState([]);
-  const [groups, setGroups] = React.useState([]);
+  // Suppression de l'état et des effets liés aux sections et modules
+  // const [sections, setSections] = React.useState([]);
+  // const [modules, setModules] = React.useState([]);
+  // const [groups, setGroups] = React.useState([]);
+  //
+  // React.useEffect(() => {
+  //   if (isEditing && formData.assignedSections.length > 0) {
+  //     api.get(`/enseignants/groups?sectionIds=${formData.assignedSections.join(',')}`, {
+  //       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+  //     })
+  //       .then(response => setGroups(response.data))
+  //       .catch(err => setError('Erreur lors de la récupération des groupes'));
+  //
+  //     const specialtyIds = sections
+  //       .filter(section => formData.assignedSections.includes(section.ID_section))
+  //       .map(section => section.ID_specialite);
+  //     if (specialtyIds.length > 0) {
+  //       api.post(`/enseignants/modules/by-sections-specialty`, {
+  //         sectionIds: formData.assignedSections,
+  //         specialtyId: specialtyIds[0]
+  //       }, {
+  //         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+  //       })
+  //         .then(response => setModules(response.data))
+  //         .catch(err => setError('Erreur lors de la récupération des modules'));
+  //     }
+  //   } else {
+  //     setModules([]);
+  //     setGroups([]);
+  //   }
+  // }, [formData.assignedSections, sections, isEditing, setError]);
 
-  React.useEffect(() => {
-    if (isEditing && formData.assignedSections.length > 0) {
-      api.get(`/enseignants/groups?sectionIds=${formData.assignedSections.join(',')}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      })
-        .then(response => setGroups(response.data))
-        .catch(err => setError('Erreur lors de la récupération des groupes'));
-
-      const specialtyIds = sections
-        .filter(section => formData.assignedSections.includes(section.ID_section))
-        .map(section => section.ID_specialite);
-      if (specialtyIds.length > 0) {
-        api.post(`/enseignants/modules/by-sections-specialty`, {
-          sectionIds: formData.assignedSections,
-          specialtyId: specialtyIds[0]
-        }, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        })
-          .then(response => setModules(response.data))
-          .catch(err => setError('Erreur lors de la récupération des modules'));
-      }
-    } else {
-      setModules([]);
-      setGroups([]);
-    }
-  }, [formData.assignedSections, sections, isEditing, setError]);
-
-  const handleSectionChange = (sectionId) => {
-    setFormData(prev => {
-      const assignedSections = prev.assignedSections.includes(sectionId)
-        ? prev.assignedSections.filter(id => id !== sectionId)
-        : [...prev.assignedSections, sectionId];
-      return { ...prev, assignedSections, assignedModules: [], moduleSessionTypes: {}, assignedGroups: {} };
-    });
-  };
-
-  const handleModuleChange = (moduleId) => {
-    setFormData(prev => {
-      const assignedModules = prev.assignedModules.includes(moduleId)
-        ? prev.assignedModules.filter(id => id !== moduleId)
-        : [...prev.assignedModules, moduleId];
-      const moduleSessionTypes = { ...prev.moduleSessionTypes };
-      const assignedGroups = { ...prev.assignedGroups };
-      if (!assignedModules.includes(moduleId)) {
-        delete moduleSessionTypes[moduleId];
-        delete assignedGroups[moduleId];
-      }
-      return { ...prev, assignedModules, moduleSessionTypes, assignedGroups };
-    });
-  };
-
-  const handleSessionTypeChange = (moduleId, courseType) => {
-    setFormData(prev => {
-      const moduleSessionTypes = { ...prev.moduleSessionTypes, [moduleId]: courseType };
-      const assignedGroups = { ...prev.assignedGroups };
-      if (!courseType.includes('TD') && !courseType.includes('TP')) {
-        delete assignedGroups[moduleId];
-      }
-      return { ...prev, moduleSessionTypes, assignedGroups };
-    });
-  };
-
-  const handleGroupChange = (moduleId, courseType, groupId) => {
-    setFormData(prev => {
-      const assignedGroups = { ...prev.assignedGroups };
-      if (!assignedGroups[moduleId]) {
-        assignedGroups[moduleId] = { TD: [], TP: [] };
-      }
-      const groupsForType = assignedGroups[moduleId][courseType] || [];
-      assignedGroups[moduleId][courseType] = groupsForType.includes(groupId)
-        ? groupsForType.filter(id => id !== groupId)
-        : [...groupsForType, groupId];
-      return { ...prev, assignedGroups };
-    });
-  };
+  // Suppression des fonctions de gestion des sections, modules et groupes
+  // const handleSectionChange = (sectionId) => { ... };
+  // const handleModuleChange = (moduleId) => { ... };
+  // const handleSessionTypeChange = (moduleId, courseType) => { ... };
+  // const handleGroupChange = (moduleId, courseType, groupId) => { ... };
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
@@ -231,21 +190,17 @@ export const TeacherDetailsModal = ({ showDetailsModal, setShowDetailsModal, sel
       return;
     }
     try {
-      const derivedSections =
-        formData.assignedSections.length > 0
-          ? formData.assignedSections
-          : [...new Set(Object.values(formData.moduleSections).filter((id) => id))];
-
       const updatedData = {
         nom: formData.nom || selectedTeacher.nom,
         prenom: formData.prenom || selectedTeacher.prenom,
         email: formData.email || selectedTeacher.email,
         ID_faculte: Number.parseInt(formData.facultyId) || selectedTeacher.ID_faculte,
         ID_departement: Number.parseInt(formData.departmentId) || selectedTeacher.ID_departement,
-        assignedModules: formData.assignedModules,
-        assignedSections: derivedSections,
-        moduleSessionTypes: formData.moduleSessionTypes,
-        assignedGroups: formData.assignedGroups
+        // Suppression des champs liés aux sections, modules et groupes
+        // assignedModules: formData.assignedModules,
+        // assignedSections: derivedSections,
+        // moduleSessionTypes: formData.moduleSessionTypes,
+        // assignedGroups: formData.assignedGroups
       };
       console.log("Data being sent to backend:", updatedData);
       await api.put(`/teachers/${selectedTeacher.matricule}`, updatedData);
@@ -349,111 +304,7 @@ export const TeacherDetailsModal = ({ showDetailsModal, setShowDetailsModal, sel
                   required
                 />
               </div>
-              <div className={styles["ADM-ENS-form-section"]}>
-                <label>Sections</label>
-                <div className={styles["ADM-ENS-section-tags"]}>
-                  {sections.map(section => (
-                    <div key={section.ID_section} className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id={`section-${section.ID_section}`}
-                        checked={formData.assignedSections.includes(section.ID_section)}
-                        onChange={() => handleSectionChange(section.ID_section)}
-                        className="mr-2"
-                      />
-                      <label htmlFor={`section-${section.ID_section}`}>
-                        {section.nom_section} ({section.niveau}, {section.nom_specialite})
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className={styles["ADM-ENS-form-section"]}>
-                <label>Modules</label>
-                <div className={styles["ADM-ENS-section-tags"]}>
-                  {modules.map(module => (
-                    <div key={module.ID_module} className="mb-2">
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id={`module-${module.ID_module}`}
-                          checked={formData.assignedModules.includes(module.ID_module)}
-                          onChange={() => handleModuleChange(module.ID_module)}
-                          className="mr-2"
-                        />
-                        <label htmlFor={`module-${module.ID_module}`}>
-                          {module.nom_module}
-                        </label>
-                      </div>
-                      {formData.assignedModules.includes(module.ID_module) && (
-                        <div className="ml-6 mt-2">
-                          <label className="block text-gray-600 text-sm">Type de séance</label>
-                          <select
-                            value={formData.moduleSessionTypes[module.ID_module] || 'Cour'}
-                            onChange={(e) => handleSessionTypeChange(module.ID_module, e.target.value)}
-                            className={styles["ADM-ENS-select"]}
-                          >
-                            <option value="Cour">Cour</option>
-                            <option value="Cour/TD">Cour/TD</option>
-                            <option value="Cour/TP">Cour/TP</option>
-                            <option value="Cour/TD/TP">Cour/TD/TP</option>
-                            <option value="TD">TD</option>
-                            <option value="TP">TP</option>
-                            <option value="enligne">En ligne</option>
-                          </select>
-                          {(formData.moduleSessionTypes[module.ID_module]?.includes('TD') ||
-                            formData.moduleSessionTypes[module.ID_module]?.includes('TP')) && (
-                            <div className="mt-2">
-                              {formData.moduleSessionTypes[module.ID_module]?.includes('TD') && (
-                                <div>
-                                  <label className="block text-gray-600 text-sm">Groupes pour TD</label>
-                                  <div className={styles["ADM-ENS-section-tags"]}>
-                                    {groups.map(group => (
-                                      <div key={group.ID_groupe} className="flex items-center">
-                                        <input
-                                          type="checkbox"
-                                          id={`group-td-${module.ID_module}-${group.ID_groupe}`}
-                                          checked={formData.assignedGroups[module.ID_module]?.TD?.includes(group.ID_groupe) || false}
-                                          onChange={() => handleGroupChange(module.ID_module, 'TD', group.ID_groupe)}
-                                          className="mr-2"
-                                        />
-                                        <label htmlFor={`group-td-${module.ID_module}-${group.ID_groupe}`}>
-                                          Groupe {group.num_groupe} ({group.nom_section})
-                                        </label>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                              )}
-                              {formData.moduleSessionTypes[module.ID_module]?.includes('TP') && (
-                                <div>
-                                  <label className="block text-gray-600 text-sm">Groupes pour TP</label>
-                                  <div className={styles["ADM-ENS-section-tags"]}>
-                                    {groups.map(group => (
-                                      <div key={group.ID_groupe} className="flex items-center">
-                                        <input
-                                          type="checkbox"
-                                          id={`group-tp-${module.ID_module}-${group.ID_groupe}`}
-                                          checked={formData.assignedGroups[module.ID_module]?.TP?.includes(group.ID_groupe) || false}
-                                          onChange={() => handleGroupChange(module.ID_module, 'TP', group.ID_groupe)}
-                                          className="mr-2"
-                                        />
-                                        <label htmlFor={`group-tp-${module.ID_module}-${group.ID_groupe}`}>
-                                          Groupe {group.num_groupe} ({group.nom_section})
-                                        </label>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
+              {/* Suppression des sections pour les sections et modules */}
               <div className={styles["ADM-ENS-modal-actions"]}>
                 <button type="submit" className={styles["ADM-ENS-button"]}>
                   Enregistrer
@@ -471,42 +322,12 @@ export const TeacherDetailsModal = ({ showDetailsModal, setShowDetailsModal, sel
                       departmentId: selectedTeacher.ID_departement || "",
                       specialtyId: "",
                       level: "",
-                      assignedModules: Array.isArray(selectedTeacher.modules)
-                        ? selectedTeacher.modules.map((m) => m.ID_module)
-                        : [],
-                      assignedSections: Array.isArray(selectedTeacher.sections)
-                        ? selectedTeacher.sections.map((s) => s.ID_section)
-                        : [],
-                      moduleSessionTypes: Array.isArray(selectedTeacher.modules)
-                        ? selectedTeacher.modules.reduce(
-                            (acc, m) => ({
-                              ...acc,
-                              [m.ID_module]: m.course_type,
-                            }),
-                            {},
-                          )
-                        : {},
-                      moduleSections: Array.isArray(selectedTeacher.modules)
-                        ? selectedTeacher.modules.reduce(
-                            (acc, m) => ({
-                              ...acc,
-                              [m.ID_module]: m.ID_section,
-                            }),
-                            {},
-                          )
-                        : {},
-                      assignedGroups: Array.isArray(selectedTeacher.groups)
-                        ? selectedTeacher.groups.reduce(
-                            (acc, g) => ({
-                              ...acc,
-                              [g.ID_module]: {
-                                ...acc[g.ID_module],
-                                [g.course_type]: [...(acc[g.ID_module]?.[g.course_type] || []), g.ID_groupe],
-                              },
-                            }),
-                            {},
-                          )
-                        : {},
+                      // Suppression des initialisations liées aux sections, modules et groupes
+                      assignedModules: [],
+                      assignedSections: [],
+                      moduleSessionTypes: {},
+                      moduleSections: {},
+                      assignedGroups: {},
                     });
                     setError("");
                     setSuccess("");
@@ -514,15 +335,7 @@ export const TeacherDetailsModal = ({ showDetailsModal, setShowDetailsModal, sel
                 >
                   Annuler
                 </button>
-                <button
-                  className={styles["ADM-ENS-delete-button"]}
-                  onClick={() => {
-                    setTeacherToDelete(selectedTeacher);
-                    setShowDeleteModal(true);
-                  }}
-                >
-                  <FaTrash /> Supprimer
-                </button>
+                {/* Suppression du bouton Supprimer */}
               </div>
             </form>
           </>
@@ -582,42 +395,12 @@ export const TeacherDetailsModal = ({ showDetailsModal, setShowDetailsModal, sel
                     departmentId: selectedTeacher.ID_departement || "",
                     specialtyId: "",
                     level: "",
-                    assignedModules: Array.isArray(selectedTeacher.modules)
-                      ? selectedTeacher.modules.map((m) => m.ID_module)
-                      : [],
-                    assignedSections: Array.isArray(selectedTeacher.sections)
-                      ? selectedTeacher.sections.map((s) => s.ID_section)
-                      : [],
-                    moduleSessionTypes: Array.isArray(selectedTeacher.modules)
-                      ? selectedTeacher.modules.reduce(
-                          (acc, m) => ({
-                            ...acc,
-                            [m.ID_module]: m.course_type,
-                          }),
-                          {},
-                        )
-                      : {},
-                    moduleSections: Array.isArray(selectedTeacher.modules)
-                      ? selectedTeacher.modules.reduce(
-                          (acc, m) => ({
-                            ...acc,
-                            [m.ID_module]: m.ID_section,
-                          }),
-                          {},
-                        )
-                      : {},
-                    assignedGroups: Array.isArray(selectedTeacher.groups)
-                      ? selectedTeacher.groups.reduce(
-                          (acc, g) => ({
-                            ...acc,
-                            [g.ID_module]: {
-                              ...acc[g.ID_module],
-                              [g.course_type]: [...(acc[g.ID_module]?.[g.course_type] || []), g.ID_groupe],
-                            },
-                          }),
-                          {},
-                        )
-                      : {},
+                    // Suppression des initialisations liées aux sections, modules et groupes
+                    assignedModules: [],
+                    assignedSections: [],
+                    moduleSessionTypes: {},
+                    moduleSections: {},
+                    assignedGroups: {},
                   });
                   setError("");
                   setSuccess("");
@@ -643,7 +426,7 @@ export const TeacherDetailsModal = ({ showDetailsModal, setShowDetailsModal, sel
   );
 };
 
-// Other modals remain unchanged
+// ImportTeachersModal, DeleteConfirmationModal, et AssignmentsModal restent inchangés
 export const ImportTeachersModal = ({ showImportModal, setShowImportModal, importData, setImportData, faculties, filteredDepartments, handleImportInputChange, resetImportData, setTeachers, error, setError, success, setSuccess, setSelectedTeacher }) => {
   const handleImportSubmit = async (e) => {
     e.preventDefault();
@@ -1318,7 +1101,7 @@ export const AssignmentsModal = ({ showAssignmentsModal, setShowAssignmentsModal
                               ...acc,
                               [m.ID_module]: m.course_type,
                             }),
-                            {},
+                            {}
                           )
                         : {},
                       moduleSections: Array.isArray(selectedTeacher.modules)
@@ -1327,7 +1110,7 @@ export const AssignmentsModal = ({ showAssignmentsModal, setShowAssignmentsModal
                               ...acc,
                               [m.ID_module]: m.ID_section,
                             }),
-                            {},
+                            {}
                           )
                         : {},
                       assignedGroups: Array.isArray(selectedTeacher.groups)
@@ -1339,7 +1122,7 @@ export const AssignmentsModal = ({ showAssignmentsModal, setShowAssignmentsModal
                                 [g.course_type]: [...(acc[g.ID_module]?.[g.course_type] || []), g.ID_groupe],
                               },
                             }),
-                            {},
+                            {}
                           )
                         : {},
                     });

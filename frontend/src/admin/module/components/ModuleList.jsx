@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
@@ -7,7 +7,7 @@ import styles from "../module.module.css";
 
 const API_URL = 'http://courses.localhost/modules';
 
-const ModuleList = ({ modules, onDelete, onUpdate, niveau }) => {
+const ModuleList = ({ modules, onDelete, onUpdate, niveau, sectionId }) => {
   const [editingModule, setEditingModule] = useState(null);
   const [editFormData, setEditFormData] = useState({
     nom_module: '',
@@ -48,16 +48,14 @@ const ModuleList = ({ modules, onDelete, onUpdate, niveau }) => {
     setShowDeleteModal(moduleId);
   };
 
-  const handleConfirmDelete = async () => {
-    try {
-      await axios.delete(`${API_URL}/${showDeleteModal}`);
-      onDelete(showDeleteModal);
-      setShowDeleteModal(null);
-    } catch (err) {
-      console.error('Erreur de suppression du module:', err);
-      alert(`Erreur de suppression du module: ${err.response?.data?.error || err.message}`);
-    }
-  };
+  const handleConfirmDelete = () => {
+  if (!sectionId) {
+    alert('Veuillez sélectionner une section avant de supprimer un module.');
+    return;
+  }
+  onDelete(showDeleteModal); // Appeler handleDeleteModule depuis Home.jsx
+  setShowDeleteModal(null);
+};
 
   const handleCancelDelete = () => {
     setShowDeleteModal(null);

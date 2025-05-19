@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React,{ useState, useEffect, useRef } from 'react';
 import { FaUsers, FaBook, FaFileAlt, FaFileUpload, FaInfoCircle } from 'react-icons/fa';
 import styles from '../ressources.module.css';
 

@@ -5,44 +5,72 @@ http:
       service: "users-service"
       entryPoints:
         - "web"
+
     courses:
       rule: "Host(`courses.localhost`)"
       service: "courses-service"
       entryPoints:
         - "web"
-    messaging:
-      rule: "Host(`messaging.localhost`)"
+
+    messaging-http:
+      rule: "Host(`messaging.localhost`) && PathPrefix(`/api`)"
       service: "messaging-service"
       entryPoints:
         - "web"
+      priority: 100
+
+    messaging-ws:
+      rule: "Host(`messaging.localhost`)"
+      service: "messaging-service-ws"
+      entryPoints:
+        - "web"
+      priority: 90
+
     events:
       rule: "Host(`events.localhost`)"
       service: "events-service"
       entryPoints:
         - "web"
+
     frontend:
       rule: "Host(`plateform.universitaire`)"
       service: "frontend"
       entryPoints:
         - "web"
+
+    frontend-ws:
+      rule: "Host(`plateform.universitaire`) && PathPrefix(`/ws`)"
+      service: "messaging-service-ws"
+      entryPoints:
+        - "web"
+
   services:
     users-service:
       loadBalancer:
         servers:
           - url: "http://users-service:8081"
+
     courses-service:
       loadBalancer:
         servers:
           - url: "http://courses-service:8083"
+
     messaging-service:
       loadBalancer:
         servers:
           - url: "http://messaging-service:8082"
+
+    messaging-service-ws:
+      loadBalancer:
+        servers:
+          - url: "http://messaging-service:8082"
+
     events-service:
       loadBalancer:
         servers:
           - url: "http://events-service:8084"
+
     frontend:
       loadBalancer:
         servers:
-          - url: "http://frontend:80" # Port 80 car le frontend écoute sur 80 dans le conteneur
+          - url: "http://frontend:80"

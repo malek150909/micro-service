@@ -36,6 +36,9 @@ app.use(express.json()); // Parsing JSON avant les routes
 app.use(bodyParser.json()); // Parsing JSON avant les routes (optionnel si vous utilisez express.json())
 app.use(express.urlencoded({ extended: true }));
 
+app.use('/uploads', express.static(path.resolve(__dirname, 'uploads')));
+
+
 // Routes (après les middlewares qui consomment le flux)
 app.use('/annonces',authMiddleware ,annonceRoutes);
 app.use("/api/users", userRoutes);
@@ -47,7 +50,6 @@ app.use('/sondages', sondageRoutes);
 app.use('/notifications', notificationRoutes);
 
 // Serve static files
-app.use('/uploads', express.static(path.resolve(__dirname, 'uploads')));
 
 // Gestion des erreurs globale
 app.use((err, req, res, next) => {

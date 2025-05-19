@@ -99,7 +99,7 @@ const Message = {
       );
 
       // Supprimer les fichiers joints
-      const uploadsDir = path.resolve(__dirname, '../Uploads');
+      const uploadsDir = path.resolve(__dirname, '../uploads');
       messages.forEach((msg) => {
         if (msg.filePath) {
           const filePath = path.join(uploadsDir, msg.filePath);
